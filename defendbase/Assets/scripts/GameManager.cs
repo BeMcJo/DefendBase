@@ -1,11 +1,35 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
+[Serializable]
+public class PlayerData
+{
+    public bool savedGame;
+    public int wave,
+        objectiveHP,
+        score,
+        totalKills;
+
+    public PlayerData()
+    {
+        savedGame = false;
+        wave = 0;
+        objectiveHP = 0;
+        score = 0;
+        totalKills = 0;
+    }
+}
+
 public class GameManager : MonoBehaviour {
     public static GameManager gm;
+
+    public PlayerData data;
 
     public bool inGame,
                 startWaves,
@@ -13,6 +37,7 @@ public class GameManager : MonoBehaviour {
                 doneSpawningWave,
                 setupRotation,
                 gyroEnabled,
+                onIntermission,
                 paused;
 
     public int wave,
@@ -31,6 +56,7 @@ public class GameManager : MonoBehaviour {
                       enemyPrefab;
 
     public GameObject playerStatusCanvas,
+                      intermissionCanvas,
                       player,
                       playerSpawnPoint,
                       playerRotation,
@@ -51,6 +77,64 @@ public class GameManager : MonoBehaviour {
 
     Pattern pattern;
 
+    public void Save(string type)
+    {
+        BinaryFormatter bf = new BinaryFormatter();
+        string path = Application.persistentDataPath + "/" + type + ".dat";
+        //if (type == "continuedGame")
+        if (!File.Exists(path))
+        {
+            File.Create(path);
+        }
+        FileStream file = File.Open(path, FileMode.Open);
+
+        switch (type)
+        {
+            case "continuedGame":
+                PlayerData data = new PlayerData();
+                data.savedGame = inGame;
+                data.totalKills = totalKills;
+                data.score = score;
+                if(objective != null)
+                    data.objectiveHP = objective.transform.GetComponent<Objective>().HP;
+                data.wave = wave;
+                gm.data = data;
+                bf.Serialize(file, data);
+                break;
+        }
+        
+        file.Close();
+        Debug.Log("saved");
+    }
+
+    public void Load(string type)
+    {
+        string path = Application.persistentDataPath + "/" + type + ".dat";
+        if (File.Exists(path))
+        {
+            BinaryFormatter bf = new BinaryFormatter();
+            FileStream file = File.Open(path, FileMode.Open);
+
+            if (file.Length <= 0)
+            {
+                Debug.Log("File is empty. No loading");
+                file.Close();
+                return;
+            }
+            switch (type)
+            {
+                case "continuedGame":
+                    PlayerData data = (PlayerData)bf.Deserialize(file);
+                    gm.data = data;
+                    break;
+            }
+            //Debug.Log(file.Length);
+
+            file.Close();
+        }
+        Debug.Log("File Does Not Exists");
+    }
+
     // Use this for initialization
 
     void Start () {
@@ -58,9 +142,12 @@ public class GameManager : MonoBehaviour {
             return;
         //Debug.Log("START");
         gm = this;
+        gm.data = new PlayerData();
+        //data = new PlayerData();
         DontDestroyOnLoad(gm);
         playerOrientation = Vector3.zero;
         Screen.orientation = ScreenOrientation.Landscape;
+        Load("continuedGame");
         LoadMainScene();
         EnemySpawnPattern.InstantiatePatterns();
     }
@@ -113,12 +200,18 @@ public class GameManager : MonoBehaviour {
         inGame = false;
         setupRotation = true;
         mainMenuCanvas = GameObject.Find("MainMenuCanvas");
-        mainMenuCanvas.transform.Find("PlayBtn").GetComponent<Button>().onClick.AddListener(GoToGameScene);
-        mainMenuCanvas.transform.Find("SettingsBtn").GetComponent<Button>().onClick.AddListener(GoToCalibrationScene);
+        Transform btnContainer = mainMenuCanvas.transform.Find("ButtonsContainer");
+        btnContainer.Find("PlayBtn").GetComponent<Button>().onClick.AddListener(GoToGameScene);
+        //mainMenuCanvas.transform.Find("OnlineBtn").GetComponent<Button>().onClick.AddListener(Save);
+        btnContainer.Find("SettingsBtn").GetComponent<Button>().onClick.AddListener(GoToCalibrationScene);
+        btnContainer.Find("ContinueBtn").GetComponent<Button>().onClick.AddListener(GoToGameScene);
+        btnContainer.Find("ContinueBtn").GetChild(0).GetComponent<Text>().text += (data != null && data.savedGame) ? " (Wave " + (data.wave+1) + ")" : "";
+        btnContainer.Find("ContinueBtn").gameObject.SetActive(data != null && data.savedGame);
     }
 
     public void LoadGameScene()
     {
+        Save("continuedGame");
         scene = "game";
         inGame = true;
         paused = false;
@@ -128,6 +221,10 @@ public class GameManager : MonoBehaviour {
         //setupRotation = false;
         //gyroEnabled = true;
         totalKills = 0;
+        intermissionCanvas = GameObject.Find("IntermissionCanvas");
+        intermissionCanvas.transform.Find("SaveAndQuitBtn").GetComponent<Button>().onClick.AddListener(SaveAndQuit);
+        intermissionCanvas.transform.Find("ResumeBtn").GetComponent<Button>().onClick.AddListener(NextWave);
+        intermissionCanvas.SetActive(false);
         enemiesContainer = GameObject.Find("EnemiesContainer");
         projectilesContainer = GameObject.Find("ProjectilesContainer");
         particleEffectsContainer = GameObject.Find("ParticleEffectsContainer");
@@ -151,6 +248,26 @@ public class GameManager : MonoBehaviour {
         optionsCanvas.SetActive(false);
         StartCoroutine(MapManager.mapManager.LoadGameScene());
         StartGame();
+    }
+
+    public void SaveAndQuit()
+    {
+        Save("continuedGame");
+        GoToMainScene();
+    }
+
+    public void NextWave()
+    {
+        intermissionCanvas.SetActive(false);
+        StartWave(wave);
+    }
+
+    public void DisplayIntermission()
+    {
+        onIntermission = true;
+        startWaves = false;
+        intermissionCanvas.SetActive(true);
+        intermissionCanvas.transform.Find("StatsTxt").GetComponent<Text>().text = "Score: " + score + "\tKills: " + totalKills + "\nNext Wave: " + (wave + 1);
     }
 
     public void DisplayOptions()
@@ -305,11 +422,21 @@ public class GameManager : MonoBehaviour {
         Debug.Log("Starting Game");
         inGame = true;
         paused = false;
+        
         score = 0;
         kills = 0;
+        wave = 0;
         totalKills = 0;
         MapManager.mapManager.LoadMap(0);
-        StartWave(0);
+        if (data != null && data.savedGame)
+        {
+            score = data.score;
+            totalKills = data.totalKills;
+            wave = data.wave;
+            objective.transform.GetComponent<Objective>().HP = data.objectiveHP;
+        }
+        //data = new PlayerData();
+        StartWave(wave);
     }
 
     void StartWave(int w)
@@ -317,6 +444,7 @@ public class GameManager : MonoBehaviour {
         //Debug.Log("Starting Wave " + w);
         //Debug.Log("Displaying wave");
         //spawnIndex = 0;
+        onIntermission = false;
         ResetSpawnSetup(w);
         pattern = EnemySpawnPattern.patternsBySpawnPointCt[0][w % EnemySpawnPattern.patternsBySpawnPointCt[0].Count];   
         patternIterations = pattern.iterations;
@@ -329,7 +457,7 @@ public class GameManager : MonoBehaviour {
         spawning = true;
         enemiesSpawned++;
         GameObject enemy = Instantiate(enemyPrefab);
-        GameObject spawnPoint = MapManager.mapManager.spawnPoints[Random.Range(0, MapManager.mapManager.spawnPoints.Count)];
+        GameObject spawnPoint = MapManager.mapManager.spawnPoints[UnityEngine.Random.Range(0, MapManager.mapManager.spawnPoints.Count)];
         enemy.transform.position = new Vector3(
                                     spawnPoint.transform.position.x,
                                     enemy.transform.position.y,
@@ -441,10 +569,19 @@ public class GameManager : MonoBehaviour {
         }
         else
         {
-            if(kills == enemiesSpawned)
+            if(kills == enemiesSpawned && !onIntermission)
             {
+                startWaves = false;
                 wave++;
-                StartWave(wave);
+                if(wave % 5 == 0)
+                {
+                    DisplayIntermission();
+                    //intermissionCanvas.SetActive(true);
+                }
+                else
+                {
+                    StartWave(wave);
+                }
             }
         }
     }
