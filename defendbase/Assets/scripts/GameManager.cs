@@ -53,6 +53,7 @@ public class GameManager : MonoBehaviour {
 
     public GameObject statusIndicatorPrefab,
                       playerPrefab,
+                      buttonPrefab,
                       enemyPrefab;
 
     public GameObject playerStatusCanvas,
@@ -67,6 +68,8 @@ public class GameManager : MonoBehaviour {
                       resultNotification,
                       mainMenuCanvas,
                       optionsCanvas,
+                      hostListCanvas,
+                      multiplayerCanvas,
                       waveNotification;
 
     public Text scoreTxt;
@@ -172,15 +175,21 @@ public class GameManager : MonoBehaviour {
             case 2:
                 LoadCalibrationScene();
                 break;
-            /*// Client
+            // Online Lobby
             case 3:
-                LoadClientScene();
+                LoadLobbyScene();
                 break;
-            // Game (Multiplayer)
+            /*// Game (Multiplayer)
             case 4:
                 LoadMultiplayerGameScene();
                 break;*/
         }
+    }
+
+    public void LoadLobbyScene()
+    {
+        projectilesContainer = GameObject.Find("ProjectilesContainer");
+        GameObject.Find("Canvas").transform.Find("LeaveBtn").GetComponent<Button>().onClick.AddListener(GoToMainScene);
     }
 
     public void LoadCalibrationScene()
@@ -200,13 +209,31 @@ public class GameManager : MonoBehaviour {
         inGame = false;
         setupRotation = true;
         mainMenuCanvas = GameObject.Find("MainMenuCanvas");
+
         Transform btnContainer = mainMenuCanvas.transform.Find("ButtonsContainer");
         btnContainer.Find("PlayBtn").GetComponent<Button>().onClick.AddListener(GoToGameScene);
-        //mainMenuCanvas.transform.Find("OnlineBtn").GetComponent<Button>().onClick.AddListener(Save);
+        btnContainer.Find("OnlineBtn").GetComponent<Button>().onClick.AddListener(ToggleMultiplayerCanvas);
+        btnContainer.Find("OnlineBtn").GetComponent<Button>().onClick.AddListener(ToggleMainMenuCanvas);
         btnContainer.Find("SettingsBtn").GetComponent<Button>().onClick.AddListener(GoToCalibrationScene);
         btnContainer.Find("ContinueBtn").GetComponent<Button>().onClick.AddListener(GoToGameScene);
         btnContainer.Find("ContinueBtn").GetChild(0).GetComponent<Text>().text += (data != null && data.savedGame) ? " (Wave " + (data.wave+1) + ")" : "";
         btnContainer.Find("ContinueBtn").gameObject.SetActive(data != null && data.savedGame);
+
+        multiplayerCanvas = GameObject.Find("MultiplayerCanvas");
+        multiplayerCanvas.SetActive(false);
+        btnContainer = multiplayerCanvas.transform.Find("ButtonsContainer");
+        btnContainer.Find("HostBtn").GetComponent<Button>().onClick.AddListener(GoToLobbyScene);
+        btnContainer.Find("HostBtn").GetComponent<Button>().onClick.AddListener(NetworkManager.nm.SetupAsHost);
+        btnContainer.Find("FindHostBtn").GetComponent<Button>().onClick.AddListener(ToggleHostListCanvas);
+        btnContainer.Find("FindHostBtn").GetComponent<Button>().onClick.AddListener(ToggleMultiplayerCanvas);
+        btnContainer.Find("FindHostBtn").GetComponent<Button>().onClick.AddListener(NetworkManager.nm.SetupAsClient);
+        btnContainer.Find("BackBtn").GetComponent<Button>().onClick.AddListener(ToggleMainMenuCanvas);
+        btnContainer.Find("BackBtn").GetComponent<Button>().onClick.AddListener(ToggleMultiplayerCanvas);
+        
+        hostListCanvas = GameObject.Find("HostListCanvas");
+        hostListCanvas.SetActive(false);
+        hostListCanvas.transform.Find("BackBtn").GetComponent<Button>().onClick.AddListener(ToggleMultiplayerCanvas);
+        hostListCanvas.transform.Find("BackBtn").GetComponent<Button>().onClick.AddListener(ToggleHostListCanvas);
     }
 
     public void LoadGameScene()
@@ -250,6 +277,21 @@ public class GameManager : MonoBehaviour {
         StartGame();
     }
 
+    public void ToggleMainMenuCanvas()
+    {
+        mainMenuCanvas.SetActive(!mainMenuCanvas.activeSelf);
+    }
+
+    public void ToggleHostListCanvas()
+    {
+        hostListCanvas.SetActive(!hostListCanvas.activeSelf);
+    }
+
+    public void ToggleMultiplayerCanvas()
+    {
+        multiplayerCanvas.SetActive(!multiplayerCanvas.activeSelf);
+    }
+
     public void SaveAndQuit()
     {
         Save("continuedGame");
@@ -283,6 +325,11 @@ public class GameManager : MonoBehaviour {
     public void LeaveGame()
     {
         GoToMainScene();
+    }
+
+    public void GoToLobbyScene()
+    {
+        SceneManager.LoadScene("lobby");
     }
 
     public void GoToMainScene()

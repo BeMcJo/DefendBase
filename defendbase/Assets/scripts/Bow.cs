@@ -36,6 +36,11 @@ public class Bow : Weapon {
         {
             Charge();
         }
+        if(arrow == null)
+        {
+            Reload();
+            return;
+        }
         List<Vector3> positions = new List<Vector3>();
         positions.Add(new Vector3(0, .5f, -.475f));
         if(reloading)

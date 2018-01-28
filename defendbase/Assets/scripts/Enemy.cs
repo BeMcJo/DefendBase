@@ -21,6 +21,8 @@ public class Enemy : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (!GameManager.gm.inGame)
+            return;
         if (health <= 0)
         {
             Die();
