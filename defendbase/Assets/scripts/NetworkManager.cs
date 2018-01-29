@@ -9,6 +9,7 @@ public class Player
 {
     public int connectionID;
     public string playerName;
+    public bool isReady;
     public GameObject playerGO;
 }
 
@@ -63,13 +64,14 @@ public class NetworkManager : MonoBehaviour {
     // Used for less important data that can tolerate missing packets/corruption
     private int unreliableChannel;
 
-
+    public float sendRate = .015f, sendTimer = .015f;
     private float connectionTime;
     private float timer, timeout = 30f;
-    private bool isStarted = false;
+    public bool isStarted = false;
     public bool inLobby = false;
     private bool requestingConnection = false;
     private bool inGame = false;
+    private bool isReady;
     private bool isConnected = false;
     private bool destroyed = false;
     private bool isOriginal = false;
@@ -212,9 +214,16 @@ public class NetworkManager : MonoBehaviour {
         //{
         //    return;
         //}
-
+        
         if (GameManager.gm.inGame)
         {
+            //Debug.Log("IONGAMRE");
+            sendTimer -= Time.deltaTime;
+            if (sendTimer <= 0)
+            {
+                SendPlayerInformation();
+                sendTimer = sendRate;
+            }
             /*string s = "";
             foreach (string str in activityLog)
                 s += str + "\n";
@@ -246,16 +255,34 @@ public class NetworkManager : MonoBehaviour {
 
     }
 
+    public void SendPlayerInformation()
+    {
+        string info = "PLAYERSTATS|" + ourClientID + "|";
+        Camera cam = GameManager.gm.player.transform.GetComponent<PlayerController>().playerCam;
+        Vector3 dir = cam.transform.eulerAngles - GameManager.gm.playerOrientation;
+        info += dir.x + "," + dir.y + "," + dir.z + "|";
+        //info += cam.transform.localEulerAngles.x + ","+ cam.transform.localEulerAngles.y+","+ cam.transform.localEulerAngles.z + "|";
+        if (isHost)
+        {
+            Send(info, reliableChannel, players);
+        }
+        else
+        {
+            Send(info, reliableChannel);
+        }
+    }
+
     public void StartUpNetworkActivities()
     {
         isStarted = true;
+        isReady = false;
         GameManager.gm.lobbyCanvas.transform.Find("BackBtn").GetComponent<Button>().interactable = true;
-        GameManager.gm.lobbyCanvas.transform.Find("ReadyBtn").GetComponent<Button>().interactable = true;
     }
 
     public void SetupAsHost()
     {
         isHost = true;
+        GameManager.gm.lobbyCanvas.transform.Find("ReadyBtn").GetComponent<Button>().interactable = false;
         ConnectionConfig cc = new ConnectionConfig();
 
         reliableChannel = cc.AddChannel(QosType.Reliable);
@@ -266,7 +293,7 @@ public class NetworkManager : MonoBehaviour {
         hostID = NetworkTransport.AddHost(topo, 0);
         ourClientID = hostID;
         SpawnPlayerUI("HOST", ourClientID);
-
+        players[ourClientID].isReady = false;
         StartBroadcast();
     }
 
@@ -293,6 +320,7 @@ public class NetworkManager : MonoBehaviour {
     {
         isHost = false;
         requestingConnection = false;
+        GameManager.gm.lobbyCanvas.transform.Find("ReadyBtn").GetComponent<Button>().interactable = true;
         inLobby = false;
         hostID = -1;
     }
@@ -424,6 +452,15 @@ public class NetworkManager : MonoBehaviour {
             isDisconnected = false;
             requestingConnection = false;
         }
+    }
+
+    public void OnPlayerInformation(string[] data)
+    {
+        int cnnID = int.Parse(data[1]);
+        if (cnnID == ourClientID)
+            return;
+        string[] orientation = data[2].Split(',');
+        players[cnnID].playerGO.transform.GetComponent<PlayerController>().playerCam.transform.eulerAngles = GameManager.gm.playerOrientation + new Vector3(float.Parse(orientation[0]), float.Parse(orientation[01]), float.Parse(orientation[2]));
     }
 
     public void OnReceivedBroadcast(string fromAddress, int fromPort, string data)
@@ -623,37 +660,46 @@ public class NetworkManager : MonoBehaviour {
                     case "NEWCNN":
                         OnConnection(connectionId);
                         break;
-                        /*
-                    case "PLAYERATTACK":
-                        if (OnReceivePlayerAttack(connectionId, splitData))
-                            Send(msg, reliableChannel, players);
-                        else
-                            Send("PLAYERATTACKFAILED|", reliableChannel, connectionId);
+                    case "PLAYERSTATS":
+                        OnPlayerInformation(splitData);
                         break;
-                    case "PLAYERENDBATTLE":
-                        //        Debug.Log("RECEVED ENBGBATTLE");
-                        GameManager.gm.PerformCommitEndBattle();
+                    /*
+                case "PLAYERATTACK":
+                    if (OnReceivePlayerAttack(connectionId, splitData))
+                        Send(msg, reliableChannel, players);
+                    else
+                        Send("PLAYERATTACKFAILED|", reliableChannel, connectionId);
+                    break;
+                case "PLAYERENDBATTLE":
+                    //        Debug.Log("RECEVED ENBGBATTLE");
+                    GameManager.gm.PerformCommitEndBattle();
+                    Send(msg, reliableChannel, players);
+                    activityLog.Add(msg);
+                    break;
+                case "PLAYERDEFEND":
+                    if (OnReceivePlayerDefend(connectionId, splitData))
+                    {
                         Send(msg, reliableChannel, players);
                         activityLog.Add(msg);
+                    }
+                    else
+                        Send("PLAYERDEFENDFAILED|", reliableChannel, connectionId);
+                    break;
+                case "PLAYERTRANSFER":
+                    if (OnPlayerTransfer(connectionId, splitData))
+                    {
+                        Send(msg, reliableChannel, players);
+                        activityLog.Add(msg);
+                    }
+                    else
+                        Send("PLAYERTRANSFERFAILED|", reliableChannel, connectionId);
+                    break;*/
+                    case "READY?":
+                        OnReady(connectionId);
                         break;
-                    case "PLAYERDEFEND":
-                        if (OnReceivePlayerDefend(connectionId, splitData))
-                        {
-                            Send(msg, reliableChannel, players);
-                            activityLog.Add(msg);
-                        }
-                        else
-                            Send("PLAYERDEFENDFAILED|", reliableChannel, connectionId);
+                    case "READY":
                         break;
-                    case "PLAYERTRANSFER":
-                        if (OnPlayerTransfer(connectionId, splitData))
-                        {
-                            Send(msg, reliableChannel, players);
-                            activityLog.Add(msg);
-                        }
-                        else
-                            Send("PLAYERTRANSFERFAILED|", reliableChannel, connectionId);
-                        break;
+                    /*
                     case "RECONNECT":
                         OnReconnect(connectionId, splitData);
                         break;
@@ -810,20 +856,27 @@ public class NetworkManager : MonoBehaviour {
                     activityLog.Add(msg);
                     break;
                     */
+                    case "PLAYERSTATS":
+                        OnPlayerInformation(splitData);
+                        break;
                     case "PURPOSE":
                         OnPurpose();
                         break;
-                        /*
+                    
+                    case "READY":
+                        OnReady(int.Parse(splitData[1]));
+                        break;
                     case "STARTGAME":
                         StartGame();
                         break;
-                    case "TRUMP":
-                        ReceiveTrumpCard(splitData[1]);
-                        break;
-                    default:
-                        Debug.Log("Invalid Message: " + msg);
-                        break;
-                        */
+                        /*
+                        case "TRUMP":
+                            ReceiveTrumpCard(splitData[1]);
+                            break;
+                        default:
+                            Debug.Log("Invalid Message: " + msg);
+                            break;
+                            */
                 }
                 break;
             case NetworkEventType.BroadcastEvent:
@@ -876,6 +929,20 @@ public class NetworkManager : MonoBehaviour {
         {
             
         }
+    }
+
+    public void StartGame()
+    {
+        activityLog.Add("STARTGAME|");
+        if (isHost)
+        {
+            Send("STARTGAME|", reliableChannel, players);
+        }
+        else
+        {
+            Send("STARTGAME|", reliableChannel);
+        }
+        GameManager.gm.GoToGameScene();
     }
 
     private void PlayerDisconnected(int cnnId)
@@ -979,6 +1046,53 @@ public class NetworkManager : MonoBehaviour {
         Send(action + "?|", reliableChannel);
     }
 
+    public void RequestReady()
+    {
+        if (isHost)
+        {
+            Ready(ourClientID);
+            return;
+        }
+        RequestAction("READY");
+        GameManager.gm.lobbyCanvas.transform.Find("BackBtn").GetComponent<Button>().interactable = false;
+        GameManager.gm.lobbyCanvas.transform.Find("ReadyBtn").GetComponent<Button>().interactable = false;
+    }
+
+    public void OnReady(int cnnID)
+    {
+        if (isHost)
+            Send("READY|" + cnnID, reliableChannel, players);
+        Ready(cnnID);
+    }
+
+    public void Ready(int cnnID)
+    {
+        players[cnnID].isReady = !players[cnnID].isReady;
+        bool readyToStart = true;
+        foreach (KeyValuePair<int, Player> kvp in players)
+        {
+            readyToStart = kvp.Value.connectionID == 0 || kvp.Value.isReady;
+            if (!readyToStart)
+                break;
+        }
+        players[cnnID].playerGO.transform.Find("NameText").GetComponent<Text>().text = players[cnnID].playerName;
+        if (players[cnnID].isReady)
+            players[cnnID].playerGO.transform.Find("NameText").GetComponent<Text>().text += " READY";
+        if (isHost)
+            GameManager.gm.lobbyCanvas.transform.Find("ReadyBtn").GetComponent<Button>().interactable = readyToStart && players.Count > 1;
+
+        if (isHost && cnnID == ourClientID)
+        {
+            StartGame();
+        }
+        else if(cnnID == ourClientID)
+        {
+            //isReady = !isReady;
+            GameManager.gm.lobbyCanvas.transform.Find("BackBtn").GetComponent<Button>().interactable = true;
+            GameManager.gm.lobbyCanvas.transform.Find("ReadyBtn").GetComponent<Button>().interactable = true;
+        }
+    }
+
     public void RequestLeaveLobby()
     {
         if (isHost)
@@ -1006,6 +1120,7 @@ public class NetworkManager : MonoBehaviour {
                 break;
             // Game
             case 1:
+                LoadGameScene();
                 //Destroy(gameObject);
                 //destroyed = true;
                 break;
@@ -1041,10 +1156,47 @@ public class NetworkManager : MonoBehaviour {
         inLobby = false;
         Disconnect();
     }
+    
+
+    public IEnumerator LoadGameScene()
+    {
+        //GameManager.gm.playerRotation = GameObject.Find("Player Rotation");
+        playerSpawnPoints = GameManager.gm.playerSpawnPoints;
+
+        //StartCoroutine(WaitForGameManagerToLoad());
+        int spawnPt = 0;
+        Debug.Log(players.Count);
+        //GameObject playerSpawnPoint = GameObject.Find("Player Rotation").transform.Find("PlayerSpawnPoint").gameObject;
+        foreach (KeyValuePair<int, Player> kvp in players)
+        {
+            GameObject playerGO = Instantiate(GameManager.gm.playerPrefab);
+            kvp.Value.playerGO = playerGO;
+            if (kvp.Key != ourClientID)
+            {
+                playerGO.transform.GetComponent<PlayerController>().playerCam.GetComponent<Camera>().enabled = false;
+                playerGO.transform.GetComponent<PlayerController>().playerCam.GetComponent<AudioListener>().enabled = false;
+                //playerGO.transform.localEulerAngles += GameManager.gm.playerOrientation;
+
+            }
+            else
+            {
+                GameManager.gm.player = playerGO;
+            }
+            playerGO.transform.position = playerSpawnPoints.transform.GetChild(spawnPt).position;
+            playerGO.transform.SetParent(GameManager.gm.playerRotation.transform);
+            spawnPt++;
+        }
+
+        yield return new WaitForSeconds(0);
+    }
 
     public void LoadMainScene()
     {
-
+        Disconnect();
+        isStarted = false;
+        players.Clear();
+        isConnected = false;
+        
     }
 
 

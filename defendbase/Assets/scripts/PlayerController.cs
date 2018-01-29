@@ -68,7 +68,13 @@ public class PlayerController : MonoBehaviour {
 
     // Update is called once per frame
     void Update () {
+        //return;
         //GameObject.Find("PlayerUI").transform.Find("Text").GetComponent<Text>().text = "";
+        if (gameObject != GameManager.gm.player)
+        {
+            //Debug.Log("NOT palyer");
+            return;
+        }
         PlayerMobileInput();
         PlayerPCInput();
         

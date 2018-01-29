@@ -150,6 +150,11 @@ public class Bow : Weapon {
             arrow = null;
             reloading = true;
             reloadTime = timeToReload;
+            List<Vector3> positions = new List<Vector3>();
+            positions.Add(new Vector3(0, .5f, -.475f));
+            positions.Add(new Vector3(0, 0, drawRange));
+            positions.Add(new Vector3(0, -.5f, -.475f));
+            lr.SetPositions(positions.ToArray());
         }
     }
 }

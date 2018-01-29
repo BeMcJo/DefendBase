@@ -60,7 +60,7 @@ public class GameManager : MonoBehaviour {
     public GameObject playerStatusCanvas,
                       intermissionCanvas,
                       player,
-                      playerSpawnPoint,
+                      playerSpawnPoints,
                       playerRotation,
                       projectilesContainer,
                       enemiesContainer,
@@ -246,6 +246,7 @@ public class GameManager : MonoBehaviour {
         //lobbyCanvas.transform.Find("BackBtn").GetComponent<Button>().onClick.AddListener(ToggleMultiplayerCanvas);
         //lobbyCanvas.transform.Find("BackBtn").GetComponent<Button>().onClick.AddListener(ToggleLobbyCanvas);
         lobbyCanvas.transform.Find("BackBtn").GetComponent<Button>().onClick.AddListener(NetworkManager.nm.RequestLeaveLobby);
+        lobbyCanvas.transform.Find("ReadyBtn").GetComponent<Button>().onClick.AddListener(NetworkManager.nm.RequestReady);
     }
 
     public void LoadGameScene()
@@ -269,10 +270,9 @@ public class GameManager : MonoBehaviour {
         particleEffectsContainer = GameObject.Find("ParticleEffectsContainer");
         playerRotation = GameObject.Find("Player Rotation");
         playerRotation.transform.eulerAngles = playerOrientation;
-        player = Instantiate(playerPrefab);
         playerStatusCanvas = GameObject.Find("PlayerStatusCanvas").gameObject;
         playerStatusCanvas.transform.Find("OptionsBtn").GetComponent<Button>().onClick.AddListener(DisplayOptions);
-        playerSpawnPoint = playerRotation.transform.Find("PlayerSpawnPoint").gameObject;
+        playerSpawnPoints = playerRotation.transform.Find("PlayerSpawnPoints").gameObject;
         resultNotification = playerStatusCanvas.transform.Find("Result Notification").gameObject;
         resultNotification.SetActive(false);
         scoreTxt = playerStatusCanvas.transform.Find("ScoreTxt").GetComponent<Text>();
@@ -286,6 +286,19 @@ public class GameManager : MonoBehaviour {
         optionsCanvas.transform.Find("ExitBtn").GetComponent<Button>().onClick.AddListener(LeaveGame);
         optionsCanvas.SetActive(false);
         StartCoroutine(MapManager.mapManager.LoadGameScene());
+        StartCoroutine(NetworkManager.nm.LoadGameScene());
+
+
+        if (!NetworkManager.nm.isStarted || player == null)
+        {
+            player = Instantiate(playerPrefab);
+            if (!NetworkManager.nm.isStarted)
+            {
+                player.transform.position = playerSpawnPoints.transform.GetChild(0).position;
+                player.transform.SetParent(playerRotation.transform);
+            }
+        }
+
         StartGame();
     }
 
@@ -481,8 +494,6 @@ public class GameManager : MonoBehaviour {
 
     void StartGame()
     {
-        player.transform.position = playerSpawnPoint.transform.position;
-        player.transform.SetParent(playerRotation.transform);
         Debug.Log("Starting Game");
         inGame = true;
         paused = false;
@@ -500,7 +511,7 @@ public class GameManager : MonoBehaviour {
             objective.transform.GetComponent<Objective>().HP = data.objectiveHP;
         }
         //data = new PlayerData();
-        StartWave(wave);
+        //StartWave(wave);
     }
 
     void StartWave(int w)
@@ -590,6 +601,24 @@ public class GameManager : MonoBehaviour {
                 break;
 
             case "game":
+                if (player) {
+
+                    /*Camera cam = player.GetComponent<PlayerController>().playerCam;
+                    Vector3 ea = cam.transform.localEulerAngles;
+                    Debug.Log(ea.ToString());
+                    //Debug.Log("Euler" + cam.transform.localRotation.x + "," + cam.transform.localRotation.y + "," + cam.transform.localRotation.z);// + ".> Localeu" + "," + cam.localEulerAngles.x + "," + cam.localEulerAngles.y + "," + cam.localEulerAngles.z);
+                    Quaternion test = Quaternion.Euler(cam.transform.localRotation.x, cam.transform.localRotation.y, cam.transform.localRotation.z);
+                    Vector3 v = new Vector3(cam.transform.localRotation.x, cam.transform.localRotation.y, cam.transform.localRotation.z);
+                    cam.transform.localEulerAngles = ea;//Quaternion.Euler(v);
+                    Debug.Log("ADTER" + cam.transform.localEulerAngles.ToString());
+                    *///Debug.Log("EulerAFTER" + cam.transform.localRotation.x + "," + cam.transform.localRotation.y + "," + cam.transform.localRotation.z);// + ".> Localeu" + "," + cam.localEulerAngles.x + "," + cam.localEulerAngles.y + "," + cam.localEulerAngles.z);
+
+                    //Debug.Log("test quat" + test.x + "," + test.y + "," + test.z);// calEulerAngles.y + "," + cam.localEulerAngles.z);
+
+                    //Debug.Log(cam.)
+                    //Quaternion target = Quaternion.Euler(0, 0, .5f);
+                    //cam.transform.localRotation = target;//Quaternion.Slerp(cam.transform.localRotation, target, Time.deltaTime * 1f);
+                }
                 break;
         }
         /*

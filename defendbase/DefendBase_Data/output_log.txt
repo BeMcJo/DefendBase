@@ -15,7 +15,7 @@ Platform assembly: C:\Users\TwoTen512\Desktop\Unity Programs\DefendBase\DefendBa
 Loading C:\Users\TwoTen512\Desktop\Unity Programs\DefendBase\DefendBase\DefendBase_Data\Managed\UnityEngine.UI.dll into Unity Child Domain
 Platform assembly: C:\Users\TwoTen512\Desktop\Unity Programs\DefendBase\DefendBase\DefendBase_Data\Managed\UnityEngine.Networking.dll (this message is harmless)
 Loading C:\Users\TwoTen512\Desktop\Unity Programs\DefendBase\DefendBase\DefendBase_Data\Managed\UnityEngine.Networking.dll into Unity Child Domain
-- Completed reload, in  0.017 seconds
+- Completed reload, in  0.018 seconds
 Platform assembly: C:\Users\TwoTen512\Desktop\Unity Programs\DefendBase\DefendBase\DefendBase_Data\Managed\System.Core.dll (this message is harmless)
 Platform assembly: C:\Users\TwoTen512\Desktop\Unity Programs\DefendBase\DefendBase\DefendBase_Data\Managed\System.dll (this message is harmless)
 OnLevelWasLoaded was found on GameManager
@@ -48,7 +48,7 @@ The class named 'Weapon' is abstract. The script class can't be abstract!
  
 (Filename:  Line: 1514)
 
-UnloadTime: 3.368385 ms
+UnloadTime: 1.634204 ms
 Instantiating Map Library
  
 (Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
@@ -109,15 +109,77 @@ DataEvent
  
 (Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
 
-Player 1 has sent: LEAVELOBBY?|
+Player 1 has sent: READY?|
  
 (Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
 
-Disconnectin gplayer1
+Sending : READY|1
  
 (Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
 
-sendDC|1 1
+Sending : STARTGAME|
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+The class named 'Weapon' is abstract. The script class can't be abstract!
+ 
+(Filename:  Line: 1514)
+
+The class named 'Weapon' is abstract. The script class can't be abstract!
+ 
+(Filename:  Line: 1514)
+
+Unloading 5 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 1.963402 ms
+saved
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+2
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+The class named 'Weapon' is abstract. The script class can't be abstract!
+ 
+(Filename:  Line: 1514)
+
+The class named 'Weapon' is abstract. The script class can't be abstract!
+ 
+(Filename:  Line: 1514)
+
+The class named 'Weapon' is abstract. The script class can't be abstract!
+ 
+(Filename:  Line: 1514)
+
+The class named 'Weapon' is abstract. The script class can't be abstract!
+ 
+(Filename:  Line: 1514)
+
+Starting Game
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+
+Unloading 5 unused Assets to reduce memory usage. Loaded Objects now: 1109.
+Total: 0.425752 ms (FindLiveObjects: 0.053979 ms CreateObjectMapping: 0.023188 ms MarkObjects: 0.340982 ms  DeleteObjects: 0.007222 ms)
+
+DataEvent
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Player 1 has sent: STARTGAME|
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+reactor filed to acomplish request with code {1234}, bytesReceived {0}
+reactor filed to acomplish request with code {1234}, bytesReceived {0}
+reactor filed to acomplish request with code {1234}, bytesReceived {0}
+Log: connection {1} has been disconnected by timeout; address {::ffff:192.168.1.7:62144}
+DisconnectEvent
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Player 1 has disconnected
  
 (Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
 
@@ -129,1013 +191,68 @@ Sending : DC|1
  
 (Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
 
-Done
+Wave started
  
 (Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
 
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-ConnectEvent
+SPAWED
  
 (Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
 
-Player 2 has connected
+SPAWED
  
 (Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
 
-sendPURPOSE| 2
+SPAWED
  
 (Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
 
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-DataEvent
+attackingGate
  
 (Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
 
-Player 2 has sent: NEWCNN|
+attackingGate
  
 (Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
 
-sendASKNAME|2|ME%0 2
+attackingGate
  
 (Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
 
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-DataEvent
+attackingGate
  
 (Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
 
-Player 2 has sent: NAMEIS|PLAYER
+SPAWED
  
 (Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
 
-Sending : CNN|PLAYER|2
+attackingGate
  
 (Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
 
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-Log: connection {1} has been disconnected by timeout; address {::ffff:192.168.162.1:52614}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-DisconnectEvent
+attackingGate
  
 (Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
 
-Player 1 has disconnected
+attackingGate
  
 (Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
 
-DataEvent
+attackingGate
  
 (Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
 
-Player 2 has sent: LEAVELOBBY?|
+attackingGate
  
 (Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
 
-Disconnectin gplayer2
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-sendDC|2 2
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-DCS: 2
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Sending : DC|2
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Done
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-ConnectEvent
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Player 1 has connected
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-sendPURPOSE| 1
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-DataEvent
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Player 1 has sent: NEWCNN|
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-sendASKNAME|1|ME%0 1
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-DataEvent
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Player 1 has sent: NAMEIS|PLAYER
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Sending : CNN|PLAYER|1
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-Log: connection {2} has been disconnected by timeout; address {::ffff:192.168.162.1:52615}
-DisconnectEvent
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Player 2 has disconnected
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Leaving
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Disconnected
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Spawn player HOST0
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-ConnectEvent
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Player 1 has connected
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-sendPURPOSE| 1
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-DataEvent
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Player 1 has sent: NEWCNN|
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-sendASKNAME|1|ME%0 1
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-DataEvent
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Player 1 has sent: NAMEIS|PLAYER
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Sending : CNN|PLAYER|1
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-DataEvent
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Player 1 has sent: LEAVELOBBY?|
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Disconnectin gplayer1
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-sendDC|1 1
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-DCS: 1
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Sending : DC|1
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Done
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-Log: connection {1} has been disconnected by timeout; address {::ffff:192.168.162.1:51839}
-DisconnectEvent
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Player 1 has disconnected
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Leaving
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Disconnected
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-YE
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Found Connection
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-New host
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-YE
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Found Connection
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-New host
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-False
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-I CONNE
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Receiving : PURPOSE|
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Sending : NEWCNN|
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Receiving : ASKNAME|1|ME%0
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Sending : NAMEIS|PLAYER
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Spawn player ME0
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Receiving : CNN|PLAYER|1
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Spawn player PLAYER1
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Sending : LEAVELOBBY?|
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Receiving : DC|1
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Leaving from player dc
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Leaving
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Disconnected
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-YE
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Found Connection
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-New host
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-YE
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Found Connection
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-New host
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-YE
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Found Connection
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-EXITST
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-YE
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Found Connection
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-EXITST
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Disconnected
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Spawn player HOST0
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Leaving
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Disconnected
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Spawn player HOST0
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Leaving
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Disconnected
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Spawn player HOST0
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-ConnectEvent
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Player 1 has connected
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-sendPURPOSE| 1
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-DataEvent
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Player 1 has sent: NEWCNN|
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-sendASKNAME|1|ME%0 1
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-DataEvent
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Player 1 has sent: NAMEIS|PLAYER
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Sending : CNN|PLAYER|1
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-DataEvent
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Player 1 has sent: LEAVELOBBY?|
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Disconnectin gplayer1
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-sendDC|1 1
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-DCS: 1
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Sending : DC|1
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Done
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-Log: connection {1} has been disconnected by timeout; address {::ffff:192.168.162.1:64143}
-DisconnectEvent
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Player 1 has disconnected
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Leaving
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Disconnected
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Disconnected
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Spawn player HOST0
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Leaving
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Disconnected
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Disconnected
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Spawn player HOST0
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Leaving
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Disconnected
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-YE
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Found Connection
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-New host
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-YE
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Found Connection
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-New host
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-False
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-I CONNE
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Receiving : PURPOSE|
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Sending : NEWCNN|
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Receiving : ASKNAME|1|ME%0
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Sending : NAMEIS|PLAYER
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Spawn player ME0
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Receiving : CNN|PLAYER|1
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Spawn player PLAYER1
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Sending : LEAVELOBBY?|
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Receiving : DC|1
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Leaving from player dc
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Leaving
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Disconnected
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Spawn player HOST0
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-ConnectEvent
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Player 1 has connected
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-sendPURPOSE| 1
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-DataEvent
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Player 1 has sent: NEWCNN|
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-sendASKNAME|1|ME%0 1
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-DataEvent
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Player 1 has sent: NAMEIS|PLAYER
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Sending : CNN|PLAYER|1
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Leaving
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Disconnected
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Spawn player HOST0
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Leaving
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Disconnected
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Spawn player HOST0
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Leaving
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Disconnected
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Spawn player HOST0
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Leaving
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Disconnected
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Spawn player HOST0
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Leaving
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Disconnected
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Spawn player HOST0
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Leaving
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Disconnected
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Spawn player HOST0
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Leaving
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Disconnected
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Spawn player HOST0
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Leaving
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Disconnected
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Spawn player HOST0
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Leaving
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Disconnected
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Spawn player HOST0
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Leaving
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Disconnected
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Spawn player HOST0
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Leaving
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Disconnected
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Spawn player HOST0
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Leaving
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Disconnected
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Spawn player HOST0
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Leaving
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Disconnected
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Spawn player HOST0
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-ConnectEvent
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Player 1 has connected
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-sendPURPOSE| 1
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-DataEvent
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Player 1 has sent: NEWCNN|
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-sendASKNAME|1|ME%0 1
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-DataEvent
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Player 1 has sent: NAMEIS|PLAYER
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Sending : CNN|PLAYER|1
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-DataEvent
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Player 1 has sent: LEAVELOBBY?|
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Disconnectin gplayer1
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-sendDC|1 1
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-DCS: 1
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Sending : DC|1
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Done
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-Log: connection {1} has been disconnected by timeout; address {::ffff:192.168.162.1:52946}
-DisconnectEvent
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Player 1 has disconnected
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Leaving
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Disconnected
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Spawn player HOST0
+attackingGate
  
 (Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
 
 Setting up 4 worker threads for Enlighten.
-  Thread -> id: a714 -> priority: 1 
-  Thread -> id: bce4 -> priority: 1 
-  Thread -> id: b988 -> priority: 1 
-  Thread -> id: 9180 -> priority: 1 
+  Thread -> id: d3c0 -> priority: 1 
+  Thread -> id: d3bc -> priority: 1 
+  Thread -> id: d3cc -> priority: 1 
+  Thread -> id: d060 -> priority: 1 
