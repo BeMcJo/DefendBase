@@ -53,6 +53,7 @@ public class GameManager : MonoBehaviour {
 
     public GameObject statusIndicatorPrefab,
                       playerPrefab,
+                      playerUIPrefab,
                       buttonPrefab,
                       enemyPrefab;
 
@@ -70,6 +71,7 @@ public class GameManager : MonoBehaviour {
                       optionsCanvas,
                       hostListCanvas,
                       multiplayerCanvas,
+                      lobbyCanvas,
                       waveNotification;
 
     public Text scoreTxt;
@@ -222,11 +224,14 @@ public class GameManager : MonoBehaviour {
         multiplayerCanvas = GameObject.Find("MultiplayerCanvas");
         multiplayerCanvas.SetActive(false);
         btnContainer = multiplayerCanvas.transform.Find("ButtonsContainer");
-        btnContainer.Find("HostBtn").GetComponent<Button>().onClick.AddListener(GoToLobbyScene);
+        btnContainer.Find("HostBtn").GetComponent<Button>().onClick.AddListener(ToggleLobbyCanvas);
+        btnContainer.Find("HostBtn").GetComponent<Button>().onClick.AddListener(ToggleMultiplayerCanvas);
         btnContainer.Find("HostBtn").GetComponent<Button>().onClick.AddListener(NetworkManager.nm.SetupAsHost);
+        btnContainer.Find("HostBtn").GetComponent<Button>().onClick.AddListener(NetworkManager.nm.StartUpNetworkActivities);
         btnContainer.Find("FindHostBtn").GetComponent<Button>().onClick.AddListener(ToggleHostListCanvas);
         btnContainer.Find("FindHostBtn").GetComponent<Button>().onClick.AddListener(ToggleMultiplayerCanvas);
         btnContainer.Find("FindHostBtn").GetComponent<Button>().onClick.AddListener(NetworkManager.nm.SetupAsClient);
+        btnContainer.Find("FindHostBtn").GetComponent<Button>().onClick.AddListener(NetworkManager.nm.StartUpNetworkActivities);
         btnContainer.Find("BackBtn").GetComponent<Button>().onClick.AddListener(ToggleMainMenuCanvas);
         btnContainer.Find("BackBtn").GetComponent<Button>().onClick.AddListener(ToggleMultiplayerCanvas);
         
@@ -234,6 +239,13 @@ public class GameManager : MonoBehaviour {
         hostListCanvas.SetActive(false);
         hostListCanvas.transform.Find("BackBtn").GetComponent<Button>().onClick.AddListener(ToggleMultiplayerCanvas);
         hostListCanvas.transform.Find("BackBtn").GetComponent<Button>().onClick.AddListener(ToggleHostListCanvas);
+        hostListCanvas.transform.Find("BackBtn").GetComponent<Button>().onClick.AddListener(NetworkManager.nm.Disconnect);
+
+        lobbyCanvas = GameObject.Find("LobbyCanvas");
+        lobbyCanvas.SetActive(false);
+        //lobbyCanvas.transform.Find("BackBtn").GetComponent<Button>().onClick.AddListener(ToggleMultiplayerCanvas);
+        //lobbyCanvas.transform.Find("BackBtn").GetComponent<Button>().onClick.AddListener(ToggleLobbyCanvas);
+        lobbyCanvas.transform.Find("BackBtn").GetComponent<Button>().onClick.AddListener(NetworkManager.nm.RequestLeaveLobby);
     }
 
     public void LoadGameScene()
@@ -280,6 +292,11 @@ public class GameManager : MonoBehaviour {
     public void ToggleMainMenuCanvas()
     {
         mainMenuCanvas.SetActive(!mainMenuCanvas.activeSelf);
+    }
+
+    public void ToggleLobbyCanvas()
+    {
+        lobbyCanvas.SetActive(!lobbyCanvas.activeSelf);
     }
 
     public void ToggleHostListCanvas()
