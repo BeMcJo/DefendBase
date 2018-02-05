@@ -258,9 +258,10 @@ public class NetworkManager : MonoBehaviour {
     public void SendPlayerInformation()
     {
         string info = "PLAYERSTATS|" + ourClientID + "|";
-        Camera cam = GameManager.gm.player.transform.GetComponent<PlayerController>().playerCam;
+        PlayerController p = GameManager.gm.player.transform.GetComponent<PlayerController>();
+        Camera cam = p.playerCam;
         Vector3 dir = cam.transform.eulerAngles - GameManager.gm.playerOrientation;
-        info += dir.x + "," + dir.y + "," + dir.z + "|";
+        info += dir.x + "," + dir.y + "," + dir.z + "|" + p.wep.NetworkInformation();
         //info += cam.transform.localEulerAngles.x + ","+ cam.transform.localEulerAngles.y+","+ cam.transform.localEulerAngles.z + "|";
         if (isHost)
         {
@@ -460,7 +461,27 @@ public class NetworkManager : MonoBehaviour {
         if (cnnID == ourClientID)
             return;
         string[] orientation = data[2].Split(',');
-        players[cnnID].playerGO.transform.GetComponent<PlayerController>().playerCam.transform.eulerAngles = GameManager.gm.playerOrientation + new Vector3(float.Parse(orientation[0]), float.Parse(orientation[01]), float.Parse(orientation[2]));
+
+        PlayerController p = players[cnnID].playerGO.transform.GetComponent<PlayerController>();
+        p.playerCam.transform.eulerAngles = GameManager.gm.playerOrientation + new Vector3(float.Parse(orientation[0]), float.Parse(orientation[01]), float.Parse(orientation[2]));
+
+        bool wepInUse = bool.Parse(data[4]);
+        float chargePower = float.Parse(data[5]);
+        if (wepInUse)
+        {
+            if (!p.wep.inUse)
+            {
+                p.wep.StartUse();//Input.GetTouch(0));
+            }
+            p.wep.Charge(chargePower);
+        }
+        else
+        {
+            if (p.wep.inUse)
+            {
+                p.wep.EndUse();
+            }
+        }
     }
 
     public void OnReceivedBroadcast(string fromAddress, int fromPort, string data)
@@ -867,7 +888,17 @@ public class NetworkManager : MonoBehaviour {
                         OnReady(int.Parse(splitData[1]));
                         break;
                     case "STARTGAME":
+                        //StopBroadcast();
                         StartGame();
+                        break;
+                    case "STARTWAVE":
+                        int logID = int.Parse(splitData[1]);
+                        if(logID != activityLog.Count)
+                        {
+                            RequestActivityLog();
+                            break;
+                        }
+                        StartWave(int.Parse(splitData[2]));
                         break;
                         /*
                         case "TRUMP":
@@ -931,18 +962,95 @@ public class NetworkManager : MonoBehaviour {
         }
     }
 
-    public void StartGame()
+    public void RequestActivityLog()
     {
-        activityLog.Add("STARTGAME|");
+        Debug.Log("OUT OF SYNC, REQUESTING LOG ORDER");
+    }
+
+    public void NotifyObjectDamagedBy(GameObject target, GameObject source)
+    {
+        string msg = "";
+        int tid = 0, 
+            sid = 0,
+            dmg = 0;
+
+        if (target.tag == "Enemy")
+        {
+            Enemy e = target.transform.GetComponent<Enemy>();
+            tid = e.id;
+            msg = "ENEMY";
+        }
+
+        if (source.tag == "Projectile")
+        {
+            Projectile p = source.transform.GetComponent<Projectile>();
+            sid = p.id;
+            dmg = p.dmg;
+        }
+        msg += "DMG|" + tid + "|" + sid + "|" + dmg + "|";
         if (isHost)
         {
-            Send("STARTGAME|", reliableChannel, players);
+            Send(msg, reliableChannel,players);
+            activityLog.Add(msg);
         }
         else
         {
-            Send("STARTGAME|", reliableChannel);
+            Send(msg, reliableChannel);
         }
+    }
+
+    public void ResetReadyStatus()
+    {
+        foreach (KeyValuePair<int, Player> kvp in players)
+        {
+            kvp.Value.isReady = false;
+        }
+    }
+
+    public void StartGame()
+    {
+        activityLog = new List<string>();
+        activityLog.Add("STARTGAME|0|");
+        if (isHost)
+        {
+            StopBroadcast();
+            Send("STARTGAME|0|", reliableChannel, players);
+        }
+        else
+        {
+            Send("STARTGAME|0|", reliableChannel);
+        }
+        ResetReadyStatus();
         GameManager.gm.GoToGameScene();
+        if (!isHost)
+        {
+            RequestReady();
+        }
+        else
+        {
+            //Ready(ourClientID);
+        }
+    }
+    /*
+    public void RequestStartWave()
+    {
+        if (isHost)
+        {
+            StartWave(GameManager.gm.wave);
+            return;
+        }
+        RequestAction("STARTWAVE");
+    }*/
+
+    public void StartWave(int wave)
+    {
+        string msg =  "STARTWAVE|" + activityLog.Count + "|" + wave + "|";
+        if (isHost)
+        {
+            Send(msg, reliableChannel, players);
+        }
+        GameManager.gm.StartWave(wave);
+        activityLog.Add(msg);
     }
 
     private void PlayerDisconnected(int cnnId)
@@ -1026,6 +1134,8 @@ public class NetworkManager : MonoBehaviour {
 
     public void Disconnect()
     {
+        if (!isStarted)
+            return;
         if (hostID != -1)
         {
             if(!isConnected)
@@ -1065,31 +1175,64 @@ public class NetworkManager : MonoBehaviour {
         Ready(cnnID);
     }
 
+    public bool ConfirmReadyStatus(int cnnID)
+    {
+        bool readyToStart = true;
+        players[cnnID].isReady = !players[cnnID].isReady;
+        foreach (KeyValuePair<int, Player> kvp in players)
+        {
+            if (kvp.Value.connectionID != 0)
+            {
+                readyToStart = kvp.Value.isReady;
+                if (!readyToStart)
+                    break;
+            }
+        }
+        return readyToStart;
+    }
+
     public void Ready(int cnnID)
     {
-        players[cnnID].isReady = !players[cnnID].isReady;
-        bool readyToStart = true;
-        foreach (KeyValuePair<int, Player> kvp in players)
+        //players[cnnID].isReady = !players[cnnID].isReady;
+        bool readyToStart = ConfirmReadyStatus(cnnID);
+        /*foreach (KeyValuePair<int, Player> kvp in players)
         {
             readyToStart = kvp.Value.connectionID == 0 || kvp.Value.isReady;
             if (!readyToStart)
                 break;
-        }
-        players[cnnID].playerGO.transform.Find("NameText").GetComponent<Text>().text = players[cnnID].playerName;
-        if (players[cnnID].isReady)
-            players[cnnID].playerGO.transform.Find("NameText").GetComponent<Text>().text += " READY";
-        if (isHost)
-            GameManager.gm.lobbyCanvas.transform.Find("ReadyBtn").GetComponent<Button>().interactable = readyToStart && players.Count > 1;
-
-        if (isHost && cnnID == ourClientID)
+        }*/
+        if (!GameManager.gm.inGame)
         {
-            StartGame();
+            players[cnnID].playerGO.transform.Find("NameText").GetComponent<Text>().text = players[cnnID].playerName;
+            if (players[cnnID].isReady)
+                players[cnnID].playerGO.transform.Find("NameText").GetComponent<Text>().text += " READY";
+            if (isHost)
+                GameManager.gm.lobbyCanvas.transform.Find("ReadyBtn").GetComponent<Button>().interactable = readyToStart && players.Count > 1;
+        }
+        if (isHost)
+        {
+            if (cnnID == ourClientID)
+            {
+                if (!GameManager.gm.inGame)
+                {
+                    StartGame();
+                    return;
+                }
+                else
+                {
+                }
+            }
+            if (GameManager.gm.inGame && readyToStart)
+                StartWave(GameManager.gm.wave);
         }
         else if(cnnID == ourClientID)
         {
             //isReady = !isReady;
-            GameManager.gm.lobbyCanvas.transform.Find("BackBtn").GetComponent<Button>().interactable = true;
-            GameManager.gm.lobbyCanvas.transform.Find("ReadyBtn").GetComponent<Button>().interactable = true;
+            if (!GameManager.gm.inGame)
+            {
+                GameManager.gm.lobbyCanvas.transform.Find("BackBtn").GetComponent<Button>().interactable = true;
+                GameManager.gm.lobbyCanvas.transform.Find("ReadyBtn").GetComponent<Button>().interactable = true;
+            }
         }
     }
 
@@ -1182,6 +1325,8 @@ public class NetworkManager : MonoBehaviour {
             {
                 GameManager.gm.player = playerGO;
             }
+
+            playerGO.transform.GetComponent<PlayerController>().id = connectionId;
             playerGO.transform.position = playerSpawnPoints.transform.GetChild(spawnPt).position;
             playerGO.transform.SetParent(GameManager.gm.playerRotation.transform);
             spawnPt++;

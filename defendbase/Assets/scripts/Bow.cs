@@ -26,6 +26,20 @@ public class Bow : Weapon {
         maxScreenDrawRange = Vector2.Distance(new Vector2(0, 0), new Vector2(Screen.width, Screen.height) / 2);
 	}
 	
+    public override string NetworkInformation()
+    {
+        string s = base.NetworkInformation();
+        //s += chargePower + "|";
+        return s;
+    }
+
+    public override void SetNetworkInformation(string[] data)
+    {
+        base.SetNetworkInformation(data);
+        float chargePower = float.Parse(data[2]);
+        Charge(chargePower);
+    }
+
 	// Update is called once per frame
 	protected override void Update () {
         if (reloading)
@@ -34,7 +48,7 @@ public class Bow : Weapon {
         }
         if (charging)
         {
-            Charge();
+            Charge(chargePower);
         }
         if(arrow == null)
         {
@@ -43,10 +57,13 @@ public class Bow : Weapon {
         }
         List<Vector3> positions = new List<Vector3>();
         positions.Add(new Vector3(0, .5f, -.475f));
-        if(reloading)
+        if (reloading)
             positions.Add(new Vector3(0, 0, drawRange));
         else
-            positions.Add(new Vector3(0,0,drawRange + arrow.localPosition.z - 2.35f));
+        {
+            //Transform tail = arrow.transform.Find("Tail");
+            positions.Add(new Vector3(0, 0, drawRange + arrow.localPosition.z - 2.35f));
+        }
         positions.Add(new Vector3(0, -.5f, -.475f));
         lr.SetPositions(positions.ToArray());
         //Debug.Log(positions.Count);
@@ -71,6 +88,12 @@ public class Bow : Weapon {
 
     public override bool StartUse(Touch t)
     {
+        if (NetworkManager.nm.isStarted && !user.IsMyPlayer())
+        {
+            base.StartUse(t);
+            charging = true;
+            return true;
+        }
         //Debug.Log("check");
         RaycastHit2D hitInfo = Physics2D.Raycast(t.position, user.playerCam.transform.forward);
         if(hitInfo.collider != null)
@@ -86,6 +109,7 @@ public class Bow : Weapon {
             //Debug.Log(hit.collider.name);
             if(hit.collider.name == "Tail")
             {
+                base.StartUse(t);
                 charging = true;
                 touchID = t.fingerId;
                 originalTouchPos = t.position;
@@ -101,13 +125,21 @@ public class Bow : Weapon {
         touchID = -1;
         arrow.localPosition = bulletSpawn.localPosition;
         drawRange = drawOffset;
-        Shoot();
+        Shoot(chargePower);
         charging = false;
         chargePower = 0;
+        base.EndUse();
     }
 
-    public override void Charge()
+    public override void Charge(float chargePower)
     {
+        if (NetworkManager.nm.isStarted && !user.IsMyPlayer())
+        {
+            this.chargePower = chargePower;
+            drawRange = drawOffset + chargePower * drawLimit * drawElasticity;
+            arrow.localPosition = bulletSpawn.localPosition + new Vector3(0, 0, chargePower * drawLimit);
+            return;
+        }
         Touch t;
         for (int i = 0; i < Input.touchCount; i++)
         {
@@ -130,10 +162,11 @@ public class Bow : Weapon {
                 break;
             }
         }
+        this.chargePower = chargePower;
         //Debug.Log(chargePower);
     }
 
-    public override void Shoot()
+    public override void Shoot(float chargePower)
     {
         if (chargePower > .05f)
         {
@@ -146,6 +179,7 @@ public class Bow : Weapon {
             rb.AddForce(user.playerCam.transform.forward * chargePower * distance);
             rb.useGravity = true;
             arrow.GetComponent<Arrow>().isShot = true;
+            arrow.GetComponent<Arrow>().id = user.id;
             //arrow.transform.Find("Arrow Tip").GetComponent<BoxCollider>().isTrigger = false;
             arrow = null;
             reloading = true;

@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 public class PlayerController : MonoBehaviour {
+    public int id;
     private bool gyroEnabled, useGyro;
     private Gyroscope gyro;
     private Vector2 initialTouchPosition;
@@ -66,11 +67,15 @@ public class PlayerController : MonoBehaviour {
         return false;
     }
 
+    public bool IsMyPlayer()
+    {
+        return gameObject == GameManager.gm.player;
+    }
     // Update is called once per frame
     void Update () {
         //return;
         //GameObject.Find("PlayerUI").transform.Find("Text").GetComponent<Text>().text = "";
-        if (gameObject != GameManager.gm.player)
+        if (!IsMyPlayer())
         {
             //Debug.Log("NOT palyer");
             return;
@@ -120,6 +125,10 @@ public class PlayerController : MonoBehaviour {
                         if (wep.StartUse(Input.GetTouch(i))) {
                             //Debug.Log("12");
                             shootTouchID = Input.GetTouch(i).fingerId;
+                            //if (NetworkManager.nm.isStarted)
+                            //{
+
+                            //}
                         }
                         /*
                         charging = true;

@@ -4,7 +4,8 @@ using UnityEngine;
 
 public class Enemy : MonoBehaviour
 {
-    public int health = 2, maxHP = 2, dmg = 1;
+    public static int EnemyCount = 0;
+    public int health = 2, maxHP = 2, dmg = 1, id;
     public float moveSpd = 1f,
                  timeToAttack = 2.5f,
                  atkTimer,
@@ -12,14 +13,16 @@ public class Enemy : MonoBehaviour
     public GameObject target;
     public Vector3 targetPos;
     // Use this for initialization
-    void Start()
+    protected virtual void Start()
     {
         atkTimer = timeToAttack;
+        id = EnemyCount;
+        EnemyCount++;
         //target = GameObject.Find("Gate");
     }
 
     // Update is called once per frame
-    void Update()
+    protected virtual void Update()
     {
         if (!GameManager.gm.inGame)
             return;
@@ -59,7 +62,7 @@ public class Enemy : MonoBehaviour
         }
     }
 
-    public void Attack(GameObject target)
+    public virtual void Attack(GameObject target)
     {
         atkTimer -= Time.deltaTime;
         if (atkTimer > 0)
@@ -73,14 +76,14 @@ public class Enemy : MonoBehaviour
         atkTimer = timeToAttack;
     }
 
-    public void Die()
+    public virtual void Die()
     {
         GameManager.gm.AddScore(50);
         GameManager.gm.kills++;
         Destroy(gameObject);
     }
 
-    public void SetTarget(GameObject g)
+    public virtual void SetTarget(GameObject g)
     {
         target = g;
         Vector3 pos = new Vector3(
@@ -91,8 +94,9 @@ public class Enemy : MonoBehaviour
         targetPos = pos;
     }
 
-    public void TakeDamage(int dmg)
+    public virtual bool TakeDamage(int dmg)
     {
         health -= dmg;
+        return true;
     }
 }

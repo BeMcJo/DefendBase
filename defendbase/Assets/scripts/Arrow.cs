@@ -5,12 +5,13 @@ using UnityEngine;
 public class Arrow : Projectile {
     protected bool deflected;
 	// Use this for initialization
-	void Start () {
+	protected override void Start () {
+        base.Start();
         deflected = false;
 	}
 	
 	// Update is called once per frame
-	void FixedUpdate () {
+	protected virtual void FixedUpdate () {
         if (transform.GetComponent<Rigidbody>().velocity != Vector3.zero)
             transform.rotation = Quaternion.LookRotation(transform.GetComponent<Rigidbody>().velocity);
 	}
@@ -34,21 +35,30 @@ public class Arrow : Projectile {
         }
     }*/
 
-    protected void OnCollisionEnter(Collision collision)
+    protected override void OnCollisionEnter(Collision collision)
     {
         //Debug.Log("Ar");
         if (collision.transform.tag == "Enemy")
         {
-            if (!hitGround && !deflected)
+            if (!hitGround && id == GameManager.gm.player.transform.GetComponent<PlayerController>().id)
             {
                 //Debug.Log("colide");
+                //if(networ)
                 Enemy e = collision.transform.GetComponent<Enemy>();
-                e.TakeDamage(dmg);
+                
                 e.transform.GetComponent<Rigidbody>().velocity = Vector3.zero;
-                if(e.health > 0)
+                if (e.TakeDamage(dmg))
                 {
-                    deflected = true;
-                    transform.GetComponent<Rigidbody>().velocity = Vector3.zero;
+                    if (e.health > 0)
+                    {
+                        deflected = true;
+                        transform.GetComponent<Rigidbody>().velocity = Vector3.zero;
+                    }
+
+                    if (NetworkManager.nm.isStarted)
+                    {
+                        NetworkManager.nm.NotifyObjectDamagedBy(e.gameObject, gameObject);
+                    }
                 }
                 //Destroy(gameObject);
             }

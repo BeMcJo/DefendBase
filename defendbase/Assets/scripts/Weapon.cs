@@ -6,7 +6,9 @@ public abstract class Weapon : MonoBehaviour {
     protected Transform bulletSpawn;
     public GameObject bulletPrefab;
     public GameObject chargeBarGuage, chargeBar;
-    public bool charging, reloading;
+    public bool charging,
+                inUse,
+                reloading;
     public float chargePower, chargeAccelerator, distance = 1000;
     public float reloadTime, timeToReload;
     private int chargeBarAlt = 1;
@@ -24,9 +26,11 @@ public abstract class Weapon : MonoBehaviour {
         if (charging)
         {
             Debug.Log("charge");
-            Charge();
+            Charge(chargePower);
         }
 	}
+
+    
 
     public void Use()
     {
@@ -37,25 +41,65 @@ public abstract class Weapon : MonoBehaviour {
         }
     }
 
+    public virtual string NetworkInformation()
+    {
+        return "WEP|" + inUse + "|" + chargePower + "|";
+    }
+    
+    public virtual void SetNetworkInformation(string[] data)
+    {
+        
+        bool inUse = bool.Parse(data[1]);
+        //bool charging = bool.Parse(data[2]);
+        float chargePower = float.Parse(data[2]);
+        //this.chargePower = chargePower;
+        /*if (inUse)
+        {
+            if (this.inUse)
+            {
+                this.chargePower = chargePower;
+            }
+            else
+            {
+                start
+            }
+        }*/
+    }
+
+    public virtual bool StartUse()
+    {
+        Debug.Log("?");
+        inUse = true;
+        charging = true;
+        chargePower = 0;
+        //chargeBarGuage.SetActive(true);
+        //chargeBar.transform.localScale = new Vector3(0, 0, 0);
+        //chargeBarAlt = 1;
+        //chargeAccelerator = 0;
+        return true;
+    }
+
     public virtual bool StartUse(Touch t)
     {
         Debug.Log("?");
+        inUse = true;
         charging = true;
         chargePower = 0;
-        chargeBarGuage.SetActive(true);
-        chargeBar.transform.localScale = new Vector3(0, 0, 0);
-        chargeBarAlt = 1;
-        chargeAccelerator = 0;
+        //chargeBarGuage.SetActive(true);
+        //chargeBar.transform.localScale = new Vector3(0, 0, 0);
+        //chargeBarAlt = 1;
+        //chargeAccelerator = 0;
         return true;
     }
 
     public virtual void EndUse()
     {
         Debug.Log("FIRE");
-        Shoot();
+        inUse = false;
+        //Shoot(chargePower);
     }
 
-    public virtual void Shoot()
+    public virtual void Shoot(float chargePower)
     {
         charging = false;
         chargeBarGuage.SetActive(false);
@@ -65,12 +109,12 @@ public abstract class Weapon : MonoBehaviour {
         bullet.transform.GetComponent<Rigidbody>().AddForce(user.playerCam.transform.forward * chargePower * distance);
     }
 
-    public virtual void Charge()
+    public virtual void Charge(float chargePower)
     {
         chargePower += .025f * chargeBarAlt;
         chargeAccelerator += .05f * chargeBarAlt;
         chargeBar.transform.localScale = new Vector3(1, chargePower, 1);
-
+        this.chargePower = chargePower;
         //chargePower
         if (chargeBar.transform.localScale.y >= 1)
         {

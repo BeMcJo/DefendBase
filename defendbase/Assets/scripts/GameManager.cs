@@ -38,6 +38,7 @@ public class GameManager : MonoBehaviour {
                 setupRotation,
                 gyroEnabled,
                 onIntermission,
+                playingOnline,
                 paused;
 
     public int wave,
@@ -209,6 +210,7 @@ public class GameManager : MonoBehaviour {
     {
         scene = "main";
         inGame = false;
+        //playingOnline = false;
         setupRotation = true;
         mainMenuCanvas = GameObject.Find("MainMenuCanvas");
 
@@ -511,10 +513,12 @@ public class GameManager : MonoBehaviour {
             objective.transform.GetComponent<Objective>().HP = data.objectiveHP;
         }
         //data = new PlayerData();
-        //StartWave(wave);
+        if (NetworkManager.nm.isStarted)
+            return;
+        StartWave(wave);
     }
 
-    void StartWave(int w)
+    public void StartWave(int w)
     {
         //Debug.Log("Starting Wave " + w);
         //Debug.Log("Displaying wave");
@@ -525,6 +529,10 @@ public class GameManager : MonoBehaviour {
         patternIterations = pattern.iterations;
         timeToSpawn = pattern.spawnTimes[intervalIndex] / pattern.spawnCts[intervalIndex].Count;
         StartCoroutine(NotifyIncomingWave(w));
+        //if (NetworkManager.nm.isStarted)
+        //{
+            //NetworkManager.nm.StartWave(wave);
+        //}
     }
 
     public IEnumerator SpawnEnemy()
