@@ -34,6 +34,7 @@ public class GameManager : MonoBehaviour {
     public Dictionary<int, Enemy> enemies;
 
     public bool inGame,
+                gameOver,
                 startWaves,
                 spawning,
                 doneSpawningWave,
@@ -259,6 +260,7 @@ public class GameManager : MonoBehaviour {
         Save("continuedGame");
         scene = "game";
         inGame = true;
+        gameOver = false;
         paused = false;
         ResetSpawnSetup(0);
         wave = 0;
@@ -440,7 +442,7 @@ public class GameManager : MonoBehaviour {
         waveNotification.SetActive(true);
         waveNotification.transform.GetChild(0).GetComponent<Text>().text = "Wave " + (w+1);
         yield return new WaitUntil(DisplayWaveNotification);
-        yield return new WaitForSeconds(5);
+        yield return new WaitForSeconds(3f);
         yield return new WaitUntil(HideWaveNotification);
         startWaves = true;
         Debug.Log("Wave started");
@@ -452,6 +454,7 @@ public class GameManager : MonoBehaviour {
         {
             Destroy(enemiesContainer.transform.GetChild(i).gameObject);
         }
+        enemies.Clear();
     }
 
     public void ClearProjectiles()
@@ -500,13 +503,15 @@ public class GameManager : MonoBehaviour {
         ResetPlayerStats();
         resultNotification.SetActive(false);
         //StartGame();
-        StartWave(0);
+        //ResetSpawnSetup(0);
+        objective.transform.GetComponent<Objective>().Reset();
         inGame = true;
+        gameOver = false;
         paused = false;
+        StartWave(0);
         //score = 0;
         //kills = 0;
         //totalKills = 0;
-        //ResetSpawnSetup(0);
         //SceneManager.LoadScene("game");
     }
 
@@ -515,10 +520,12 @@ public class GameManager : MonoBehaviour {
         Debug.Log("Starting Game");
         inGame = true;
         paused = false;
+        gameOver = false;
         Enemy.EnemyCount = 0;
+        Objective.ObjectiveCount = 0;
         score = 0;
         kills = 0;
-        wave = 4;
+        wave = 0;
         totalKills = 0;
         MapManager.mapManager.LoadMap(0);
         if (data != null && data.savedGame)
@@ -555,40 +562,53 @@ public class GameManager : MonoBehaviour {
 
     public IEnumerator SpawnEnemy(int sp)
     {
-        spawning = true;
-        enemiesSpawned++;
-        GameObject enemy = Instantiate(enemyPrefab);
-        if(sp == -1)
-            sp = UnityEngine.Random.Range(0, MapManager.mapManager.spawnPoints.Count);
-        GameObject spawnPoint = MapManager.mapManager.spawnPoints[sp];
-        enemy.transform.position = new Vector3(
-                                    spawnPoint.transform.position.x,
-                                    enemy.transform.position.y,
-                                    spawnPoint.transform.position.z);
-        enemy.transform.GetComponent<Enemy>().SetTarget(spawnPoint);
-        GameObject enemyUI = Instantiate(statusIndicatorPrefab);
-        enemyUI.transform.GetComponent<StatusIndicator>().target = enemy;
-        enemy.transform.SetParent(enemiesContainer.transform);
-        enemyUI.transform.SetParent(enemiesContainer.transform);
-        spawnIndex++;
-        //if (NetworkManager.nm.isStarted && NetworkManager.nm.isHost)
-        //{
-        //    NetworkManager.nm.NotifySpawnEnemyAt(sp);
-        //}
-        if(spawnIndex >= pattern.spawnCts[intervalIndex].Count)
+        if (inGame)
         {
-            if (intervalIndex >= pattern.spawnFreqs.Count)
+
+            spawning = true;
+            enemiesSpawned++;
+            GameObject enemy = Instantiate(enemyPrefab);
+            if (sp == -1)
+                sp = UnityEngine.Random.Range(0, MapManager.mapManager.spawnPoints.Count);
+            GameObject spawnPoint = MapManager.mapManager.spawnPoints[sp];
+            enemy.transform.position = new Vector3(
+                                        spawnPoint.transform.position.x,
+                                        enemy.transform.position.y,
+                                        spawnPoint.transform.position.z);
+            enemy.transform.GetComponent<Enemy>().SetTarget(spawnPoint);
+            GameObject enemyUI = Instantiate(statusIndicatorPrefab);
+            enemyUI.transform.GetComponent<StatusIndicator>().target = enemy;
+            enemy.transform.SetParent(enemiesContainer.transform);
+            enemyUI.transform.SetParent(enemiesContainer.transform);
+            spawnIndex++;
+            //if (NetworkManager.nm.isStarted && NetworkManager.nm.isHost)
+            //{
+            //    NetworkManager.nm.NotifySpawnEnemyAt(sp);
+            //}
+            if (spawnIndex >= pattern.spawnCts[intervalIndex].Count)
             {
-                yield return new WaitForSeconds(pattern.endIterationTime);
-                patternIterations--;
-                if (patternIterations <= 0)
+                if (intervalIndex >= pattern.spawnFreqs.Count)
                 {
-                    doneSpawningWave = true;
+                    yield return new WaitForSeconds(pattern.endIterationTime);
+                    patternIterations--;
+                    if (patternIterations <= 0)
+                    {
+                        doneSpawningWave = true;
+                    }
+                    else
+                    {
+                        spawnIndex = 0;
+                        intervalIndex = 0;
+                        //pattern = EnemySpawnPattern.patternsBySpawnPointCt[0][wave % 2];
+                        spawnTimer = 0;
+                        //patternIterations = pattern.iterations;
+                        timeToSpawn = pattern.spawnTimes[intervalIndex] / pattern.spawnCts[intervalIndex].Count;
+                    }
                 }
                 else
                 {
-                    spawnIndex = 0;
-                    intervalIndex = 0;
+                    yield return new WaitForSeconds(pattern.spawnFreqs[intervalIndex]);
+                    intervalIndex++;
                     //pattern = EnemySpawnPattern.patternsBySpawnPointCt[0][wave % 2];
                     spawnTimer = 0;
                     //patternIterations = pattern.iterations;
@@ -597,19 +617,10 @@ public class GameManager : MonoBehaviour {
             }
             else
             {
-                yield return new WaitForSeconds(pattern.spawnFreqs[intervalIndex]);
-                intervalIndex++;
-                //pattern = EnemySpawnPattern.patternsBySpawnPointCt[0][wave % 2];
-                spawnTimer = 0;
-                //patternIterations = pattern.iterations;
-                timeToSpawn = pattern.spawnTimes[intervalIndex] / pattern.spawnCts[intervalIndex].Count;
+                spawnTimer = timeToSpawn;
             }
+            spawning = false;
         }
-        else
-        {
-            spawnTimer = timeToSpawn;
-        }
-        spawning = false;
     }
 
     // Update is called once per frame

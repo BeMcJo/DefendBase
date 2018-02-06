@@ -13,6 +13,31 @@ public class Player
     public GameObject playerGO;
 }
 
+public class Attack
+{
+    //public static int AttackCount = 0;
+    //public int id;
+    public int confirmedAttackCount;
+    public int tid;
+    //public int sid;
+    public int dmg;
+    public Attack(int tid, int dmg)
+    {
+        //id = AttackCount;
+        //AttackCount++;
+        //this.sid = sid;
+        this.tid = tid;
+        this.dmg = dmg;
+        confirmedAttackCount = 0;
+    }
+
+    public bool ConfirmAttack()
+    {
+        confirmedAttackCount++;
+        return confirmedAttackCount == NetworkManager.nm.PlayerCount() - NetworkManager.nm.PLayerDCCount();
+    }
+}
+
 public class Host
 {
     public string ip;
@@ -98,6 +123,8 @@ public class NetworkManager : MonoBehaviour {
     // Player Order Pos -> DC timer
     private Dictionary<int, float> playerDC = new Dictionary<int, float>();
     //private List<Player> playerOrder = new List<Player>();
+
+    private Dictionary<int, Dictionary<int, Attack>> enemyAttacks = new Dictionary<int, Dictionary<int, Attack>>();
 
     public Dictionary<Host, GameObject> hosts = new Dictionary<Host, GameObject>();
 
@@ -255,6 +282,16 @@ public class NetworkManager : MonoBehaviour {
             Send(m, unreliableChannel, clients);
         }*/
 
+    }
+
+    public int PlayerCount()
+    {
+        return players.Count;
+    }
+
+    public int PLayerDCCount()
+    {
+        return playerDC.Count;
     }
 
     public void SendPlayerInformation()
@@ -700,6 +737,9 @@ public class NetworkManager : MonoBehaviour {
                     case "NEWCNN":
                         OnConnection(connectionId);
                         break;
+                    case "OBJECTIVEDMG":
+                        OnObjectiveDamaged(splitData);
+                        break;
                     case "PLAYERSTATS":
                         OnPlayerInformation(splitData);
                         break;
@@ -892,7 +932,25 @@ public class NetworkManager : MonoBehaviour {
                     case "LEAVELOBBY":
                         LeaveLobby();
                         break;
+                    case "OBJECTIVEDMG":
+                        logID = int.Parse(splitData[1]);
+                        cnnID = int.Parse(splitData[3]);
 
+                        print(msg);
+                        //if (activityLog.Count > 0)
+                        //    print(activityLog[activityLog.Count - 1]);
+                        //if (cnnID == ourClientID)
+                        //{
+                        //    break;
+                        //}
+                        if (logID != activityLog.Count)
+                        {
+                            RequestActivityLog();
+                            break;
+                        }
+                        OnObjectiveDamaged(splitData);
+                        activityLog.Add(msg);
+                        break;
                     /*
                 case "LEAVEGAME":
                     LeaveGame();
@@ -1042,6 +1100,125 @@ public class NetworkManager : MonoBehaviour {
         }
     }
 
+    public void RemoveEnemyAttacks(int eid)
+    {
+        if (!enemyAttacks.ContainsKey(eid))
+            return;
+        enemyAttacks[eid].Clear();
+        enemyAttacks.Remove(eid);
+    }
+
+    public void OnObjectiveDamaged(string[] data)
+    {
+        int oid = int.Parse(data[2]);
+        int eid = int.Parse(data[3]);
+        int atkID = int.Parse(data[4]);
+        int dmg = int.Parse(data[5]);
+        if (isHost)
+        {
+            bool canAttack = ConfirmEnemyAttack(eid, oid, atkID, dmg);
+            if (canAttack)
+            {
+                if (oid == 0 && GameManager.gm.objective)
+                {
+                    Debug.Log("OBJ ATTACKED");
+                    Objective o = GameManager.gm.objective.transform.GetComponent<Objective>();
+                    o.TakeDamage(dmg);
+                    if (isHost)
+                    {
+                        string msg = "OBJECTIVEDMG|" + activityLog.Count + "|" + oid + "|" + eid + "|" +atkID + "|" + dmg + "|";
+                        Send(msg, reliableChannel, players);
+                        activityLog.Add(msg);
+                    }
+                    //msg += "DMG|" + activityLog.Count + "|" + tid + "|" + sid + "|" + dmg + "|";
+                    enemyAttacks[eid].Remove(atkID);
+                }
+            }
+        }
+        else
+        {
+            if (oid == 0 && GameManager.gm.objective)
+            {
+                Debug.Log("OBJ ATTACKED");
+                Objective o = GameManager.gm.objective.transform.GetComponent<Objective>();
+                o.TakeDamage(dmg);
+                //if (isHost)
+                //{
+                //string msg = "OBJECTIVEDMG|" + activityLog.Count + "|" + oid + "|" + eid + "|" + dmg + "|";
+                //Send(msg, reliableChannel, players);
+                //activityLog.Add(msg);
+                //}
+                //msg += "DMG|" + activityLog.Count + "|" + tid + "|" + sid + "|" + dmg + "|";
+                //enemyAttacks[eid].Remove(atkID);
+            }
+        }
+    }
+
+    public bool ConfirmEnemyAttack(int eid, int tid, int atkID, int dmg)
+    {
+        if (!GameManager.gm.enemies.ContainsKey(eid))
+            return false;
+        if (!enemyAttacks.ContainsKey(eid))
+        {
+            enemyAttacks[eid] = new Dictionary<int, Attack>();
+        }
+        if (!enemyAttacks[eid].ContainsKey(atkID))
+        {
+            enemyAttacks[eid][atkID] = new Attack(tid, dmg);
+        }
+        return enemyAttacks[eid][atkID].ConfirmAttack();
+    }
+
+    public void QueueAttackOnObject(GameObject source, GameObject target)
+    {
+        int tid = -1;
+        Objective o = null;
+        if (target.tag == "Objective")
+        {
+            o = target.transform.GetComponent<Objective>();
+            tid = o.id;
+        }
+        if(source.tag == "Enemy")
+        {
+            Enemy e = source.transform.GetComponent<Enemy>();
+            bool canAttack = false;
+            int atkID = e.attackCt;
+            e.attackCt++;
+            /*
+            if (!enemyAttacks.ContainsKey(e.id))
+            {
+                enemyAttacks[e.id] = new Dictionary<int, Attack>();
+            }
+            if (!enemyAttacks[e.id].ContainsKey(atkID))
+            {
+                enemyAttacks[e.id][atkID] = new Attack(tid, e.dmg);
+            }
+            canAttack = enemyAttacks[e.id][atkID].ConfirmAttack();
+            */
+            if (isHost)
+            {
+                canAttack = ConfirmEnemyAttack(e.id, tid, atkID, e.dmg);
+                if (canAttack)
+                {
+                    if (o)
+                    {
+                        o.TakeDamage(enemyAttacks[e.id][atkID].dmg);
+                        string msg = "OBJECTIVEDMG|" + activityLog.Count + "|" + tid + "|" + e.id + "|" + atkID + "|" + e.dmg + "|";
+                        Send(msg, reliableChannel, players);
+                        activityLog.Add(msg);
+                        //msg += "DMG|" + activityLog.Count + "|" + tid + "|" + sid + "|" + dmg + "|";
+                        enemyAttacks[e.id].Remove(atkID);
+                    }
+                }
+            }
+            else
+            {
+                string msg = "OBJECTIVEDMG|" + activityLog.Count + "|" + tid + "|" + e.id + "|" + atkID + "|" + e.dmg + "|";
+                Send(msg, reliableChannel, players);
+            }
+        }
+    }
+
     public void RequestActivityLog()
     {
         Debug.Log("OUT OF SYNC, REQUESTING LOG ORDER");
@@ -1075,6 +1252,11 @@ public class NetworkManager : MonoBehaviour {
             Enemy e = target.transform.GetComponent<Enemy>();
             tid = e.id;
             msg = "ENEMY";
+        }else if (target.tag == "Objective")
+        {
+            Objective o = target.transform.GetComponent<Objective>();
+            tid = o.id;
+            msg = "OBJECTIVE";
         }
 
         if (source.tag == "Projectile")
@@ -1082,6 +1264,11 @@ public class NetworkManager : MonoBehaviour {
             Projectile p = source.transform.GetComponent<Projectile>();
             sid = p.id;
             dmg = p.dmg;
+        }else if (source.tag == "Enemy")
+        {
+            Enemy e = source.transform.GetComponent<Enemy>();
+            sid = e.id;
+            dmg = e.dmg;
         }
 
         msg += "DMG|" + activityLog.Count + "|" + tid + "|" + sid + "|" + dmg + "|";
@@ -1107,6 +1294,7 @@ public class NetworkManager : MonoBehaviour {
 
     public void StartGame()
     {
+        enemyAttacks = new Dictionary<int, Dictionary<int, Attack>>();
         activityLog = new List<string>();
         activityLog.Add("STARTGAME|0|");
         if (isHost)

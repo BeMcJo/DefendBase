@@ -5,7 +5,7 @@ using UnityEngine;
 public class Enemy : MonoBehaviour
 {
     public static int EnemyCount = 0;
-    public int health = 2, maxHP = 2, dmg = 1, id;
+    public int health = 2, maxHP = 2, dmg = 1, id, attackCt;
     public float moveSpd = 1f,
                  timeToAttack = 2.5f,
                  atkTimer,
@@ -15,6 +15,7 @@ public class Enemy : MonoBehaviour
     // Use this for initialization
     protected virtual void Start()
     {
+        attackCt = 0;
         atkTimer = timeToAttack;
         id = EnemyCount;
         EnemyCount++;
@@ -37,26 +38,41 @@ public class Enemy : MonoBehaviour
         }
         if (target != null)
         {
-            transform.position = Vector3.MoveTowards(transform.position, targetPos, moveSpd);
-            transform.LookAt(targetPos);
+            
             float dist = Vector3.Distance(transform.position, targetPos);
-            if(dist <= .1f)
+            if (target.tag == "Path")
             {
-                //Debug.Log("close");
-                if(target.tag == "Path")
+                // Debug.Log("paths");
+
+                if (dist <= .1f)
                 {
-                   // Debug.Log("paths");
+                    //Debug.Log("close");
+
                     PlatformPath p = target.transform.GetComponent<PlatformPath>();
                     target = null;
-                    
-                    if(p.destTargets.Count > 0)
+
+                    if (p.destTargets.Count > 0)
                     {
-                     //   Debug.Log("another oen");
+                        //   Debug.Log("another oen");
                         SetTarget(p.destTargets[Random.Range(0, p.destTargets.Count)]);
                     }
-                } else if(target.tag == "Objective")
+                }
+                else
+                {
+                    transform.position = Vector3.MoveTowards(transform.position, targetPos, moveSpd);
+                    transform.LookAt(targetPos);
+                }
+            }
+            else if (target.tag == "Objective")
+            {
+                if (dist <= 2f)
                 {
                     Attack(target);
+                }
+                else
+                {
+                    transform.position = Vector3.MoveTowards(transform.position, targetPos, moveSpd);
+                    transform.LookAt(targetPos);
                 }
             }
         }
@@ -72,10 +88,18 @@ public class Enemy : MonoBehaviour
         if (atkTimer > 0)
             return;
         Debug.Log("attacking" + target.name);
-        if (target.tag == "Objective")
+        if (NetworkManager.nm.isStarted)
         {
-            Objective o = target.transform.GetComponent<Objective>();
-            o.TakeDamage(dmg);
+            NetworkManager.nm.QueueAttackOnObject(gameObject, target);
+            //NetworkManager.nm.NotifyObjectDamagedBy(target, gameObject);
+        }
+        else
+        {
+            if (target.tag == "Objective")
+            {
+                Objective o = target.transform.GetComponent<Objective>();
+                o.TakeDamage(dmg);
+            }
         }
         atkTimer = timeToAttack;
     }
@@ -84,6 +108,11 @@ public class Enemy : MonoBehaviour
     {
         GameManager.gm.AddScore(50);
         GameManager.gm.kills++;
+        if (NetworkManager.nm.isStarted)
+        {
+            NetworkManager.nm.RemoveEnemyAttacks(id);
+        }
+        GameManager.gm.enemies.Remove(id);
         Destroy(gameObject);
     }
 

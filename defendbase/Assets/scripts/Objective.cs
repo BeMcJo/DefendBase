@@ -3,11 +3,14 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Objective : MonoBehaviour {
+    public static int ObjectiveCount = 0;
+    public int id;
     public int HP = 10, maxHP = 10;
     public string objectiveType = "defend";
 	// Use this for initialization
 	void Start () {
-		
+        id = ObjectiveCount;
+        ObjectiveCount++;
 	}
 
     public void Reset()
@@ -26,7 +29,7 @@ public class Objective : MonoBehaviour {
         {
             //Debug.Log("Lose");
             GameManager.gm.resultNotification.SetActive(true);
-            GameManager.gm.inGame = false;
+            GameManager.gm.gameOver = false;
         }
 	}
 }

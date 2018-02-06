@@ -21,13 +21,18 @@ public class StatusIndicator : MonoBehaviour {
             Destroy(gameObject);
             return;
         }
+        if (GameManager.gm.player)
+        {
+            //Debug.Log("here");
+            healthBarGauge.LookAt(GameManager.gm.player.transform.GetComponent<PlayerController>().playerCam.transform);
+        }
         healthBarGauge.position = target.transform.position +
             new Vector3(
                 0,
                 target.transform.localScale.y +
                 healthBarGauge.transform.GetComponent<RectTransform>().rect.height,
                 0);
-        transform.localEulerAngles = target.transform.localEulerAngles;
+        //transform.localEulerAngles = target.transform.localEulerAngles;
         int hp = 0, maxHP = 1;
         if(target.tag == "Enemy")
         {
