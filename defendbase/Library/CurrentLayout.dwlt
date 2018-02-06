@@ -467,9 +467,9 @@ MonoBehaviour:
     height: 424
   m_TreeViewState:
     scrollPos: {x: 0, y: 0}
-    m_SelectedIDs: 686bfdff
-    m_LastClickedID: -169112
-    m_ExpandedIDs: a268fdff5a6bfdff686bfdff6e6cfdff3a72fdfffc72fdff3474fdffea74fdffa275fdffa675fdff2a0effff2e0effffcc10ffffe210fffff010ffff2e11ffff4411ffff5211fffff611ffff2e65fffff065ffff3267fffff267ffffb268ffffc068ffff8a80ffff6886ffff0689ffff1c89ffff2a89ffffce89ffff409affff009bffff4a9cffff129dffffdc9dfffff29dffffdad3fffffed6ffffa2d7fffff0f5ffffaaf6ffffe4f7ffff9cf8ffff56f9ffff5cf9ffffcafbfffff4ffffff00000000663900006e3a0000da4900000a4b0000e86f00009a850000
+    m_SelectedIDs: 
+    m_LastClickedID: 0
+    m_ExpandedIDs: 62c8fdff24c9fdff5ccafdff12cbfdffcacbfdffcecbfdffda20feff9c21feffd422feff8a23feff4224feff4624feffb478feff7679feffae7afeff647bfeff1c7cfeff207cfeffea27ffffac28ffffe429ffff9a2affff522bffff562bfffff049ffffb24affffea4bffffa04cffff584dffff5c4dffffe0e8ffffa4e9ffffe0eaffff9aebffff56ecffff5eecffff6cedffffa4f9ffffcafbfffff4ffffff000000002e290000bc290000422a0000942a0000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -519,14 +519,14 @@ MonoBehaviour:
     width: 467
     height: 424
   m_SceneLighting: 1
-  lastFramingTime: 10119.386669084333
+  lastFramingTime: 783.1038375232692
   m_2DMode: 0
   m_isRotationLocked: 0
   m_AudioPlay: 0
   m_Position:
-    m_Target: {x: -6.6975646, y: 13.637095, z: -64.11779}
+    m_Target: {x: 833.14557, y: 161.92732, z: 373.5879}
     speed: 2
-    m_Value: {x: -6.6975646, y: 13.637095, z: -64.11779}
+    m_Value: {x: 833.14557, y: 161.92732, z: 373.5879}
   m_RenderMode: 0
   m_ValidateTrueMetals: 0
   m_SceneViewState:
@@ -549,13 +549,13 @@ MonoBehaviour:
       speed: 2
       m_Value: 0
   m_Rotation:
-    m_Target: {x: -0.09116978, y: 0.4154722, z: -0.04189805, w: -0.904055}
+    m_Target: {x: -0.0838927, y: 0.018214302, z: -0.0015333348, w: -0.9963072}
     speed: 2
-    m_Value: {x: -0.09116978, y: 0.4154722, z: -0.04189805, w: -0.904055}
+    m_Value: {x: -0.0838927, y: 0.018214302, z: -0.0015333348, w: -0.9963072}
   m_Size:
-    m_Target: 0.05230236
+    m_Target: 1365.7697
     speed: 2
-    m_Value: 0.05230236
+    m_Value: 1365.7697
   m_Ortho:
     m_Target: 0
     speed: 2
@@ -636,9 +636,9 @@ MonoBehaviour:
   m_Pos:
     serializedVersion: 2
     x: 8
-    y: 549
+    y: 545
     width: 671
-    height: 252
+    height: 249
   m_SearchFilter:
     m_NameFilter: 
     m_ClassNames: []
@@ -650,18 +650,18 @@ MonoBehaviour:
     m_ShowAllHits: 0
     m_SearchArea: 0
     m_Folders:
-    - Assets/prefabs
+    - Assets/scenes
   m_ViewMode: 1
   m_StartGridSize: 16
   m_LastFolders:
-  - Assets/prefabs
+  - Assets/scenes
   m_LastFoldersGridSize: 16
   m_LastProjectPath: C:\Users\TwoTen512\Desktop\Unity Programs\DefendBase\DefendBase
   m_IsLocked: 0
   m_FolderTreeState:
     scrollPos: {x: 0, y: 0}
-    m_SelectedIDs: 6e250000
-    m_LastClickedID: 9582
+    m_SelectedIDs: 70250000
+    m_LastClickedID: 9584
     m_ExpandedIDs: 000000000c25000070250000ffffff7f
     m_RenameOverlay:
       m_UserAcceptedRename: 0
@@ -715,8 +715,8 @@ MonoBehaviour:
       m_Icon: {fileID: 0}
       m_ResourceFile: 
   m_ListAreaState:
-    m_SelectedInstanceIDs: 62250000
-    m_LastClickedInstanceID: 9570
+    m_SelectedInstanceIDs: 
+    m_LastClickedInstanceID: 0
     m_HadKeyboardFocusLastEvent: 1
     m_ExpandedInstanceIDs: c6230000fa250000ecea0100683301004a270000802b0000f82600001427000086270000a23e0000c42600006a2500002226000016260000f42500009627000092bcffff16f9fdff6e2500005ef2fbff56defbff7a4202003a250000a4250000b0250000e82500008ccc85ffa6210100148cd9ff1a2600000e2600004e270000662700002a2600004a12ecff4e10d0ff9e250000000000007425000084250000ba250000
     m_RenameOverlay:

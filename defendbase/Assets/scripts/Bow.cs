@@ -170,7 +170,7 @@ public class Bow : Weapon {
 
     public override void Shoot(float chargePower)
     {
-        if (chargePower > .05f)
+        if (chargePower > .05f && arrow)
         {
             //chargeBarGuage.SetActive(false);
             //GameObject bullet = Instantiate(bulletPrefab);

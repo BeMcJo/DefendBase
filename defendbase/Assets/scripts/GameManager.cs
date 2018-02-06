@@ -267,9 +267,18 @@ public class GameManager : MonoBehaviour {
         //gyroEnabled = true;
         totalKills = 0;
         intermissionCanvas = GameObject.Find("IntermissionCanvas");
+        if (NetworkManager.nm.isStarted)
+        {
+            intermissionCanvas.transform.Find("ResumeBtn").GetComponent<Button>().onClick.AddListener(NetworkManager.nm.RequestReady);
+            intermissionCanvas.transform.Find("ResumeBtn").GetChild(0).GetComponent<Text>().text = "Ready";
+        }
+        else
+        {
+            intermissionCanvas.transform.Find("ResumeBtn").GetComponent<Button>().onClick.AddListener(NextWave);
+        }
         intermissionCanvas.transform.Find("SaveAndQuitBtn").GetComponent<Button>().onClick.AddListener(SaveAndQuit);
-        intermissionCanvas.transform.Find("ResumeBtn").GetComponent<Button>().onClick.AddListener(NextWave);
         intermissionCanvas.SetActive(false);
+
         enemiesContainer = GameObject.Find("EnemiesContainer");
         projectilesContainer = GameObject.Find("ProjectilesContainer");
         particleEffectsContainer = GameObject.Find("ParticleEffectsContainer");
@@ -345,6 +354,10 @@ public class GameManager : MonoBehaviour {
         startWaves = false;
         intermissionCanvas.SetActive(true);
         intermissionCanvas.transform.Find("StatsTxt").GetComponent<Text>().text = "Score: " + score + "\tKills: " + totalKills + "\nNext Wave: " + (wave + 1);
+        if(NetworkManager.nm.isStarted && NetworkManager.nm.isHost)
+        {
+            intermissionCanvas.transform.Find("ResumeBtn").GetComponent<Button>().interactable = false;
+        }
     }
 
     public void DisplayOptions()
@@ -502,10 +515,10 @@ public class GameManager : MonoBehaviour {
         Debug.Log("Starting Game");
         inGame = true;
         paused = false;
-        
+        Enemy.EnemyCount = 0;
         score = 0;
         kills = 0;
-        wave = 0;
+        wave = 4;
         totalKills = 0;
         MapManager.mapManager.LoadMap(0);
         if (data != null && data.savedGame)
@@ -526,6 +539,8 @@ public class GameManager : MonoBehaviour {
         //Debug.Log("Starting Wave " + w);
         //Debug.Log("Displaying wave");
         //spawnIndex = 0;
+
+        intermissionCanvas.SetActive(false);
         onIntermission = false;
         ResetSpawnSetup(w);
         pattern = EnemySpawnPattern.patternsBySpawnPointCt[0][w % EnemySpawnPattern.patternsBySpawnPointCt[0].Count];   

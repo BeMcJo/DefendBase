@@ -218,6 +218,8 @@ public class NetworkManager : MonoBehaviour {
         if (GameManager.gm.inGame)
         {
             //Debug.Log("IONGAMRE");
+            if (GameManager.gm.onIntermission || !GameManager.gm.startWaves)
+                return;
             sendTimer -= Time.deltaTime;
             if (sendTimer <= 0)
             {
@@ -1021,8 +1023,8 @@ public class NetworkManager : MonoBehaviour {
 
     public void OnEnemyDamaged(string[] data)
     {
-        for (int i = 0; i < data.Length; i++)
-            Debug.Log(data[i]);
+        //for (int i = 0; i < data.Length; i++)
+        //    Debug.Log(data[i]);
         int targetID = int.Parse(data[2]);
         int sourceID = int.Parse(data[3]);
         if(sourceID == ourClientID)
@@ -1265,8 +1267,19 @@ public class NetworkManager : MonoBehaviour {
             return;
         }
         RequestAction("READY");
-        GameManager.gm.lobbyCanvas.transform.Find("BackBtn").GetComponent<Button>().interactable = false;
-        GameManager.gm.lobbyCanvas.transform.Find("ReadyBtn").GetComponent<Button>().interactable = false;
+        if (!GameManager.gm.inGame)
+        {
+            GameManager.gm.lobbyCanvas.transform.Find("BackBtn").GetComponent<Button>().interactable = false;
+            GameManager.gm.lobbyCanvas.transform.Find("ReadyBtn").GetComponent<Button>().interactable = false;
+        }
+        else
+        {
+            if (GameManager.gm.onIntermission)
+            {
+                GameManager.gm.intermissionCanvas.transform.Find("ResumeBtn").GetComponent<Button>().interactable = false;
+                GameManager.gm.intermissionCanvas.transform.Find("SaveAndQuitBtn").GetComponent<Button>().interactable = false;
+            }
+        }
     }
 
     public void OnReady(int cnnID)
@@ -1310,6 +1323,13 @@ public class NetworkManager : MonoBehaviour {
             if (isHost)
                 GameManager.gm.lobbyCanvas.transform.Find("ReadyBtn").GetComponent<Button>().interactable = readyToStart && players.Count > 1;
         }
+        else
+        {
+            if (GameManager.gm.onIntermission)
+            {
+                GameManager.gm.intermissionCanvas.transform.Find("ResumeBtn").GetComponent<Button>().interactable = readyToStart;
+            }
+        }
         if (isHost)
         {
             if (cnnID == ourClientID)
@@ -1321,9 +1341,14 @@ public class NetworkManager : MonoBehaviour {
                 }
                 else
                 {
+                    if(GameManager.gm.onIntermission)
+                    {
+                        StartWave(GameManager.gm.wave);
+                        return;
+                    }
                 }
             }
-            if (GameManager.gm.inGame && readyToStart)
+            if (GameManager.gm.inGame && readyToStart && !GameManager.gm.onIntermission)
                 StartWave(GameManager.gm.wave);
         }
         else if(cnnID == ourClientID)
@@ -1333,6 +1358,14 @@ public class NetworkManager : MonoBehaviour {
             {
                 GameManager.gm.lobbyCanvas.transform.Find("BackBtn").GetComponent<Button>().interactable = true;
                 GameManager.gm.lobbyCanvas.transform.Find("ReadyBtn").GetComponent<Button>().interactable = true;
+            }
+            else
+            {
+                if (GameManager.gm.onIntermission)
+                {
+                    GameManager.gm.intermissionCanvas.transform.Find("ResumeBtn").GetComponent<Button>().interactable = true;
+                    GameManager.gm.intermissionCanvas.transform.Find("SaveAndQuitBtn").GetComponent<Button>().interactable = true;
+                }
             }
         }
     }
