@@ -79,7 +79,7 @@ public class NetworkManager : MonoBehaviour {
     private bool initialConfirmation = true;
 
     private bool isBroadcasting = false;
-    private bool isHost = false;
+    public bool isHost = false;
     private bool isListening = false;
     private bool gameStarted = false;
     private bool doneSetup = false;
@@ -560,6 +560,7 @@ public class NetworkManager : MonoBehaviour {
         c.playerName = "TEMP";
         c.playerGO = Instantiate(GameManager.gm.playerUIPrefab);
         c.playerGO.SetActive(false);
+        Debug.Log(cnnId);
         players.Add(cnnId, c);
         if (players.Count == MAX_PLAYERS - 1)
         {
@@ -632,8 +633,8 @@ public class NetworkManager : MonoBehaviour {
         NetworkEventType recData = NetworkTransport.Receive(out recHostId, out connectionId, out channelId, recBuffer, bufferSize, out dataSize, out error);
         //Debug.Log(recHostId + " " + connectionId + " " + channelId + " " + recBuffer + " " + bufferSize + " " + dataSize + " " + error);
 
-        if (recData != NetworkEventType.Nothing)
-            Debug.Log(recData);
+        //if (recData != NetworkEventType.Nothing)
+            //Debug.Log(recData);
         switch (recData)
         {
             case NetworkEventType.ConnectEvent:    //2
@@ -643,14 +644,30 @@ public class NetworkManager : MonoBehaviour {
                 break;
             case NetworkEventType.DataEvent:       //3
                 string msg = Encoding.Unicode.GetString(recBuffer, 0, dataSize);
-                Debug.Log("Player " + connectionId + " has sent: " + msg);
+                //Debug.Log("Player " + connectionId + " has sent: " + msg);
                 string[] splitData = msg.Split('|');
-
+                int logID;
                 switch (splitData[0])
                 {
                     /*case "DONESETUP":
                         OnDoneSetup(connectionId);
                         break;*/
+                    case "ENEMYDMG":
+                        //logID = int.Parse(splitData[1]);
+                        Debug.Log(msg);
+                        if (activityLog.Count > 0)
+                            Debug.Log(activityLog[activityLog.Count - 1]);
+                        /*if (logID != activityLog.Count)
+                        {
+                            RequestActivityLog();
+                            break;
+                        }*/
+                        OnEnemyDamaged(splitData);
+                        msg = splitData[0] + "|" + activityLog.Count + "|" + splitData[2] + "|" + splitData[3] + "|" + splitData[4] + "|";
+                        activityLog.Add(msg);
+                        Send(msg, reliableChannel, players);
+                        break;
+
                     case "LEAVELOBBY?":
                         Debug.Log("Disconnectin gplayer" + connectionId);
                         Send("DC|" + connectionId, reliableChannel, connectionId);
@@ -793,9 +810,10 @@ public class NetworkManager : MonoBehaviour {
             case NetworkEventType.DataEvent:       //3
                 //Debug.Log("data");
                 string msg = Encoding.Unicode.GetString(recBuffer, 0, dataSize);
-                Debug.Log("Receiving : " + msg);
+                //Debug.Log("Receiving : " + msg);
                 string[] splitData = msg.Split('|');
-
+                int logID;
+                int cnnID;
                 switch (splitData[0])
                 {
                     /*case "ANYREQUESTS":
@@ -811,10 +829,46 @@ public class NetworkManager : MonoBehaviour {
                     case "CNN":
                         SpawnPlayerUI(splitData[1], int.Parse(splitData[2]));
                         break;
-                        
+
+                    case "ENEMYDMG":
+                        logID = int.Parse(splitData[1]);
+                        cnnID = int.Parse(splitData[3]);
+
+                        print(msg);
+                        if (activityLog.Count > 0)
+                            print(activityLog[activityLog.Count - 1]);
+                        //if (cnnID == ourClientID)
+                        //{
+                        //    break;
+                        //}
+                        if (logID != activityLog.Count)
+                        {
+                            RequestActivityLog();
+                            break;
+                        }
+                        OnEnemyDamaged(splitData);
+                        activityLog.Add(msg);
+                        break;
+
+                    case "ENEMYSPAWN":
+
+                        print(msg);
+                        //if (activityLog.Count > 0)
+                        //    print(activityLog[activityLog.Count - 1]);
+                        logID = int.Parse(splitData[1]);
+                        if(logID != activityLog.Count)
+                        {
+                            RequestActivityLog();
+                            break;
+                        }
+                        SpawnEnemy(int.Parse(splitData[2]));
+                        //activityLog.Add(msg);
+                        break;
+
                     case "DC":
                         PlayerDisconnected(int.Parse(splitData[1]));
                         break;
+
                         /*
                     case "DECK":
                         ReceiveDeck(splitData);
@@ -892,7 +946,7 @@ public class NetworkManager : MonoBehaviour {
                         StartGame();
                         break;
                     case "STARTWAVE":
-                        int logID = int.Parse(splitData[1]);
+                        logID = int.Parse(splitData[1]);
                         if(logID != activityLog.Count)
                         {
                             RequestActivityLog();
@@ -928,7 +982,10 @@ public class NetworkManager : MonoBehaviour {
                 if (connectionId == ourClientID)
                 {
                     Debug.Log("HOST DC?");
-                    LeaveLobby();
+                    if (GameManager.gm.inGame)
+                        LeaveGame();
+                    else
+                        LeaveLobby();
                     /*if (GameManager.gm.durak != -1)
                         return;
                     Debug.Log("THATS OUR MAIN CON");
@@ -962,16 +1019,53 @@ public class NetworkManager : MonoBehaviour {
         }
     }
 
+    public void OnEnemyDamaged(string[] data)
+    {
+        for (int i = 0; i < data.Length; i++)
+            Debug.Log(data[i]);
+        int targetID = int.Parse(data[2]);
+        int sourceID = int.Parse(data[3]);
+        if(sourceID == ourClientID)
+        {
+            return;
+        }
+        int dmg = int.Parse(data[4]);
+        if (GameManager.gm.enemies.ContainsKey(targetID))
+        {
+            GameManager.gm.enemies[targetID].TakeDamage(dmg);
+            if (GameManager.gm.enemies[targetID] == null || GameManager.gm.enemies[targetID].health <= 0)
+            {
+                GameManager.gm.enemies.Remove(targetID);
+            }
+        }
+    }
+
     public void RequestActivityLog()
     {
         Debug.Log("OUT OF SYNC, REQUESTING LOG ORDER");
     }
 
+    public void SpawnEnemy(int sp)
+    {
+        if (sp == -1)
+            sp = UnityEngine.Random.Range(0, MapManager.mapManager.spawnPoints.Count);
+        NotifySpawnEnemyAt(sp);
+        StartCoroutine(GameManager.gm.SpawnEnemy(sp));
+    }
+
+    public void NotifySpawnEnemyAt(int spawnPoint)
+    {
+        string msg = "ENEMYSPAWN|" + activityLog.Count + "|" + spawnPoint + "|";
+        if(isHost)
+            Send(msg, reliableChannel, players);
+        activityLog.Add(msg);
+    }
+
     public void NotifyObjectDamagedBy(GameObject target, GameObject source)
     {
         string msg = "";
-        int tid = 0, 
-            sid = 0,
+        int tid = -1, 
+            sid = -1,
             dmg = 0;
 
         if (target.tag == "Enemy")
@@ -987,7 +1081,9 @@ public class NetworkManager : MonoBehaviour {
             sid = p.id;
             dmg = p.dmg;
         }
-        msg += "DMG|" + tid + "|" + sid + "|" + dmg + "|";
+
+        msg += "DMG|" + activityLog.Count + "|" + tid + "|" + sid + "|" + dmg + "|";
+        Debug.Log(msg);
         if (isHost)
         {
             Send(msg, reliableChannel,players);
@@ -1051,6 +1147,7 @@ public class NetworkManager : MonoBehaviour {
         }
         GameManager.gm.StartWave(wave);
         activityLog.Add(msg);
+        ResetReadyStatus();
     }
 
     private void PlayerDisconnected(int cnnId)
@@ -1136,6 +1233,10 @@ public class NetworkManager : MonoBehaviour {
     {
         if (!isStarted)
             return;
+        if (isBroadcasting)
+        {
+            StopBroadcast();
+        }
         if (hostID != -1)
         {
             if(!isConnected)
@@ -1281,6 +1382,25 @@ public class NetworkManager : MonoBehaviour {
         }
     }
 
+    public void LeaveGame()
+    {
+        Debug.Log("Leaving");
+        isStarted = false;
+        foreach (KeyValuePair<int, Player> kvp in players)
+        {
+            Destroy(kvp.Value.playerGO);
+        }
+        players.Clear();
+        if (isBroadcasting)
+        {
+            StopBroadcast();
+        }
+        //GameManager.gm.ToggleLobbyCanvas();
+        //GameManager.gm.ToggleMultiplayerCanvas();
+        inLobby = false;
+        Disconnect();
+    }
+
     public void LeaveLobby()
     {
         Debug.Log("Leaving");
@@ -1326,7 +1446,7 @@ public class NetworkManager : MonoBehaviour {
                 GameManager.gm.player = playerGO;
             }
 
-            playerGO.transform.GetComponent<PlayerController>().id = connectionId;
+            playerGO.transform.GetComponent<PlayerController>().id = kvp.Value.connectionID;
             playerGO.transform.position = playerSpawnPoints.transform.GetChild(spawnPt).position;
             playerGO.transform.SetParent(GameManager.gm.playerRotation.transform);
             spawnPt++;
@@ -1370,7 +1490,7 @@ public class NetworkManager : MonoBehaviour {
 
     private void Send(string message, int channelId)
     {
-        Debug.Log("Sending : " + message);
+        //Debug.Log("Sending : " + message);
         byte[] msg = Encoding.Unicode.GetBytes(message);
         NetworkTransport.Send(hostID, connectionId, channelId, msg, message.Length * sizeof(char), out error);
     }
@@ -1379,14 +1499,14 @@ public class NetworkManager : MonoBehaviour {
     {
         //if (!players.ContainsKey(cnnId))
         //    return;
-        Debug.Log("send" + message + " " + cnnId);
+        //Debug.Log("send" + message + " " + cnnId);
         NetworkTransport.Send(hostID, cnnId, channelId, Encoding.Unicode.GetBytes(message), message.Length * sizeof(char), out error);
     }
 
     private void Send(string message, int channelId, Dictionary<int, Player> c)
     {
 
-        Debug.Log("Sending : " + message);
+        //Debug.Log("Sending : " + message);
         byte[] msg = Encoding.Unicode.GetBytes(message);
         foreach (KeyValuePair<int, Player> kvp in players)
         {

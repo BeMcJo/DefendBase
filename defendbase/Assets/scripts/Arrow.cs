@@ -43,7 +43,6 @@ public class Arrow : Projectile {
             if (!hitGround && id == GameManager.gm.player.transform.GetComponent<PlayerController>().id)
             {
                 //Debug.Log("colide");
-                //if(networ)
                 Enemy e = collision.transform.GetComponent<Enemy>();
                 
                 e.transform.GetComponent<Rigidbody>().velocity = Vector3.zero;
@@ -54,7 +53,7 @@ public class Arrow : Projectile {
                         deflected = true;
                         transform.GetComponent<Rigidbody>().velocity = Vector3.zero;
                     }
-
+                    Debug.Log(gameObject.tag);
                     if (NetworkManager.nm.isStarted)
                     {
                         NetworkManager.nm.NotifyObjectDamagedBy(e.gameObject, gameObject);

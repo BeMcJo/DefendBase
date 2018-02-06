@@ -31,6 +31,8 @@ public class GameManager : MonoBehaviour {
 
     public PlayerData data;
 
+    public Dictionary<int, Enemy> enemies;
+
     public bool inGame,
                 startWaves,
                 spawning,
@@ -146,6 +148,7 @@ public class GameManager : MonoBehaviour {
     void Start () {
         if (gm)
             return;
+        enemies = new Dictionary<int, Enemy>();
         //Debug.Log("START");
         gm = this;
         gm.data = new PlayerData();
@@ -535,12 +538,14 @@ public class GameManager : MonoBehaviour {
         //}
     }
 
-    public IEnumerator SpawnEnemy()
+    public IEnumerator SpawnEnemy(int sp)
     {
         spawning = true;
         enemiesSpawned++;
         GameObject enemy = Instantiate(enemyPrefab);
-        GameObject spawnPoint = MapManager.mapManager.spawnPoints[UnityEngine.Random.Range(0, MapManager.mapManager.spawnPoints.Count)];
+        if(sp == -1)
+            sp = UnityEngine.Random.Range(0, MapManager.mapManager.spawnPoints.Count);
+        GameObject spawnPoint = MapManager.mapManager.spawnPoints[sp];
         enemy.transform.position = new Vector3(
                                     spawnPoint.transform.position.x,
                                     enemy.transform.position.y,
@@ -551,6 +556,10 @@ public class GameManager : MonoBehaviour {
         enemy.transform.SetParent(enemiesContainer.transform);
         enemyUI.transform.SetParent(enemiesContainer.transform);
         spawnIndex++;
+        //if (NetworkManager.nm.isStarted && NetworkManager.nm.isHost)
+        //{
+        //    NetworkManager.nm.NotifySpawnEnemyAt(sp);
+        //}
         if(spawnIndex >= pattern.spawnCts[intervalIndex].Count)
         {
             if (intervalIndex >= pattern.spawnFreqs.Count)
@@ -657,13 +666,16 @@ public class GameManager : MonoBehaviour {
         scoreTxt.text = "Score: " + score + ", spawned" + enemiesSpawned + "/kills" + kills;
         if (!doneSpawningWave)
         {
-            if (!spawning)
+            if (!spawning && (!NetworkManager.nm.isStarted || NetworkManager.nm.isHost))
             {
                 spawnTimer -= Time.deltaTime;
                 if (spawnTimer <= 0)
                 {
                     Debug.Log("SPAWED");
-                    StartCoroutine(SpawnEnemy());
+                    if (NetworkManager.nm.isStarted)
+                        NetworkManager.nm.SpawnEnemy(-1);
+                    else
+                        StartCoroutine(SpawnEnemy(-1));
                     //spawnTimer = timeToSpawn;
                 }
             }
@@ -681,7 +693,12 @@ public class GameManager : MonoBehaviour {
                 }
                 else
                 {
-                    StartWave(wave);
+                    if(!NetworkManager.nm.isStarted)
+                        StartWave(wave);
+                    else
+                    {
+                        NetworkManager.nm.RequestReady();
+                    }
                 }
             }
         }

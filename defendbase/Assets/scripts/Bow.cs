@@ -123,7 +123,8 @@ public class Bow : Weapon {
     public override void EndUse()
     {
         touchID = -1;
-        arrow.localPosition = bulletSpawn.localPosition;
+        if(arrow)
+            arrow.localPosition = bulletSpawn.localPosition;
         drawRange = drawOffset;
         Shoot(chargePower);
         charging = false;
@@ -137,7 +138,8 @@ public class Bow : Weapon {
         {
             this.chargePower = chargePower;
             drawRange = drawOffset + chargePower * drawLimit * drawElasticity;
-            arrow.localPosition = bulletSpawn.localPosition + new Vector3(0, 0, chargePower * drawLimit);
+            if(arrow)
+                arrow.localPosition = bulletSpawn.localPosition + new Vector3(0, 0, chargePower * drawLimit);
             return;
         }
         Touch t;

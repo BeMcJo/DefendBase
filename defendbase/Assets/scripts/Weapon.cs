@@ -68,7 +68,7 @@ public abstract class Weapon : MonoBehaviour {
 
     public virtual bool StartUse()
     {
-        Debug.Log("?");
+        //Debug.Log("?");
         inUse = true;
         charging = true;
         chargePower = 0;
@@ -94,7 +94,7 @@ public abstract class Weapon : MonoBehaviour {
 
     public virtual void EndUse()
     {
-        Debug.Log("FIRE");
+        //Debug.Log("FIRE");
         inUse = false;
         //Shoot(chargePower);
     }

@@ -18,6 +18,10 @@ public class Enemy : MonoBehaviour
         atkTimer = timeToAttack;
         id = EnemyCount;
         EnemyCount++;
+        if (GameManager.gm.enemies != null)
+        {
+            GameManager.gm.enemies[id] = this;
+        }
         //target = GameObject.Find("Gate");
     }
 
