@@ -29,7 +29,7 @@ public class Enemy : MonoBehaviour
     // Update is called once per frame
     protected virtual void Update()
     {
-        if (!GameManager.gm.inGame)
+        if (!GameManager.gm.inGame || GameManager.gm.gameOver)
             return;
         if (health <= 0)
         {

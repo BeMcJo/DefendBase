@@ -51,6 +51,8 @@ public class GameManager : MonoBehaviour {
                intervalIndex,
                patternIterations,
                enemiesSpawned,
+               playerCurrency,
+               inGameCurrency,
                score;
 
     public Vector3 playerOrientation;
@@ -59,6 +61,7 @@ public class GameManager : MonoBehaviour {
                       playerPrefab,
                       playerUIPrefab,
                       buttonPrefab,
+                      enemyArmorPrefab,
                       enemyPrefab;
 
     public GameObject playerStatusCanvas,
@@ -484,12 +487,12 @@ public class GameManager : MonoBehaviour {
 
     public void ResetSpawnSetup(int w)
     {
-        spawnIndex = 0;
         //timeToSpawn = 10f;
         spawnTimer = 0;
         startWaves = false;
-        intervalIndex = 0;
+        //intervalIndex = 0;
         wave = w;
+        //totalKills += kills;
         kills = 0;
         enemiesSpawned = 0;
         doneSpawningWave = false;
@@ -564,7 +567,6 @@ public class GameManager : MonoBehaviour {
     {
         if (inGame)
         {
-
             spawning = true;
             enemiesSpawned++;
             GameObject enemy = Instantiate(enemyPrefab);
@@ -585,10 +587,14 @@ public class GameManager : MonoBehaviour {
             //{
             //    NetworkManager.nm.NotifySpawnEnemyAt(sp);
             //}
+            Debug.Log(spawnIndex + " " +pattern.spawnCts[intervalIndex].Count);
+
             if (spawnIndex >= pattern.spawnCts[intervalIndex].Count)
             {
+                spawnIndex = 0;
                 if (intervalIndex >= pattern.spawnFreqs.Count)
                 {
+                    intervalIndex = 0;
                     yield return new WaitForSeconds(pattern.endIterationTime);
                     patternIterations--;
                     if (patternIterations <= 0)
@@ -597,8 +603,7 @@ public class GameManager : MonoBehaviour {
                     }
                     else
                     {
-                        spawnIndex = 0;
-                        intervalIndex = 0;
+                        //spawnIndex = 0;
                         //pattern = EnemySpawnPattern.patternsBySpawnPointCt[0][wave % 2];
                         spawnTimer = 0;
                         //patternIterations = pattern.iterations;
@@ -712,6 +717,8 @@ public class GameManager : MonoBehaviour {
             {
                 startWaves = false;
                 wave++;
+                totalKills += kills;
+                kills = 0;
                 if(wave % 5 == 0)
                 {
                     DisplayIntermission();
