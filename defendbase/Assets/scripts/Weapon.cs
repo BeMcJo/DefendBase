@@ -81,7 +81,6 @@ public abstract class Weapon : MonoBehaviour {
 
     public virtual bool StartUse(Touch t)
     {
-        Debug.Log("?");
         inUse = true;
         charging = true;
         chargePower = 0;

@@ -1649,7 +1649,7 @@ public class NetworkManager : MonoBehaviour {
 
         //StartCoroutine(WaitForGameManagerToLoad());
         int spawnPt = 0;
-        Debug.Log(players.Count);
+        //Debug.Log(players.Count);
         //GameObject playerSpawnPoint = GameObject.Find("Player Rotation").transform.Find("PlayerSpawnPoint").gameObject;
         foreach (KeyValuePair<int, Player> kvp in players)
         {

@@ -2,21 +2,50 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+public class EnemyStats
+{
+    public int maxHP, dmg;
+    public float moveSpd, atkSpd;
+    public EnemyStats(int hp, int dmg, float ms, float atkSpd)
+    {
+        maxHP = hp;
+        this.dmg = dmg;
+        moveSpd = ms;
+        this.atkSpd = atkSpd;
+    }
+}
 public class Enemy : MonoBehaviour
 {
     public static int EnemyCount = 0;
-    public int health = 2, maxHP = 2, dmg = 1, id, attackCt;
-    public float moveSpd = 1f,
-                 timeToAttack = 2.5f,
+    public static EnemyStats[] difficulties = new EnemyStats[] {
+        new EnemyStats(1, 1, 1, 1),
+        new EnemyStats(2, 2, 1.2f, 1.2f),
+        new EnemyStats(2, 2, 1.25f, 1.2f),
+        new EnemyStats(3, 2, 1.5f, 1.2f),
+        new EnemyStats(3, 2, 1.5f, 1.2f)
+    };
+    public int health = 2, maxHP = 2, dmg = 1, id, attackCt, level;
+    public float originalMoveSpd = 0.075f,
+                 effectiveMoveSpd,
+                 originalTimeToAttack = 2.5f,
+                 effectiveTimeToAttack,
                  atkTimer,
-                 attackSpd = 1f;
+                 originalAttackSpd = 1f,
+                 effectiveAttackSpd;
     public GameObject target;
     public Vector3 targetPos;
     // Use this for initialization
     protected virtual void Start()
     {
+        maxHP = difficulties[level].maxHP;
+        health = maxHP;
+        dmg = difficulties[level].dmg;
+        effectiveMoveSpd = originalMoveSpd * difficulties[level].moveSpd;
+        effectiveTimeToAttack = originalTimeToAttack / difficulties[level].atkSpd;
+        atkTimer = effectiveTimeToAttack;
+        effectiveAttackSpd = originalAttackSpd / difficulties[level].atkSpd;
         attackCt = 0;
-        atkTimer = timeToAttack;
+        //atkTimer = timeToAttack;
         id = EnemyCount;
         EnemyCount++;
         if (GameManager.gm.enemies != null)
@@ -59,7 +88,7 @@ public class Enemy : MonoBehaviour
                 }
                 else
                 {
-                    transform.position = Vector3.MoveTowards(transform.position, targetPos, moveSpd);
+                    transform.position = Vector3.MoveTowards(transform.position, targetPos, effectiveMoveSpd);
                     transform.LookAt(targetPos);
                 }
             }
@@ -71,7 +100,7 @@ public class Enemy : MonoBehaviour
                 }
                 else
                 {
-                    transform.position = Vector3.MoveTowards(transform.position, targetPos, moveSpd);
+                    transform.position = Vector3.MoveTowards(transform.position, targetPos, effectiveMoveSpd);
                     transform.LookAt(targetPos);
                 }
             }
@@ -101,7 +130,7 @@ public class Enemy : MonoBehaviour
                 o.TakeDamage(dmg);
             }
         }
-        atkTimer = timeToAttack;
+        atkTimer = effectiveTimeToAttack;
     }
 
     public virtual void Die()

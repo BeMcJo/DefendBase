@@ -36,6 +36,7 @@ public class GameManager : MonoBehaviour {
     public bool inGame,
                 gameOver,
                 startWaves,
+                continuedGame,
                 spawning,
                 doneSpawningWave,
                 setupRotation,
@@ -53,6 +54,7 @@ public class GameManager : MonoBehaviour {
                enemiesSpawned,
                playerCurrency,
                inGameCurrency,
+               difficulty,
                score;
 
     public Vector3 playerOrientation;
@@ -107,16 +109,19 @@ public class GameManager : MonoBehaviour {
                 data.savedGame = inGame;
                 data.totalKills = totalKills;
                 data.score = score;
-                if(objective != null)
+                Debug.Log(inGame + " " + wave);
+                if (objective != null)
+                {
                     data.objectiveHP = objective.transform.GetComponent<Objective>().HP;
+                }
                 data.wave = wave;
-                gm.data = data;
+                //gm.data = data;
                 bf.Serialize(file, data);
                 break;
         }
         
         file.Close();
-        Debug.Log("saved");
+        Debug.Log("Saved " + type);
     }
 
     public void Load(string type)
@@ -144,7 +149,10 @@ public class GameManager : MonoBehaviour {
 
             file.Close();
         }
-        Debug.Log("File Does Not Exists");
+        else
+        {
+            Debug.Log("File Does Not Exists");
+        }
     }
 
     // Use this for initialization
@@ -160,7 +168,6 @@ public class GameManager : MonoBehaviour {
         DontDestroyOnLoad(gm);
         playerOrientation = Vector3.zero;
         Screen.orientation = ScreenOrientation.Landscape;
-        Load("continuedGame");
         LoadMainScene();
         EnemySpawnPattern.InstantiatePatterns();
     }
@@ -215,6 +222,7 @@ public class GameManager : MonoBehaviour {
 
     public void LoadMainScene()
     {
+        Load("continuedGame");
         scene = "main";
         inGame = false;
         //playingOnline = false;
@@ -226,7 +234,7 @@ public class GameManager : MonoBehaviour {
         btnContainer.Find("OnlineBtn").GetComponent<Button>().onClick.AddListener(ToggleMultiplayerCanvas);
         btnContainer.Find("OnlineBtn").GetComponent<Button>().onClick.AddListener(ToggleMainMenuCanvas);
         btnContainer.Find("SettingsBtn").GetComponent<Button>().onClick.AddListener(GoToCalibrationScene);
-        btnContainer.Find("ContinueBtn").GetComponent<Button>().onClick.AddListener(GoToGameScene);
+        btnContainer.Find("ContinueBtn").GetComponent<Button>().onClick.AddListener(GoToContinuedGameScene);
         btnContainer.Find("ContinueBtn").GetChild(0).GetComponent<Text>().text += (data != null && data.savedGame) ? " (Wave " + (data.wave+1) + ")" : "";
         btnContainer.Find("ContinueBtn").gameObject.SetActive(data != null && data.savedGame);
 
@@ -390,8 +398,15 @@ public class GameManager : MonoBehaviour {
         SceneManager.LoadScene("main");
     }
 
+    public void GoToContinuedGameScene()
+    {
+        continuedGame = true;
+        SceneManager.LoadScene("game");
+    }
+
     public void GoToGameScene()
     {
+        continuedGame = false;
         SceneManager.LoadScene("game");
     }
 
@@ -528,15 +543,21 @@ public class GameManager : MonoBehaviour {
         Objective.ObjectiveCount = 0;
         score = 0;
         kills = 0;
+        difficulty = 0;
         wave = 0;
         totalKills = 0;
         MapManager.mapManager.LoadMap(0);
-        if (data != null && data.savedGame)
+        if (continuedGame)
         {
-            score = data.score;
-            totalKills = data.totalKills;
-            wave = data.wave;
-            objective.transform.GetComponent<Objective>().HP = data.objectiveHP;
+            Debug.Log("COntinued");
+            if (data != null && data.savedGame)
+            {
+                Debug.Log("fetching saved data");
+                score = data.score;
+                totalKills = data.totalKills;
+                wave = data.wave;
+                objective.transform.GetComponent<Objective>().HP = data.objectiveHP;
+            }
         }
         //data = new PlayerData();
         if (NetworkManager.nm.isStarted)
@@ -582,6 +603,9 @@ public class GameManager : MonoBehaviour {
             enemyUI.transform.GetComponent<StatusIndicator>().target = enemy;
             enemy.transform.SetParent(enemiesContainer.transform);
             enemyUI.transform.SetParent(enemiesContainer.transform);
+            Enemy e = enemy.transform.GetComponent<Enemy>();
+            e.level = (pattern.enemyLvls[intervalIndex][spawnIndex] + difficulty) % Enemy.difficulties.Length;
+
             spawnIndex++;
             //if (NetworkManager.nm.isStarted && NetworkManager.nm.isHost)
             //{
@@ -719,6 +743,10 @@ public class GameManager : MonoBehaviour {
                 wave++;
                 totalKills += kills;
                 kills = 0;
+                if (wave % 10 == 0)
+                {
+                    difficulty++;
+                }
                 if(wave % 5 == 0)
                 {
                     DisplayIntermission();
