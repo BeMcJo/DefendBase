@@ -8,9 +8,10 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 [Serializable]
+// Used to save in game state
 public class PlayerData
 {
-    public bool savedGame;
+    public bool savedGame; // Determines if game is being loaded or saved
     public int wave,
         inGameCurrency,
         objectiveHP,
@@ -31,83 +32,84 @@ public class PlayerData
 }
 
 public class GameManager : MonoBehaviour {
-    public static GameManager gm;
+    public static GameManager gm; // Single existing game manager
 
-    public PlayerData data;
+    public PlayerData data; // Information about any saved game
 
-    public Dictionary<int, Enemy> enemies;
+    public Dictionary<int, Enemy> enemies; // Keeps track of enemies spawned in game
 
-    public bool inGame,
-                gameOver,
-                startWaves,
-                continuedGame,
-                spawning,
-                doneSpawningWave,
-                setupRotation,
-                gyroEnabled,
-                interactiveTouch,
-                onIntermission,
-                playingOnline,
-                paused;
+    public bool inGame, // In game scene?
+                gameOver, // Game session end?
+                startWaves, // Wave spawning?
+                continuedGame, // Was this game saved then loaded? If so load game from data
+                spawning, // Determines if in process of spawning an enemy
+                doneSpawningWave, // Is current wave all spawned?
+                setupRotation, // Are you done setting up the orientation of your forward?
+                //gyroEnabled, // Used????
+                interactiveTouch, // Using touch interactions that isn't just shoot button?
+                onIntermission, // Are we on break from defending waves of enemies?
+                playingOnline, // Are we playing with players online?
+                paused; // Game paused?
 
-    public int wave,
-               kills,
-               totalKills,
-               spawnIndex,
-               intervalIndex,
-               patternIterations,
-               enemiesSpawned,
-               playerCurrency,
-               inGameCurrency,
-               difficulty,
-               score;
+    public int wave, // Determines current wave to spawn
+               kills, // Total enemies killed in one wave
+               totalKills, // Total enemies killed cumulative
+               spawnIndex, // Which enemy to spawn in an interval
+               intervalIndex, // Which group of enemies to spawn in a wave
+               patternIterations, // How many times you spawn this spawn pattern
+               enemiesSpawned, // Total number of enemies spawned
+               playerCurrency, // Currency used outside game session
+               inGameCurrency, // Currency used inside game session
+               difficulty, // How hard enemies will be (Used to offset enemy level)
+               score; // Keeps track of how awesome you are
 
-    public Vector3 playerOrientation;
+    public Vector3 playerOrientation; // Keeps track of where your forward is
 
-    public GameObject[] weaponPrefabs;
+    public GameObject[] weaponPrefabs; // List of weapon objects
 
-    public GameObject statusIndicatorPrefab,
-                      playerPrefab,
-                      playerUIPrefab,
-                      buttonPrefab,
-                      itemUIPrefab,
-                      enemyArmorPrefab,
-                      enemyPrefab;
+    public GameObject statusIndicatorPrefab, // Shows health and other status for object
+                      playerPrefab, // Your player in game
+                      playerUIPrefab, // Your object in lobby
+                      buttonPrefab, // Used for any general purposes as button
+                      itemUIPrefab, // Used to display items in store in game
+                      enemyArmorPrefab, // ???
+                      enemyPrefab; // Enemy object
 
-    public GameObject playerStatusCanvas,
-                      intermissionCanvas,
-                      player,
-                      playerSpawnPoints,
-                      playerRotation,
-                      projectilesContainer,
-                      enemiesContainer,
-                      particleEffectsContainer,
-                      objective,
-                      resultNotification,
-                      mainMenuCanvas,
-                      optionsCanvas,
-                      hostListCanvas,
-                      multiplayerCanvas,
-                      lobbyCanvas,
-                      shopCanvas,
-                      settingsCanvas,
-                      waveNotification;
+    public GameObject playerStatusCanvas, // Information used for player to see
+                      intermissionCanvas, // Displays things to do during break 
+                      player, // Points to your player
+                      playerSpawnPoints, // Container for all potentail spawn points for each player
+                      playerRotation, // Container for the map in game
+                      projectilesContainer, // Contains projectiles
+                      enemiesContainer, // Contains enemies
+                      particleEffectsContainer, // Contains particle effects
+                      objective, // What you need to defend
+                      resultNotification, // Notifies player of victory/defeat
+                      mainMenuCanvas, // Displays what you can do when game starts
+                      optionsCanvas, // Displays settings to adjust in game
+                      hostListCanvas, // Displays list of hosts broadcasting availability
+                      multiplayerCanvas, // Displays host or client option
+                      lobbyCanvas, // Displays players connected in the lobby
+                      shopCanvas, // Displays items to buy/upgrade
+                      settingsCanvas, // Displays settings to ajust
+                      waveNotification; // Notifies player that enemies will spawn
 
-    public Text scoreTxt;
+    public Text scoreTxt; // Indicates how awesome you are
 
-    public string scene,
-                  shopType,
-                  itemType;
+    public string scene, // Indicates which scene is loaded
+                  shopType, // Type of purchse: Store, Upgrade
+                  itemType; // Type of item: Weapon, Defense, Trap, Objective, ...
 
-    public float spawnTimer, timeToSpawn;
+    public float spawnTimer, // Time currently before spawning enemy 
+                 timeToSpawn; // Default time to assign to spawn enemy
 
-    Pattern pattern;
+    Pattern pattern; // Points to enemy spawn pattern
 
+    // Saves data based on the type
     public void Save(string type)
     {
         BinaryFormatter bf = new BinaryFormatter();
         string path = Application.persistentDataPath + "/" + type + ".dat";
-        //if (type == "continuedGame")
         if (!File.Exists(path))
         {
             File.Create(path);
@@ -116,6 +118,7 @@ public class GameManager : MonoBehaviour {
 
         switch (type)
         {
+            // Save in game progress
             case "continuedGame":
                 PlayerData data = new PlayerData();
                 data.savedGame = inGame;
@@ -129,7 +132,6 @@ public class GameManager : MonoBehaviour {
                     data.objectiveHP = objective.transform.GetComponent<Objective>().HP;
                 }
                 data.wave = wave;
-                //gm.data = data;
                 bf.Serialize(file, data);
                 break;
         }
@@ -138,6 +140,7 @@ public class GameManager : MonoBehaviour {
         Debug.Log("Saved " + type);
     }
 
+    // Load data based on the type
     public void Load(string type)
     {
         string path = Application.persistentDataPath + "/" + type + ".dat";
@@ -152,8 +155,10 @@ public class GameManager : MonoBehaviour {
                 file.Close();
                 return;
             }
+
             switch (type)
             {
+                // Load in game progress
                 case "continuedGame":
                     PlayerData data = (PlayerData)bf.Deserialize(file);
                     gm.data = data;
@@ -175,16 +180,13 @@ public class GameManager : MonoBehaviour {
         if (gm)
             return;
         enemies = new Dictionary<int, Enemy>();
-        //Debug.Log("START");
         gm = this;
         gm.data = new PlayerData();
-        //inGameCurrency = 999999;
-        //data = new PlayerData();
         DontDestroyOnLoad(gm);
         interactiveTouch = false;
         playerOrientation = Vector3.zero;
-        Screen.orientation = ScreenOrientation.Landscape;
-        LoadMainScene();
+        Screen.orientation = ScreenOrientation.Landscape; // Landscape mode for mobile phones
+        LoadMainScene(); // Default start game in main scene
         EnemySpawnPattern.InstantiatePatterns();
     }
 
@@ -192,7 +194,7 @@ public class GameManager : MonoBehaviour {
     {
         if (this != gm)
             return;
-        //ClearGame();
+
         switch (level)
         {
             // Main
@@ -208,23 +210,21 @@ public class GameManager : MonoBehaviour {
             case 2:
                 LoadCalibrationScene();
                 break;
-            // Online Lobby
+            // Online Lobby (unused)
             case 3:
                 LoadLobbyScene();
                 break;
-            /*// Game (Multiplayer)
-            case 4:
-                LoadMultiplayerGameScene();
-                break;*/
         }
     }
 
+    // unused
     public void LoadLobbyScene()
     {
         projectilesContainer = GameObject.Find("ProjectilesContainer");
         GameObject.Find("Canvas").transform.Find("LeaveBtn").GetComponent<Button>().onClick.AddListener(GoToMainScene);
     }
 
+    // Scene where you adjust your forward direction
     public void LoadCalibrationScene()
     {
         scene = "calibration";
@@ -241,17 +241,21 @@ public class GameManager : MonoBehaviour {
         Load("continuedGame");
         scene = "main";
         inGame = false;
-        //playingOnline = false;
+
         setupRotation = true;
         mainMenuCanvas = GameObject.Find("MainMenuCanvas");
 
         Transform btnContainer = mainMenuCanvas.transform.Find("ButtonsContainer");
         btnContainer.Find("PlayBtn").GetComponent<Button>().onClick.AddListener(GoToGameScene);
+
         btnContainer.Find("OnlineBtn").GetComponent<Button>().onClick.AddListener(ToggleMultiplayerCanvas);
+
         btnContainer.Find("OnlineBtn").GetComponent<Button>().onClick.AddListener(ToggleMainMenuCanvas);
-        //btnContainer.Find("SettingsBtn").GetComponent<Button>().onClick.AddListener(GoToCalibrationScene);
+
         btnContainer.Find("SettingsBtn").GetComponent<Button>().onClick.AddListener(ToggleMainMenuCanvas);
         btnContainer.Find("SettingsBtn").GetComponent<Button>().onClick.AddListener(ToggleSettingsCanvas);
+        
+        // Go to continued game if saved game progress exists
         btnContainer.Find("ContinueBtn").GetComponent<Button>().onClick.AddListener(GoToContinuedGameScene);
         btnContainer.Find("ContinueBtn").GetChild(0).GetComponent<Text>().text += (data != null && data.savedGame) ? " (Wave " + (data.wave+1) + ")" : "";
         btnContainer.Find("ContinueBtn").gameObject.SetActive(data != null && data.savedGame);
@@ -259,14 +263,17 @@ public class GameManager : MonoBehaviour {
         multiplayerCanvas = GameObject.Find("MultiplayerCanvas");
         multiplayerCanvas.SetActive(false);
         btnContainer = multiplayerCanvas.transform.Find("ButtonsContainer");
+
         btnContainer.Find("HostBtn").GetComponent<Button>().onClick.AddListener(ToggleLobbyCanvas);
         btnContainer.Find("HostBtn").GetComponent<Button>().onClick.AddListener(ToggleMultiplayerCanvas);
         btnContainer.Find("HostBtn").GetComponent<Button>().onClick.AddListener(NetworkManager.nm.SetupAsHost);
         btnContainer.Find("HostBtn").GetComponent<Button>().onClick.AddListener(NetworkManager.nm.StartUpNetworkActivities);
+
         btnContainer.Find("FindHostBtn").GetComponent<Button>().onClick.AddListener(ToggleHostListCanvas);
         btnContainer.Find("FindHostBtn").GetComponent<Button>().onClick.AddListener(ToggleMultiplayerCanvas);
         btnContainer.Find("FindHostBtn").GetComponent<Button>().onClick.AddListener(NetworkManager.nm.SetupAsClient);
         btnContainer.Find("FindHostBtn").GetComponent<Button>().onClick.AddListener(NetworkManager.nm.StartUpNetworkActivities);
+
         btnContainer.Find("BackBtn").GetComponent<Button>().onClick.AddListener(ToggleMainMenuCanvas);
         btnContainer.Find("BackBtn").GetComponent<Button>().onClick.AddListener(ToggleMultiplayerCanvas);
         
@@ -278,9 +285,8 @@ public class GameManager : MonoBehaviour {
 
         lobbyCanvas = GameObject.Find("LobbyCanvas");
         lobbyCanvas.SetActive(false);
-        //lobbyCanvas.transform.Find("BackBtn").GetComponent<Button>().onClick.AddListener(ToggleMultiplayerCanvas);
-        //lobbyCanvas.transform.Find("BackBtn").GetComponent<Button>().onClick.AddListener(ToggleLobbyCanvas);
         lobbyCanvas.transform.Find("BackBtn").GetComponent<Button>().onClick.AddListener(NetworkManager.nm.RequestLeaveLobby);
+
         lobbyCanvas.transform.Find("ReadyBtn").GetComponent<Button>().onClick.AddListener(NetworkManager.nm.RequestReady);
 
         settingsCanvas = GameObject.Find("SettingsCanvas");
@@ -290,28 +296,33 @@ public class GameManager : MonoBehaviour {
             isOn = "OFF";
         settingsCanvas.transform.Find("ButtonsContainer").Find("InteractiveTouchBtn").GetChild(0).GetComponent<Text>().text = "Interactive Touch: " + isOn;
         btnContainer = settingsCanvas.transform.Find("ButtonsContainer");
+
         btnContainer.Find("InteractiveTouchBtn").GetComponent<Button>().onClick.AddListener(ToggleInteractiveTouch);
+
         btnContainer.Find("SetupOrientationBtn").GetComponent<Button>().onClick.AddListener(GoToCalibrationScene);
         btnContainer.Find("SetupOrientationBtn").gameObject.SetActive(SystemInfo.supportsGyroscope);
+
         btnContainer.Find("BackBtn").GetComponent<Button>().onClick.AddListener(ToggleMainMenuCanvas);
         btnContainer.Find("BackBtn").GetComponent<Button>().onClick.AddListener(ToggleSettingsCanvas);
     }
 
+    // Load game scene. If there was any saved game progress, remove it
     public void LoadGameScene()
     {
-        Save("continuedGame");
+        Save("continuedGame"); // Removes saved game progress
         scene = "game";
-        inGame = true;
-        gameOver = false;
-        paused = false;
-        ResetSpawnSetup(0);
-        wave = 0;
-        kills = 0;
+        //inGame = true;
+        //gameOver = false;
+        //paused = false;
+        //ResetSpawnSetup(0);
+        //wave = 0;
+        //kills = 0;
         //setupRotation = false;
         //gyroEnabled = true;
-        totalKills = 0;
+        //totalKills = 0;
 
         intermissionCanvas = GameObject.Find("IntermissionCanvas");
+        // If online, make sure everyone is ready to start next wave on intermission
         if (NetworkManager.nm.isStarted)
         {
             intermissionCanvas.transform.Find("ResumeBtn").GetComponent<Button>().onClick.AddListener(NetworkManager.nm.RequestReady);
@@ -321,7 +332,9 @@ public class GameManager : MonoBehaviour {
         {
             intermissionCanvas.transform.Find("ResumeBtn").GetComponent<Button>().onClick.AddListener(NextWave);
         }
+
         intermissionCanvas.transform.Find("SaveAndQuitBtn").GetComponent<Button>().onClick.AddListener(SaveAndQuit);
+        
         intermissionCanvas.transform.Find("ShopBtn").GetComponent<Button>().onClick.AddListener(ToggleShopCanvas);
         intermissionCanvas.transform.Find("ShopBtn").GetComponent<Button>().onClick.AddListener(ToggleIntermissionCanvas);
         intermissionCanvas.SetActive(false);
@@ -329,19 +342,26 @@ public class GameManager : MonoBehaviour {
         enemiesContainer = GameObject.Find("EnemiesContainer");
         projectilesContainer = GameObject.Find("ProjectilesContainer");
         particleEffectsContainer = GameObject.Find("ParticleEffectsContainer");
+
         playerRotation = GameObject.Find("Player Rotation");
         playerRotation.transform.eulerAngles = playerOrientation;
+
         playerStatusCanvas = GameObject.Find("PlayerStatusCanvas").gameObject;
         playerStatusCanvas.transform.Find("OptionsBtn").GetComponent<Button>().onClick.AddListener(DisplayOptions);
-        playerSpawnPoints = playerRotation.transform.Find("PlayerSpawnPoints").gameObject;
-        resultNotification = playerStatusCanvas.transform.Find("Result Notification").gameObject;
-        resultNotification.SetActive(false);
-        scoreTxt = playerStatusCanvas.transform.Find("ScoreTxt").GetComponent<Text>();
+
         waveNotification = playerStatusCanvas.transform.Find("Wave Notification").gameObject;
         waveNotification.SetActive(false);
-        objective = playerRotation.transform.Find("Castle").Find("Gate").gameObject;
-        resultNotification.transform.Find("RetryBtn").GetComponent<Button>().onClick.AddListener(ResetGame);
 
+        playerSpawnPoints = playerRotation.transform.Find("PlayerSpawnPoints").gameObject;
+
+        resultNotification = playerStatusCanvas.transform.Find("Result Notification").gameObject;
+        resultNotification.transform.Find("RetryBtn").GetComponent<Button>().onClick.AddListener(ResetGame);
+        resultNotification.SetActive(false);
+
+        scoreTxt = playerStatusCanvas.transform.Find("ScoreTxt").GetComponent<Text>();
+
+        objective = playerRotation.transform.Find("Castle").Find("Gate").gameObject;
+        
         optionsCanvas = GameObject.Find("OptionsCanvas");
         optionsCanvas.transform.Find("ResumeBtn").GetComponent<Button>().onClick.AddListener(ResumeGame);
         optionsCanvas.transform.Find("ExitBtn").GetComponent<Button>().onClick.AddListener(LeaveGame);
@@ -355,19 +375,16 @@ public class GameManager : MonoBehaviour {
         btns1.Find("UpgradeBtn").GetComponent<Button>().onClick.AddListener(DisplayUpgradeSelection);
         Transform btns2 = shopCanvas.transform.Find("ButtonContainer2");
         btns2.Find("WeaponsBtn").GetComponent<Button>().onClick.AddListener(DisplayWeaponItems);
-        //btns2.Find("UpgradeBtn").GetComponent<Button>().onClick.AddListener(DisplayUpgradeSelection);
         shopCanvas.SetActive(false);
 
         StartCoroutine(MapManager.mapManager.LoadGameScene());
-        StartCoroutine(NetworkManager.nm.LoadGameScene());
+        StartCoroutine(NetworkManager.nm.LoadGameScene()); 
 
-        
-
+        // If not online, game manager handles creating player
         if (!NetworkManager.nm.isStarted)
         {
             player = Instantiate(playerPrefab);
-            //if (!NetworkManager.nm.isStarted)
-            //{
+
             player.transform.position = playerSpawnPoints.transform.GetChild(0).position;
             player.transform.SetParent(playerRotation.transform);
 
@@ -377,14 +394,7 @@ public class GameManager : MonoBehaviour {
                 PlayerController pc = player.transform.GetComponent<PlayerController>();
                 pc.EquipWeapon(wep.transform.GetComponent<Weapon>());
                 pc.wep.purchased = true;
-                /*
-                pc.wep = wep.transform.GetComponent<Weapon>();
-                pc.wep.user = pc;
-                wep.transform.SetParent(player.transform.Find("Player Camera"));
-                wep.transform.position = player.transform.Find("Player Camera").Find("WeaponPlaceholder").position;
-                */
             }
-            //}
         }
 
         StartGame();
@@ -430,6 +440,7 @@ public class GameManager : MonoBehaviour {
         DisplaySelectedItems();
     }
 
+    // Displays items based on shopType and itemType
     public void DisplaySelectedItems()
     {
         Transform btns1 = shopCanvas.transform.Find("ButtonContainer1");
@@ -547,15 +558,16 @@ public class GameManager : MonoBehaviour {
         score += s;
     }
 
+    // Updates in game currency and displays the information in shop
     public void UpdateInGameCurrency(int currency)
     {
         inGameCurrency += currency;
         shopCanvas.transform.Find("Currency").GetChild(0).GetComponent<Text>().text = "$" + inGameCurrency;
     }
 
+    // Animates wave notification text to slowly appear
     bool DisplayWaveNotification()
     {
-        //Debug.Log(1);
         if (!inGame)
         {
             return true;
@@ -570,9 +582,9 @@ public class GameManager : MonoBehaviour {
         return c.a >= 1;
     }
 
+    // Slowly makes wave notification text disappear
     bool HideWaveNotification()
     {
-        //Debug.Log(2);
         if (!inGame)
         {
             return true;
@@ -587,6 +599,7 @@ public class GameManager : MonoBehaviour {
         return c.a <= 0;
     }
 
+    // Displays wave notification text and then hides it, the end indicates wave starts
     IEnumerator NotifyIncomingWave(int w)
     {
         
@@ -624,29 +637,28 @@ public class GameManager : MonoBehaviour {
         }
     }
 
+    // Set player in game information to initial values
     public void ResetPlayerStats()
     {
-        //kills = 0;
         score = 0;
-        //wave = 0;
         totalKills = 0;
         objective.transform.GetComponent<Objective>().Reset();
     }
 
+    // Reset enemy spawn related variables to initial values for wave w
     public void ResetSpawnSetup(int w)
     {
-        //timeToSpawn = 10f;
         spawnTimer = 0;
         spawnIndex = 0;
         startWaves = false;
         intervalIndex = 0;
         wave = w;
-        //totalKills += kills;
         kills = 0;
         enemiesSpawned = 0;
         doneSpawningWave = false;
     }
 
+    // Restart game session, (maybe remove)
     public void ResetGame()
     {
         ClearEnemyObjects();
@@ -654,19 +666,13 @@ public class GameManager : MonoBehaviour {
         ClearParticleEffects();
         ResetPlayerStats();
         resultNotification.SetActive(false);
-        //StartGame();
-        //ResetSpawnSetup(0);
         objective.transform.GetComponent<Objective>().Reset();
         inGame = true;
         gameOver = false;
         paused = false;
         StartWave(0);
-        //score = 0;
-        //kills = 0;
-        //totalKills = 0;
-        //SceneManager.LoadScene("game");
     }
-
+    
     void StartGame()
     {
         Debug.Log("Starting Game");
@@ -679,7 +685,6 @@ public class GameManager : MonoBehaviour {
         Objective.ObjectiveCount = 0;
         Weapon.WeaponCount = 0;
         inGameCurrency = 0;
-        //UpdateInGameCurrency(9999);
         score = 0;
         kills = 0;
         difficulty = 0;
@@ -688,7 +693,7 @@ public class GameManager : MonoBehaviour {
         MapManager.mapManager.LoadMap(0);
         if (continuedGame)
         {
-            Debug.Log("COntinued");
+            Debug.Log("Continued Game");
             if (data != null && data.savedGame)
             {
                 Debug.Log("fetching saved data");
@@ -699,7 +704,6 @@ public class GameManager : MonoBehaviour {
                 objective.transform.GetComponent<Objective>().HP = data.objectiveHP;
             }
         }
-        //data = new PlayerData();
         if (NetworkManager.nm.isStarted)
             return;
         StartWave(wave);
@@ -707,28 +711,25 @@ public class GameManager : MonoBehaviour {
 
     public void StartWave(int w)
     {
-
         intermissionCanvas.SetActive(false);
         onIntermission = false;
         ResetSpawnSetup(w);
-        pattern = EnemySpawnPattern.patternsBySpawnPointCt[0][w % EnemySpawnPattern.patternsBySpawnPointCt[0].Count];   
+        pattern = EnemySpawnPattern.patternsBySpawnPointCt[0][w % EnemySpawnPattern.patternsBySpawnPointCt[0].Count]; // Get spawn pattern for the wave
         patternIterations = pattern.iterations;
         timeToSpawn = pattern.spawnTimes[intervalIndex] / pattern.spawnCts[intervalIndex].Count;
         StartCoroutine(NotifyIncomingWave(w));
-        //if (NetworkManager.nm.isStarted)
-        //{
-            //NetworkManager.nm.StartWave(wave);
-        //}
     }
 
+    // Spawn enemy at the spawn point sp
     public IEnumerator SpawnEnemy(int sp)
     {
         if (inGame)
         {
-            spawning = true;
+            spawning = true; // Indicate currently spawning an enemy
             enemiesSpawned++;
             GameObject enemy = Instantiate(enemyPrefab);
             Enemy.AssignEnemy(enemy.transform.GetComponent<Enemy>());
+            // Get random spawn point
             if (sp == -1)
                 sp = UnityEngine.Random.Range(0, MapManager.mapManager.spawnPoints.Count);
             GameObject spawnPoint = MapManager.mapManager.spawnPoints[sp];
@@ -740,53 +741,48 @@ public class GameManager : MonoBehaviour {
             GameObject enemyUI = Instantiate(statusIndicatorPrefab);
             enemyUI.transform.GetComponent<StatusIndicator>().target = enemy;
             enemy.transform.SetParent(enemiesContainer.transform);
-            //enemyUI.transform.SetParent(enemiesContainer.transform);
             Enemy e = enemy.transform.GetComponent<Enemy>();
             e.level = (pattern.enemyLvls[intervalIndex][spawnIndex] + difficulty) % Enemy.difficulties.Length;
 
             spawnIndex++;
-            //if (NetworkManager.nm.isStarted && NetworkManager.nm.isHost)
-            //{
-            //    NetworkManager.nm.NotifySpawnEnemyAt(sp);
-            //}
-            //Debug.Log(spawnIndex + " " +pattern.spawnCts[intervalIndex].Count);
-
+            
+            // If reached end of spawning enemies in current group
             if (spawnIndex >= pattern.spawnCts[intervalIndex].Count)
             {
                 spawnIndex = 0;
+                // If reached end of spawning from current wave
                 if (intervalIndex >= pattern.spawnFreqs.Count)
                 {
                     intervalIndex = 0;
                     yield return new WaitForSeconds(pattern.endIterationTime);
                     patternIterations--;
+                    // If no more iterations of this pattern to spawn
                     if (patternIterations <= 0)
                     {
                         doneSpawningWave = true;
                     }
+                    // Repeat this spawn pattern
                     else
                     {
-                        //spawnIndex = 0;
-                        //pattern = EnemySpawnPattern.patternsBySpawnPointCt[0][wave % 2];
                         spawnTimer = 0;
-                        //patternIterations = pattern.iterations;
                         timeToSpawn = pattern.spawnTimes[intervalIndex] / pattern.spawnCts[intervalIndex].Count;
                     }
                 }
+                // Move to next group of enemies to spawn
                 else
                 {
                     yield return new WaitForSeconds(pattern.spawnFreqs[intervalIndex]);
                     intervalIndex++;
-                    //pattern = EnemySpawnPattern.patternsBySpawnPointCt[0][wave % 2];
                     spawnTimer = 0;
-                    //patternIterations = pattern.iterations;
                     timeToSpawn = pattern.spawnTimes[intervalIndex] / pattern.spawnCts[intervalIndex].Count;
                 }
             }
+            // Still got enemies to spawn in this group
             else
             {
                 spawnTimer = timeToSpawn;
             }
-            spawning = false;
+            spawning = false; // Indicate the end of spawning current enemy
         }
     }
 
@@ -796,14 +792,11 @@ public class GameManager : MonoBehaviour {
         switch (scene)
         {
             case "calibration":
+                // In calibration scene, tap anywhere to set direction forward
                 if (Input.touchCount > 0)
                 {
                     playerRotation.transform.eulerAngles = new Vector3(0, player.transform.GetComponent<PlayerController>().playerCam.transform.eulerAngles.y, 0);
-                    //setupRotation = true;
                     playerOrientation = playerRotation.transform.eulerAngles;
-                    //player.transform.position = playerSpawnPoint.transform.position;
-                    //player.transform.SetParent(playerRotation.transform);
-
                 }
                 break;
 
@@ -811,87 +804,57 @@ public class GameManager : MonoBehaviour {
                 break;
 
             case "game":
-                if (player) {
-
-                    /*Camera cam = player.GetComponent<PlayerController>().playerCam;
-                    Vector3 ea = cam.transform.localEulerAngles;
-                    Debug.Log(ea.ToString());
-                    //Debug.Log("Euler" + cam.transform.localRotation.x + "," + cam.transform.localRotation.y + "," + cam.transform.localRotation.z);// + ".> Localeu" + "," + cam.localEulerAngles.x + "," + cam.localEulerAngles.y + "," + cam.localEulerAngles.z);
-                    Quaternion test = Quaternion.Euler(cam.transform.localRotation.x, cam.transform.localRotation.y, cam.transform.localRotation.z);
-                    Vector3 v = new Vector3(cam.transform.localRotation.x, cam.transform.localRotation.y, cam.transform.localRotation.z);
-                    cam.transform.localEulerAngles = ea;//Quaternion.Euler(v);
-                    Debug.Log("ADTER" + cam.transform.localEulerAngles.ToString());
-                    *///Debug.Log("EulerAFTER" + cam.transform.localRotation.x + "," + cam.transform.localRotation.y + "," + cam.transform.localRotation.z);// + ".> Localeu" + "," + cam.localEulerAngles.x + "," + cam.localEulerAngles.y + "," + cam.localEulerAngles.z);
-
-                    //Debug.Log("test quat" + test.x + "," + test.y + "," + test.z);// calEulerAngles.y + "," + cam.localEulerAngles.z);
-
-                    //Debug.Log(cam.)
-                    //Quaternion target = Quaternion.Euler(0, 0, .5f);
-                    //cam.transform.localRotation = target;//Quaternion.Slerp(cam.transform.localRotation, target, Time.deltaTime * 1f);
-                }
                 break;
         }
-        /*
-        if (gyroEnabled && !setupRotation)
-        {
-            //Debug.Log("Tap to set this as your front view");
-            if (Input.touchCount > 0)
-            {
-                //Debug.Log("SETTING THIS TO YOUR FRONT VIEW");
 
-                playerRotation.transform.eulerAngles = new Vector3(0, player.transform.GetComponent<PlayerController>().playerCam.transform.eulerAngles.y, 0);
-                setupRotation = true;
-                player.transform.position = playerSpawnPoint.transform.position;
-                player.transform.SetParent(playerRotation.transform);
-
-            }
-            playerStatusCanvas.transform.Find("Calibration Notification").gameObject.SetActive(!setupRotation);
-            if (setupRotation)
-            {
-                StartGame();
-            }
-            return;
-        }*/
+        // Don't do anything if not in game or didn't start the waves
         if (!inGame || !startWaves)
         {
             return;
         }
         scoreTxt.text = "Score: " + score + ", spawned" + enemiesSpawned + "/kills" + kills;
+        // if there are enemies to spawn
         if (!doneSpawningWave)
         {
+            // if not spawning an enemy and either not online or is online and the host
             if (!spawning && (!NetworkManager.nm.isStarted || NetworkManager.nm.isHost))
             {
                 spawnTimer -= Time.deltaTime;
                 if (spawnTimer <= 0)
                 {
-                    //Debug.Log("SPAWED");
+                    // if online, let host announce spawning enemy
                     if (NetworkManager.nm.isStarted)
                         NetworkManager.nm.SpawnEnemy(-1);
+                    // not online, spawn the enmy
                     else
                         StartCoroutine(SpawnEnemy(-1));
-                    //spawnTimer = timeToSpawn;
                 }
             }
         }
+        // done spawning
         else
         {
+            // end current wave when all enemies are killed and not on break
             if(kills == enemiesSpawned && !onIntermission)
             {
-                startWaves = false;
-                wave++;
-                totalKills += kills;
-                kills = 0;
-                if (wave % 10 == 0)
+                startWaves = false; // indicate end of wave
+                wave++; // increment to next wave
+                totalKills += kills; // add to cumulative kills
+                kills = 0; // reset kill count
+                // increment difficulty after every 10th wave
+                if (wave % 10 == 0) 
                 {
                     difficulty++;
                 }
+                // go on intermission after every 5th wave
                 if(wave % 5 == 0)
                 {
                     DisplayIntermission();
-                    //intermissionCanvas.SetActive(true);
                 }
+                // Start wave else
                 else
-                {
+                { 
+                    // If online, sync everyone to start wave
                     if(!NetworkManager.nm.isStarted)
                         StartWave(wave);
                     else

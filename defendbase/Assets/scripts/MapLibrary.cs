@@ -19,12 +19,20 @@ public class TriangularNode
     }
 }
 
+// Node in the logical form of a hexagon, each side mapped as followed
+/*
+ *           0
+ *          ___
+ *       5 /   \ 1
+ *       4 \___/ 2
+ *           3
+ */
 public class HexNode
 {
-    public static int nodeCount = 0;
-    public HexNode[] neighbors;
+    public static int nodeCount = 0; // Keep track of # of numbers
+    public HexNode[] neighbors; // Represents each of the 6 sides
     public int id;
-    public bool isSpawnPoint;
+    public bool isSpawnPoint; // Denotes if this node is a spawn point for enemies
     public HexNode(HexNode[] nbrs = null)
     {
         id = nodeCount;
@@ -39,9 +47,9 @@ public class HexNode
     }
 }
 
+// Holds the list of HexNodes that make up the map (pathing for enemies)
 public class Map
 {
-    //public TriangularNode initialBuildNode;
     public List<HexNode> nodes;
     public Map()
     {
@@ -49,26 +57,21 @@ public class Map
     }
 }
 
+// List of all the maps for the game
 public class MapLibrary {
-    public static MapLibrary mapLib;
-    public static List<Map> maps;
-    // Use this for initialization
-    void Start() {
-
-    }
+    public static MapLibrary mapLib; // Public accessor to the maps (used)?
+    public static List<Map> maps; // Holds all the maps created
 
     public MapLibrary()
     {
-        Debug.Log("map lib");
         if (mapLib != null)
         {
-            //Destroy(gameObject);
             return;
         }
-        Debug.Log("maplib made");
         mapLib = this;
     }
 
+    // Starts up and creates all the maps
     public static void Instatiate()
     {
         Debug.Log("Instantiating Map Library");
@@ -76,14 +79,25 @@ public class MapLibrary {
         CreateMaps();
     }
 
+    /*
+     * Creates all the maps
+     * Map is represented by hexnodes, each hexnode have their neighbors assigned
+     * Assigning HexNode A's neighbors[0] to HexNode B means that A directs to B
+     * Essentially a digraph
+     */
     static void CreateMaps()
     {
         Debug.Log("Creating Map Blueprints");
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        Debug.Log("Creating Map 1");
         Map newMap = new Map();
+        // Create 16 HexNodes for Map 1
         for(int i = 0; i < 16; i++)
             AddHexNode(newMap);
         maps.Add(newMap);
         HexNode node = newMap.nodes[0];
+        // Assign the neighbors for each HexNode
         newMap.nodes[0].neighbors[3] = newMap.nodes[1];
         newMap.nodes[0].isSpawnPoint = true;
 
@@ -115,23 +129,11 @@ public class MapLibrary {
         newMap.nodes[13].neighbors[3] = newMap.nodes[14];
 
         newMap.nodes[14].neighbors[3] = newMap.nodes[15];
-
-        //newMap.nodes[15].neighbors[3] = newMap.nodes[16];
-
-        //newMap.nodes[16].neighbors[3] = newMap.nodes[17];
-
-        //newMap.nodes[17].neighbors[3] = newMap.nodes[18];
-        //TriangularNode node = new TriangularNode();
-
-        //int[] relation = new int[3];
-        //node.isSpawnPoint = true;
-        //newMap.initialBuildNode = node;
-        //maps.Add(newMap);
-        //AddRelationTo(node, 0, 1, 3);
-
-
+        Debug.Log("Done Creating Map 1");
+        /////////////////////////////////////////////////////////////////////////////////////////////////////
     }
 
+    // Creates HexNode and adds to Map m
     static HexNode AddHexNode(Map m)
     {
         HexNode node = new HexNode();
@@ -139,6 +141,7 @@ public class MapLibrary {
         return node;
     }
 
+    //Unused
     void AddRelationTo(TriangularNode node,int hex1, int hex2, int side)
     {
         int[] relation = new int[3];
@@ -147,9 +150,4 @@ public class MapLibrary {
         relation[2] = side;
         node.relations.Add(relation);
     }
-
-	// Update is called once per frame
-	void Update () {
-		
-	}
 }

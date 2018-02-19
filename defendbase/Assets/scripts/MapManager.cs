@@ -3,15 +3,15 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class MapManager : MonoBehaviour {
-    public static MapManager mapManager;
-    public float dz = 7f, dx = 6.0625f;
-    public GameObject hexPlatformPrefab;
-    public GameObject mapContainer;
+    public static MapManager mapManager; // Singleton
+    public float dz = 7f, // z offset to accurately align HexNodes
+                 dx = 6.0625f; // x offset to accurately align HexNodes
+    public GameObject hexPlatformPrefab; // HexNode object
+    public GameObject mapContainer; // Holds all the HexNode objects representing the map
 
-    public List<GameObject> spawnPoints;
-    //public List<GameObject> platforms;// = new List<GameObject>();
-    public Dictionary<int, GameObject> platforms;
-    private bool createdMap;
+    public List<GameObject> spawnPoints; // List of areas where enemy can spawn
+    public Dictionary<int, GameObject> platforms; // Keeps track of Platforms by their ID
+    private bool createdMap; // Used to denote if map is done creating
 	// Use this for initialization
 	void Start () {
         if(mapManager != null)
@@ -22,19 +22,15 @@ public class MapManager : MonoBehaviour {
         mapManager = this;
         DontDestroyOnLoad(mapManager);
         createdMap = false;
-        //platforms = new List<GameObject>();
         platforms = new Dictionary<int, GameObject>();
         spawnPoints = new List<GameObject>();
         MapLibrary.Instatiate();
-        //map = new GameObject("Map");
-        //LoadMap(0);
     }
 
     private void OnLevelWasLoaded(int level)
     {
         if (this != mapManager)
             return;
-        //ClearGame();
         switch (level)
         {
             // Main
@@ -45,19 +41,6 @@ public class MapManager : MonoBehaviour {
             case 1:
                 LoadGameScene();
                 break;
-                /*
-                // Server
-                case 2:
-                    LoadServerScene();
-                    break;
-                // Client
-                case 3:
-                    LoadClientScene();
-                    break;
-                // Game (Multiplayer)
-                case 4:
-                    LoadMultiplayerGameScene();
-                    break;*/
         }
     }
 
@@ -69,34 +52,43 @@ public class MapManager : MonoBehaviour {
     public IEnumerator LoadGameScene()
     {
         mapContainer = new GameObject("MapContainer");
+        // Align map to face in forward direction as player is oriented
         mapContainer.transform.SetParent(GameObject.Find("Player Rotation").transform);
         mapContainer.transform.localEulerAngles = Vector3.zero;
         yield return new WaitForSeconds(0);
     }
 
+    // Instantiates the platforms from the Map Library based on the map
     public void LoadMap(int map)
     {
         platforms.Clear();
         spawnPoints.Clear();
         createdMap = false;
-        PlatformPath.PlatformCount = 0;
-        Map m = MapLibrary.maps[map];
+        PlatformPath.PlatformCount = 0; // Reset platform count
+        Map m = MapLibrary.maps[map]; // Get the map
+
+        // Instantiate all the platforms and keep track of them by their ID
         for (int i = 0; i < m.nodes.Count; i++)
         {
             platforms.Add(i,Instantiate(hexPlatformPrefab));
             platforms[i].transform.SetParent(mapContainer.transform);
         }
+
+        // For each platform,...
         for (int i = 0; i < m.nodes.Count; i++)
         {
             HexNode node = m.nodes[i];
             PlatformPath src = platforms[i].transform.GetComponent<PlatformPath>();
+            // Check if platform is a spawn point and add to list if true
             if (node.isSpawnPoint)
             {
                 spawnPoints.Add(platforms[i]);
             }
+            // Check each neighbor to bind the hexNodes as source and destination nodes (creating digraph)
             for (int j = 0; j < 6; j++)
             {
                 HexNode nbr = node.neighbors[j];
+                // If neighbor exist, align neighbor with respect to current hexNode
                 if(nbr != null)
                 {
                     PlatformPath dest = platforms[nbr.id % platforms.Count].transform.GetComponent<PlatformPath>();
@@ -123,18 +115,7 @@ public class MapManager : MonoBehaviour {
                 }
             }
         }
-        createdMap = true;
-        mapContainer.transform.localEulerAngles = GameManager.gm.playerOrientation;
+        mapContainer.transform.localEulerAngles = GameManager.gm.playerOrientation; // Orient map to face in forward direction as player
+        createdMap = true; // Done creating map
     }
-
-    // Update is called once per frame
-    void Update () {
-        if (!createdMap)
-        {
-            return;
-        }
-        
-	}
-
-   
 }

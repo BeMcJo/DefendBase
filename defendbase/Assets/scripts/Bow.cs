@@ -4,20 +4,23 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class Bow : Weapon {
-    public Transform arrow;
-    public Transform bow;
-    private LineRenderer lr;
-    private Vector2 originalTouchPos;
-    private float drawRange, drawLimit, drawOffset;
-    private float maxScreenDrawRange;
-    public float drawElasticity = 15;
+public class Bow : Weapon
+{
+    public Transform arrow; // The type of projectile shot by this weapon
+    public Transform bow; // The actual game object
+    private LineRenderer lr; // Used for the bowstring
+    private Vector2 originalTouchPos; // Used for Touch Interactive shooting. Determines bow draw distance
+
+    private float drawRange, // How far arrow and bowstring can be pulled
+                  drawLimit, // Max draw range
+                  drawOffset; // Default position when arrow and bowstring isn't pulled
+    private float maxScreenDrawRange; // Distance from middle of screen to corner
+    public float drawElasticity = 15; // Determines how much string can stretch upon pulling
 	// Use this for initialization
 	protected override void Start ()
     {
         wepID = 0;
         base.Start();
-        //interactiveTouch = false;
         distance = 2000;
         arrow = transform.Find("Arrow");
         bow = transform.Find("Bow");
@@ -31,13 +34,13 @@ public class Bow : Weapon {
         maxScreenDrawRange = Vector2.Distance(new Vector2(0, 0), new Vector2(Screen.width, Screen.height) / 2);
     }
 	
+    // Key information to have NetworkManager send to other players
     public override string NetworkInformation()
     {
         string s = base.NetworkInformation();
-        //s += chargePower + "|";
         return s;
     }
-
+    // Assign values received from NetworkManager
     public override void SetNetworkInformation(string[] data)
     {
         base.SetNetworkInformation(data);
@@ -45,7 +48,11 @@ public class Bow : Weapon {
         Charge(chargePower);
     }
 
-	// Update is called once per frame
+	/*
+     * Reload if shot arrow
+     * If not, then check if user attempt to shoot
+     * Update bowstring based on arrow position
+     */
 	protected override bool Update () {
         //Debug.Log(lvl);
         if (reloading)
@@ -65,24 +72,19 @@ public class Bow : Weapon {
             Reload();
             return true;
         }
-        List<Vector3> positions = new List<Vector3>();
-        positions.Add(new Vector3(0, .5f, -.475f));
+        List<Vector3> positions = new List<Vector3>(); // Keeps track of the vertices of the bowstring
+        positions.Add(new Vector3(0, .5f, -.475f)); // Vertex at top of bow
         if (reloading)
-            positions.Add(new Vector3(0, 0, drawRange));
+            positions.Add(new Vector3(0, 0, drawRange)); // Default position of middle vertex
         else
         {
-            //Transform tail = arrow.transform.Find("Tail");
-            positions.Add(new Vector3(0, 0, drawRange + arrow.localPosition.z - 2.35f));
+            positions.Add(new Vector3(0, 0, drawRange + arrow.localPosition.z - 2.35f)); // Position of arrow tail
         }
-        positions.Add(new Vector3(0, -.5f, -.475f));
-        lr.SetPositions(positions.ToArray());
-        //Debug.Log(positions.Count);
-        //foreach(Vector3 v in positions){
-        //    Debug.Log(">" + v.x + " " + v.y + " " + v.z);
-        //}
-        //Debug.Log("zzz");
+        positions.Add(new Vector3(0, -.5f, -.475f)); // Vertex at bottom of bow
+        lr.SetPositions(positions.ToArray()); // Assign vertices positions
         return true;    
 	}
+
 
     public void Reload()
     {
@@ -96,70 +98,49 @@ public class Bow : Weapon {
         arrow.transform.localPosition = bulletSpawn.transform.localPosition;
     }
 
+    // Charges up arrow, drawing it back until drawLimit
     public override bool StartUse(Touch t)
     {
-        //Debug.Log("bow");
+        // If playing online and not my weapon, set the arrow and drawstring to information received
         if (NetworkManager.nm.isStarted && !user.IsMyPlayer())
         {
             base.StartUse(t);
             charging = true;
             return true;
         }
-        //if (!GameManager.gm.interactiveTouch)
-        //{
-        //}
+        // If not using Touch Interactive mode, check if shoot button is being touched
         if (!GameManager.gm.interactiveTouch)
         {
-            //Debug.Log("HERE");
-            /*RaycastHit2D hitInfo2 = Physics2D.Raycast(t.position, user.playerCam.transform.forward);
-            if (hitInfo2.collider != null)
-            {
-                Debug.Log(hitInfo2.collider.name);
-            }
-            else
-            {
-                Debug.Log("NOTHING");
-            }*/
+            // Is there an object we are touching?
             if (EventSystem.current.IsPointerOverGameObject(t.fingerId))
             {
-                // ui touched
-               // Debug.Log(EventSystem.current.currentSelectedGameObject == null);
+                // Is that object our Shoot Button?
                 if (EventSystem.current.currentSelectedGameObject && EventSystem.current.currentSelectedGameObject.tag == "Shoot")
                 {
-                    //Debug.Log(EventSystem.current.currentSelectedGameObject.name);
                     base.StartUse(t);
                     shootTouchID = t.fingerId;
                 }
             }
             return charging;
         }
-        //Debug.Log("check");
-        //Debug.Log(user == null);
+        // Using Touch Interactive. Check if object we touch is arrow tail
         RaycastHit2D hitInfo = Physics2D.Raycast(t.position, user.playerCam.transform.forward);
-        if(hitInfo.collider != null)
-        {
-            Debug.Log(hitInfo.collider.name);
-        }
-
         RaycastHit hit;
         Ray ray = user.playerCam.ScreenPointToRay(t.position);
-        if(Physics.Raycast(ray, out hit))
+        // If we are touching arrow tail
+        if (Physics.Raycast(ray, out hit) && hit.collider.name == "Tail")
         {
-            //Debug.Log("SOMTHING");
-            //Debug.Log(hit.collider.name);
-            if(hit.collider.name == "Tail")
-            {
-                base.StartUse(t);
-                charging = true;
-                shootTouchID = t.fingerId;
-                originalTouchPos = t.position;
-                return true;
-            }
+            base.StartUse(t);
+            charging = true;
+            shootTouchID = t.fingerId;
+            originalTouchPos = t.position;
+            return true;
         }
 
         return false;
     }
 
+    // Upon end use, shoot arrow
     public override void EndUse()
     {
         shootTouchID = -1;
@@ -171,9 +152,10 @@ public class Bow : Weapon {
         chargePower = 0;
         base.EndUse();
     }
-
+    
     public override void Charge(float chargePower)
     {
+        // Assign charge to bow if multiplayer and not my weapon
         if (NetworkManager.nm.isStarted && !user.IsMyPlayer())
         {
             this.chargePower = chargePower;
@@ -182,25 +164,15 @@ public class Bow : Weapon {
                 arrow.localPosition = bulletSpawn.localPosition + new Vector3(0, 0, chargePower * drawLimit);
             return;
         }
+        // If not using Touch Interactive mode, progressively increase the chargePower as long as user holds shoot button
         if (!GameManager.gm.interactiveTouch)
         {
-            chargePower = chargePower + .03f;
+            chargePower = chargePower + .03f; // increment charge power
             if (chargePower >= chargeLimit)
                 chargePower = chargeLimit;
-            chargeBar.transform.localScale = new Vector3(1, chargePower/chargeLimit, 1);
-            //this.chargePower = chargePower;
-            //chargePower
-            /*if (chargeBar.transform.localScale.y >= 1)
-            {
-                chargeBar.transform.localScale = new Vector3(
-                    chargeBar.transform.localScale.x,
-                    1,
-                    chargeBar.transform.localScale.z);
-                chargePower = 1;
-                chargeAccelerator *= -1;
-                chargeBarAlt = -1;
-            }*/
+            chargeBar.transform.localScale = new Vector3(1, chargePower/chargeLimit, 1); // Visual indicator of charge percentage
         }
+        // Using Touch Interactive
         else
         {
             Touch t;
@@ -209,49 +181,46 @@ public class Bow : Weapon {
                 if (Input.GetTouch(i).fingerId == shootTouchID)
                 {
                     t = Input.GetTouch(i);
+                    // If finger slides to the left half of the screen, arrow won't be drawn
                     if (t.position.x < originalTouchPos.x)
                     {
                         chargePower = 0;
-                        //    break;
                     }
+                    // If finger is on right half of screen, calculate charge power based on distance of original position to finger position
                     else
                     {
                         float dist = Vector2.Distance(t.position, originalTouchPos);
                         //Debug.Log(dist + " " + Screen.width / 2);
                         chargePower = dist / maxScreenDrawRange;
                     }
-
                     break;
                 }
             }
         }
-        drawRange = drawOffset + chargePower * drawLimit * drawElasticity;
-        arrow.localPosition = bulletSpawn.localPosition + new Vector3(0, 0, chargePower * drawLimit);
+        drawRange = drawOffset + chargePower * drawLimit * drawElasticity; // Calculate how far arrow and bowstring is drawn
+        arrow.localPosition = bulletSpawn.localPosition + new Vector3(0, 0, chargePower * drawLimit); // Move arrow backwards based on charge power 
         this.chargePower = chargePower;
-        //Debug.Log(chargePower);
     }
 
+    // Launch arrow if charge exceeds minimum
     public override void Shoot(float chargePower)
     {
         if (chargePower > .05f && arrow)
         {
-            //chargeBarGuage.SetActive(false);
-            //GameObject bullet = Instantiate(bulletPrefab);
             arrow.SetParent(GameManager.gm.projectilesContainer.transform);
-            //bullet.transform.position = bulletSpawn.transform.position;
             Rigidbody rb = arrow.transform.GetComponent<Rigidbody>();
-            rb.constraints = RigidbodyConstraints.None;
-            //rb.AddForce(user.playerCam.transform.forward * chargePower * distance);
-            rb.AddForce(user.playerCam.transform.forward * chargePower * statsByLevel[wepID].distance[lvl]);
+            rb.constraints = RigidbodyConstraints.None; // Remove the fixed position of arrow
+            rb.AddForce(user.playerCam.transform.forward * chargePower * statsByLevel[wepID].distance[lvl]); // Launch arrow
             rb.useGravity = true;
             arrow.GetComponent<Arrow>().isShot = true;
             arrow.GetComponent<Arrow>().id = user.id;
             arrow.GetComponent<Arrow>().dmg = statsByLevel[wepID].dmg[lvl];
-            //arrow.transform.Find("Arrow Tip").GetComponent<BoxCollider>().isTrigger = false;
+            arrow.transform.Find("Tail").GetComponent<BoxCollider>().enabled = false;
             arrow = null;
             reloading = true;
-            //reloadTime = timeToReload;
             reloadTime = statsByLevel[wepID].timeToReload[lvl];
+
+            // Reset bowstring vertices
             List<Vector3> positions = new List<Vector3>();
             positions.Add(new Vector3(0, .5f, -.475f));
             positions.Add(new Vector3(0, 0, drawRange));

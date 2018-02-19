@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class StatusIndicator : MonoBehaviour {
-    public GameObject target;
-    public Transform healthBar, healthBarGauge;
+    public GameObject target; // Follow this object
+    public Transform healthBar, // Visual indicator of health 
+                     healthBarGauge; // Visual indicator of max health
     // Use this for initialization
     void Start()
     {
@@ -15,24 +16,25 @@ public class StatusIndicator : MonoBehaviour {
     // Update is called once per frame
     void Update()
     {
+        // No target? Remove self
         if (target == null)
         {
-            //Debug.Log("?");
             Destroy(gameObject);
             return;
         }
+        // Have this face the player to player can see
         if (GameManager.gm.player)
         {
-            //Debug.Log("here");
             healthBarGauge.LookAt(GameManager.gm.player.transform.GetComponent<PlayerController>().playerCam.transform);
         }
+
+        // Update health bar based on target's health
         healthBarGauge.position = target.transform.position +
             new Vector3(
                 0,
                 target.transform.localScale.y +
                 healthBarGauge.transform.GetComponent<RectTransform>().rect.height,
                 0);
-        //transform.localEulerAngles = target.transform.localEulerAngles;
         int hp = 0, maxHP = 1;
         if(target.tag == "Enemy")
         {

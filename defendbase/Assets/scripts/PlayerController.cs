@@ -4,27 +4,26 @@ using UnityEngine;
 using UnityEngine.UI;
 
 public class PlayerController : MonoBehaviour {
-    public int id;
-    public bool gyroEnabled, useGyro;
-    private Gyroscope gyro;
-    private Vector2 initialTouchPosition;
-    public float turnSpd = 1f;
-    private GameObject cameraContainer;
-    public Camera playerCam;
-    private Quaternion rot;
-    public float speed = 10f, prevXAngle, maxLookDownLimit;
-    private int shootTouchID, aimTouchID;
+    public int id; // Used to assign who controls this player online
+    public bool gyroEnabled, // Is there gyroscope feature on this device? 
+                useGyro; // Are we using gyroscope?
+    private Gyroscope gyro; // Point to gyroscope object
+    private GameObject cameraContainer; // Holds the camera that represents your view
+    public Camera playerCam; // Your perspective in game
+    private Quaternion rot; // Used for orienting your perspective
+    public float prevXAngle, // Used for limiting how far you can look down
+                 maxLookDownLimit; // Limit on how far your look down
+    // PC purpose?
     private Transform bulletSpawn;
     public GameObject bulletPrefab;
     public GameObject chargeBarGuage, chargeBar;
     private bool charging;
     private float chargePower, chargeAccelerator;
     private int chargeBarAlt = 1;
-    public Weapon wep;
+
+    public Weapon wep; // Weapon player is currently holding and using
 	// Use this for initialization
 	void Start () {
-        shootTouchID = -1;
-        aimTouchID = -1;
         charging = false;
         bulletSpawn = playerCam.transform.Find("BulletSpawn");
         prevXAngle = 0;
@@ -32,60 +31,52 @@ public class PlayerController : MonoBehaviour {
         Screen.orientation = ScreenOrientation.Landscape;
         cameraContainer = transform.Find("Camera Container").gameObject;
         gyroEnabled = EnableGyro();
-        //cameraContainer.transform.SetParent(transform);
-        //cameraContainer.transform.localPosition = playerCam.transform.localPosition;
         playerCam.transform.SetParent(cameraContainer.transform);
         useGyro = true;
-        //DisableGyro();
     }
-
+    
+    // Disable using gyro if existent
     private void DisableGyro()
     {
         if (SystemInfo.supportsGyroscope)
         {
             gyro.enabled = false;
-            //GameManager.gm.gyroEnabled = false;
             cameraContainer.transform.rotation = Quaternion.Euler(0f, 0f, 0f);
-            //rot = new Quaternion(0, 0, .5f, 0);
             playerCam.transform.localEulerAngles = new Vector3(0, 0, 0);
-            //return true;
         }
     }
-
+    // Enable gyro capability if existent
     private bool EnableGyro()
     {
         if (SystemInfo.supportsGyroscope)
         {
             gyro = Input.gyro;
             gyro.enabled = true;
-            //GameManager.gm.gyroEnabled = true;
             cameraContainer.transform.rotation = Quaternion.Euler(90f, 90f, 0f);
             rot = new Quaternion(0, 0, .5f, 0);
-
             return true;
         }
         return false;
     }
 
+    // Check if this object is the player I control
     public bool IsMyPlayer()
     {
         return gameObject == GameManager.gm.player;
     }
+
     // Update is called once per frame
     void Update () {
-        //return;
-        //GameObject.Find("PlayerUI").transform.Find("Text").GetComponent<Text>().text = "";
+        // Don't do anything if this player isn't in my control
         if (!IsMyPlayer())
         {
-            //Debug.Log("NOT palyer");
             return;
         }
         PlayerMobileInput();
         PlayerPCInput();
-        
-        
     }
 
+    // Bind weapon w to this player
     public void EquipWeapon(Weapon w)
     {
         if (wep)
@@ -101,19 +92,14 @@ public class PlayerController : MonoBehaviour {
 
     }
 
+    // Handle Mobile inputs
     private void PlayerMobileInput()
     {
+        // Using gyro if existent? Rotate player perspective
         if (gyroEnabled && useGyro)
         {
-            //Debug.Log("Rotate)");
             RotatePlayer();
-            //transform.Translate(0, 0,
-            //(-1 * Input.acceleration.z * speed * Time.deltaTime)); // adds movement on the Z axis alone.
-            //GameObject.Find("txt").transform.GetChild(0).GetComponent<Text>().text = "" + transform.position + "\n" + Input.acceleration;
         }
-        //if (wep == null)
-        //    return;
-        
     }
 
     private void PlayerPCInput()
@@ -136,7 +122,6 @@ public class PlayerController : MonoBehaviour {
         }
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            Debug.Log("Down");
             charging = true;
             chargePower = 0;
             chargeBarGuage.SetActive(true);
@@ -144,38 +129,8 @@ public class PlayerController : MonoBehaviour {
             chargeBarAlt = 1;
             chargeAccelerator = 0;
         }
-        /*
-        if (charging)
-        {
-            Debug.Log("Charg" + chargePower + " " + chargeAccelerator  + " " );
-            chargePower += .025f * chargeBarAlt;
-            chargeAccelerator += .05f * chargeBarAlt;
-            chargeBar.transform.localScale = new Vector3(1, chargePower, 1);
-            
-            //chargePower
-            if(chargeBar.transform.localScale.y >= 1)
-            {
-                chargeBar.transform.localScale = new Vector3(
-                    chargeBar.transform.localScale.x,
-                    1,
-                    chargeBar.transform.localScale.z);
-                chargePower = 1;
-                chargeAccelerator *= -1;
-                chargeBarAlt = -1;
-            } else if (chargeBar.transform.localScale.y < 0)
-            {
-                chargeBar.transform.localScale = new Vector3(
-                    chargeBar.transform.localScale.x,
-                    0,
-                    chargeBar.transform.localScale.z);
-                chargeAccelerator *= -1;
-                chargePower = 0;
-                chargeBarAlt = 1;
-            }
-        }*/
         if (Input.GetKeyUp(KeyCode.Space))
         {
-            Debug.Log("Done");
             charging = false;
             chargeBarGuage.SetActive(false);
 
@@ -187,20 +142,13 @@ public class PlayerController : MonoBehaviour {
 
     }
 
+    // Orient player perspective
     private void RotatePlayer()
     {
-        //Quaternion q = gyro.attitude;// * rot;
-        //Vector3 angles = q.eulerAngles;
-        //playerCam.transform.localEulerAngles = new Vector3(angles.x, 0,0);
-        //transform.localEulerAngles = new Vector3(0, angles.y, 0);
-        
         playerCam.transform.localRotation = gyro.attitude * rot;
         if(playerCam.transform.eulerAngles.x >= maxLookDownLimit && playerCam.transform.eulerAngles.x <= 90f)
         {
             playerCam.transform.eulerAngles = new Vector3(maxLookDownLimit, playerCam.transform.eulerAngles.y, playerCam.transform.eulerAngles.z);
         }
-        //Debug.Log(playerCam.transform.eulerAngles + " " + playerCam.transform.localEulerAngles);
-        //transform.localEulerAngles = new Vector3(0, playerCam.transform.eulerAngles.x, 0);
-        //playerCam.transform.localEulerAngles = new Vector3(0,playerCam.transform.localEulerAngles.y, 0);
-    }
+     }
 }

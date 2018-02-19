@@ -3,15 +3,16 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+// Keeps track of weapon details per level
 public class WeaponStats
 {
     public string name;
-    public int price = 0;
-    public int[] dmg,
-          costToUpgrade;
-    public float[] distance,
-          timeToReload,
-          chargeAccelation;
+    public int price = 0; // How much to initially buy from store
+    public int[] dmg, // List of damage per level
+                 costToUpgrade; // List of cost to upgrade to next level
+    public float[] distance, // How far can shoot projectiles
+                   timeToReload, // How long before shooting
+                   chargeAccelation; // How fast to charge (for bows, cannons, etc.)
     public WeaponStats(string nm, int[] dmgs,int[] costs, float[] distances, float[] timeToReloads, float[] chargeAccelerations)
     {
         name = nm;
@@ -25,6 +26,7 @@ public class WeaponStats
 
 public abstract class Weapon : MonoBehaviour
 {
+    // List of all weapons and their stats
     public static WeaponStats[] statsByLevel = new WeaponStats[] {
         // Bow Level Stats
         new WeaponStats
@@ -37,27 +39,33 @@ public abstract class Weapon : MonoBehaviour
             new float[] {.75f,.70f,.65f,.55f,.5f}
         )
     };
-    public static int WeaponCount = 0;
-    protected Transform bulletSpawn;
-    public GameObject bulletPrefab;
-    public GameObject chargeBarGuage, 
-                      chargeBar,
-                      shootBtn,
-                      itemUI;
-    public bool charging,
-                inUse,
-                purchased,
-                reloading;
-    public float chargePower, chargeAccelerator, distance = 1000, chargeLimit;
-    public float reloadTime, timeToReload;
-    protected int chargeBarAlt = 1, 
-                  lvl, 
-                  id, 
-                  wepID;
-    public PlayerController user;
-    protected int shootTouchID, aimTouchID;
 
-    private Vector2 initialTouchPosition;
+    public static int WeaponCount = 0; // Counts number of weapons created
+    protected Transform bulletSpawn; // Spawn point for bullets
+    public GameObject bulletPrefab; // Projectile to spawn
+    public GameObject chargeBarGuage, // Visual indicator of max charge
+                      chargeBar, // Visual indicator of charge percentage
+                      shootBtn, // What to touch when player wants to shoot
+                      itemUI; // Displays item detail in store
+    public bool charging, // Am I charging up shot?
+                inUse, // Used for online purpose to denote other players using their weapon
+                purchased, // Did I already buy weapon?
+                reloading; // Am I reloading?
+    public float chargePower, // How much I have been charging (More = stronger or further shots)
+                 chargeAccelerator, // How fast my shot will charge up
+                 distance = 1000,  // How far my shot will go
+                 chargeLimit; // How much my charge can go up to
+    public float reloadTime, // How long before bullet spawns 
+                 timeToReload; // Default time for reloading
+    protected int chargeBarAlt = 1, // Unused. Originally used to have charge increase and decrease if charging
+                  lvl, // Determines stats of weapon
+                  id, // Unique ID for this object
+                  wepID; // Distinguishes what weapon this is
+    public PlayerController user; // Who is using this weapon
+    protected int shootTouchID, // Finger ID that is used for shooting
+                  aimTouchID; // Finger ID that is used for aiming camera perspective
+
+    //private Vector2 initialTouchPosition; // Used for determining 
     // Use this for initialization
     protected virtual void Start () {
         charging = false;
@@ -67,10 +75,10 @@ public abstract class Weapon : MonoBehaviour
         id = WeaponCount;
         WeaponCount++;
         bulletSpawn = transform.Find("BulletSpawn");
-        //itemUI = Instantiate(GameManager.gm.itemUIPrefab);
         chargeBarGuage = Instantiate(chargeBarGuage);
         chargeBar = chargeBarGuage.transform.GetChild(0).gameObject;
         shootBtn = Instantiate(shootBtn);
+        // Display the non-Touch Interactive UIs if not using Touch Interaction and is my player
         if (!GameManager.gm.interactiveTouch && GameManager.gm.player == user.gameObject)
         {
             chargeBarGuage.transform.SetParent(GameManager.gm.playerStatusCanvas.transform);
@@ -79,6 +87,8 @@ public abstract class Weapon : MonoBehaviour
             shootBtn.transform.localPosition = GameManager.gm.playerStatusCanvas.transform.Find("ShootBtnPlaceholder").localPosition;
         }
         chargeBarGuage.SetActive(false);
+
+        // Add item UI to store with respect to if item was purchased or not
         itemUI = Instantiate(itemUI);
         itemUI.transform.Find("ItemDescription").GetComponent<Text>().text = statsByLevel[wepID].name + " Lvl" + lvl;
         itemUI.transform.Find("BuyBtn").GetComponent<Button>().onClick.AddListener(Purchase);
@@ -99,14 +109,17 @@ public abstract class Weapon : MonoBehaviour
 	
 	// Update is called once per frame
 	protected virtual bool Update () {
+        // Don't do anything if no user exists
         if (!user)
             return false;
+        // If using online feature and disconnected, cancel using weapon, to prevent further complications
         if(NetworkManager.nm.isStarted && NetworkManager.nm.isDisconnected)
         {
             CancelUse();
             return false;
         }
 
+        // Check to see if any finger touch ID is valid for shooting
         if (Input.touchCount > 0)
         {
             for (int i = 0; i < Input.touchCount; i++)
@@ -136,12 +149,14 @@ public abstract class Weapon : MonoBehaviour
         return true;
     }
 
+    // Stop using weapon, prevent charge and shooting
     public virtual void CancelUse()
     {
         chargePower = 0;
         EndUse();
     }
 
+    // Handle either buying weapon or upgrading it
     public void Purchase()
     {
         if (!purchased)
@@ -185,37 +200,27 @@ public abstract class Weapon : MonoBehaviour
             }
         }
     }
-
+    
     public void SetLevel(int lvl)
     {
         this.lvl = lvl;
     }
 
+    // Format:
+    // WEP|Using weapon|charge power|
     public virtual string NetworkInformation()
     {
         return "WEP|" + inUse + "|" + chargePower + "|";
     }
     
+    // Extract network information
     public virtual void SetNetworkInformation(string[] data)
     {
-        
         bool inUse = bool.Parse(data[1]);
-        //bool charging = bool.Parse(data[2]);
         float chargePower = float.Parse(data[2]);
-        //this.chargePower = chargePower;
-        /*if (inUse)
-        {
-            if (this.inUse)
-            {
-                this.chargePower = chargePower;
-            }
-            else
-            {
-                start
-            }
-        }*/
     }
 
+    // Handles the beginning of weapon usage for online feature
     public virtual bool StartUse()
     {
         inUse = true;
@@ -230,6 +235,7 @@ public abstract class Weapon : MonoBehaviour
         return true;
     }
 
+    // Handles the beginning of weapon usage
     public virtual bool StartUse(Touch t)
     {
         inUse = true;
@@ -243,38 +249,32 @@ public abstract class Weapon : MonoBehaviour
             chargeBarAlt = 1;
             chargeAccelerator = 0;
         }
-        //chargeBarGuage.SetActive(true);
-        //chargeBar.transform.localScale = new Vector3(0, 0, 0);
-        //chargeBarAlt = 1;
-        //chargeAccelerator = 0;
         return true;
     }
 
+    // Handles the end of weapon usage
     public virtual void EndUse()
     {
-        //Debug.Log("FIRE");
         inUse = false;
         chargeBarGuage.SetActive(false);
-        //Shoot(chargePower);
     }
 
+    // Handles what happens when weapon shoots at a certain charge power
     public virtual void Shoot(float chargePower)
     {
         charging = false;
-        //chargeBarGuage.SetActive(false);
         GameObject bullet = Instantiate(bulletPrefab);
-
         bullet.transform.position = bulletSpawn.transform.position;
         bullet.transform.GetComponent<Rigidbody>().AddForce(user.playerCam.transform.forward * chargePower * distance);
     }
 
+    // Handle charging weapon
     public virtual void Charge(float chargePower)
     {
         chargePower += .025f * chargeBarAlt;
         chargeAccelerator += .05f * chargeBarAlt;
         chargeBar.transform.localScale = new Vector3(1, chargePower, 1);
         this.chargePower = chargePower;
-        //chargePower
         if (chargeBar.transform.localScale.y >= 1)
         {
             chargeBar.transform.localScale = new Vector3(

@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+// Used for keeping track of how long a join button lasts
 public class ExpiringButton : MonoBehaviour
 {
-    public int timer;
-    public Host host;
+    public int timer; // How long before destroying this
+    public Host host; // Keep track of hosts broadcasting available rooms
 
     public void Start()
     {
@@ -36,10 +37,11 @@ public class ExpiringButton : MonoBehaviour
         return timer <= 0;
     }
 
+    // Attempt to join host room
     public void Join()
     {
         NetworkManager.nm.ConnectTo(host);
-        GetComponent<Button>().interactable = false;
+        GetComponent<Button>().interactable = false; // Prevent player from spamming to join room
         NetworkManager.nm.ClearHostList();
     }
 }

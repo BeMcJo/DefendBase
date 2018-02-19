@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public abstract class Projectile : MonoBehaviour {
-    public int id;
-    public float activeDuration = 10f;
-    public int dmg = 1;
-    public bool hitGround, isShot;
-    protected bool deflected;
-    public TrailRenderer tr;
+    public int id; // ID based on which player shot this object
+    public float activeDuration = 10f; // How long before destroying object
+    public int dmg = 1; // How much damage this can inflict
+    public bool hitGround, // Did this get dull from hitting ground/wall? Can't damage enemies if so 
+                isShot; // Did this get launched?
+    protected bool deflected; // Did this not penetrate object? If so, bounce 
+    public TrailRenderer tr; // Shows trajectory path tailing this object
 	// Use this for initialization
 	protected virtual void Start () {
         hitGround = false;
@@ -34,15 +35,50 @@ public abstract class Projectile : MonoBehaviour {
         }
 
 	}
-
+    
     protected virtual void OnTriggerEnter(Collider collision)
     {
-        //Debug.Log("Ar");
         if (collision.transform.tag == "Enemy")
         {
+            // If can damage enemy and this is shot by my player
             if (!hitGround && !deflected && id == GameManager.gm.player.transform.GetComponent<PlayerController>().id)
             {
-                //Debug.Log("colide");
+                Enemy e = collision.transform.GetComponent<Enemy>();
+                //e.transform.GetComponent<Rigidbody>().velocity = Vector3.zero; // Disable physics force applied when colliding
+                // If using online feature, let Network Manager handle this
+                if (NetworkManager.nm.isStarted)
+                {
+                    NetworkManager.nm.NotifyObjectDamagedBy(e.gameObject, gameObject);
+                    return;
+                }
+                // If not using online feature, inflict damage to enemy
+                if (e.TakeDamage(dmg))
+                {
+                    // If enemy is still alive, leave arrow stuck in enemy
+                    if (e.health > 0)
+                    {
+                        deflected = true;
+                        transform.GetComponent<Rigidbody>().velocity = Vector3.zero;
+                        transform.GetComponent<Rigidbody>().useGravity = false;
+                        tr.enabled = false;
+                        transform.SetParent(collision.transform);
+                    }
+                }
+            }
+        }
+        else if (collision.transform.tag == "Ground")
+        {
+            hitGround = true;
+            Destroy(gameObject);
+        }
+    }
+    
+    protected virtual void OnCollisionEnter(Collision collision)
+    {
+        if (collision.transform.tag == "Enemy")
+        {
+            if (!hitGround && id == GameManager.gm.player.transform.GetComponent<PlayerController>().id)
+            {
                 Enemy e = collision.transform.GetComponent<Enemy>();
 
                 e.transform.GetComponent<Rigidbody>().velocity = Vector3.zero;
@@ -57,37 +93,13 @@ public abstract class Projectile : MonoBehaviour {
                     {
                         deflected = true;
                         transform.GetComponent<Rigidbody>().velocity = Vector3.zero;
-                        transform.GetComponent<Rigidbody>().useGravity = false;
-                        tr.enabled = false;
-                        //this.enabled = false;
-                        transform.SetParent(collision.transform);
                     }
                     Debug.Log(gameObject.tag);
 
                 }
-                //Destroy(gameObject);
             }
         }
         else if (collision.transform.tag == "Ground")
-        {
-            hitGround = true;
-            Destroy(gameObject);
-        }
-    }
-
-    protected virtual void OnCollisionEnter(Collision collision)
-    {
-        if(collision.transform.tag == "Enemy")
-        {
-            if (!hitGround && id == GameManager.gm.player.transform.GetComponent<PlayerController>().id)
-            {
-                Debug.Log("colide");
-                Enemy e = collision.transform.GetComponent<Enemy>();
-                e.TakeDamage(dmg);
-                e.transform.GetComponent<Rigidbody>().velocity = Vector3.zero;
-                //Destroy(gameObject);
-            }
-        }else if(collision.transform.tag == "Ground")
         {
             hitGround = true;
             Destroy(gameObject);
