@@ -12,14 +12,18 @@ public class PlayerData
 {
     public bool savedGame;
     public int wave,
+        inGameCurrency,
         objectiveHP,
         score,
+        difficulty,
         totalKills;
 
     public PlayerData()
     {
         savedGame = false;
         wave = 0;
+        inGameCurrency = 0;
+        difficulty = 0;
         objectiveHP = 0;
         score = 0;
         totalKills = 0;
@@ -41,6 +45,7 @@ public class GameManager : MonoBehaviour {
                 doneSpawningWave,
                 setupRotation,
                 gyroEnabled,
+                interactiveTouch,
                 onIntermission,
                 playingOnline,
                 paused;
@@ -59,10 +64,13 @@ public class GameManager : MonoBehaviour {
 
     public Vector3 playerOrientation;
 
+    public GameObject[] weaponPrefabs;
+
     public GameObject statusIndicatorPrefab,
                       playerPrefab,
                       playerUIPrefab,
                       buttonPrefab,
+                      itemUIPrefab,
                       enemyArmorPrefab,
                       enemyPrefab;
 
@@ -81,11 +89,15 @@ public class GameManager : MonoBehaviour {
                       hostListCanvas,
                       multiplayerCanvas,
                       lobbyCanvas,
+                      shopCanvas,
+                      settingsCanvas,
                       waveNotification;
 
     public Text scoreTxt;
 
-    public string scene;
+    public string scene,
+                  shopType,
+                  itemType;
 
     public float spawnTimer, timeToSpawn;
 
@@ -108,7 +120,9 @@ public class GameManager : MonoBehaviour {
                 PlayerData data = new PlayerData();
                 data.savedGame = inGame;
                 data.totalKills = totalKills;
+                data.inGameCurrency = inGameCurrency;
                 data.score = score;
+                data.difficulty = difficulty;
                 Debug.Log(inGame + " " + wave);
                 if (objective != null)
                 {
@@ -164,8 +178,10 @@ public class GameManager : MonoBehaviour {
         //Debug.Log("START");
         gm = this;
         gm.data = new PlayerData();
+        //inGameCurrency = 999999;
         //data = new PlayerData();
         DontDestroyOnLoad(gm);
+        interactiveTouch = false;
         playerOrientation = Vector3.zero;
         Screen.orientation = ScreenOrientation.Landscape;
         LoadMainScene();
@@ -233,7 +249,9 @@ public class GameManager : MonoBehaviour {
         btnContainer.Find("PlayBtn").GetComponent<Button>().onClick.AddListener(GoToGameScene);
         btnContainer.Find("OnlineBtn").GetComponent<Button>().onClick.AddListener(ToggleMultiplayerCanvas);
         btnContainer.Find("OnlineBtn").GetComponent<Button>().onClick.AddListener(ToggleMainMenuCanvas);
-        btnContainer.Find("SettingsBtn").GetComponent<Button>().onClick.AddListener(GoToCalibrationScene);
+        //btnContainer.Find("SettingsBtn").GetComponent<Button>().onClick.AddListener(GoToCalibrationScene);
+        btnContainer.Find("SettingsBtn").GetComponent<Button>().onClick.AddListener(ToggleMainMenuCanvas);
+        btnContainer.Find("SettingsBtn").GetComponent<Button>().onClick.AddListener(ToggleSettingsCanvas);
         btnContainer.Find("ContinueBtn").GetComponent<Button>().onClick.AddListener(GoToContinuedGameScene);
         btnContainer.Find("ContinueBtn").GetChild(0).GetComponent<Text>().text += (data != null && data.savedGame) ? " (Wave " + (data.wave+1) + ")" : "";
         btnContainer.Find("ContinueBtn").gameObject.SetActive(data != null && data.savedGame);
@@ -264,6 +282,19 @@ public class GameManager : MonoBehaviour {
         //lobbyCanvas.transform.Find("BackBtn").GetComponent<Button>().onClick.AddListener(ToggleLobbyCanvas);
         lobbyCanvas.transform.Find("BackBtn").GetComponent<Button>().onClick.AddListener(NetworkManager.nm.RequestLeaveLobby);
         lobbyCanvas.transform.Find("ReadyBtn").GetComponent<Button>().onClick.AddListener(NetworkManager.nm.RequestReady);
+
+        settingsCanvas = GameObject.Find("SettingsCanvas");
+        settingsCanvas.SetActive(false);
+        string isOn = "ON";
+        if (!interactiveTouch)
+            isOn = "OFF";
+        settingsCanvas.transform.Find("ButtonsContainer").Find("InteractiveTouchBtn").GetChild(0).GetComponent<Text>().text = "Interactive Touch: " + isOn;
+        btnContainer = settingsCanvas.transform.Find("ButtonsContainer");
+        btnContainer.Find("InteractiveTouchBtn").GetComponent<Button>().onClick.AddListener(ToggleInteractiveTouch);
+        btnContainer.Find("SetupOrientationBtn").GetComponent<Button>().onClick.AddListener(GoToCalibrationScene);
+        btnContainer.Find("SetupOrientationBtn").gameObject.SetActive(SystemInfo.supportsGyroscope);
+        btnContainer.Find("BackBtn").GetComponent<Button>().onClick.AddListener(ToggleMainMenuCanvas);
+        btnContainer.Find("BackBtn").GetComponent<Button>().onClick.AddListener(ToggleSettingsCanvas);
     }
 
     public void LoadGameScene()
@@ -279,6 +310,7 @@ public class GameManager : MonoBehaviour {
         //setupRotation = false;
         //gyroEnabled = true;
         totalKills = 0;
+
         intermissionCanvas = GameObject.Find("IntermissionCanvas");
         if (NetworkManager.nm.isStarted)
         {
@@ -290,6 +322,8 @@ public class GameManager : MonoBehaviour {
             intermissionCanvas.transform.Find("ResumeBtn").GetComponent<Button>().onClick.AddListener(NextWave);
         }
         intermissionCanvas.transform.Find("SaveAndQuitBtn").GetComponent<Button>().onClick.AddListener(SaveAndQuit);
+        intermissionCanvas.transform.Find("ShopBtn").GetComponent<Button>().onClick.AddListener(ToggleShopCanvas);
+        intermissionCanvas.transform.Find("ShopBtn").GetComponent<Button>().onClick.AddListener(ToggleIntermissionCanvas);
         intermissionCanvas.SetActive(false);
 
         enemiesContainer = GameObject.Find("EnemiesContainer");
@@ -312,21 +346,108 @@ public class GameManager : MonoBehaviour {
         optionsCanvas.transform.Find("ResumeBtn").GetComponent<Button>().onClick.AddListener(ResumeGame);
         optionsCanvas.transform.Find("ExitBtn").GetComponent<Button>().onClick.AddListener(LeaveGame);
         optionsCanvas.SetActive(false);
+
+        shopCanvas = GameObject.Find("ShopCanvas");
+        shopCanvas.transform.Find("CloseBtn").GetComponent<Button>().onClick.AddListener(ToggleShopCanvas);
+        shopCanvas.transform.Find("CloseBtn").GetComponent<Button>().onClick.AddListener(ToggleIntermissionCanvas);
+        Transform btns1 = shopCanvas.transform.Find("ButtonContainer1");
+        btns1.Find("StoreBtn").GetComponent<Button>().onClick.AddListener(DisplayStoreSelection);
+        btns1.Find("UpgradeBtn").GetComponent<Button>().onClick.AddListener(DisplayUpgradeSelection);
+        Transform btns2 = shopCanvas.transform.Find("ButtonContainer2");
+        btns2.Find("WeaponsBtn").GetComponent<Button>().onClick.AddListener(DisplayWeaponItems);
+        //btns2.Find("UpgradeBtn").GetComponent<Button>().onClick.AddListener(DisplayUpgradeSelection);
+        shopCanvas.SetActive(false);
+
         StartCoroutine(MapManager.mapManager.LoadGameScene());
         StartCoroutine(NetworkManager.nm.LoadGameScene());
 
+        
 
-        if (!NetworkManager.nm.isStarted || player == null)
+        if (!NetworkManager.nm.isStarted)
         {
             player = Instantiate(playerPrefab);
-            if (!NetworkManager.nm.isStarted)
+            //if (!NetworkManager.nm.isStarted)
+            //{
+            player.transform.position = playerSpawnPoints.transform.GetChild(0).position;
+            player.transform.SetParent(playerRotation.transform);
+
+            for (int i = 0; i < 1; i++)
             {
-                player.transform.position = playerSpawnPoints.transform.GetChild(0).position;
-                player.transform.SetParent(playerRotation.transform);
+                GameObject wep = Instantiate(weaponPrefabs[0]);
+                PlayerController pc = player.transform.GetComponent<PlayerController>();
+                pc.EquipWeapon(wep.transform.GetComponent<Weapon>());
+                pc.wep.purchased = true;
+                /*
+                pc.wep = wep.transform.GetComponent<Weapon>();
+                pc.wep.user = pc;
+                wep.transform.SetParent(player.transform.Find("Player Camera"));
+                wep.transform.position = player.transform.Find("Player Camera").Find("WeaponPlaceholder").position;
+                */
             }
+            //}
         }
 
         StartGame();
+    }
+
+    public void ToggleSettingsCanvas()
+    {
+        settingsCanvas.SetActive(!settingsCanvas.activeSelf);
+    }
+
+    public void ToggleInteractiveTouch()
+    {
+        interactiveTouch = !interactiveTouch;
+        string isOn = "ON";
+        if (!interactiveTouch)
+            isOn = "OFF";
+        settingsCanvas.transform.Find("ButtonsContainer").Find("InteractiveTouchBtn").GetChild(0).GetComponent<Text>().text = "Interactive Touch: " + isOn;
+    }
+
+    public void ToggleShopCanvas()
+    {
+        shopCanvas.SetActive(!shopCanvas.activeSelf);
+        shopType = "Store";
+        itemType = "Weapons";
+        DisplaySelectedItems();
+    }
+
+    public void DisplayStoreSelection()
+    {
+        shopType = "Store";
+        DisplaySelectedItems();
+    }
+
+    public void DisplayUpgradeSelection()
+    {
+        shopType = "Upgrade";
+        DisplaySelectedItems();
+    }
+
+    public void DisplayWeaponItems()
+    {
+        itemType = "Weapons";
+        DisplaySelectedItems();
+    }
+
+    public void DisplaySelectedItems()
+    {
+        Transform btns1 = shopCanvas.transform.Find("ButtonContainer1");
+        Transform btns2 = shopCanvas.transform.Find("ButtonContainer2");
+        Transform displays = shopCanvas.transform.Find("Displays");
+        for (int i = 0; i < btns1.childCount; i++)
+        {
+            btns1.GetChild(i).GetComponent<Button>().interactable = btns1.GetChild(i).name != shopType + "Btn";
+        }
+        for (int i = 0; i < btns2.childCount; i++)
+        {
+            btns2.GetChild(i).GetComponent<Button>().interactable = btns2.GetChild(i).name != itemType + "Btn";
+        }
+        string displayType = shopType + itemType + "Display";
+        for (int i = 0; i < displays.childCount; i++)
+        { 
+            displays.GetChild(i).gameObject.SetActive(displayType == displays.GetChild(i).name);
+        }
     }
 
     public void ToggleMainMenuCanvas()
@@ -349,6 +470,11 @@ public class GameManager : MonoBehaviour {
         multiplayerCanvas.SetActive(!multiplayerCanvas.activeSelf);
     }
 
+    public void ToggleIntermissionCanvas()
+    {
+        intermissionCanvas.SetActive(!intermissionCanvas.activeSelf);
+    }
+
     public void SaveAndQuit()
     {
         Save("continuedGame");
@@ -367,7 +493,8 @@ public class GameManager : MonoBehaviour {
         startWaves = false;
         intermissionCanvas.SetActive(true);
         intermissionCanvas.transform.Find("StatsTxt").GetComponent<Text>().text = "Score: " + score + "\tKills: " + totalKills + "\nNext Wave: " + (wave + 1);
-        if(NetworkManager.nm.isStarted && NetworkManager.nm.isHost)
+        intermissionCanvas.transform.Find("ShopBtn").GetComponent<Button>().interactable = wave % 10 == 0;
+        if (NetworkManager.nm.isStarted && NetworkManager.nm.isHost)
         {
             intermissionCanvas.transform.Find("ResumeBtn").GetComponent<Button>().interactable = false;
         }
@@ -418,6 +545,12 @@ public class GameManager : MonoBehaviour {
     public void AddScore(int s)
     {
         score += s;
+    }
+
+    public void UpdateInGameCurrency(int currency)
+    {
+        inGameCurrency += currency;
+        shopCanvas.transform.Find("Currency").GetChild(0).GetComponent<Text>().text = "$" + inGameCurrency;
     }
 
     bool DisplayWaveNotification()
@@ -504,8 +637,9 @@ public class GameManager : MonoBehaviour {
     {
         //timeToSpawn = 10f;
         spawnTimer = 0;
+        spawnIndex = 0;
         startWaves = false;
-        //intervalIndex = 0;
+        intervalIndex = 0;
         wave = w;
         //totalKills += kills;
         kills = 0;
@@ -536,11 +670,16 @@ public class GameManager : MonoBehaviour {
     void StartGame()
     {
         Debug.Log("Starting Game");
+        enemies.Clear();
         inGame = true;
+        onIntermission = false;
         paused = false;
         gameOver = false;
         Enemy.EnemyCount = 0;
         Objective.ObjectiveCount = 0;
+        Weapon.WeaponCount = 0;
+        inGameCurrency = 0;
+        //UpdateInGameCurrency(9999);
         score = 0;
         kills = 0;
         difficulty = 0;
@@ -556,6 +695,7 @@ public class GameManager : MonoBehaviour {
                 score = data.score;
                 totalKills = data.totalKills;
                 wave = data.wave;
+                inGameCurrency = data.inGameCurrency;
                 objective.transform.GetComponent<Objective>().HP = data.objectiveHP;
             }
         }
@@ -567,9 +707,6 @@ public class GameManager : MonoBehaviour {
 
     public void StartWave(int w)
     {
-        //Debug.Log("Starting Wave " + w);
-        //Debug.Log("Displaying wave");
-        //spawnIndex = 0;
 
         intermissionCanvas.SetActive(false);
         onIntermission = false;
@@ -591,6 +728,7 @@ public class GameManager : MonoBehaviour {
             spawning = true;
             enemiesSpawned++;
             GameObject enemy = Instantiate(enemyPrefab);
+            Enemy.AssignEnemy(enemy.transform.GetComponent<Enemy>());
             if (sp == -1)
                 sp = UnityEngine.Random.Range(0, MapManager.mapManager.spawnPoints.Count);
             GameObject spawnPoint = MapManager.mapManager.spawnPoints[sp];
@@ -602,7 +740,7 @@ public class GameManager : MonoBehaviour {
             GameObject enemyUI = Instantiate(statusIndicatorPrefab);
             enemyUI.transform.GetComponent<StatusIndicator>().target = enemy;
             enemy.transform.SetParent(enemiesContainer.transform);
-            enemyUI.transform.SetParent(enemiesContainer.transform);
+            //enemyUI.transform.SetParent(enemiesContainer.transform);
             Enemy e = enemy.transform.GetComponent<Enemy>();
             e.level = (pattern.enemyLvls[intervalIndex][spawnIndex] + difficulty) % Enemy.difficulties.Length;
 
@@ -611,7 +749,7 @@ public class GameManager : MonoBehaviour {
             //{
             //    NetworkManager.nm.NotifySpawnEnemyAt(sp);
             //}
-            Debug.Log(spawnIndex + " " +pattern.spawnCts[intervalIndex].Count);
+            //Debug.Log(spawnIndex + " " +pattern.spawnCts[intervalIndex].Count);
 
             if (spawnIndex >= pattern.spawnCts[intervalIndex].Count)
             {
@@ -726,7 +864,7 @@ public class GameManager : MonoBehaviour {
                 spawnTimer -= Time.deltaTime;
                 if (spawnTimer <= 0)
                 {
-                    Debug.Log("SPAWED");
+                    //Debug.Log("SPAWED");
                     if (NetworkManager.nm.isStarted)
                         NetworkManager.nm.SpawnEnemy(-1);
                     else

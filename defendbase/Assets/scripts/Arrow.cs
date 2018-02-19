@@ -3,11 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Arrow : Projectile {
-    protected bool deflected;
 	// Use this for initialization
 	protected override void Start () {
         base.Start();
-        deflected = false;
 	}
 	
 	// Update is called once per frame
@@ -46,6 +44,11 @@ public class Arrow : Projectile {
                 Enemy e = collision.transform.GetComponent<Enemy>();
                 
                 e.transform.GetComponent<Rigidbody>().velocity = Vector3.zero;
+                if (NetworkManager.nm.isStarted)
+                {
+                    NetworkManager.nm.NotifyObjectDamagedBy(e.gameObject, gameObject);
+                    return;
+                }
                 if (e.TakeDamage(dmg))
                 {
                     if (e.health > 0)
@@ -54,10 +57,7 @@ public class Arrow : Projectile {
                         transform.GetComponent<Rigidbody>().velocity = Vector3.zero;
                     }
                     Debug.Log(gameObject.tag);
-                    if (NetworkManager.nm.isStarted)
-                    {
-                        NetworkManager.nm.NotifyObjectDamagedBy(e.gameObject, gameObject);
-                    }
+                    
                 }
                 //Destroy(gameObject);
             }

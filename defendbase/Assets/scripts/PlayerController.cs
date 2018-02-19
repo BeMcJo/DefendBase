@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 public class PlayerController : MonoBehaviour {
     public int id;
-    private bool gyroEnabled, useGyro;
+    public bool gyroEnabled, useGyro;
     private Gyroscope gyro;
     private Vector2 initialTouchPosition;
     public float turnSpd = 1f;
@@ -30,10 +30,10 @@ public class PlayerController : MonoBehaviour {
         prevXAngle = 0;
         maxLookDownLimit = 60f;
         Screen.orientation = ScreenOrientation.Landscape;
-        cameraContainer = new GameObject("Camera Container");
+        cameraContainer = transform.Find("Camera Container").gameObject;
         gyroEnabled = EnableGyro();
-        cameraContainer.transform.position = playerCam.transform.position;
-        cameraContainer.transform.SetParent(transform);
+        //cameraContainer.transform.SetParent(transform);
+        //cameraContainer.transform.localPosition = playerCam.transform.localPosition;
         playerCam.transform.SetParent(cameraContainer.transform);
         useGyro = true;
         //DisableGyro();
@@ -86,6 +86,21 @@ public class PlayerController : MonoBehaviour {
         
     }
 
+    public void EquipWeapon(Weapon w)
+    {
+        if (wep)
+        {
+            Debug.Log("Unequipping weapon");
+            wep.user = null;
+        }
+        
+        wep = w;
+        w.user = this;
+        wep.transform.SetParent(transform.Find("Camera Container").Find("Player Camera"));
+        wep.transform.position = transform.Find("Camera Container").Find("Player Camera").Find("WeaponPlaceholder").position;
+
+    }
+
     private void PlayerMobileInput()
     {
         if (gyroEnabled && useGyro)
@@ -96,107 +111,9 @@ public class PlayerController : MonoBehaviour {
             //(-1 * Input.acceleration.z * speed * Time.deltaTime)); // adds movement on the Z axis alone.
             //GameObject.Find("txt").transform.GetChild(0).GetComponent<Text>().text = "" + transform.position + "\n" + Input.acceleration;
         }
-        if (wep == null)
-            return;
-        if (Input.touchCount > 0)
-        {
-            //if (!charging)
-            //{
-
-            for (int i = 0; i < Input.touchCount; i++)
-            {
-                //GameObject.Find("PlayerUI").transform.Find("Text").GetComponent<Text>().text += Input.GetTouch(i).ToString() + " " + Input.GetTouch(i).fingerId;
-                //Debug.Log(Input.GetTouch(i).ToString() + " " + Input.GetTouch(i).fingerId);
-                
-                if (shootTouchID == -1 && Input.GetTouch(i).position.x > Screen.width / 2)
-                {
-                    //Debug.Log(1);
-                    // touch on screen
-                    if (Input.GetTouch(i).phase == TouchPhase.Began)
-                    {
-                        /*Ray ray = Camera.main.ScreenPointToRay(Input.GetTouch(0).position);
-                        RaycastHit hit = new RaycastHit();
-                        bool moving = Physics.Raycast(ray, out hit);
-                        if (moving)
-                        {
-                            //go = hit.transform.gameObject;
-                            Debug.Log("Touch Detected on : ");
-                        }*/
-                        if (wep.StartUse(Input.GetTouch(i))) {
-                            //Debug.Log("12");
-                            shootTouchID = Input.GetTouch(i).fingerId;
-                            //if (NetworkManager.nm.isStarted)
-                            //{
-
-                            //}
-                        }
-                        /*
-                        charging = true;
-                        chargePower = 0;
-                        chargeBarGuage.SetActive(true);
-                        chargeBar.transform.localScale = new Vector3(0, 0, 0);
-                        chargeBarAlt = 1;
-                        chargeAccelerator = 0;*/
-                    }
-
-
-                }
-                else if (Input.GetTouch(i).fingerId == shootTouchID)
-                {
-                    //Debug.Log(2);
-                    //wep.Use();
-                    // release touch/dragging
-                    if (Input.GetTouch(i).phase == TouchPhase.Ended || Input.GetTouch(i).phase == TouchPhase.Canceled)
-                    {
-                        wep.EndUse();
-                        shootTouchID = -1;
-                    }
-
-                }
-                else if (!useGyro)
-                {
-                    Vector2 pos = Input.GetTouch(i).position;
-                    if (Input.GetTouch(i).position.x <= Screen.width / 4 && aimTouchID == -1 && Input.GetTouch(i).phase == TouchPhase.Began)
-                    {
-                        //Debug.Log("??");
-                        aimTouchID = Input.GetTouch(i).fingerId;
-                        initialTouchPosition = pos;
-                    }
-                    if (aimTouchID != -1 && Input.GetTouch(i).fingerId == aimTouchID)
-                    {
-                        Vector2 dif = pos - initialTouchPosition;
-                        dif.Normalize();
-                        //Debug.Log("here2" + dif);
-
-                        playerCam.transform.localEulerAngles += new Vector3(-dif.y, dif.x, 0) * turnSpd;
-                    }
-                    if (Input.GetTouch(i).fingerId == aimTouchID && Input.GetTouch(i).phase == TouchPhase.Ended)
-                    {
-                        //Debug.Log("here3");
-                        aimTouchID = -1;
-                    }
-                }
-                /*
-            else if (charging)
-            {
-                Debug.Log("Done");
-                charging = false;
-                chargeBarGuage.SetActive(false);
-
-                GameObject bullet = Instantiate(bulletPrefab);
-
-                bullet.transform.position = bulletSpawn.transform.position;
-                bullet.transform.GetComponent<Rigidbody>().AddForce(playerCam.transform.forward * chargePower * 1000);
-
-
-                // moving = false;
-                Debug.Log("Touch Released from : ");
-            }*/
-            }
-            //}
-
-
-        }
+        //if (wep == null)
+        //    return;
+        
     }
 
     private void PlayerPCInput()

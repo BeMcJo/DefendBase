@@ -9,8 +9,8 @@ public class MapManager : MonoBehaviour {
     public GameObject mapContainer;
 
     public List<GameObject> spawnPoints;
-    public List<GameObject> platforms;// = new List<GameObject>();
-    
+    //public List<GameObject> platforms;// = new List<GameObject>();
+    public Dictionary<int, GameObject> platforms;
     private bool createdMap;
 	// Use this for initialization
 	void Start () {
@@ -22,6 +22,9 @@ public class MapManager : MonoBehaviour {
         mapManager = this;
         DontDestroyOnLoad(mapManager);
         createdMap = false;
+        //platforms = new List<GameObject>();
+        platforms = new Dictionary<int, GameObject>();
+        spawnPoints = new List<GameObject>();
         MapLibrary.Instatiate();
         //map = new GameObject("Map");
         //LoadMap(0);
@@ -73,13 +76,14 @@ public class MapManager : MonoBehaviour {
 
     public void LoadMap(int map)
     {
+        platforms.Clear();
+        spawnPoints.Clear();
         createdMap = false;
-        platforms = new List<GameObject>();
-        spawnPoints = new List<GameObject>();
+        PlatformPath.PlatformCount = 0;
         Map m = MapLibrary.maps[map];
         for (int i = 0; i < m.nodes.Count; i++)
         {
-            platforms.Add(Instantiate(hexPlatformPrefab));
+            platforms.Add(i,Instantiate(hexPlatformPrefab));
             platforms[i].transform.SetParent(mapContainer.transform);
         }
         for (int i = 0; i < m.nodes.Count; i++)

@@ -95,12 +95,12 @@ public class NetworkManager : MonoBehaviour {
     public bool isStarted = false;
     public bool inLobby = false;
     private bool requestingConnection = false;
-    private bool inGame = false;
+    //private bool inGame = false;
     private bool isReady;
     private bool isConnected = false;
     private bool destroyed = false;
     private bool isOriginal = false;
-    private bool isDisconnected = false;
+    public bool isDisconnected = false;
     private bool initialConfirmation = true;
 
     private bool isBroadcasting = false;
@@ -139,7 +139,7 @@ public class NetworkManager : MonoBehaviour {
     public Transform hostsList;
     public GameObject playerPrefab, joinButtonPrefab;
 
-    public List<string> activityLog;
+    public List<string> activityLog, activitiesToSend,debugLog;
 
     //public GameObject playerPrefab;
     GameObject //startBroadcastButton,
@@ -150,6 +150,7 @@ public class NetworkManager : MonoBehaviour {
                settingsBtn,
                playersList,
                playerSpawnPoints,
+               DCNotification,
                lobbyCanvas;
     //multiplayersCanvas;
     private Player myPlayer;
@@ -175,6 +176,7 @@ public class NetworkManager : MonoBehaviour {
             Destroy(gameObject);
             return;
         }
+        activitiesToSend = new List<string>(); 
         //LoadLobbyScene();
         //LoadSceneObjects();
         NetworkTransport.Init();
@@ -227,6 +229,7 @@ public class NetworkManager : MonoBehaviour {
         //Debug.Log("DeltaTime" + Time.deltaTime);
         if (!isStarted)// || !isListening)
         {
+            //Debug.Log("STOPPED RUNNIGN");
             return;
         }
         if (isHost)
@@ -237,12 +240,36 @@ public class NetworkManager : MonoBehaviour {
         {
             PerformClientActivities();
         }
+        if (GameManager.gm.inGame)
+        {
+            Text activity = GameManager.gm.playerStatusCanvas.transform.Find("ActivitiesTxt").GetComponent<Text>();
+            string t = "";
+            for (int i = 0; i < 10; i++)
+            {
+                int j = activityLog.Count - 1 - i;
+                if (j >= 0)
+                    t = "\n" + activityLog[j] + t;
+            }
+            t = "Activity Log:" + t;
+            activity.text = t;
+
+            Text debug = GameManager.gm.playerStatusCanvas.transform.Find("DebugTxt").GetComponent<Text>();
+            t = "";
+            for (int i = 0; i < 10; i++)
+            {
+                int j = debugLog.Count - 1 - i;
+                if (j >= 0)
+                    t = "\n" + debugLog[j] + t;
+            }
+            t = "Debug Log:" + t;
+            debug.text = t;
+        }
         //if (!gameStarted)
         //{
         //    return;
         //}
-        
-        if (GameManager.gm.inGame)
+
+        if (GameManager.gm.inGame && !isDisconnected)
         {
             //Debug.Log("IONGAMRE");
             if (GameManager.gm.onIntermission || !GameManager.gm.startWaves)
@@ -266,6 +293,8 @@ public class NetworkManager : MonoBehaviour {
                     LeaveGame();
             }*/
         }
+        if(DCNotification)
+            DCNotification.SetActive(GameManager.gm.inGame && isStarted && isDisconnected);
 
         
         /*
@@ -316,6 +345,7 @@ public class NetworkManager : MonoBehaviour {
     {
         isStarted = true;
         isReady = false;
+        isDisconnected = false;
         GameManager.gm.lobbyCanvas.transform.Find("BackBtn").GetComponent<Button>().interactable = true;
     }
 
@@ -455,7 +485,7 @@ public class NetworkManager : MonoBehaviour {
 
     public void ConnectTo(Host host)
     {
-        //Debug.Log("Connecting" + host == null);
+        Debug.Log("Connecting" + host == null);
         connectedHost = host;
         //Debug.Log(host != null);
         if (hostID != -1)
@@ -473,6 +503,7 @@ public class NetworkManager : MonoBehaviour {
             Debug.LogError("NetworkDiscovery StartAsClient - addHost failed");
             return;
         }
+        Debug.Log(connectedHost == null);
         connectionId = NetworkTransport.Connect(hostID, connectedHost.ip, connectedHost.port, 0, out error);
         //isConnected = true;
         timer = Time.time;
@@ -488,7 +519,7 @@ public class NetworkManager : MonoBehaviour {
         else
         {
             Debug.Log("Reconnected");
-            //Send("RECONNECT|" + GameManager.gm.myTurn + "|" + activityLog.Count, reliableChannel);
+            RequestActivityLog();
             isDisconnected = false;
             requestingConnection = false;
         }
@@ -626,16 +657,18 @@ public class NetworkManager : MonoBehaviour {
     private void OnNameIs(int cnnId, string playerName)
     {
         if (players.Count == 1 && !players.ContainsKey(cnnId))
+        {
             return;
+        }
         Player sc = players[cnnId];
         //Player sc = players.Find(x => x.connectionId == cnnId);
         sc.playerName = playerName;
-        sc.playerGO.transform.Find("NameText").GetComponent<Text>().text = playerName;
+        sc.playerGO.transform.Find("NameText").GetComponent<Text>().text = playerName + cnnId;
         sc.playerGO.transform.SetParent(GameManager.gm.lobbyCanvas.transform.Find("PlayerList"));//GameManager.gm.playerRotation.transform);
         //sc.playerGO.transform.localScale = new Vector3(1, 1, 1);
         //lobbyCanvas.transform.Find("StartBtn").GetComponent<Button>().interactable = true;
         sc.playerGO.SetActive(true);
-
+        //Debug.Log("confirmed name");
         // Tell everybody that new player has connected
         Send("CNN|" + playerName + '|' + cnnId, reliableChannel, players);
     }
@@ -656,6 +689,37 @@ public class NetworkManager : MonoBehaviour {
         Debug.Log("DCS: " + cnnId);
         // Tell everyone that someone has disconnected
         Send("DC|" + cnnId, reliableChannel, players);
+    }
+
+    private void OnReconnect(int cnnId, string[] data)
+    {
+        if (!GameManager.gm.inGame)
+            return;
+        //int player = int.Parse(data[1]);
+        int lastCommittedActivity = int.Parse(data[1]);
+        //client2player[cnnId] = player;
+        //player2client[player] = cnnId;
+        playerDC.Remove(cnnId);
+        ResendCommits(cnnId, lastCommittedActivity);
+        //for(int i = 0; i < GameManager.gm.enemiesContainer.transform.childCount; i++)
+        foreach(KeyValuePair<int,Enemy> kvp in GameManager.gm.enemies)
+        {
+            //string msg = GameManager.gm.enemiesContainer.transform.GetChild(i).GetComponent<Enemy>().NetworkInformation();
+            string msg = kvp.Value.NetworkInformation();
+            Send(msg,reliableChannel ,cnnId);
+        }
+        //Send("ANYREQUESTS|", reliableChannel, cnnId);
+        //for (int i = lastCommittedActivity; i < activityLog.Count; i++)
+        //    Send(activityLog[i], reliableChannel, cnnId);
+        //Send("LOG|" + activityLog.Count + "|" + activityLog[activityLog.Count - 1], reliableChannel, cnnId);
+    }
+
+    private void ResendCommits(int cnnId, int lastCommit)
+    {
+        if (!GameManager.gm.inGame)
+            return;
+        for (int i = lastCommit; i < activityLog.Count; i++)
+            Send(activityLog[i], reliableChannel, cnnId);
     }
 
     public void PerformHostActivities()
@@ -694,6 +758,7 @@ public class NetworkManager : MonoBehaviour {
                     case "ENEMYDMG":
                         //logID = int.Parse(splitData[1]);
                         Debug.Log(msg);
+                        debugLog.Add(msg);
                         if (activityLog.Count > 0)
                             Debug.Log(activityLog[activityLog.Count - 1]);
                         /*if (logID != activityLog.Count)
@@ -779,10 +844,11 @@ public class NetworkManager : MonoBehaviour {
                         break;
                     case "READY":
                         break;
-                    /*
+                    
                     case "RECONNECT":
                         OnReconnect(connectionId, splitData);
                         break;
+                        /*
                     case "STARTGAME":
                         OnReceivedStartGame(connectionId);
                         break;
@@ -794,11 +860,12 @@ public class NetworkManager : MonoBehaviour {
                 break;
             case NetworkEventType.DisconnectEvent: //4
                 Debug.Log("Player " + connectionId + " has disconnected");
-                if (gameStarted)
+                if (GameManager.gm.inGame)
                 {
                     //if (GameManager.gm.durak != -1)
                     //    return;
-                    playerDC.Add(client2player[connectionId], Time.time);
+                    playerDC.Add(connectionId, Time.time);
+                    //playerDC.Add(client2player[connectionId], Time.time);
                     //LeaveGame();
                 }
                 else
@@ -834,12 +901,13 @@ public class NetworkManager : MonoBehaviour {
             }
         }
         //Debug.Log(requestingConnection + " " + findingHosts + " " + inGame);
-        if (!requestingConnection && !inLobby && !inGame)// || findingHosts)
+        if (!requestingConnection && !inLobby && !GameManager.gm.inGame)// || findingHosts)
         {
             //Debug.Log("Searching");
             FindHosts();
             return;
         }
+        //Debug.Log(isDisconnected);
         //Debug.Log("waiting for requests");
         NetworkEventType recData = NetworkTransport.Receive(out recHostId, out connectionId, out channelId, recBuffer, bufferSize, out dataSize, out error);
         //Debug.Log(recHostId + " " + connectionId + " " + channelId + " " + recBuffer + " " + bufferSize + " " + dataSize + " " + error);
@@ -869,6 +937,7 @@ public class NetworkManager : MonoBehaviour {
                         OnAskPosition(splitData);
                         break;*/
                     case "CNN":
+                        Debug.Log(msg);
                         SpawnPlayerUI(splitData[1], int.Parse(splitData[2]));
                         break;
 
@@ -891,7 +960,27 @@ public class NetworkManager : MonoBehaviour {
                         OnEnemyDamaged(splitData);
                         activityLog.Add(msg);
                         break;
-
+                    case "ENEMYINFO":
+                        int eid = int.Parse(splitData[1]);
+                        Debug.Log(msg);
+                        string s = "EIDS";
+                        foreach (KeyValuePair<int, Enemy> kvp in GameManager.gm.enemies)
+                            s += "" + (kvp.Key);
+                        Debug.Log("<<<"+eid);
+                        Debug.Log("....>" + s);
+                        Debug.Log(GameManager.gm.enemies.ContainsKey(eid));
+                        if (GameManager.gm.enemies.ContainsKey(eid))
+                        {
+                            Debug.Log("zz");
+                            Debug.Log(GameManager.gm.enemies[eid] == null);
+                            
+                            GameManager.gm.enemies[eid].SetNetworkInformation(splitData);
+                        }
+                        else
+                        {
+                            Debug.Log("?");
+                        }
+                        break;
                     case "ENEMYSPAWN":
 
                         print(msg);
@@ -995,6 +1084,7 @@ public class NetworkManager : MonoBehaviour {
                         OnPlayerInformation(splitData);
                         break;
                     case "PURPOSE":
+                        Debug.Log("PURPOSE" + msg);
                         OnPurpose();
                         break;
                     
@@ -1043,7 +1133,17 @@ public class NetworkManager : MonoBehaviour {
                 {
                     Debug.Log("HOST DC?");
                     if (GameManager.gm.inGame)
-                        LeaveGame();
+                    {
+                        if (isDisconnected)
+                            LeaveGame();
+                        debugLog.Add("HOST DC");
+                        //requestingConnection = true;
+                        isDisconnected = true;
+                        ReconnectTo(connectedHost);
+                        timer = Time.time;
+                        isStarted = true;
+                        //LeaveGame();
+                    }
                     else
                         LeaveLobby();
                     /*if (GameManager.gm.durak != -1)
@@ -1051,7 +1151,6 @@ public class NetworkManager : MonoBehaviour {
                     Debug.Log("THATS OUR MAIN CON");
                     isDisconnected = true;
                     timer = Time.time;
-                    ReconnectTo(connectedHost);
                     //LeaveGame();*/
                 }else if (requestingConnection)
                 {
@@ -1073,22 +1172,46 @@ public class NetworkManager : MonoBehaviour {
         }
 
 
-        if (requestingConnection)
+        if (isDisconnected)
         {
-            
+            //Debug.Log(Time.time - timer + " " + timeout);
+            if (Time.time - timer >= timeout)
+            {
+                if (GameManager.gm.inGame)
+                {
+                    Debug.Log("U DC");
+                    LeaveGame();
+                }
+                //Debug.Log("WAITED TOO LONG");
+                //Disconnect();
+                //isConnected = false;
+                //findingHosts = true;
+                //requestingConnection = false;
+                //inLobby = false;
+                //inGame = false;
+            }
         }
+        //Debug.Log("running");
+    }
+
+    void ReconnectTo(Host h)
+    {
+        Debug.Log("Reconnecte");
+        Disconnect();
+        ConnectTo(h);
     }
 
     public void OnEnemyDamaged(string[] data)
     {
+        debugLog.Add("ENEMY DAMAGED");
         //for (int i = 0; i < data.Length; i++)
         //    Debug.Log(data[i]);
         int targetID = int.Parse(data[2]);
         int sourceID = int.Parse(data[3]);
-        if(sourceID == ourClientID)
+        /*if(sourceID == ourClientID)
         {
             return;
-        }
+        }*/
         int dmg = int.Parse(data[4]);
         if (GameManager.gm.enemies.ContainsKey(targetID))
         {
@@ -1121,7 +1244,6 @@ public class NetworkManager : MonoBehaviour {
             {
                 if (oid == 0 && GameManager.gm.objective)
                 {
-                    Debug.Log("OBJ ATTACKED");
                     Objective o = GameManager.gm.objective.transform.GetComponent<Objective>();
                     o.TakeDamage(dmg);
                     if (isHost)
@@ -1139,7 +1261,7 @@ public class NetworkManager : MonoBehaviour {
         {
             if (oid == 0 && GameManager.gm.objective)
             {
-                Debug.Log("OBJ ATTACKED");
+                //Debug.Log("OBJ ATTACKED");
                 Objective o = GameManager.gm.objective.transform.GetComponent<Objective>();
                 o.TakeDamage(dmg);
                 //if (isHost)
@@ -1222,6 +1344,13 @@ public class NetworkManager : MonoBehaviour {
     public void RequestActivityLog()
     {
         Debug.Log("OUT OF SYNC, REQUESTING LOG ORDER");
+        Debug.Log(activityLog[activityLog.Count - 1] + "<<<<");
+        Send("RECONNECT|" + activityLog.Count + "|", reliableChannel);
+        foreach(string msg in activitiesToSend)
+        {
+            Send(msg, reliableChannel);
+        }
+        activitiesToSend.Clear();
     }
 
     public void SpawnEnemy(int sp)
@@ -1272,14 +1401,22 @@ public class NetworkManager : MonoBehaviour {
         }
 
         msg += "DMG|" + activityLog.Count + "|" + tid + "|" + sid + "|" + dmg + "|";
+        debugLog.Add(msg);
+        debugLog.Add(source.tag + " " + source.name);
         Debug.Log(msg);
         if (isHost)
         {
             Send(msg, reliableChannel,players);
             activityLog.Add(msg);
+            OnEnemyDamaged(msg.Split('|'));
         }
         else
         {
+            if (isDisconnected)
+            {
+                activitiesToSend.Add(msg);
+                return;
+            }
             Send(msg, reliableChannel);
         }
     }
@@ -1297,6 +1434,7 @@ public class NetworkManager : MonoBehaviour {
         enemyAttacks = new Dictionary<int, Dictionary<int, Attack>>();
         activityLog = new List<string>();
         activityLog.Add("STARTGAME|0|");
+        inLobby = false;
         if (isHost)
         {
             StopBroadcast();
@@ -1375,7 +1513,7 @@ public class NetworkManager : MonoBehaviour {
 
         // Set this client's ID
         ourClientID = int.Parse(data[1]);
-
+        Debug.Log("send name is" + ourClientID);
         // Send our name to server
         Send("NAMEIS|" + "PLAYER", reliableChannel);
 
@@ -1408,6 +1546,7 @@ public class NetworkManager : MonoBehaviour {
             playerName = "ME"; //GameManager.gm.playerName;
             //isStarted = true;
         }
+        playerName += "" + cnnId;
         Player p = new Player();
         p.playerGO = go;
         p.playerName = playerName;
@@ -1423,23 +1562,28 @@ public class NetworkManager : MonoBehaviour {
     {
         if (!isStarted)
             return;
-        if (isBroadcasting)
+        if (isHost)
         {
-            StopBroadcast();
+            if (isBroadcasting)
+            {
+                StopBroadcast();
+            }
         }
-        if (hostID != -1)
-        {
-            if(!isConnected)
+        //else
+        //{
+            if (hostID != -1)
+            {
+                if (isHost)
+                    NetworkTransport.Disconnect(hostID, connectionId, out error);
                 NetworkTransport.RemoveHost(hostID);
-            else
-                NetworkTransport.Disconnect(hostID, connectionId, out error);
-        }
-        hostID = -1;
-        findingHosts = false;
-        connectedHost = null;
-        isStarted = false;
-        Debug.Log("Disconnected");
-        isConnected = false;
+            }
+            hostID = -1;
+            findingHosts = false;
+            connectedHost = null;
+            isStarted = false;
+            Debug.Log("Disconnected");
+            isConnected = false;
+        //}
     }
 
     public void RequestAction(string action)
@@ -1606,47 +1750,53 @@ public class NetworkManager : MonoBehaviour {
     public void LeaveGame()
     {
         Debug.Log("Leaving");
-        isStarted = false;
-        foreach (KeyValuePair<int, Player> kvp in players)
-        {
-            Destroy(kvp.Value.playerGO);
-        }
+        //isStarted = false;
+        Disconnect();
+        //foreach (KeyValuePair<int, Player> kvp in players)
+        //{
+        //    Destroy(kvp.Value.playerGO);
+        //}
         players.Clear();
-        if (isBroadcasting)
-        {
-            StopBroadcast();
-        }
+        playerDC.Clear();
+        //if (isBroadcasting)
+        //{
+        //    StopBroadcast();
+        //}
         //GameManager.gm.ToggleLobbyCanvas();
         //GameManager.gm.ToggleMultiplayerCanvas();
         inLobby = false;
-        Disconnect();
+        GameManager.gm.GoToMainScene();
     }
 
     public void LeaveLobby()
     {
         Debug.Log("Leaving");
+
+        Disconnect();
         isStarted = false;
         foreach(KeyValuePair<int,Player> kvp in players)
         {
             Destroy(kvp.Value.playerGO);
         }
         players.Clear();
-        if (isBroadcasting)
-        {
-            StopBroadcast();
-        }
+        //if (isBroadcasting)
+        //{
+        //    StopBroadcast();
+        //}
         GameManager.gm.ToggleLobbyCanvas();
         GameManager.gm.ToggleMultiplayerCanvas();
         inLobby = false;
-        Disconnect();
     }
     
 
     public IEnumerator LoadGameScene()
     {
+        //Debug.Log(">>>");
         //GameManager.gm.playerRotation = GameObject.Find("Player Rotation");
+        DCNotification = GameManager.gm.playerStatusCanvas.transform.Find("DC Notification").gameObject;
+        DCNotification.SetActive(false);
         playerSpawnPoints = GameManager.gm.playerSpawnPoints;
-
+        debugLog = new List<string>();
         //StartCoroutine(WaitForGameManagerToLoad());
         int spawnPt = 0;
         //Debug.Log(players.Count);
@@ -1654,6 +1804,13 @@ public class NetworkManager : MonoBehaviour {
         foreach (KeyValuePair<int, Player> kvp in players)
         {
             GameObject playerGO = Instantiate(GameManager.gm.playerPrefab);
+            GameObject wep = Instantiate(GameManager.gm.weaponPrefabs[0]);
+            PlayerController pc = playerGO.transform.GetComponent<PlayerController>();
+            Weapon w = wep.transform.GetComponent<Weapon>();
+            pc.EquipWeapon(w);
+            w.purchased = true;
+            //pc.wep = w;
+            //w.user = pc;
             kvp.Value.playerGO = playerGO;
             if (kvp.Key != ourClientID)
             {
@@ -1666,7 +1823,6 @@ public class NetworkManager : MonoBehaviour {
             {
                 GameManager.gm.player = playerGO;
             }
-
             playerGO.transform.GetComponent<PlayerController>().id = kvp.Value.connectionID;
             playerGO.transform.position = playerSpawnPoints.transform.GetChild(spawnPt).position;
             playerGO.transform.SetParent(GameManager.gm.playerRotation.transform);
@@ -1681,6 +1837,7 @@ public class NetworkManager : MonoBehaviour {
         Disconnect();
         isStarted = false;
         players.Clear();
+        playerDC.Clear();
         isConnected = false;
         
     }
@@ -1732,7 +1889,7 @@ public class NetworkManager : MonoBehaviour {
         foreach (KeyValuePair<int, Player> kvp in players)
         {
             Player p = kvp.Value;
-            if (p != null && p != myPlayer)
+            if (p != null && p != myPlayer && !playerDC.ContainsKey(kvp.Key))
                 NetworkTransport.Send(hostID, p.connectionID, channelId, msg, message.Length * sizeof(char), out error);
             //return;
         }

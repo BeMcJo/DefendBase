@@ -1,19 +1,23 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 public class Bow : Weapon {
     public Transform arrow;
     public Transform bow;
     private LineRenderer lr;
-    private int touchID;
     private Vector2 originalTouchPos;
     private float drawRange, drawLimit, drawOffset;
     private float maxScreenDrawRange;
     public float drawElasticity = 15;
 	// Use this for initialization
-	protected override void Start () {
+	protected override void Start ()
+    {
+        wepID = 0;
         base.Start();
+        //interactiveTouch = false;
         distance = 2000;
         arrow = transform.Find("Arrow");
         bow = transform.Find("Bow");
@@ -21,10 +25,11 @@ public class Bow : Weapon {
         drawOffset = -3.65f;
         drawRange = drawOffset;
         drawLimit = -1.7f;
+        chargeLimit = .9f;
         reloadTime = 0;
         timeToReload = 1f;
         maxScreenDrawRange = Vector2.Distance(new Vector2(0, 0), new Vector2(Screen.width, Screen.height) / 2);
-	}
+    }
 	
     public override string NetworkInformation()
     {
@@ -41,11 +46,16 @@ public class Bow : Weapon {
     }
 
 	// Update is called once per frame
-	protected override void Update () {
+	protected override bool Update () {
+        //Debug.Log(lvl);
         if (reloading)
         {
             Reload();
+            return true;
         }
+
+        base.Update();
+
         if (charging)
         {
             Charge(chargePower);
@@ -53,7 +63,7 @@ public class Bow : Weapon {
         if(arrow == null)
         {
             Reload();
-            return;
+            return true;
         }
         List<Vector3> positions = new List<Vector3>();
         positions.Add(new Vector3(0, .5f, -.475f));
@@ -71,7 +81,7 @@ public class Bow : Weapon {
         //    Debug.Log(">" + v.x + " " + v.y + " " + v.z);
         //}
         //Debug.Log("zzz");
-        
+        return true;    
 	}
 
     public void Reload()
@@ -88,13 +98,43 @@ public class Bow : Weapon {
 
     public override bool StartUse(Touch t)
     {
+        //Debug.Log("bow");
         if (NetworkManager.nm.isStarted && !user.IsMyPlayer())
         {
             base.StartUse(t);
             charging = true;
             return true;
         }
+        //if (!GameManager.gm.interactiveTouch)
+        //{
+        //}
+        if (!GameManager.gm.interactiveTouch)
+        {
+            //Debug.Log("HERE");
+            /*RaycastHit2D hitInfo2 = Physics2D.Raycast(t.position, user.playerCam.transform.forward);
+            if (hitInfo2.collider != null)
+            {
+                Debug.Log(hitInfo2.collider.name);
+            }
+            else
+            {
+                Debug.Log("NOTHING");
+            }*/
+            if (EventSystem.current.IsPointerOverGameObject(t.fingerId))
+            {
+                // ui touched
+               // Debug.Log(EventSystem.current.currentSelectedGameObject == null);
+                if (EventSystem.current.currentSelectedGameObject && EventSystem.current.currentSelectedGameObject.tag == "Shoot")
+                {
+                    //Debug.Log(EventSystem.current.currentSelectedGameObject.name);
+                    base.StartUse(t);
+                    shootTouchID = t.fingerId;
+                }
+            }
+            return charging;
+        }
         //Debug.Log("check");
+        //Debug.Log(user == null);
         RaycastHit2D hitInfo = Physics2D.Raycast(t.position, user.playerCam.transform.forward);
         if(hitInfo.collider != null)
         {
@@ -111,7 +151,7 @@ public class Bow : Weapon {
             {
                 base.StartUse(t);
                 charging = true;
-                touchID = t.fingerId;
+                shootTouchID = t.fingerId;
                 originalTouchPos = t.position;
                 return true;
             }
@@ -122,7 +162,7 @@ public class Bow : Weapon {
 
     public override void EndUse()
     {
-        touchID = -1;
+        shootTouchID = -1;
         if(arrow)
             arrow.localPosition = bulletSpawn.localPosition;
         drawRange = drawOffset;
@@ -142,28 +182,51 @@ public class Bow : Weapon {
                 arrow.localPosition = bulletSpawn.localPosition + new Vector3(0, 0, chargePower * drawLimit);
             return;
         }
-        Touch t;
-        for (int i = 0; i < Input.touchCount; i++)
+        if (!GameManager.gm.interactiveTouch)
         {
-            if (Input.GetTouch(i).fingerId == touchID)
+            chargePower = chargePower + .03f;
+            if (chargePower >= chargeLimit)
+                chargePower = chargeLimit;
+            chargeBar.transform.localScale = new Vector3(1, chargePower/chargeLimit, 1);
+            //this.chargePower = chargePower;
+            //chargePower
+            /*if (chargeBar.transform.localScale.y >= 1)
             {
-                t = Input.GetTouch(i);
-                if (t.position.x < originalTouchPos.x)
+                chargeBar.transform.localScale = new Vector3(
+                    chargeBar.transform.localScale.x,
+                    1,
+                    chargeBar.transform.localScale.z);
+                chargePower = 1;
+                chargeAccelerator *= -1;
+                chargeBarAlt = -1;
+            }*/
+        }
+        else
+        {
+            Touch t;
+            for (int i = 0; i < Input.touchCount; i++)
+            {
+                if (Input.GetTouch(i).fingerId == shootTouchID)
                 {
-                    chargePower = 0;
-                    //    break;
+                    t = Input.GetTouch(i);
+                    if (t.position.x < originalTouchPos.x)
+                    {
+                        chargePower = 0;
+                        //    break;
+                    }
+                    else
+                    {
+                        float dist = Vector2.Distance(t.position, originalTouchPos);
+                        //Debug.Log(dist + " " + Screen.width / 2);
+                        chargePower = dist / maxScreenDrawRange;
+                    }
+
+                    break;
                 }
-                else
-                {
-                    float dist = Vector2.Distance(t.position, originalTouchPos);
-                    //Debug.Log(dist + " " + Screen.width / 2);
-                    chargePower = dist / maxScreenDrawRange;
-                }
-                drawRange = drawOffset + chargePower * drawLimit * drawElasticity;
-                arrow.localPosition = bulletSpawn.localPosition + new Vector3(0, 0, chargePower * drawLimit);
-                break;
             }
         }
+        drawRange = drawOffset + chargePower * drawLimit * drawElasticity;
+        arrow.localPosition = bulletSpawn.localPosition + new Vector3(0, 0, chargePower * drawLimit);
         this.chargePower = chargePower;
         //Debug.Log(chargePower);
     }
@@ -178,14 +241,17 @@ public class Bow : Weapon {
             //bullet.transform.position = bulletSpawn.transform.position;
             Rigidbody rb = arrow.transform.GetComponent<Rigidbody>();
             rb.constraints = RigidbodyConstraints.None;
-            rb.AddForce(user.playerCam.transform.forward * chargePower * distance);
+            //rb.AddForce(user.playerCam.transform.forward * chargePower * distance);
+            rb.AddForce(user.playerCam.transform.forward * chargePower * statsByLevel[wepID].distance[lvl]);
             rb.useGravity = true;
             arrow.GetComponent<Arrow>().isShot = true;
             arrow.GetComponent<Arrow>().id = user.id;
+            arrow.GetComponent<Arrow>().dmg = statsByLevel[wepID].dmg[lvl];
             //arrow.transform.Find("Arrow Tip").GetComponent<BoxCollider>().isTrigger = false;
             arrow = null;
             reloading = true;
-            reloadTime = timeToReload;
+            //reloadTime = timeToReload;
+            reloadTime = statsByLevel[wepID].timeToReload[lvl];
             List<Vector3> positions = new List<Vector3>();
             positions.Add(new Vector3(0, .5f, -.475f));
             positions.Add(new Vector3(0, 0, drawRange));
