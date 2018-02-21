@@ -38,10 +38,12 @@ public abstract class Projectile : MonoBehaviour {
     
     protected virtual void OnTriggerEnter(Collider collision)
     {
+        if (id != GameManager.gm.player.transform.GetComponent<PlayerController>().id)
+            return;
         if (collision.transform.tag == "Enemy")
         {
             // If can damage enemy and this is shot by my player
-            if (!hitGround && !deflected && id == GameManager.gm.player.transform.GetComponent<PlayerController>().id)
+            if (!hitGround && !deflected)
             {
                 Enemy e = collision.transform.GetComponent<Enemy>();
                 //e.transform.GetComponent<Rigidbody>().velocity = Vector3.zero; // Disable physics force applied when colliding
@@ -70,6 +72,16 @@ public abstract class Projectile : MonoBehaviour {
         {
             hitGround = true;
             Destroy(gameObject);
+        }
+        else if(collision.tag == "Trap")
+        {
+            Debug.Log("???");
+            if (NetworkManager.nm.isStarted)
+            {
+                NetworkManager.nm.NotifyObjectDamagedBy(collision.gameObject, gameObject);
+                return;
+            }
+            collision.GetComponent<Trap>().TakeDamage(dmg);
         }
     }
     

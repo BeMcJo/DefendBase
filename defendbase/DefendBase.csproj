@@ -94,6 +94,7 @@
     <Compile Include="Assets\scripts\EnemySpawnPattern.cs" />
     <Compile Include="Assets\scripts\EnemyUI.cs" />
     <Compile Include="Assets\scripts\ExpiringButton.cs" />
+    <Compile Include="Assets\scripts\Explosion.cs" />
     <Compile Include="Assets\scripts\GameManager.cs" />
     <Compile Include="Assets\scripts\MapLibrary.cs" />
     <Compile Include="Assets\scripts\MapManager.cs" />
@@ -103,6 +104,8 @@
     <Compile Include="Assets\scripts\PlayerController.cs" />
     <Compile Include="Assets\scripts\Projectile.cs" />
     <Compile Include="Assets\scripts\StatusIndicator.cs" />
+    <Compile Include="Assets\scripts\Tnt.cs" />
+    <Compile Include="Assets\scripts\Trap.cs" />
     <Compile Include="Assets\scripts\Weapon.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -13,11 +13,13 @@ public class PlayerData
 {
     public bool savedGame; // Determines if game is being loaded or saved
     public int wave,
-        inGameCurrency,
-        objectiveHP,
-        score,
-        difficulty,
-        totalKills;
+               inGameCurrency,
+               objectiveHP,
+               score,
+               difficulty,
+               wepLvl,
+               wepID,
+               totalKills;
 
     public PlayerData()
     {
@@ -28,15 +30,18 @@ public class PlayerData
         objectiveHP = 0;
         score = 0;
         totalKills = 0;
+        wepID = 0;
+        wepLvl = 0;
     }
 }
 
 public class GameManager : MonoBehaviour {
     public static GameManager gm; // Single existing game manager
-
+    public static bool Debugging; // Enables in game debugging
     public PlayerData data; // Information about any saved game
 
     public Dictionary<int, Enemy> enemies; // Keeps track of enemies spawned in game
+    public Dictionary<int, Trap> traps; // Keeps track of traps spawned in game
 
     public bool inGame, // In game scene?
                 gameOver, // Game session end?
@@ -65,7 +70,8 @@ public class GameManager : MonoBehaviour {
 
     public Vector3 playerOrientation; // Keeps track of where your forward is
 
-    public GameObject[] weaponPrefabs; // List of weapon objects
+    public GameObject[] trapPrefabs, // List of trap objects
+                        weaponPrefabs; // List of weapon objects
 
     public GameObject statusIndicatorPrefab, // Shows health and other status for object
                       playerPrefab, // Your player in game
@@ -131,6 +137,15 @@ public class GameManager : MonoBehaviour {
                 {
                     data.objectiveHP = objective.transform.GetComponent<Objective>().HP;
                 }
+                if (player)
+                {
+                    PlayerController pc = player.GetComponent<PlayerController>();
+                    if (pc && pc.wep)
+                    {
+                        data.wepLvl = pc.wep.lvl;
+                        data.wepID = pc.wep.wepID;
+                    }
+                }
                 data.wave = wave;
                 bf.Serialize(file, data);
                 break;
@@ -184,6 +199,7 @@ public class GameManager : MonoBehaviour {
         gm.data = new PlayerData();
         DontDestroyOnLoad(gm);
         interactiveTouch = false;
+        traps = new Dictionary<int, Trap>();
         playerOrientation = Vector3.zero;
         Screen.orientation = ScreenOrientation.Landscape; // Landscape mode for mobile phones
         LoadMainScene(); // Default start game in main scene
@@ -295,9 +311,17 @@ public class GameManager : MonoBehaviour {
         if (!interactiveTouch)
             isOn = "OFF";
         settingsCanvas.transform.Find("ButtonsContainer").Find("InteractiveTouchBtn").GetChild(0).GetComponent<Text>().text = "Interactive Touch: " + isOn;
+        if (Debugging)
+            isOn = "ON";
+        else
+            isOn = "OFF";
+        settingsCanvas.transform.Find("ButtonsContainer").Find("DebugBtn").GetChild(0).GetComponent<Text>().text = "Debug Mode: " + isOn;
+
         btnContainer = settingsCanvas.transform.Find("ButtonsContainer");
 
         btnContainer.Find("InteractiveTouchBtn").GetComponent<Button>().onClick.AddListener(ToggleInteractiveTouch);
+
+        btnContainer.Find("DebugBtn").GetComponent<Button>().onClick.AddListener(ToggleDebugging);
 
         btnContainer.Find("SetupOrientationBtn").GetComponent<Button>().onClick.AddListener(GoToCalibrationScene);
         btnContainer.Find("SetupOrientationBtn").gameObject.SetActive(SystemInfo.supportsGyroscope);
@@ -311,6 +335,7 @@ public class GameManager : MonoBehaviour {
     {
         Save("continuedGame"); // Removes saved game progress
         scene = "game";
+        //Needed here???////////
         //inGame = true;
         //gameOver = false;
         //paused = false;
@@ -320,6 +345,12 @@ public class GameManager : MonoBehaviour {
         //setupRotation = false;
         //gyroEnabled = true;
         //totalKills = 0;
+        //////////////////////////
+
+        Enemy.EnemyCount = 0;
+        Objective.ObjectiveCount = 0;
+        Weapon.WeaponCount = 0;
+        Trap.TrapCount = 0;
 
         intermissionCanvas = GameObject.Find("IntermissionCanvas");
         // If online, make sure everyone is ready to start next wave on intermission
@@ -327,13 +358,14 @@ public class GameManager : MonoBehaviour {
         {
             intermissionCanvas.transform.Find("ResumeBtn").GetComponent<Button>().onClick.AddListener(NetworkManager.nm.RequestReady);
             intermissionCanvas.transform.Find("ResumeBtn").GetChild(0).GetComponent<Text>().text = "Ready";
+            intermissionCanvas.transform.Find("SaveAndQuitBtn").GetComponent<Button>().onClick.AddListener(NetworkManager.nm.LeaveGame);
         }
         else
         {
             intermissionCanvas.transform.Find("ResumeBtn").GetComponent<Button>().onClick.AddListener(NextWave);
+            intermissionCanvas.transform.Find("SaveAndQuitBtn").GetComponent<Button>().onClick.AddListener(SaveAndQuit);
         }
 
-        intermissionCanvas.transform.Find("SaveAndQuitBtn").GetComponent<Button>().onClick.AddListener(SaveAndQuit);
         
         intermissionCanvas.transform.Find("ShopBtn").GetComponent<Button>().onClick.AddListener(ToggleShopCanvas);
         intermissionCanvas.transform.Find("ShopBtn").GetComponent<Button>().onClick.AddListener(ToggleIntermissionCanvas);
@@ -375,34 +407,27 @@ public class GameManager : MonoBehaviour {
         btns1.Find("UpgradeBtn").GetComponent<Button>().onClick.AddListener(DisplayUpgradeSelection);
         Transform btns2 = shopCanvas.transform.Find("ButtonContainer2");
         btns2.Find("WeaponsBtn").GetComponent<Button>().onClick.AddListener(DisplayWeaponItems);
+        btns2.Find("ObjectivesBtn").GetComponent<Button>().onClick.AddListener(DisplayObjectiveItems);
         shopCanvas.SetActive(false);
 
         StartCoroutine(MapManager.mapManager.LoadGameScene());
         StartCoroutine(NetworkManager.nm.LoadGameScene()); 
-
-        // If not online, game manager handles creating player
-        if (!NetworkManager.nm.isStarted)
-        {
-            player = Instantiate(playerPrefab);
-
-            player.transform.position = playerSpawnPoints.transform.GetChild(0).position;
-            player.transform.SetParent(playerRotation.transform);
-
-            for (int i = 0; i < 1; i++)
-            {
-                GameObject wep = Instantiate(weaponPrefabs[0]);
-                PlayerController pc = player.transform.GetComponent<PlayerController>();
-                pc.EquipWeapon(wep.transform.GetComponent<Weapon>());
-                pc.wep.purchased = true;
-            }
-        }
-
+        
         StartGame();
     }
 
     public void ToggleSettingsCanvas()
     {
         settingsCanvas.SetActive(!settingsCanvas.activeSelf);
+    }
+
+    public void ToggleDebugging()
+    {
+        Debugging = !Debugging;
+        string isOn = "ON";
+        if (!Debugging)
+            isOn = "OFF";
+        settingsCanvas.transform.Find("ButtonsContainer").Find("DebugBtn").GetChild(0).GetComponent<Text>().text = "Debug Mode: " + isOn;
     }
 
     public void ToggleInteractiveTouch()
@@ -437,6 +462,12 @@ public class GameManager : MonoBehaviour {
     public void DisplayWeaponItems()
     {
         itemType = "Weapons";
+        DisplaySelectedItems();
+    }
+
+    public void DisplayObjectiveItems()
+    {
+        itemType = "Objectives";
         DisplaySelectedItems();
     }
 
@@ -672,18 +703,20 @@ public class GameManager : MonoBehaviour {
         paused = false;
         StartWave(0);
     }
-    
+
     void StartGame()
     {
         Debug.Log("Starting Game");
+        Enemy.EnemyCount = 0;
+        Objective.ObjectiveCount = 0;
+        Weapon.WeaponCount = 0;
+        Trap.TrapCount = 0;
         enemies.Clear();
+        traps.Clear();
         inGame = true;
         onIntermission = false;
         paused = false;
         gameOver = false;
-        Enemy.EnemyCount = 0;
-        Objective.ObjectiveCount = 0;
-        Weapon.WeaponCount = 0;
         inGameCurrency = 0;
         score = 0;
         kills = 0;
@@ -691,6 +724,17 @@ public class GameManager : MonoBehaviour {
         wave = 0;
         totalKills = 0;
         MapManager.mapManager.LoadMap(0);
+        Weapon w = null;
+
+        GameObject trap = Instantiate(trapPrefabs[0]);
+        traps.Add(0, trap.GetComponent<Trap>());
+        trap.transform.SetParent(playerRotation.transform);
+        trap.transform.localPosition = new Vector3(0, 2, -20);
+        trap = Instantiate(trapPrefabs[0]);
+        traps.Add(1, trap.GetComponent<Trap>());
+        trap.transform.SetParent(playerRotation.transform);
+        trap.transform.localPosition = new Vector3(5, 2, -72);
+       
         if (continuedGame)
         {
             Debug.Log("Continued Game");
@@ -702,10 +746,37 @@ public class GameManager : MonoBehaviour {
                 wave = data.wave;
                 inGameCurrency = data.inGameCurrency;
                 objective.transform.GetComponent<Objective>().HP = data.objectiveHP;
+                w = Instantiate(weaponPrefabs[data.wepID]).transform.GetComponent<Weapon>();
+                w.lvl = data.wepLvl;
+                w.purchased = true;
+            }
+            if (wave % 10 == 0)
+            {
+                DisplayIntermission();
+                return;
             }
         }
+        //DisplayIntermission();
         if (NetworkManager.nm.isStarted)
             return;
+        // If not online, game manager handles creating player
+        player = Instantiate(playerPrefab);
+        PlayerController pc = player.transform.GetComponent<PlayerController>();
+        player.transform.position = playerSpawnPoints.transform.GetChild(0).position;
+        player.transform.SetParent(playerRotation.transform);
+        if (w == null)
+        {
+            for (int i = 0; i < 1; i++)
+            {
+                GameObject wep = Instantiate(weaponPrefabs[0]);
+                pc.EquipWeapon(wep.transform.GetComponent<Weapon>());
+                pc.wep.purchased = true;
+            }
+        }
+        else
+        {
+            pc.EquipWeapon(w);
+        }
         StartWave(wave);
     }
 
@@ -808,7 +879,7 @@ public class GameManager : MonoBehaviour {
         }
 
         // Don't do anything if not in game or didn't start the waves
-        if (!inGame || !startWaves)
+        if (!inGame || !startWaves || gameOver)
         {
             return;
         }

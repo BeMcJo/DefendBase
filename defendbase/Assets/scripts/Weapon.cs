@@ -57,7 +57,7 @@ public abstract class Weapon : MonoBehaviour
                  chargeLimit; // How much my charge can go up to
     public float reloadTime, // How long before bullet spawns 
                  timeToReload; // Default time for reloading
-    protected int chargeBarAlt = 1, // Unused. Originally used to have charge increase and decrease if charging
+    public int chargeBarAlt = 1, // Unused. Originally used to have charge increase and decrease if charging
                   lvl, // Determines stats of weapon
                   id, // Unique ID for this object
                   wepID; // Distinguishes what weapon this is
@@ -82,8 +82,10 @@ public abstract class Weapon : MonoBehaviour
         if (!GameManager.gm.interactiveTouch && GameManager.gm.player == user.gameObject)
         {
             chargeBarGuage.transform.SetParent(GameManager.gm.playerStatusCanvas.transform);
+            chargeBarGuage.transform.localScale = new Vector3(1, 1, 1);
             chargeBarGuage.transform.localPosition = GameManager.gm.playerStatusCanvas.transform.Find("ChargeBarGaugePlaceholder").localPosition;
             shootBtn.transform.SetParent(GameManager.gm.playerStatusCanvas.transform);
+            shootBtn.transform.localScale = new Vector3(1, 1, 1);
             shootBtn.transform.localPosition = GameManager.gm.playerStatusCanvas.transform.Find("ShootBtnPlaceholder").localPosition;
         }
         chargeBarGuage.SetActive(false);
@@ -105,12 +107,13 @@ public abstract class Weapon : MonoBehaviour
             if(user == null)
                 itemUI.transform.SetParent(GameManager.gm.shopCanvas.transform.Find("Displays").Find("StoreWeaponsDisplay").GetChild(0));
         }
+        itemUI.transform.localScale = new Vector3(1, 1, 1);
     }
 	
 	// Update is called once per frame
 	protected virtual bool Update () {
-        // Don't do anything if no user exists
-        if (!user)
+        // Don't do anything if no user exists or game is over
+        if (!user || GameManager.gm.gameOver)
             return false;
         // If using online feature and disconnected, cancel using weapon, to prevent further complications
         if(NetworkManager.nm.isStarted && NetworkManager.nm.isDisconnected)

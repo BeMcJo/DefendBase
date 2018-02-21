@@ -169,7 +169,7 @@ public class NetworkManager : MonoBehaviour {
             PerformClientActivities();
         }
         // While in game, print out debug purpose information
-        if (GameManager.gm.inGame)
+        if (GameManager.gm.inGame && GameManager.Debugging)
         {
             Text activity = GameManager.gm.playerStatusCanvas.transform.Find("ActivitiesTxt").GetComponent<Text>();
             string t = "";
@@ -609,9 +609,6 @@ public class NetworkManager : MonoBehaviour {
                         //if (activityLog.Count > 0)
                         //    Debug.Log(activityLog[activityLog.Count - 1]);
                         OnEnemyDamaged(splitData);
-                        msg = splitData[0] + "|" + activityLog.Count + "|" + splitData[2] + "|" + splitData[3] + "|" + splitData[4] + "|";
-                        activityLog.Add(msg);
-                        Send(msg, reliableChannel, players);
                         break;
                     // Client formally requests to leave lobby
                     case "LEAVELOBBY?":
@@ -642,9 +639,17 @@ public class NetworkManager : MonoBehaviour {
                     // Client is ready
                     case "READY":
                         break;
+                    // Client requests to repair objective
+                    case "REPAIROBJECTIVE":
+                        OnRepairObjective(splitData);
+                        break;
                     // Client has disconnected and requests to reconnect
                     case "RECONNECT":
                         OnReconnect(connectionId, splitData);
+                        break;
+                    // Client states he/she has damaged trap
+                    case "TRAPDMG":
+                        OnTrapDamaged(splitData);
                         break;
                 }
                 break;
@@ -719,7 +724,7 @@ public class NetworkManager : MonoBehaviour {
                     // Host states enemy has been damaged, make sure log is synced with the sequence of actions in game
                     case "ENEMYDMG":
                         logID = int.Parse(splitData[1]);
-                        cnnID = int.Parse(splitData[3]);
+                        //cnnID = int.Parse(splitData[3]);
                         // Request for sequential order of activity log since my log is missing something before this action
                         if (logID != activityLog.Count)
                         {
@@ -727,7 +732,7 @@ public class NetworkManager : MonoBehaviour {
                             break;
                         }
                         OnEnemyDamaged(splitData);
-                        activityLog.Add(msg);
+                        //activityLog.Add(msg);
                         break;
                     // Receiving information about the enemies in the game
                     case "ENEMYINFO":
@@ -765,7 +770,7 @@ public class NetworkManager : MonoBehaviour {
                     // Host states that objective has taken damage
                     case "OBJECTIVEDMG":
                         logID = int.Parse(splitData[1]);
-                        cnnID = int.Parse(splitData[3]);
+                        //cnnID = int.Parse(splitData[3]);
                         // Sync activity log if missing something
                         if (logID != activityLog.Count)
                         {
@@ -773,7 +778,7 @@ public class NetworkManager : MonoBehaviour {
                             break;
                         }
                         OnObjectiveDamaged(splitData);
-                        activityLog.Add(msg);
+                        //activityLog.Add(msg);
                         break;
                     // Received information about player
                     case "PLAYERSTATS":
@@ -786,6 +791,18 @@ public class NetworkManager : MonoBehaviour {
                     // Host states someone is ready
                     case "READY":
                         OnReady(int.Parse(splitData[1]));
+                        break;
+                    // Host announces objective has been repaired by someone
+                    case "REPAIROBJECTIVE":
+                        logID = int.Parse(splitData[1]);
+                        // Sync activity log if missing something
+                        if (logID != activityLog.Count)
+                        {
+                            RequestActivityLog();
+                            break;
+                        }
+                        OnRepairObjective(splitData);
+                        //activityLog.Add(msg);
                         break;
                     // Host states to start game
                     case "STARTGAME":
@@ -801,6 +818,19 @@ public class NetworkManager : MonoBehaviour {
                             break;
                         }
                         StartWave(int.Parse(splitData[2]));
+                        break;
+                    // Host states someone damaged trap
+                    case "TRAPDMG":
+                        logID = int.Parse(splitData[1]);
+                        //cnnID = int.Parse(splitData[3]);
+                        // Request for sequential order of activity log since my log is missing something before this action
+                        if (logID != activityLog.Count)
+                        {
+                            RequestActivityLog();
+                            break;
+                        }
+                        OnTrapDamaged(splitData);
+                        //activityLog.Add(msg);
                         break;
                 }
                 break;
@@ -873,6 +903,12 @@ public class NetworkManager : MonoBehaviour {
             {
                 GameManager.gm.enemies.Remove(targetID);
             }
+            string msg = data[0] + "|" + activityLog.Count + "|" + data[2] + "|" + data[3] + "|" + data[4] + "|";
+            activityLog.Add(msg);
+            if (isHost)
+            {
+                Send(msg, reliableChannel, players);
+            }
         }
     }
 
@@ -892,6 +928,7 @@ public class NetworkManager : MonoBehaviour {
         int eid = int.Parse(data[3]);
         int atkID = int.Parse(data[4]);
         int dmg = int.Parse(data[5]);
+        string msg = "OBJECTIVEDMG|" + activityLog.Count + "|" + oid + "|" + eid + "|" + atkID + "|" + dmg + "|";
         // As host, check if all players synced enemy attack before inflicting damage
         if (isHost)
         {
@@ -904,7 +941,6 @@ public class NetworkManager : MonoBehaviour {
                     Objective o = GameManager.gm.objective.transform.GetComponent<Objective>();
                     o.TakeDamage(dmg);
 
-                    string msg = "OBJECTIVEDMG|" + activityLog.Count + "|" + oid + "|" + eid + "|" + atkID + "|" + dmg + "|";
                     Send(msg, reliableChannel, players);
                     activityLog.Add(msg);
 
@@ -918,6 +954,7 @@ public class NetworkManager : MonoBehaviour {
             if (oid == 0 && GameManager.gm.objective)
             {   Objective o = GameManager.gm.objective.transform.GetComponent<Objective>();
                 o.TakeDamage(dmg);
+                activityLog.Add(msg);
             }
         }
     }
@@ -1016,6 +1053,62 @@ public class NetworkManager : MonoBehaviour {
         activityLog.Add(msg);
     }
 
+    // Make request to repair objective
+    public void ConfirmObjectiveRepair(int oid, int hp)
+    {
+        string msg = "REPAIROBJECTIVE|" + activityLog.Count + "|" + ourClientID + "|" + oid + "|" + hp;
+        if (isHost)
+        {
+            OnRepairObjective(msg.Split('|'));
+        }
+        else
+        {
+            Send(msg, reliableChannel);
+        }
+    }
+
+    // Officialize the repair on objective
+    public void OnRepairObjective(string[] data)
+    {
+        int cnnID = int.Parse(data[2]);
+        int oid = int.Parse(data[3]);
+        int hp = int.Parse(data[4]);
+        Objective o = GameManager.gm.objective.transform.GetComponent<Objective>();
+        string msg = data[0] + "|" + activityLog.Count + "|" + data[2] + "|" + data[3] + "|" + data[4] + "|";
+        // As host, confirm that repairing the objective is valid
+        if (isHost)
+        {
+            if(o.HP < o.maxHP)
+            {
+                // If I was the one making request, repair and pay price
+                if(cnnID == ourClientID)
+                {
+                    o.Repair();
+                }
+                // If not, just heal objective
+                else
+                {
+                    o.TakeDamage(hp);
+                }
+                Send(msg, reliableChannel, players);
+                activityLog.Add(msg);
+            }
+        }
+        // As client, check if I made request or not to repair
+        else
+        {
+            if (cnnID == ourClientID)
+            {
+                o.Repair();
+            }
+            else
+            {
+                o.TakeDamage(hp);
+            }
+            activityLog.Add(msg);
+        }
+    }
+
     // Notify players that source is damaged by target
     public void NotifyObjectDamagedBy(GameObject target, GameObject source)
     {
@@ -1029,11 +1122,18 @@ public class NetworkManager : MonoBehaviour {
             Enemy e = target.transform.GetComponent<Enemy>();
             tid = e.id;
             msg = "ENEMY";
-        }else if (target.tag == "Objective")
+        }
+        else if (target.tag == "Objective")
         {
             Objective o = target.transform.GetComponent<Objective>();
             tid = o.id;
             msg = "OBJECTIVE";
+        }
+        else if (target.tag == "Trap")
+        {
+            Trap t = target.transform.GetComponent<Trap>();
+            tid = t.id;
+            msg = "TRAP";
         }
 
         if (source.tag == "Projectile")
@@ -1041,11 +1141,18 @@ public class NetworkManager : MonoBehaviour {
             Projectile p = source.transform.GetComponent<Projectile>();
             sid = p.id;
             dmg = p.dmg;
-        }else if (source.tag == "Enemy")
+        }
+        else if (source.tag == "Enemy")
         {
             Enemy e = source.transform.GetComponent<Enemy>();
             sid = e.id;
             dmg = e.dmg;
+        }
+        else if(source.tag == "Explosion")
+        {
+            Explosion ex = source.transform.GetComponent<Explosion>();
+            sid = ex.id;
+            dmg = ex.dmg;
         }
 
         msg += "DMG|" + activityLog.Count + "|" + tid + "|" + sid + "|" + dmg + "|";
@@ -1055,9 +1162,12 @@ public class NetworkManager : MonoBehaviour {
         // As host, tell clients about target being damaged by source
         if (isHost)
         {
-            Send(msg, reliableChannel,players);
-            activityLog.Add(msg);
-            OnEnemyDamaged(msg.Split('|'));
+            //Send(msg, reliableChannel,players);
+            //activityLog.Add(msg);
+            if (target.tag == "Enemy")
+                OnEnemyDamaged(msg.Split('|'));
+            else if (target.tag == "Trap")
+                OnTrapDamaged(msg.Split('|'));
         }
         // As client, notify host about target being attacked by source, if disconnected keep track of activity
         else
@@ -1068,6 +1178,34 @@ public class NetworkManager : MonoBehaviour {
                 return;
             }
             Send(msg, reliableChannel);
+        }
+    }
+
+    // Inflict damage to trap
+    public void OnTrapDamaged(string[] data)
+    {
+        debugLog.Add("TRAP DAMAGED");
+        int targetID = int.Parse(data[2]);
+        int sourceID = int.Parse(data[3]);
+        int dmg = int.Parse(data[4]);
+        // Inflict damage if enemy exists
+        if (GameManager.gm.traps.ContainsKey(targetID))
+        {
+            GameManager.gm.traps[targetID].TakeDamage(dmg, sourceID);
+            // Remove enemy if non-existent or dead
+            if (GameManager.gm.traps[targetID] == null || GameManager.gm.traps[targetID].hp <= 0)
+            {
+                //GameManager.gm.traps.Remove(targetID);
+            }
+
+            string msg = data[0] + "|" + activityLog.Count + "|" + data[2] + "|" + data[3] + "|" + data[4] + "|";
+            activityLog.Add(msg);
+
+            if (isHost)
+            {
+                debugLog.Add(msg);
+                Send(msg, reliableChannel, players);
+            }
         }
     }
 
@@ -1404,6 +1542,9 @@ public class NetworkManager : MonoBehaviour {
     {
         DCNotification = GameManager.gm.playerStatusCanvas.transform.Find("DC Notification").gameObject;
         DCNotification.SetActive(false);
+
+        GameManager.gm.playerStatusCanvas.transform.Find("ActivitiesTxt").gameObject.SetActive(GameManager.Debugging);
+        GameManager.gm.playerStatusCanvas.transform.Find("DebugTxt").gameObject.SetActive(GameManager.Debugging);
         GameObject playerSpawnPoints = GameManager.gm.playerSpawnPoints;
         debugLog = new List<string>();
         int spawnPt = 0;

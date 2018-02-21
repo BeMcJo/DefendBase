@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 public class PlayerController : MonoBehaviour {
+    public float noiseTolerance = .05f;
     public int id; // Used to assign who controls this player online
     public bool gyroEnabled, // Is there gyroscope feature on this device? 
                 useGyro; // Are we using gyroscope?
@@ -22,7 +23,10 @@ public class PlayerController : MonoBehaviour {
     private int chargeBarAlt = 1;
 
     public Weapon wep; // Weapon player is currently holding and using
-	// Use this for initialization
+
+    Quaternion origin;
+    
+    // Use this for initialization
 	void Start () {
         charging = false;
         bulletSpawn = playerCam.transform.Find("BulletSpawn");
@@ -33,6 +37,9 @@ public class PlayerController : MonoBehaviour {
         gyroEnabled = EnableGyro();
         playerCam.transform.SetParent(cameraContainer.transform);
         useGyro = true;
+
+
+        origin = Input.gyro.attitude;
     }
     
     // Disable using gyro if existent
@@ -145,10 +152,24 @@ public class PlayerController : MonoBehaviour {
     // Orient player perspective
     private void RotatePlayer()
     {
+        float dist = Vector3.Distance(gyro.rotationRateUnbiased, Vector3.zero);
+        //playerCam.transform.Rotate(Input.gyro.rotationRate);
+        //Debug.Log(gyro.attitude + " ...." + gyro.rotationRateUnbiased + "...a>>" +dist );
+        //playerCam.transform.Rotate(-Input.gyro.rotationRateUnbiased.x, -Input.gyro.rotationRateUnbiased.y, Input.gyro.rotationRateUnbiased.z);
+        //playerCam.transform.Rotate(-Input.gyro.rotationRateUnbiased.x, 0, 0);
+        //  playerCam.transform.localRotation = playerCam.transform.rotation * rot;
+        // Temporarily prevents camera from sliding undesireably due to gyroscope errors
+        if (dist < noiseTolerance)
+        {
+            return;
+        }
+        Debug.Log(dist);
+        //Quaternion oldRotation = playerCam.transform.localRotation;
         playerCam.transform.localRotation = gyro.attitude * rot;
-        if(playerCam.transform.eulerAngles.x >= maxLookDownLimit && playerCam.transform.eulerAngles.x <= 90f)
+
+        if (playerCam.transform.eulerAngles.x >= maxLookDownLimit && playerCam.transform.eulerAngles.x <= 90f)
         {
             playerCam.transform.eulerAngles = new Vector3(maxLookDownLimit, playerCam.transform.eulerAngles.y, playerCam.transform.eulerAngles.z);
         }
-     }
+    }
 }
