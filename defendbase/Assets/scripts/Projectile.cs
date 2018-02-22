@@ -46,6 +46,7 @@ public abstract class Projectile : MonoBehaviour {
             if (!hitGround && !deflected)
             {
                 Enemy e = collision.transform.GetComponent<Enemy>();
+                e.OnHit();
                 //e.transform.GetComponent<Rigidbody>().velocity = Vector3.zero; // Disable physics force applied when colliding
                 // If using online feature, let Network Manager handle this
                 if (NetworkManager.nm.isStarted)

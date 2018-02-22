@@ -10,13 +10,14 @@ public class Tnt : Trap {
         hp = 1;
 	}
 
+    // Helps determine who shot this
     public override void Activate(int sid)
     {
         base.Activate(sid);
         GameObject explosion = Instantiate(explosionPrefab);
         explosion.transform.GetComponent<Explosion>().id = sid;
         explosion.transform.position = transform.position;
-        //Destroy(gameObject);
+        Destroy(gameObject);
     }
 
     public override void Activate()
@@ -24,14 +25,14 @@ public class Tnt : Trap {
         base.Activate();
         GameObject explosion = Instantiate(explosionPrefab);
         explosion.transform.position = transform.position;
-        //Destroy(gameObject);
+        Destroy(gameObject);
     }
 
     public override void TakeDamage(int dmg, int sid)
     {
         base.TakeDamage(dmg, sid);
-        //if (hp > 0)
-        //    return;
+        if (hp > 0)
+            return;
         Activate(sid);
 
     }
@@ -41,8 +42,8 @@ public class Tnt : Trap {
         Debug.Log("omg");
         if (hp <= 0)
             return;
-        Activate();
-        return;
+        //Activate();
+        //return;
         base.TakeDamage(dmg);
         if(hp <= 0)
         {
@@ -50,7 +51,7 @@ public class Tnt : Trap {
         }
     }
     // Update is called once per frame
-    void Update () {
-		
+    protected override void Update () {
+        base.Update();
 	}
 }

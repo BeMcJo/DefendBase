@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
@@ -54,6 +55,7 @@ public class GameManager : MonoBehaviour {
                 interactiveTouch, // Using touch interactions that isn't just shoot button?
                 onIntermission, // Are we on break from defending waves of enemies?
                 playingOnline, // Are we playing with players online?
+                edittingMap, // Are we adjusting map defenses?
                 paused; // Game paused?
 
     public int wave, // Determines current wave to spawn
@@ -98,6 +100,7 @@ public class GameManager : MonoBehaviour {
                       lobbyCanvas, // Displays players connected in the lobby
                       shopCanvas, // Displays items to buy/upgrade
                       settingsCanvas, // Displays settings to ajust
+                      mapUICanvas, // Displays content used to edit map (Defenses, traps, etc.)
                       waveNotification; // Notifies player that enemies will spawn
 
     public Text scoreTxt; // Indicates how awesome you are
@@ -108,6 +111,11 @@ public class GameManager : MonoBehaviour {
 
     public float spawnTimer, // Time currently before spawning enemy 
                  timeToSpawn; // Default time to assign to spawn enemy
+
+    public Camera mapCamera; // Bird eye view of map, used to also edit defenses onto map
+
+    public int mapFingerID; // Used for detecting player selecting/dragging item onto map
+    public GameObject selectedDefense;
 
     Pattern pattern; // Points to enemy spawn pattern
 
@@ -380,6 +388,7 @@ public class GameManager : MonoBehaviour {
 
         playerStatusCanvas = GameObject.Find("PlayerStatusCanvas").gameObject;
         playerStatusCanvas.transform.Find("OptionsBtn").GetComponent<Button>().onClick.AddListener(DisplayOptions);
+        playerStatusCanvas.transform.Find("MapBtn").GetComponent<Button>().onClick.AddListener(ToggleMapUICanvas);
 
         waveNotification = playerStatusCanvas.transform.Find("Wave Notification").gameObject;
         waveNotification.SetActive(false);
@@ -410,10 +419,28 @@ public class GameManager : MonoBehaviour {
         btns2.Find("ObjectivesBtn").GetComponent<Button>().onClick.AddListener(DisplayObjectiveItems);
         shopCanvas.SetActive(false);
 
+        mapCamera = playerRotation.transform.Find("MapCamera").GetComponent<Camera>();
+        mapCamera.gameObject.SetActive(false);//enabled = false;
+        //mapCamera.
+        mapUICanvas = GameObject.Find("MapUICanvas");
+        mapUICanvas.SetActive(false);
+        mapUICanvas.transform.Find("BackBtn").GetComponent<Button>().onClick.AddListener(ToggleMapUICanvas);
+
         StartCoroutine(MapManager.mapManager.LoadGameScene());
         StartCoroutine(NetworkManager.nm.LoadGameScene()); 
         
         StartGame();
+    }
+
+    public void ToggleMapUICanvas()
+    {
+        mapFingerID = -1;
+        edittingMap = !edittingMap;
+        mapUICanvas.SetActive(edittingMap);
+        mapCamera.gameObject.SetActive(edittingMap);//enabled = edittingMap;
+        player.GetComponent<PlayerController>().playerCam.gameObject.SetActive(!edittingMap);//.enabled = !edittingMap;
+        playerStatusCanvas.transform.Find("ShootBtnMask(Clone)").gameObject.SetActive(!edittingMap);
+        mapCamera.transform.GetComponent<MapViewCamera>().Reset();
     }
 
     public void ToggleSettingsCanvas()
@@ -713,6 +740,7 @@ public class GameManager : MonoBehaviour {
         Trap.TrapCount = 0;
         enemies.Clear();
         traps.Clear();
+        edittingMap = false;
         inGame = true;
         onIntermission = false;
         paused = false;
@@ -726,7 +754,7 @@ public class GameManager : MonoBehaviour {
         MapManager.mapManager.LoadMap(0);
         Weapon w = null;
 
-        GameObject trap = Instantiate(trapPrefabs[0]);
+        /*GameObject trap = Instantiate(trapPrefabs[0]);
         traps.Add(0, trap.GetComponent<Trap>());
         trap.transform.SetParent(playerRotation.transform);
         trap.transform.localPosition = new Vector3(0, 2, -20);
@@ -734,7 +762,7 @@ public class GameManager : MonoBehaviour {
         traps.Add(1, trap.GetComponent<Trap>());
         trap.transform.SetParent(playerRotation.transform);
         trap.transform.localPosition = new Vector3(5, 2, -72);
-       
+       */
         if (continuedGame)
         {
             Debug.Log("Continued Game");
@@ -879,11 +907,98 @@ public class GameManager : MonoBehaviour {
         }
 
         // Don't do anything if not in game or didn't start the waves
-        if (!inGame || !startWaves || gameOver)
+        if (!inGame || gameOver)
         {
             return;
         }
-        scoreTxt.text = "Score: " + score + ", spawned" + enemiesSpawned + "/kills" + kills;
+
+        if (edittingMap)
+        {
+            mapUICanvas.SetActive(selectedDefense == null);
+            playerStatusCanvas.SetActive(selectedDefense == null);
+            // Check to see if any finger touch ID is valid for selecting defense
+            for (int i = 0; i < Input.touchCount; i++)
+            {
+                Touch t = Input.GetTouch(i);
+                if (mapFingerID == -1)
+                {
+                    // Is there an object we are touching?
+                    if (EventSystem.current.IsPointerOverGameObject(t.fingerId))
+                    {
+                        //if (EventSystem.current.currentSelectedGameObject)
+                        //    Debug.Log(EventSystem.current.currentSelectedGameObject.tag);
+                        // Is that object a PlaceDefense object?
+                        if (EventSystem.current.currentSelectedGameObject && EventSystem.current.currentSelectedGameObject.tag == "PlaceDefense")
+                        {
+                            mapFingerID = t.fingerId;
+                            selectedDefense = Instantiate(trapPrefabs[0]);
+                            //selectedDefense.transform.GetComponent<Collider>().enabled = false;
+                            selectedDefense.layer = LayerMask.NameToLayer("Ignore Raycast");
+                            Debug.Log(selectedDefense.transform.GetComponent<Collider>().GetType());
+                            Collider c = selectedDefense.transform.GetComponent<Collider>();
+                            if (c.GetType() == typeof(CapsuleCollider))
+                                ((CapsuleCollider) c).center += new Vector3(0, -.75f, 0);
+                            Vector3 cam2world = mapCamera.ScreenToWorldPoint(t.position);
+                            selectedDefense.transform.position = new Vector3(cam2world.x, 2, cam2world.z + (15 * (mapCamera.orthographicSize/55)));
+                            Debug.Log("HOLD");
+                        }
+                    }
+                }
+                else if (t.fingerId == mapFingerID)
+                {
+                    // Release the selected defense, regardless if can set or not
+                    if (t.phase == TouchPhase.Ended)
+                    {
+                        mapFingerID = -1;
+                        selectedDefense.transform.GetComponent<Collider>().enabled = true;
+                        selectedDefense.transform.GetComponent<ObjectPlacement>().isSet = true;
+                        Collider c = selectedDefense.transform.GetComponent<Collider>();
+                        if (c.GetType() == typeof(CapsuleCollider))
+                            ((CapsuleCollider)c).center -= new Vector3(0, -.75f, 0);
+                        //selectedDefense.transform.GetComponent<CapsuleCollider>().center -= new Vector3(0, -.75f, 0);
+                        selectedDefense.layer = LayerMask.NameToLayer("Default");
+                        selectedDefense = null;
+                    }
+                    // Drag selected defense to desired spot on map
+                    else if (t.phase == TouchPhase.Moved)
+                    {
+                        Vector3 cam2world = mapCamera.ScreenToWorldPoint(t.position);
+                        Ray r = mapCamera.ScreenPointToRay(t.position);
+                        RaycastHit hit;
+                        float yOffset = 0;
+                        if (Physics.Raycast(r, out hit, 100))
+                        {
+                            //Debug.Log("HIT");
+                            //Debug.Log(hit.transform.tag);
+                            if(hit.transform.tag == "Ground" || hit.transform.tag == "Path")
+                            {
+                                yOffset = hit.transform.position.y;
+                            }
+                        }
+                        selectedDefense.transform.position = new Vector3(cam2world.x, 2 + yOffset, cam2world.z + (15 * (mapCamera.orthographicSize / 55)));
+                    }    
+                }
+            }
+            // Can select objects on the field
+            if(selectedDefense == null)
+            {
+                for (int i = 0; i < Input.touchCount; i++) {
+                    Touch t = Input.GetTouch(i);
+                    Ray r = mapCamera.ScreenPointToRay(t.position);
+                    RaycastHit hit;
+                    if (Physics.Raycast(r, out hit, 100))
+                    {
+                        //Debug.Log("HIT");
+                        //Debug.Log(hit.transform.tag);
+                    }
+                }
+            }
+
+        }
+
+        if (!startWaves)
+            return;
+            scoreTxt.text = "Score: " + score + ", spawned" + enemiesSpawned + "/kills" + kills;
         // if there are enemies to spawn
         if (!doneSpawningWave)
         {

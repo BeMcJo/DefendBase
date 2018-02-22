@@ -163,7 +163,7 @@ public class PlayerController : MonoBehaviour {
         {
             return;
         }
-        Debug.Log(dist);
+        //Debug.Log(dist);
         //Quaternion oldRotation = playerCam.transform.localRotation;
         playerCam.transform.localRotation = gyro.attitude * rot;
 

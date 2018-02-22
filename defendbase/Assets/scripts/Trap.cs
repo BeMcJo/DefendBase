@@ -7,7 +7,6 @@ public abstract class Trap : MonoBehaviour {
     public int hp, // Amount of damage before activating trap
                trapID, // Distinguishes type of trap this is
                id; // Unique ID
-
 	// Use this for initialization
 	protected virtual void Start () {
         id = TrapCount;
@@ -36,8 +35,10 @@ public abstract class Trap : MonoBehaviour {
 
     }
 
+
     // Update is called once per frame
-    void Update () {
-		
-	}
+    protected virtual void Update () {
+        
+
+    }
 }

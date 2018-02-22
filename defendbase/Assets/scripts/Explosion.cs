@@ -21,21 +21,36 @@ public class Explosion : MonoBehaviour {
 
     private void OnTriggerEnter(Collider other)
     {
-        Debug.Log(other.tag);
+        //Debug.Log(other.tag);
         if (id != GameManager.gm.player.transform.GetComponent<PlayerController>().id)
             return;
-        Debug.Log("aa");
+        //Debug.Log("aa");
         if(other.tag == "Enemy")
         {
             Debug.Log("bomer");
+            Enemy e = other.transform.GetComponent<Enemy>();
+            e.OnHit();
             if (NetworkManager.nm.isStarted)
             {
                 NetworkManager.nm.NotifyObjectDamagedBy(other.gameObject, gameObject);
                 return;
             }
-            Enemy e = other.transform.GetComponent<Enemy>();
             // If not using online feature, inflict damage to enemy
             e.TakeDamage(dmg);
+            Debug.Log("BOOM");
+        }else if (other.tag == "Trap")
+        {
+            //if (!other.transform.GetComponent<ObjectPlacement>().isSet)
+            //    return;
+            Debug.Log("hit trp");
+            Trap t = other.GetComponent<Trap>();
+            if (NetworkManager.nm.isStarted)
+            {
+                NetworkManager.nm.NotifyObjectDamagedBy(other.gameObject, gameObject);
+                return;
+            }
+            // If not using online feature, inflict damage to enemy
+            t.TakeDamage(dmg);
             Debug.Log("BOOM");
         }
     }
