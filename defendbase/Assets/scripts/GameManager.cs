@@ -56,6 +56,7 @@ public class GameManager : MonoBehaviour {
                 onIntermission, // Are we on break from defending waves of enemies?
                 playingOnline, // Are we playing with players online?
                 edittingMap, // Are we adjusting map defenses?
+                realTimeAction, // Trade off between live player movement and in game activities
                 paused; // Game paused?
 
     public int wave, // Determines current wave to spawn
@@ -227,6 +228,7 @@ public class GameManager : MonoBehaviour {
         myTraps = new Dictionary<int, int>();
         myDefenses = new Dictionary<int, int>();
         playerOrientation = Vector3.zero;
+        realTimeAction = true;
         Screen.orientation = ScreenOrientation.Landscape; // Landscape mode for mobile phones
         LoadMainScene(); // Default start game in main scene
         EnemySpawnPattern.InstantiatePatterns();
@@ -342,12 +344,18 @@ public class GameManager : MonoBehaviour {
         else
             isOn = "OFF";
         settingsCanvas.transform.Find("ButtonsContainer").Find("DebugBtn").GetChild(0).GetComponent<Text>().text = "Debug Mode: " + isOn;
+        if (realTimeAction)
+            isOn = "ON";
+        else
+            isOn = "OFF";
+        settingsCanvas.transform.Find("ButtonsContainer").Find("LiveActionBtn").GetChild(0).GetComponent<Text>().text = "Real Time Action: " + isOn;
 
         btnContainer = settingsCanvas.transform.Find("ButtonsContainer");
 
         btnContainer.Find("InteractiveTouchBtn").GetComponent<Button>().onClick.AddListener(ToggleInteractiveTouch);
 
         btnContainer.Find("DebugBtn").GetComponent<Button>().onClick.AddListener(ToggleDebugging);
+        btnContainer.Find("LiveActionBtn").GetComponent<Button>().onClick.AddListener(ToggleRealTimeAction);
 
         btnContainer.Find("SetupOrientationBtn").GetComponent<Button>().onClick.AddListener(GoToCalibrationScene);
         btnContainer.Find("SetupOrientationBtn").gameObject.SetActive(SystemInfo.supportsGyroscope);
@@ -645,6 +653,15 @@ public class GameManager : MonoBehaviour {
         settingsCanvas.transform.Find("ButtonsContainer").Find("InteractiveTouchBtn").GetChild(0).GetComponent<Text>().text = "Interactive Touch: " + isOn;
     }
 
+    public void ToggleRealTimeAction()
+    {
+        realTimeAction = !realTimeAction;
+        string isOn = "ON";
+        if (!realTimeAction)
+            isOn = "OFF";
+        settingsCanvas.transform.Find("ButtonsContainer").Find("LiveActionBtn").GetChild(0).GetComponent<Text>().text = "Real Time Action: " + isOn;
+    }
+
     public void ToggleShopCanvas()
     {
         shopCanvas.SetActive(!shopCanvas.activeSelf);
@@ -913,10 +930,12 @@ public class GameManager : MonoBehaviour {
     void StartGame()
     {
         Debug.Log("Starting Game");
+        /*
         Enemy.EnemyCount = 0;
         Objective.ObjectiveCount = 0;
         Weapon.WeaponCount = 0;
         Trap.TrapCount = 0;
+        */
         enemies.Clear();
         traps.Clear();
         edittingMap = false;
@@ -1079,6 +1098,52 @@ public class GameManager : MonoBehaviour {
         selectedDefense = null;
     }
 
+    public GameObject SpawnDefense(string type, int typeID)
+    {
+        int id = typeID;
+        GameObject defense = Instantiate(trapPrefabs[id]);
+        defense.transform.GetComponent<ObjectPlacement>().isSet = true;
+        defense.transform.GetComponent<ObjectPlacement>().canSet = true;
+        NetworkManager.nm.debugLog.Add("Trap " + Trap.TrapCount);
+        traps.Add(Trap.TrapCount-1, defense.GetComponent<Trap>());
+
+        // Create description for spawned item/defense
+        // Allow ability to adjust spawned item/defense
+        GameObject descrip = Instantiate(descriptionPrefab);
+        descrip.transform.GetChild(0).GetComponent<Text>().text = "Trap " + id + "\nPlaced on field";
+        descrip.transform.SetParent(descriptionDisplay.transform.Find("Trap Descriptions").Find("Upgrade Descriptions"));
+        descrip.transform.localPosition = new Vector3(0, 0, 0);
+        descrip.SetActive(false);
+        GameObject removeBtn = Instantiate(buttonPrefab);
+        removeBtn.name = "Trap " + Trap.TrapCount;
+        removeBtn.transform.GetChild(0).GetComponent<Text>().text = "Refund\n$50";
+        RectTransform rt;
+        rt = removeBtn.transform.GetComponent<RectTransform>();
+        rt.sizeDelta = new Vector2(100, 100);
+        removeBtn.transform.SetParent(descriptionDisplay.transform.Find("Trap Descriptions").Find("Upgrade Descriptions"));
+        removeBtn.transform.localPosition = new Vector3(200, 0, 0);
+        removeBtn.GetComponent<Button>().onClick.AddListener(RemoveSelectedDefense);
+        removeBtn.transform.SetParent(descrip.transform);
+        defense.GetComponent<ObjectPlacement>().description = descrip;
+
+        return defense;
+    }
+
+    public void SpawnDefense(string type, int typeID, GameObject location)
+    {
+        GameObject defense = SpawnDefense(type, typeID);
+        defense.transform.position = location.transform.position;
+        //selectedDefense.transform.GetComponent<Collider>().enabled = false;
+        //selectedDefense.layer = LayerMask.NameToLayer("Ignore Raycast");
+        //Debug.Log(selectedDefense.transform.GetComponent<Collider>().GetType());
+        //Collider c = selectedDefense.transform.GetComponent<Collider>();
+        //if (c.GetType() == typeof(CapsuleCollider))
+        //    ((CapsuleCollider)c).center += new Vector3(0, -.75f, 0);
+        //Vector3 cam2world = mapCamera.ScreenToWorldPoint(t.position);
+        //selectedDefense.transform.position = new Vector3(cam2world.x, 2, cam2world.z + (15 * (mapCamera.orthographicSize / 55)));
+        //Debug.Log("HOLD");
+    }
+
     public void HandleMapEditActivities()
     {
         //mapUICanvas.SetActive(selectedDefense == null);
@@ -1096,10 +1161,9 @@ public class GameManager : MonoBehaviour {
                 {
                     //if (EventSystem.current.currentSelectedGameObject)
                     //    Debug.Log(EventSystem.current.currentSelectedGameObject.tag);
-                    // Is that object a PlaceDefense object?
+                    // Is this a UI object?
                     if (EventSystem.current.currentSelectedGameObject)
                     {
-                        
                         GameObject selected = EventSystem.current.currentSelectedGameObject;
                             Debug.Log(selected.name + " " + EventSystem.current.currentSelectedGameObject.tag);
                         string tag = selected.tag;
@@ -1203,45 +1267,24 @@ public class GameManager : MonoBehaviour {
                         if (op.canSet)
                         {
                             Debug.Log("Can set");
-                            myTraps[id] -= 1;
-                            defensesContainer.transform.GetChild(id).GetChild(0).GetComponent<Text>().text = "TNT x" + myTraps[id];
-                            defensesContainer.transform.GetChild(id).gameObject.SetActive(myTraps[id] > 0);
-                            // Don't show capability to spawn more of this item if no more in inventory
-                            if (myTraps[id] == 0)
-                                DeselectDescription();
-                            GameObject defense = Instantiate(trapPrefabs[id]);
-                            defense.transform.position = selectedDefense.transform.position;
-                            defense.transform.GetComponent<ObjectPlacement>().isSet = true;
-                            defense.transform.GetComponent<ObjectPlacement>().canSet = true;
-                            traps.Add(Trap.TrapCount, defense.GetComponent<Trap>());
-
-                            // Create description for spawned item/defense
-                            // Allow ability to adjust spawned item/defense
-                            GameObject descrip = Instantiate(descriptionPrefab);
-                            descrip.transform.GetChild(0).GetComponent<Text>().text = "Trap " + id + "\nPlaced on field";
-                            descrip.transform.SetParent(descriptionDisplay.transform.Find("Trap Descriptions").Find("Upgrade Descriptions"));
-                            descrip.transform.localPosition = new Vector3(0, 0, 0);
-                            descrip.SetActive(false);
-                            GameObject removeBtn = Instantiate(buttonPrefab);
-                            removeBtn.name = "Trap " + Trap.TrapCount;
-                            removeBtn.transform.GetChild(0).GetComponent<Text>().text = "Refund\n$50";
-                            RectTransform rt;
-                            rt = removeBtn.transform.GetComponent<RectTransform>();
-                            rt.sizeDelta = new Vector2(100, 100);
-                            removeBtn.transform.SetParent(descriptionDisplay.transform.Find("Trap Descriptions").Find("Upgrade Descriptions"));
-                            removeBtn.transform.localPosition = new Vector3(200, 0, 0);
-                            removeBtn.GetComponent<Button>().onClick.AddListener(RemoveSelectedDefense);
-                            removeBtn.transform.SetParent(descrip.transform);
-                            defense.GetComponent<ObjectPlacement>().description = descrip;
-                            //selectedDefense.transform.GetComponent<Collider>().enabled = false;
-                            //selectedDefense.layer = LayerMask.NameToLayer("Ignore Raycast");
-                            //Debug.Log(selectedDefense.transform.GetComponent<Collider>().GetType());
-                            //Collider c = selectedDefense.transform.GetComponent<Collider>();
-                            //if (c.GetType() == typeof(CapsuleCollider))
-                            //    ((CapsuleCollider)c).center += new Vector3(0, -.75f, 0);
-                            //Vector3 cam2world = mapCamera.ScreenToWorldPoint(t.position);
-                            //selectedDefense.transform.position = new Vector3(cam2world.x, 2, cam2world.z + (15 * (mapCamera.orthographicSize / 55)));
-                            //Debug.Log("HOLD");
+                            // Let Network Manager handle spawning defense
+                            if (NetworkManager.nm.isStarted)
+                            {
+                                Debug.Log("LEMME HANDLE");
+                                //NetworkManager.nm.
+                                NetworkManager.nm.NotifySpawnDefenseAt(type,id);
+                                return;
+                            }
+                            else
+                            {
+                                myTraps[id] -= 1;
+                                defensesContainer.transform.GetChild(id).GetChild(0).GetComponent<Text>().text = "TNT x" + myTraps[id];
+                                defensesContainer.transform.GetChild(id).gameObject.SetActive(myTraps[id] > 0);
+                                // Don't show capability to spawn more of this item if no more in inventory
+                                if (myTraps[id] == 0)
+                                    DeselectDescription();
+                                SpawnDefense(type, id, selectedDefense);
+                            }
                         }
                         else
                         {
@@ -1258,6 +1301,7 @@ public class GameManager : MonoBehaviour {
 
 
                     mapFingerID = -1;
+                    selectedDefense = null;
                     //selectedDefense.transform.GetComponent<Collider>().enabled = true;
                     //selectedDefense.transform.GetComponent<ObjectPlacement>().isSet = true;
                     //Collider c = selectedDefense.transform.GetComponent<Collider>();
@@ -1265,7 +1309,7 @@ public class GameManager : MonoBehaviour {
                     //    ((CapsuleCollider)c).center -= new Vector3(0, -.75f, 0);
                     //selectedDefense.transform.GetComponent<CapsuleCollider>().center -= new Vector3(0, -.75f, 0);
                     //selectedDefense.layer = LayerMask.NameToLayer("Default");
-                    selectedDefense = null;
+                    
                     return;
                 }
                 // Drag selected defense to desired spot on map
@@ -1284,7 +1328,7 @@ public class GameManager : MonoBehaviour {
                             yOffset = hit.transform.position.y;
                         }
                     }
-                    Debug.Log(mapFingerID + "... " + t.fingerId);
+                    //Debug.Log(mapFingerID + "... " + t.fingerId);
                     selectedDefense.transform.position = new Vector3(cam2world.x, 2 + yOffset, cam2world.z + (15 * (mapCamera.orthographicSize / 55)));
                     return;
                 }
@@ -1294,6 +1338,8 @@ public class GameManager : MonoBehaviour {
         //if (selectedDefense == null || mapFingerID == -1)
         //if(!selectedUI)
         //{
+        if (NetworkManager.nm.isStarted && NetworkManager.nm.isSpawningObject)
+            return;
         //don't interfere with dragging potential defense spawn
         if(mapFingerID == -1)
         for (int i = 0; i < Input.touchCount; i++)

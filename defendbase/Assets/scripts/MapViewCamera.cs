@@ -37,13 +37,13 @@ public class MapViewCamera : MonoBehaviour {
     private void LateUpdate()
     {
         Transform bounds = GameManager.gm.playerRotation.transform.Find("Bounds");
-        minX = bounds.GetChild(0).position.x;
-        maxX = bounds.GetChild(1).position.x;
-        minY = bounds.GetChild(2).position.z;
-        maxY = bounds.GetChild(3).position.z;
+        minX = bounds.GetChild(0).localPosition.x;
+        maxX = bounds.GetChild(1).localPosition.x;
+        minY = bounds.GetChild(2).localPosition.z;
+        maxY = bounds.GetChild(3).localPosition.z;
         vertExtent = mapCam.orthographicSize;
         horizExtent = vertExtent * Screen.width / Screen.height;
-        Vector3 pos = transform.position;
+        Vector3 pos = transform.localPosition;
         if (pos.z + vertExtent >= maxY)
             pos.z = maxY - vertExtent;
         if (pos.z - vertExtent <= minY)
@@ -54,7 +54,7 @@ public class MapViewCamera : MonoBehaviour {
             pos.x = horizExtent + minX;
         //pos.x = Mathf.Clamp(pos.x, minX, maxX);
         //pos.z = Mathf.Clamp(pos.z, minY, maxY);
-        transform.position = pos;
+        transform.localPosition = pos;
     }
     // Update is called once per frame
     void Update() {
@@ -67,12 +67,12 @@ public class MapViewCamera : MonoBehaviour {
                 // Is there an object we are touching?
                 if (EventSystem.current.IsPointerOverGameObject(t.fingerId))
                 {
-                    if (EventSystem.current.currentSelectedGameObject)
-                        Debug.Log(EventSystem.current.currentSelectedGameObject.tag + "," + EventSystem.current.currentSelectedGameObject.name + "..." + LayerMask.LayerToName(EventSystem.current.currentSelectedGameObject.layer));
+                    //if (EventSystem.current.currentSelectedGameObject)
+                    //    Debug.Log(EventSystem.current.currentSelectedGameObject.tag + "," + EventSystem.current.currentSelectedGameObject.name + "..." + LayerMask.LayerToName(EventSystem.current.currentSelectedGameObject.layer));
                     // Is that object a PlaceDefense object?
                     if (EventSystem.current.currentSelectedGameObject && EventSystem.current.currentSelectedGameObject.layer == LayerMask.NameToLayer("UI"))
                     {
-                        Debug.Log(EventSystem.current.currentSelectedGameObject.tag + "," + EventSystem.current.currentSelectedGameObject.name + "..." + LayerMask.LayerToName(EventSystem.current.currentSelectedGameObject.layer));
+                        //Debug.Log(EventSystem.current.currentSelectedGameObject.tag + "," + EventSystem.current.currentSelectedGameObject.name + "..." + LayerMask.LayerToName(EventSystem.current.currentSelectedGameObject.layer));
 
                         continue;
                     }
@@ -135,7 +135,7 @@ public class MapViewCamera : MonoBehaviour {
                         {
                             //Debug.Log(4);
                             Vector2 dif = t.position - prevPos;
-                            transform.position += new Vector3(-dif.x, 0, -dif.y) * moveSpd * (mapCam.orthographicSize / defaultZoom);
+                            transform.localPosition += new Vector3(-dif.x, 0, -dif.y) * moveSpd * (mapCam.orthographicSize / defaultZoom);
                         }
                         prevPos = t.position;
                     }

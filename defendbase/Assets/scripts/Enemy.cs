@@ -22,7 +22,7 @@ public class Enemy : MonoBehaviour
     public static int EnemyCount = 0; // Keeps track of enemies created during game session
     // List of stats per level
     public static EnemyStats[] difficulties = new EnemyStats[] {
-        new EnemyStats(1, 0, 1, 1),
+        new EnemyStats(1, 1, 1, 1),
         new EnemyStats(2, 2, 1.2f, 1.2f),
         new EnemyStats(2, 2, 1.25f, 1.2f),
         new EnemyStats(3, 2, 1.5f, 1.2f),

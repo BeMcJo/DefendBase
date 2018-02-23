@@ -13,6 +13,8 @@ public class Tnt : Trap {
     // Helps determine who shot this
     public override void Activate(int sid)
     {
+        NetworkManager.nm.debugLog.Add("Activate " + sid + " " + id);
+        Debug.Log("Activate " + sid + " " + id);
         base.Activate(sid);
         GameObject explosion = Instantiate(explosionPrefab);
         explosion.transform.GetComponent<Explosion>().id = sid;

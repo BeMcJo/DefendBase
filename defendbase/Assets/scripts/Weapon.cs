@@ -123,6 +123,12 @@ public abstract class Weapon : MonoBehaviour
             return false;
         }
 
+        if (!GameManager.gm.startWaves)
+        {
+            CancelUse();
+            return false;
+        }
+
         // Check to see if any finger touch ID is valid for shooting
         if (Input.touchCount > 0)
         {

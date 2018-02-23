@@ -102,6 +102,7 @@ public class NetworkManager : MonoBehaviour {
     private bool isBroadcasting = false; // Are we announcing that we are hosting?
     public bool isHost = false; // Are we the host or the client?
     private bool findingHosts = false; // Are we client looking for host room to join?
+    public bool isSpawningObject;
 
     private Dictionary<int, Player> players = new Dictionary<int, Player>(); // cnnID -> Player
     //Unused
@@ -195,7 +196,8 @@ public class NetworkManager : MonoBehaviour {
         }
 
         // While in game, send information about my player
-        if (GameManager.gm.inGame && !isDisconnected)
+        ///*
+        if (!GameManager.gm.realTimeAction && GameManager.gm.inGame && !isDisconnected)
         {
             // Don't send anything when wave ended for you to prevent overloading other players
             if (GameManager.gm.onIntermission || !GameManager.gm.startWaves)
@@ -207,6 +209,7 @@ public class NetworkManager : MonoBehaviour {
                 sendTimer = sendRate;
             }
         }
+        //*/
         // Notify player of dc
         if(DCNotification)
             DCNotification.SetActive(GameManager.gm.inGame && isStarted && isDisconnected);
@@ -647,6 +650,9 @@ public class NetworkManager : MonoBehaviour {
                     case "RECONNECT":
                         OnReconnect(connectionId, splitData);
                         break;
+                    case "SPAWN":
+                        OnSpawnObject(splitData);
+                        break;
                     // Client states he/she has damaged trap
                     case "TRAPDMG":
                         OnTrapDamaged(splitData);
@@ -802,6 +808,17 @@ public class NetworkManager : MonoBehaviour {
                             break;
                         }
                         OnRepairObjective(splitData);
+                        //activityLog.Add(msg);
+                        break;
+                    case "SPAWN":
+                        logID = int.Parse(splitData[1]);
+                        // Sync activity log if missing something
+                        if (logID != activityLog.Count)
+                        {
+                            RequestActivityLog();
+                            break;
+                        }
+                        OnSpawnObject(splitData);
                         //activityLog.Add(msg);
                         break;
                     // Host states to start game
@@ -1109,6 +1126,71 @@ public class NetworkManager : MonoBehaviour {
         }
     }
 
+    public void NotifySpawnDefenseAt(string type, int typeID)
+    {
+        string msg = "SPAWN|" + activityLog.Count + "|" + ourClientID + "|";
+        if(type == "Trap")
+        {
+            msg += GameManager.gm.selectedDefense.GetComponent<Trap>().NetworkInformation();
+        }
+        if (isHost)
+        {
+            OnSpawnObject(msg.Split('|'));
+        }
+        else
+        {
+            Send(msg, reliableChannel);
+            GameManager.gm.addToMapBtn.SetActive(false);
+        }
+        GameManager.gm.mapUICanvas.SetActive(true);
+        GameManager.gm.playerStatusCanvas.SetActive(true);
+        isSpawningObject = true;
+    }
+
+    public void OnSpawnObject(string[] data)
+    {
+        int clientID = int.Parse(data[2]);
+        string type = data[3];
+        int typeID = int.Parse(data[4]);
+        string msg = data[0] + "|" + activityLog.Count + "|";// + data[2] + "|" + data[3] + "|" + data[4];
+        for(int i = 2; i < data.Length; i++)
+        {
+            msg += data[i] + "|";
+        }
+        if (type == "TRAP")
+        {
+            debugLog.Add("SPAWN TRAP " + typeID);
+            if(clientID == ourClientID)
+            {
+                GameManager.gm.SpawnDefense(type, typeID, GameManager.gm.selectedDefense);
+                int id = typeID;
+                GameManager.gm.myTraps[id] -= 1;
+                GameManager.gm.defensesContainer.transform.GetChild(id).GetChild(0).GetComponent<Text>().text = "TNT x" + GameManager.gm.myTraps[id];
+                GameManager.gm.defensesContainer.transform.GetChild(id).gameObject.SetActive(GameManager.gm.myTraps[id] > 0);
+                // Don't show capability to spawn more of this item if no more in inventory
+                if (GameManager.gm.myTraps[id] == 0)
+                    GameManager.gm.DeselectDescription();
+                GameManager.gm.selectedDefense.SetActive(false);
+                if(!isHost)
+                    GameManager.gm.addToMapBtn.SetActive(true);
+                GameManager.gm.mapFingerID = -1;
+                GameManager.gm.selectedDefense = null;
+                isSpawningObject = false;
+            }
+            else
+            {
+                GameObject trap = GameManager.gm.SpawnDefense(type, typeID);
+                Debug.Log("NETWORK SPAWNED DEF" + trap.transform.localScale);
+                trap.GetComponent<Trap>().SetNetworkInformation(new string[] { data[3], data[4], data[5] });
+            }
+        }
+        if (isHost)
+        {
+            Send(msg, reliableChannel, players);
+        }
+        activityLog.Add(msg);
+    }
+
     // Notify players that source is damaged by target
     public void NotifyObjectDamagedBy(GameObject target, GameObject source)
     {
@@ -1184,10 +1266,10 @@ public class NetworkManager : MonoBehaviour {
     // Inflict damage to trap
     public void OnTrapDamaged(string[] data)
     {
-        debugLog.Add("TRAP DAMAGED");
         int targetID = int.Parse(data[2]);
         int sourceID = int.Parse(data[3]);
         int dmg = int.Parse(data[4]);
+        debugLog.Add("TRAP DAMAGED" + targetID);
         // Inflict damage if enemy exists
         if (GameManager.gm.traps.ContainsKey(targetID))
         {
