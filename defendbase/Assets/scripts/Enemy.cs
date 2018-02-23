@@ -53,6 +53,7 @@ public class Enemy : MonoBehaviour
         {
             GameManager.gm.enemies[e.id] = e;
         }
+        e.name = "Enemy " + e.id;
     }
     // Use this for initialization
     protected virtual void Start()

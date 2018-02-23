@@ -74,6 +74,7 @@ public abstract class Weapon : MonoBehaviour
         reloading = false;
         id = WeaponCount;
         WeaponCount++;
+        name = "Wep " + id;
         bulletSpawn = transform.Find("BulletSpawn");
         chargeBarGuage = Instantiate(chargeBarGuage);
         chargeBar = chargeBarGuage.transform.GetChild(0).gameObject;

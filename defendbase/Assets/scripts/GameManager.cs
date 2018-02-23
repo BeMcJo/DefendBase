@@ -73,6 +73,7 @@ public class GameManager : MonoBehaviour {
     public Vector3 playerOrientation; // Keeps track of where your forward is
 
     public GameObject[] trapPrefabs, // List of trap objects
+                        trapSpawnPrefab, // Pre-image of trap being spawned on map
                         weaponPrefabs; // List of weapon objects
 
     public GameObject statusIndicatorPrefab, // Shows health and other status for object
@@ -80,6 +81,7 @@ public class GameManager : MonoBehaviour {
                       playerUIPrefab, // Your object in lobby
                       buttonPrefab, // Used for any general purposes as button
                       itemUIPrefab, // Used to display items in store in game
+                      descriptionPrefab, // Used to provide details about item
                       enemyArmorPrefab, // ???
                       enemyPrefab; // Enemy object
 
@@ -101,6 +103,15 @@ public class GameManager : MonoBehaviour {
                       shopCanvas, // Displays items to buy/upgrade
                       settingsCanvas, // Displays settings to ajust
                       mapUICanvas, // Displays content used to edit map (Defenses, traps, etc.)
+                      buttonDisplayer, // Contains lists of buttons 
+                      displayOptions, // Contains buttons that map to type of items to display (defense, store, inventory,...)
+                      defensesContainer, // Contains defenses available to place onto map
+                      inventoryContainer, // Contains weapons and other non-defense items available to upgrade
+                      storeContainer, // List of items, defenses, etc., available to purchase
+                      descriptionDisplay, // Displays description and details about selected item
+                      selectedOption, // Selects which option container will be selected
+                      selectedItem, // Potential item to purchase
+                      addToMapBtn, // Button used to spawn defenses onto map
                       waveNotification; // Notifies player that enemies will spawn
 
     public Text scoreTxt; // Indicates how awesome you are
@@ -115,7 +126,12 @@ public class GameManager : MonoBehaviour {
     public Camera mapCamera; // Bird eye view of map, used to also edit defenses onto map
 
     public int mapFingerID; // Used for detecting player selecting/dragging item onto map
-    public GameObject selectedDefense;
+    public GameObject selectedDescription, // Selects type of item description to display
+                      selectedDefense; // Currently selected defense to place onto map
+    public Dictionary<int, int> myDefenses, // Counts number of each type of defense in inventory
+                                myTraps; // Counts number of each type of trap in inventory 
+    public string mapAction,
+                  objectDetail;
 
     Pattern pattern; // Points to enemy spawn pattern
 
@@ -208,6 +224,8 @@ public class GameManager : MonoBehaviour {
         DontDestroyOnLoad(gm);
         interactiveTouch = false;
         traps = new Dictionary<int, Trap>();
+        myTraps = new Dictionary<int, int>();
+        myDefenses = new Dictionary<int, int>();
         playerOrientation = Vector3.zero;
         Screen.orientation = ScreenOrientation.Landscape; // Landscape mode for mobile phones
         LoadMainScene(); // Default start game in main scene
@@ -424,7 +442,92 @@ public class GameManager : MonoBehaviour {
         //mapCamera.
         mapUICanvas = GameObject.Find("MapUICanvas");
         mapUICanvas.SetActive(false);
-        mapUICanvas.transform.Find("BackBtn").GetComponent<Button>().onClick.AddListener(ToggleMapUICanvas);
+        //mapUICanvas.transform.Find("BackBtn").GetComponent<Button>().onClick.AddListener(ToggleMapUICanvas);
+
+        buttonDisplayer = mapUICanvas.transform.Find("ButtonDisplayer").gameObject;
+        displayOptions = buttonDisplayer.transform.Find("DisplayOptions").gameObject;
+        defensesContainer = buttonDisplayer.transform.Find("DefensesContainer").gameObject;
+        inventoryContainer = buttonDisplayer.transform.Find("InventoryContainer").gameObject;
+        storeContainer = buttonDisplayer.transform.Find("StoreContainer").gameObject;
+        descriptionDisplay = mapUICanvas.transform.Find("DescriptionDisplay").gameObject;
+        selectedOption = displayOptions;
+        defensesContainer.SetActive(false);
+        inventoryContainer.SetActive(false);
+        storeContainer.SetActive(false);
+        displayOptions.transform.Find("DisplayDefensesBtn").GetComponent<Button>().onClick.AddListener(DisplayDefensesOptions);
+        displayOptions.transform.Find("DisplayInventoryBtn").GetComponent<Button>().onClick.AddListener(DisplayInventoryOptions);
+        displayOptions.transform.Find("DisplayStoreBtn").GetComponent<Button>().onClick.AddListener(DisplayStoreOptions);
+        mapUICanvas.transform.Find("BackBtn").GetComponent<Button>().onClick.AddListener(ShowDisplayOptions);
+
+        trapSpawnPrefab = new GameObject[trapPrefabs.Length];
+        Transform trapDescriptions = descriptionDisplay.transform.Find("Trap Descriptions");
+        RectTransform rt;
+        myTraps.Clear();
+        for(int i = 0; i < trapPrefabs.Length; i++)
+        {
+            // Create buy icon for each trap
+            GameObject btn = Instantiate(buttonPrefab);
+            btn.name = "Trap " + i;
+            btn.tag = "Buy";
+            btn.transform.GetChild(0).GetComponent<Text>().text = "TNT";
+            rt = btn.transform.GetComponent<RectTransform>();
+            rt.sizeDelta = new Vector2(100, 100);
+            btn.transform.SetParent(storeContainer.transform);
+
+            // Create available defense icon for each trap
+            btn = Instantiate(buttonPrefab);
+            btn.name = "Trap " + i;
+            btn.tag = "Inventory";
+            btn.transform.GetChild(0).GetComponent<Text>().text = "Tnt x0";
+            rt = btn.transform.GetComponent<RectTransform>();
+            rt.sizeDelta = new Vector2(100, 100);
+            btn.transform.SetParent(defensesContainer.transform);
+            btn.SetActive(false);
+            // Default have no traps
+            myTraps.Add(i, 0);
+
+            // Description for buy section
+            GameObject descrip = Instantiate(descriptionPrefab);
+            descrip.transform.GetChild(0).GetComponent<Text>().text = "Trap " + i + "\nDescription Goes Here";
+            descrip.transform.SetParent(trapDescriptions.Find("Buy Descriptions"));
+            descrip.transform.localPosition = Vector3.zero;
+            descrip.SetActive(false);
+
+            // Description for inventory purpose
+            descrip = Instantiate(descriptionPrefab);
+            descrip.transform.GetChild(0).GetComponent<Text>().text = "Trap " + i + "\nSpawn this onto map";
+            descrip.transform.SetParent(trapDescriptions.Find("AddToMap Descriptions"));
+            descrip.transform.localPosition = Vector3.zero;
+            descrip.SetActive(false);
+            // Create trap spawn object
+            trapSpawnPrefab[i] = Instantiate(trapPrefabs[i]);
+            trapSpawnPrefab[i].SetActive(false);
+            trapSpawnPrefab[i].name = "Trap " + i;
+            trapSpawnPrefab[i].layer = LayerMask.NameToLayer("Ignore Raycast");
+            Collider c = trapSpawnPrefab[i].transform.GetComponent<Collider>();
+            if (c.GetType() == typeof(CapsuleCollider))
+                ((CapsuleCollider)c).center += new Vector3(0, -.75f, 0);
+            //btn.transform.GetComponent<Button>().onClick.AddListener(Purchase);
+        }
+        GameObject buyBtn = Instantiate(buttonPrefab);
+        buyBtn.name = "BuyBtn";
+        buyBtn.transform.GetChild(0).GetComponent<Text>().text = "Buy\n$50";
+        rt = buyBtn.transform.GetComponent<RectTransform>();
+        rt.sizeDelta = new Vector2(100, 100);
+        buyBtn.transform.GetComponent<Button>().onClick.AddListener(Purchase);
+        buyBtn.transform.SetParent(trapDescriptions.Find("Buy Descriptions"));
+        buyBtn.transform.localPosition = new Vector3(200, 0, 0);
+        trapDescriptions.gameObject.SetActive(false);
+
+        addToMapBtn = Instantiate(buttonPrefab);
+        addToMapBtn.name = "AddToMapBtn";
+        addToMapBtn.tag = "PlaceDefense";
+        addToMapBtn.transform.GetChild(0).GetComponent<Text>().text = "Add To Map";
+        rt = addToMapBtn.transform.GetComponent<RectTransform>();
+        rt.sizeDelta = new Vector2(100, 100);
+        //addToMapBtn.transform.GetComponent<Button>().onClick.AddListener(SpawnPotentialDefense);
+        addToMapBtn.transform.SetParent(trapDescriptions.Find("AddToMap Descriptions"));
+        addToMapBtn.transform.localPosition = new Vector3(200, 0, 0);
 
         StartCoroutine(MapManager.mapManager.LoadGameScene());
         StartCoroutine(NetworkManager.nm.LoadGameScene()); 
@@ -432,10 +535,86 @@ public class GameManager : MonoBehaviour {
         StartGame();
     }
 
+    public void SpawnPotentialDefense()
+    {
+    }
+
+    public void DeselectDescription()
+    {
+        if (selectedDescription)
+        {
+            selectedDescription.SetActive(false);
+            selectedDescription.transform.parent.gameObject.SetActive(false);
+            selectedDescription.transform.parent.parent.gameObject.SetActive(false);
+        }
+        selectedDescription = null;
+    }
+
+    public void Purchase()
+    {
+        Debug.Log("BUY" + selectedItem.name);
+        if (selectedItem == null)
+            return;
+        string[] details = selectedItem.name.Split(' ');
+        if (details.Length < 2)
+            return;
+        string itemType = details[0];
+        int id = int.Parse(details[1]);
+        switch (itemType)
+        {
+            case "Trap":
+                Debug.Log("Buying trap");
+                if (inGameCurrency < 50)
+                    return;
+                inGameCurrency -= 50;
+                myTraps[id] += 1;
+                defensesContainer.transform.GetChild(id).GetChild(0).GetComponent<Text>().text = "TNT x" + myTraps[id];
+                defensesContainer.transform.GetChild(id).gameObject.SetActive(true);
+                Debug.Log("BOUGHT");
+                break;
+        }
+    }
+
+    public void DisplayDefensesOptions()
+    {
+        selectedOption.SetActive(false);
+        selectedOption = defensesContainer;
+        buttonDisplayer.transform.GetComponent<ScrollRect>().content = selectedOption.transform.GetComponent<RectTransform>();
+        selectedOption.SetActive(true);
+    }
+
+    public void DisplayStoreOptions()
+    {
+        selectedOption.SetActive(false);
+        selectedOption = storeContainer;
+        buttonDisplayer.transform.GetComponent<ScrollRect>().content = selectedOption.transform.GetComponent<RectTransform>();
+        selectedOption.SetActive(true);
+    }
+
+    public void DisplayInventoryOptions()
+    {
+        selectedOption.SetActive(false);
+        selectedOption = inventoryContainer;
+        buttonDisplayer.transform.GetComponent<ScrollRect>().content = selectedOption.transform.GetComponent<RectTransform>();
+        selectedOption.SetActive(true);
+    }
+
+    public void ShowDisplayOptions()
+    {
+        DeselectDescription();
+        selectedItem = null;
+        selectedDefense = null;
+        selectedOption.SetActive(false);
+        selectedOption = displayOptions;
+        selectedOption.SetActive(true);
+    }
+
     public void ToggleMapUICanvas()
     {
         mapFingerID = -1;
         edittingMap = !edittingMap;
+        ShowDisplayOptions();
+        //selectedOption = null;
         mapUICanvas.SetActive(edittingMap);
         mapCamera.gameObject.SetActive(edittingMap);//enabled = edittingMap;
         player.GetComponent<PlayerController>().playerCam.gameObject.SetActive(!edittingMap);//.enabled = !edittingMap;
@@ -745,7 +924,7 @@ public class GameManager : MonoBehaviour {
         onIntermission = false;
         paused = false;
         gameOver = false;
-        inGameCurrency = 0;
+        inGameCurrency = 100;
         score = 0;
         kills = 0;
         difficulty = 0;
@@ -885,6 +1064,286 @@ public class GameManager : MonoBehaviour {
         }
     }
 
+    public void RemoveSelectedDefense()
+    {
+        Debug.Log("remove selected def");
+        if (selectedDefense == null)
+            return;
+        Debug.Log("REMOVE " + selectedDefense.name);
+        string[] details = selectedDefense.name.Split(' ');
+        string type = details[0];
+        int id = int.Parse(details[1]);
+        traps.Remove(id);
+        UpdateInGameCurrency(50);
+        Destroy(selectedDefense);
+        selectedDefense = null;
+    }
+
+    public void HandleMapEditActivities()
+    {
+        //mapUICanvas.SetActive(selectedDefense == null);
+        //playerStatusCanvas.SetActive(selectedDefense == null);
+        bool selectedUI = false;
+        // Check to see if any finger touch ID is valid for selecting defense
+        for (int i = 0; i < Input.touchCount; i++)
+        {
+            Touch t = Input.GetTouch(i);
+            if (t.phase == TouchPhase.Began && mapFingerID == -1)
+            {
+                
+                // Is there an object we are touching?
+                if (EventSystem.current.IsPointerOverGameObject(t.fingerId))
+                {
+                    //if (EventSystem.current.currentSelectedGameObject)
+                    //    Debug.Log(EventSystem.current.currentSelectedGameObject.tag);
+                    // Is that object a PlaceDefense object?
+                    if (EventSystem.current.currentSelectedGameObject)
+                    {
+                        
+                        GameObject selected = EventSystem.current.currentSelectedGameObject;
+                            Debug.Log(selected.name + " " + EventSystem.current.currentSelectedGameObject.tag);
+                        string tag = selected.tag;
+                        if (tag == "Untagged")
+                            return;
+                        /*
+                        if (selectedDescription)
+                        {
+                            selectedDescription.SetActive(false);
+                            selectedDescription.transform.parent.gameObject.SetActive(false);
+                            selectedDescription.transform.parent.parent.gameObject.SetActive(false);
+                        }
+                        */
+                        string[] details = selected.name.Split(' ');
+                        string type = details[0];
+                        int id = int.Parse(details[1]);
+                        Debug.Log(type + " " + id);
+                        mapAction = tag;
+                        // Are you spawning a defense?
+                        if (tag == "PlaceDefense")
+                        {
+                            //SpawnPotentialDefense();
+                            Debug.Log("spawn?");
+                            // Do I have any of this defense in my inventory?
+                            if (myTraps[0] == 0)
+                                return;
+
+                            mapUICanvas.SetActive(false);
+                            playerStatusCanvas.SetActive(false);
+                            Debug.Log("canspawn");
+                            //myTraps[0] -= 1;
+                            //defensesContainer.transform.GetChild(0).GetChild(0).GetComponent<Text>().text = "TNT x" + myTraps[0];
+                            mapFingerID = t.fingerId;
+                            selectedDefense = trapSpawnPrefab[0];
+                            selectedDefense.GetComponent<ObjectPlacement>().Clear();
+                            selectedDefense.SetActive(true);
+
+                            /*Instantiate(trapPrefabs[0]);
+                        //selectedDefense.transform.GetComponent<Collider>().enabled = false;
+                        selectedDefense.layer = LayerMask.NameToLayer("Ignore Raycast");
+                        Debug.Log(selectedDefense.transform.GetComponent<Collider>().GetType());
+                        Collider c = selectedDefense.transform.GetComponent<Collider>();
+                        if (c.GetType() == typeof(CapsuleCollider))
+                            ((CapsuleCollider)c).center += new Vector3(0, -.75f, 0);*/
+                            Vector3 cam2world = mapCamera.ScreenToWorldPoint(t.position);
+                            selectedDefense.transform.position = new Vector3(cam2world.x, 2, cam2world.z + (15 * (mapCamera.orthographicSize / 55)));
+                            Debug.Log("HOLD");
+                            return;
+                        }
+                        // Are you selecting item to buy?
+                        else if(tag == "Buy")
+                        {
+                            Debug.Log("1");
+                            DeselectDescription();
+                            selectedItem = selected;
+                            selectedDescription = descriptionDisplay.transform.Find(type + " Descriptions").gameObject;
+                            selectedDescription.SetActive(true);
+                            selectedDescription = selectedDescription.transform.Find("Buy Descriptions").gameObject;
+                            selectedDescription.SetActive(true);
+                            selectedDescription.transform.Find("BuyBtn").GetChild(0).GetComponent<Text>().text = "Buy\n$50";
+                            selectedDescription = selectedDescription.transform.GetChild(id).gameObject;
+                            selectedDescription.SetActive(true);
+
+                            //myTraps[id] = myTraps[id] + 1;
+                            //defensesContainer.transform.GetChild(0).GetChild(0).GetComponent<Text>().text = "TNT x" + myTraps[0];
+                            Debug.Log("CANBUY");
+                            return;
+                        }
+                        // Display detail for selected item in inventory
+                        else if(tag == "Inventory")
+                        {
+                            Debug.Log(2);
+                            DeselectDescription();
+                            selectedItem = selected;
+                            selectedDescription = descriptionDisplay.transform.Find(type + " Descriptions").gameObject;
+                            selectedDescription.SetActive(true);
+                            selectedDescription = selectedDescription.transform.Find("AddToMap Descriptions").gameObject;
+                            selectedDescription.SetActive(true);
+                            addToMapBtn.name = selected.name;//GetChild(0).GetComponent<Text>().text = "Add To Map";
+                            selectedDescription = selectedDescription.transform.GetChild(id).gameObject;
+                            selectedDescription.SetActive(true);
+                            return;
+                        }
+                    }
+                }
+            }
+            else if (t.fingerId == mapFingerID)
+            {
+                // Release the selected defense, regardless if can set or not
+                if (t.phase == TouchPhase.Ended)
+                {
+                    // Do I have a defense to place?
+                    if (selectedDefense)
+                    {
+                        string[] details = selectedDefense.name.Split(' ');
+                        string type = details[0];
+                        int id = int.Parse(details[1]);
+                        Debug.Log("placing");
+                        ObjectPlacement op = selectedDefense.GetComponent<ObjectPlacement>();
+                        // Upon releasing my finger, is that spot legal to place defense?
+                        if (op.canSet)
+                        {
+                            Debug.Log("Can set");
+                            myTraps[id] -= 1;
+                            defensesContainer.transform.GetChild(id).GetChild(0).GetComponent<Text>().text = "TNT x" + myTraps[id];
+                            defensesContainer.transform.GetChild(id).gameObject.SetActive(myTraps[id] > 0);
+                            // Don't show capability to spawn more of this item if no more in inventory
+                            if (myTraps[id] == 0)
+                                DeselectDescription();
+                            GameObject defense = Instantiate(trapPrefabs[id]);
+                            defense.transform.position = selectedDefense.transform.position;
+                            defense.transform.GetComponent<ObjectPlacement>().isSet = true;
+                            defense.transform.GetComponent<ObjectPlacement>().canSet = true;
+                            traps.Add(Trap.TrapCount, defense.GetComponent<Trap>());
+
+                            // Create description for spawned item/defense
+                            // Allow ability to adjust spawned item/defense
+                            GameObject descrip = Instantiate(descriptionPrefab);
+                            descrip.transform.GetChild(0).GetComponent<Text>().text = "Trap " + id + "\nPlaced on field";
+                            descrip.transform.SetParent(descriptionDisplay.transform.Find("Trap Descriptions").Find("Upgrade Descriptions"));
+                            descrip.transform.localPosition = new Vector3(0, 0, 0);
+                            descrip.SetActive(false);
+                            GameObject removeBtn = Instantiate(buttonPrefab);
+                            removeBtn.name = "Trap " + Trap.TrapCount;
+                            removeBtn.transform.GetChild(0).GetComponent<Text>().text = "Refund\n$50";
+                            RectTransform rt;
+                            rt = removeBtn.transform.GetComponent<RectTransform>();
+                            rt.sizeDelta = new Vector2(100, 100);
+                            removeBtn.transform.SetParent(descriptionDisplay.transform.Find("Trap Descriptions").Find("Upgrade Descriptions"));
+                            removeBtn.transform.localPosition = new Vector3(200, 0, 0);
+                            removeBtn.GetComponent<Button>().onClick.AddListener(RemoveSelectedDefense);
+                            removeBtn.transform.SetParent(descrip.transform);
+                            defense.GetComponent<ObjectPlacement>().description = descrip;
+                            //selectedDefense.transform.GetComponent<Collider>().enabled = false;
+                            //selectedDefense.layer = LayerMask.NameToLayer("Ignore Raycast");
+                            //Debug.Log(selectedDefense.transform.GetComponent<Collider>().GetType());
+                            //Collider c = selectedDefense.transform.GetComponent<Collider>();
+                            //if (c.GetType() == typeof(CapsuleCollider))
+                            //    ((CapsuleCollider)c).center += new Vector3(0, -.75f, 0);
+                            //Vector3 cam2world = mapCamera.ScreenToWorldPoint(t.position);
+                            //selectedDefense.transform.position = new Vector3(cam2world.x, 2, cam2world.z + (15 * (mapCamera.orthographicSize / 55)));
+                            //Debug.Log("HOLD");
+                        }
+                        else
+                        {
+                            Debug.Log(op.canSet);
+                        }
+                        selectedDefense.SetActive(false);
+                        mapUICanvas.SetActive(true);
+                        playerStatusCanvas.SetActive(true);
+                    }
+                    else if (mapAction == "Buy")
+                    {
+                        
+                    }
+
+
+                    mapFingerID = -1;
+                    //selectedDefense.transform.GetComponent<Collider>().enabled = true;
+                    //selectedDefense.transform.GetComponent<ObjectPlacement>().isSet = true;
+                    //Collider c = selectedDefense.transform.GetComponent<Collider>();
+                    //if (c.GetType() == typeof(CapsuleCollider))
+                    //    ((CapsuleCollider)c).center -= new Vector3(0, -.75f, 0);
+                    //selectedDefense.transform.GetComponent<CapsuleCollider>().center -= new Vector3(0, -.75f, 0);
+                    //selectedDefense.layer = LayerMask.NameToLayer("Default");
+                    selectedDefense = null;
+                    return;
+                }
+                // Drag selected defense to desired spot on map
+                else if (t.phase == TouchPhase.Moved)
+                {
+                    Vector3 cam2world = mapCamera.ScreenToWorldPoint(t.position);
+                    Ray r = mapCamera.ScreenPointToRay(t.position);
+                    RaycastHit hit;
+                    float yOffset = 0;
+                    if (Physics.Raycast(r, out hit, 100))
+                    {
+                        //Debug.Log("HIT");
+                        //Debug.Log(hit.transform.tag);
+                        if (hit.transform.tag == "Ground" || hit.transform.tag == "Path")
+                        {
+                            yOffset = hit.transform.position.y;
+                        }
+                    }
+                    Debug.Log(mapFingerID + "... " + t.fingerId);
+                    selectedDefense.transform.position = new Vector3(cam2world.x, 2 + yOffset, cam2world.z + (15 * (mapCamera.orthographicSize / 55)));
+                    return;
+                }
+            }
+        }
+        // Can select objects on the field
+        //if (selectedDefense == null || mapFingerID == -1)
+        //if(!selectedUI)
+        //{
+        //don't interfere with dragging potential defense spawn
+        if(mapFingerID == -1)
+        for (int i = 0; i < Input.touchCount; i++)
+        {
+            Touch t = Input.GetTouch(i);
+            if (t.phase != TouchPhase.Began)
+                continue;
+            Debug.Log(">>>>>>>>>>>>>>"+t.fingerId);
+            Ray r = mapCamera.ScreenPointToRay(t.position);
+            RaycastHit hit;
+            selectedDefense = null;
+            if (Physics.Raycast(r, out hit, 100))
+            {
+
+                //Debug.Log("HIT");
+                Debug.Log(hit.transform.tag + " " + hit.transform.name);
+                DeselectDescription();
+                if (hit.transform.tag == "Trap")
+                {
+                    //string[] details = hit.transform.name.Split(' ');
+                    //string type = details[0];
+                    //int id = //int.Parse(details[1]);
+                    //selectedDefense = hit.transform.gameObject;'
+                    /*
+                    if (selectedDescription)
+                    {
+                        selectedDescription.SetActive(false);
+                        selectedDescription.transform.parent.gameObject.SetActive(false);
+                        selectedDescription.transform.parent.parent.gameObject.SetActive(false);
+                    }*/
+                    selectedDescription = descriptionDisplay.transform.Find("Trap Descriptions").gameObject;
+                    selectedDescription.SetActive(true);
+                    selectedDescription = selectedDescription.transform.Find("Upgrade Descriptions").gameObject;
+                    selectedDescription.SetActive(true);
+                    //selectedDescription.transform.Find("BuyBtn").GetChild(0).GetComponent<Text>().text = "Buy\n$50";
+                    selectedDescription = hit.transform.GetComponent<ObjectPlacement>().description;
+                    //selectedDescription = selectedDescription.transform.GetChild(id).gameObject;
+                    selectedDescription.SetActive(true);
+                    selectedDefense = hit.transform.gameObject;
+                }
+                else
+                {
+
+                }
+            }
+        }
+        //}
+
+    }
+
     // Update is called once per frame
     void Update ()
     {
@@ -914,91 +1373,12 @@ public class GameManager : MonoBehaviour {
 
         if (edittingMap)
         {
-            mapUICanvas.SetActive(selectedDefense == null);
-            playerStatusCanvas.SetActive(selectedDefense == null);
-            // Check to see if any finger touch ID is valid for selecting defense
-            for (int i = 0; i < Input.touchCount; i++)
-            {
-                Touch t = Input.GetTouch(i);
-                if (mapFingerID == -1)
-                {
-                    // Is there an object we are touching?
-                    if (EventSystem.current.IsPointerOverGameObject(t.fingerId))
-                    {
-                        //if (EventSystem.current.currentSelectedGameObject)
-                        //    Debug.Log(EventSystem.current.currentSelectedGameObject.tag);
-                        // Is that object a PlaceDefense object?
-                        if (EventSystem.current.currentSelectedGameObject && EventSystem.current.currentSelectedGameObject.tag == "PlaceDefense")
-                        {
-                            mapFingerID = t.fingerId;
-                            selectedDefense = Instantiate(trapPrefabs[0]);
-                            //selectedDefense.transform.GetComponent<Collider>().enabled = false;
-                            selectedDefense.layer = LayerMask.NameToLayer("Ignore Raycast");
-                            Debug.Log(selectedDefense.transform.GetComponent<Collider>().GetType());
-                            Collider c = selectedDefense.transform.GetComponent<Collider>();
-                            if (c.GetType() == typeof(CapsuleCollider))
-                                ((CapsuleCollider) c).center += new Vector3(0, -.75f, 0);
-                            Vector3 cam2world = mapCamera.ScreenToWorldPoint(t.position);
-                            selectedDefense.transform.position = new Vector3(cam2world.x, 2, cam2world.z + (15 * (mapCamera.orthographicSize/55)));
-                            Debug.Log("HOLD");
-                        }
-                    }
-                }
-                else if (t.fingerId == mapFingerID)
-                {
-                    // Release the selected defense, regardless if can set or not
-                    if (t.phase == TouchPhase.Ended)
-                    {
-                        mapFingerID = -1;
-                        selectedDefense.transform.GetComponent<Collider>().enabled = true;
-                        selectedDefense.transform.GetComponent<ObjectPlacement>().isSet = true;
-                        Collider c = selectedDefense.transform.GetComponent<Collider>();
-                        if (c.GetType() == typeof(CapsuleCollider))
-                            ((CapsuleCollider)c).center -= new Vector3(0, -.75f, 0);
-                        //selectedDefense.transform.GetComponent<CapsuleCollider>().center -= new Vector3(0, -.75f, 0);
-                        selectedDefense.layer = LayerMask.NameToLayer("Default");
-                        selectedDefense = null;
-                    }
-                    // Drag selected defense to desired spot on map
-                    else if (t.phase == TouchPhase.Moved)
-                    {
-                        Vector3 cam2world = mapCamera.ScreenToWorldPoint(t.position);
-                        Ray r = mapCamera.ScreenPointToRay(t.position);
-                        RaycastHit hit;
-                        float yOffset = 0;
-                        if (Physics.Raycast(r, out hit, 100))
-                        {
-                            //Debug.Log("HIT");
-                            //Debug.Log(hit.transform.tag);
-                            if(hit.transform.tag == "Ground" || hit.transform.tag == "Path")
-                            {
-                                yOffset = hit.transform.position.y;
-                            }
-                        }
-                        selectedDefense.transform.position = new Vector3(cam2world.x, 2 + yOffset, cam2world.z + (15 * (mapCamera.orthographicSize / 55)));
-                    }    
-                }
-            }
-            // Can select objects on the field
-            if(selectedDefense == null)
-            {
-                for (int i = 0; i < Input.touchCount; i++) {
-                    Touch t = Input.GetTouch(i);
-                    Ray r = mapCamera.ScreenPointToRay(t.position);
-                    RaycastHit hit;
-                    if (Physics.Raycast(r, out hit, 100))
-                    {
-                        //Debug.Log("HIT");
-                        //Debug.Log(hit.transform.tag);
-                    }
-                }
-            }
-
+            HandleMapEditActivities();
         }
 
+        scoreTxt.text = "Score: " + score + ", spawned" + enemiesSpawned + "/kills" + kills + ", $" + inGameCurrency;
         if (!startWaves)
             return;
-            scoreTxt.text = "Score: " + score + ", spawned" + enemiesSpawned + "/kills" + kills;
         // if there are enemies to spawn
         if (!doneSpawningWave)
         {

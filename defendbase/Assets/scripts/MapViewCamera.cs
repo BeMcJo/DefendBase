@@ -11,6 +11,7 @@ public class MapViewCamera : MonoBehaviour {
     float prevDist;
     public float moveSpd = .01f, zoomSpd = .1f;
     public float maxZoomIn = 4f, maxZoomOut = 75, defaultZoom = 50;
+    public float horizExtent, vertExtent, mapX, mapY, minX, minY, maxX, maxY;
 	// Use this for initialization
 	void Start () {
         mapCam = transform.GetComponent<Camera>();
@@ -18,6 +19,13 @@ public class MapViewCamera : MonoBehaviour {
         zoomIDs = new int[] { -1, -1 };
         moveID = -1;
         prevDist = 0;
+        mapX = 30;
+        mapY = 30;
+
+        minX = -horizExtent + mapX / 2;
+        maxX = -mapX / 2 + horizExtent;
+        minY = -vertExtent + mapY / 2;
+        maxY = -mapY / 2 + vertExtent;
     }
 
     public void Reset()
@@ -26,6 +34,28 @@ public class MapViewCamera : MonoBehaviour {
             touchIDs[0] = touchIDs[1] = -1;
     }
 
+    private void LateUpdate()
+    {
+        Transform bounds = GameManager.gm.playerRotation.transform.Find("Bounds");
+        minX = bounds.GetChild(0).position.x;
+        maxX = bounds.GetChild(1).position.x;
+        minY = bounds.GetChild(2).position.z;
+        maxY = bounds.GetChild(3).position.z;
+        vertExtent = mapCam.orthographicSize;
+        horizExtent = vertExtent * Screen.width / Screen.height;
+        Vector3 pos = transform.position;
+        if (pos.z + vertExtent >= maxY)
+            pos.z = maxY - vertExtent;
+        if (pos.z - vertExtent <= minY)
+            pos.z = vertExtent + minY;
+        if (pos.x + horizExtent >= maxX)
+            pos.x = maxX - horizExtent;
+        if (pos.x - horizExtent <= minX)
+            pos.x = horizExtent + minX;
+        //pos.x = Mathf.Clamp(pos.x, minX, maxX);
+        //pos.z = Mathf.Clamp(pos.z, minY, maxY);
+        transform.position = pos;
+    }
     // Update is called once per frame
     void Update() {
         for (int i = 0; i < Input.touchCount; i++)
@@ -49,7 +79,7 @@ public class MapViewCamera : MonoBehaviour {
                 }
                 else
                 {
-                    Debug.Log(1);
+                   // Debug.Log(1);
                 }
                 for (int j = 0; j < touchIDs.Length; j++)
                 {
@@ -75,7 +105,7 @@ public class MapViewCamera : MonoBehaviour {
                 }
             }
         }
-        if (GameManager.gm.selectedDefense)
+        if (GameManager.gm.selectedDefense && GameManager.gm.mapFingerID != -1)
         {
             return;
         }

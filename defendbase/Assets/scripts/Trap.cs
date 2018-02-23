@@ -11,6 +11,7 @@ public abstract class Trap : MonoBehaviour {
 	protected virtual void Start () {
         id = TrapCount;
         TrapCount++;
+        name = "Trap " + id;
 	}
 
     public virtual void TakeDamage(int dmg, int sid)
