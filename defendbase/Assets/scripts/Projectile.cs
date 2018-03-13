@@ -38,14 +38,22 @@ public abstract class Projectile : MonoBehaviour {
     
     protected virtual void OnTriggerEnter(Collider collision)
     {
-        if (id != GameManager.gm.player.transform.GetComponent<PlayerController>().id)
+        //print(collision.gameObject.name + " " + collision.gameObject.tag);
+        if (id != GameManager.gm.player.transform.GetComponent<PlayerController>().id || deflected)
             return;
         if (collision.transform.tag == "Enemy")
         {
+            GameManager.gm.OnHitEnemy();
             // If can damage enemy and this is shot by my player
             if (!hitGround && !deflected)
             {
-                Enemy e = collision.transform.GetComponent<Enemy>();
+                Transform t = collision.transform;
+                Enemy e = collision.transform.parent.GetComponent<Enemy>();
+                while (e == null)
+                {
+                    t = t.parent;
+                    e = t.parent.GetComponent<Enemy>();
+                }
                 e.OnHit();
                 //e.transform.GetComponent<Rigidbody>().velocity = Vector3.zero; // Disable physics force applied when colliding
                 // If using online feature, let Network Manager handle this
@@ -69,8 +77,11 @@ public abstract class Projectile : MonoBehaviour {
                 }
             }
         }
-        else if (collision.transform.tag == "Ground")
+        else if (collision.transform.tag == "Ground" || collision.transform.tag == "Impenetrable")
         {
+            print(collision.transform.name);
+            if (!isShot)
+                return;
             hitGround = true;
             Destroy(gameObject);
         }
@@ -85,7 +96,7 @@ public abstract class Projectile : MonoBehaviour {
             collision.GetComponent<Trap>().TakeDamage(dmg);
         }
     }
-    
+    //unused
     protected virtual void OnCollisionEnter(Collision collision)
     {
         if (collision.transform.tag == "Enemy")

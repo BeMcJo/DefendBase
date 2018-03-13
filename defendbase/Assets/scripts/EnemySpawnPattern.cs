@@ -60,6 +60,8 @@ public class EnemySpawnPattern {
         for (int i = 0; i < 5; i++)
         {
             spawnCt.Add(1);
+            spawnCt.Add(0);
+            enemyLvls.Add(0);
             enemyLvls.Add(0);
         }
         pattern.enemyLvls.Add(enemyLvls);

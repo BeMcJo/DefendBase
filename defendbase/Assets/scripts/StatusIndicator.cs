@@ -8,11 +8,13 @@ public class StatusIndicator : MonoBehaviour {
     public Transform healthBar, // Visual indicator of health 
                      healthBarGauge; // Visual indicator of max health
     public GameObject damageIndicatorPrefab;
+    public Text healthTxt;
     public int prevHP;
     // Use this for initialization
     void Start()
     {
         healthBar = transform.Find("Health Bar Gauge").Find("Health Bar");
+        healthTxt = transform.Find("HealthTxt").GetComponent<Text>();
         healthBarGauge = healthBar.parent;
         prevHP = -1;
     }
@@ -29,7 +31,11 @@ public class StatusIndicator : MonoBehaviour {
         // Have this face the player to player can see
         if (GameManager.gm.player)
         {
+            //transform.LookAt(GameManager.gm.player.transform.GetComponent<PlayerController>().playerCam.transform);
             healthBarGauge.LookAt(GameManager.gm.player.transform.GetComponent<PlayerController>().playerCam.transform);
+            healthTxt.transform.LookAt(GameManager.gm.player.transform.GetComponent<PlayerController>().playerCam.transform);
+            healthBarGauge.transform.localEulerAngles += new Vector3(0, 180, 0);
+            healthTxt.transform.localEulerAngles += new Vector3(0, 180, 0);
         }
 
         // Update health bar based on target's health
@@ -44,6 +50,7 @@ public class StatusIndicator : MonoBehaviour {
         if(target.tag == "Enemy")
         {
             Enemy e = target.transform.GetComponent<Enemy>();
+            healthBarGauge.position += e.go.transform.localPosition + new Vector3(0, 2, 0) ;
             hp = e.health;
             maxHP = e.maxHP;
         } else if(target.tag == "Objective")
@@ -55,7 +62,7 @@ public class StatusIndicator : MonoBehaviour {
         healthBar.localScale = new Vector3((float)hp / (float)maxHP, 1, 1);
         if(prevHP != -1 && prevHP != hp)
         {
-            Debug.Log("DIFFER");
+            //Debug.Log("DIFFER");
             int dif = hp - prevHP;
             GameObject damageIndicator = Instantiate(damageIndicatorPrefab);
             damageIndicator.transform.position = healthBarGauge.position + new Vector3(0,healthBarGauge.GetComponent<RectTransform>().rect.height,0);
@@ -66,5 +73,7 @@ public class StatusIndicator : MonoBehaviour {
         if (hp < 0)
             hp = 0;
         prevHP = hp;
+        healthTxt.text = hp + "/" + maxHP;
+        healthTxt.transform.position = healthBarGauge.position - new Vector3(0, .1f, 0);
     }
 }

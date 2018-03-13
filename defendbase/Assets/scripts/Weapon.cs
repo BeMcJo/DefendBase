@@ -10,9 +10,9 @@ public class WeaponStats
     public int price = 0; // How much to initially buy from store
     public int[] dmg, // List of damage per level
                  costToUpgrade; // List of cost to upgrade to next level
-    public float[] distance, // How far can shoot projectiles
-                   timeToReload, // How long before shooting
-                   chargeAccelation; // How fast to charge (for bows, cannons, etc.)
+    public float[] distance, // How far can shoot projectiles 
+                   timeToReload, // How long before shooting in percentage
+                   chargeAccelation; // How fast to charge (for bows, cannons, etc.) in percentage
     public WeaponStats(string nm, int[] dmgs,int[] costs, float[] distances, float[] timeToReloads, float[] chargeAccelerations)
     {
         name = nm;
@@ -34,7 +34,7 @@ public abstract class Weapon : MonoBehaviour
             "Bow",
             new int[] {1,2,3,4,5},
             new int[] {50,100,200,500},
-            new float[] {1600, 1700,1800,2900,2000},
+            new float[] {1600, 1700,1900,2300,2900},
             new float[] {2f,1.75f,1.5f,1.25f,1f},
             new float[] {.75f,.70f,.65f,.55f,.5f}
         )
@@ -65,6 +65,14 @@ public abstract class Weapon : MonoBehaviour
     protected int shootTouchID, // Finger ID that is used for shooting
                   aimTouchID; // Finger ID that is used for aiming camera perspective
 
+    // Use this for initialization
+    protected virtual void Awake()
+    {
+        id = WeaponCount;
+        WeaponCount++;
+        name = "Wep " + id;
+    }
+
     //private Vector2 initialTouchPosition; // Used for determining 
     // Use this for initialization
     protected virtual void Start () {
@@ -72,9 +80,11 @@ public abstract class Weapon : MonoBehaviour
         reloadTime = 0;
         shootTouchID = -1;
         reloading = false;
+        /*
         id = WeaponCount;
         WeaponCount++;
         name = "Wep " + id;
+        */    
         bulletSpawn = transform.Find("BulletSpawn");
         chargeBarGuage = Instantiate(chargeBarGuage);
         chargeBar = chargeBarGuage.transform.GetChild(0).gameObject;
@@ -99,13 +109,17 @@ public abstract class Weapon : MonoBehaviour
         if (purchased)
         {
             itemUI.transform.Find("BuyBtn").GetChild(0).GetComponent<Text>().text = "Upgrade\n" + statsByLevel[wepID].costToUpgrade[lvl] + "\nLvl " + (lvl + 1);
-            if(user && user.gameObject == GameManager.gm.player)
-                itemUI.transform.SetParent(GameManager.gm.shopCanvas.transform.Find("Displays").Find("UpgradeWeaponsDisplay").GetChild(0));
+            if (user && user.gameObject == GameManager.gm.player)
+            {
+                //Debug.Log("?");
+                itemUI.transform.SetParent(GameManager.gm.mapUICanvas.transform.Find("DescriptionDisplay").Find("Inventory Descriptions").Find("Upgrade Descriptions"));
+                itemUI.transform.localPosition = new Vector3(0, 0, 0);
+            }
         }
         else
         {
             itemUI.transform.Find("BuyBtn").GetChild(0).GetComponent<Text>().text = "Purchase\n" + statsByLevel[wepID].price;
-            if(user == null)
+            if (user == null)
                 itemUI.transform.SetParent(GameManager.gm.shopCanvas.transform.Find("Displays").Find("StoreWeaponsDisplay").GetChild(0));
         }
         itemUI.transform.localScale = new Vector3(1, 1, 1);

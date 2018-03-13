@@ -1,10 +1,14 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public abstract class Trap : MonoBehaviour {
     public static int TrapCount = 0; // Keep track of traps created in game
+    public static int[] costs = new int[] { 20 ,1};
+    public static string[] names = new string[] { "TNT","txt2" };
     public int hp, // Amount of damage before activating trap
+               ownerID = -1, // Which player owns this trap? (-1 = No one)
                trapID, // Distinguishes type of trap this is
                id; // Unique ID
 	// Use this for initialization
@@ -20,7 +24,7 @@ public abstract class Trap : MonoBehaviour {
     }
 
     // Format:
-    // TRAP|Trap ID|Relative Position to First Objective|
+    // TRAP|Trap ID|Relative Position to First Objective|owner ID|
     public virtual string NetworkInformation()
     {
         Transform parent = transform.parent;
@@ -29,7 +33,7 @@ public abstract class Trap : MonoBehaviour {
         Vector3 pos = transform.localPosition;
         transform.SetParent(parent);
         transform.localScale = scale;
-        return "TRAP|" + trapID + "|" + pos.x +"," + pos.y +"," +pos.z+"|";
+        return "TRAP|" + trapID + "|" + pos.x +"," + pos.y +"," +pos.z+"|" + ownerID + "|";
     }
 
     // Extract network information
@@ -42,8 +46,9 @@ public abstract class Trap : MonoBehaviour {
         transform.localPosition = new Vector3(float.Parse(pos[0]),float.Parse(pos[1]),float.Parse(pos[2]));
         transform.SetParent(parent);
         transform.localScale = scale;
+        ownerID = int.Parse(data[3]);
         Debug.Log("SETUP TRAP" + transform.localScale);
-
+        GetComponent<ObjectPlacement>().description.transform.Find("Trap " + id).gameObject.SetActive(ownerID == GameManager.gm.player.GetComponent<PlayerController>().id);
         //float chargePower = float.Parse(data[2]);
     }
 

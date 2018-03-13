@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿//using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -21,17 +22,32 @@ public class Enemy : MonoBehaviour
 {
     public static int EnemyCount = 0; // Keeps track of enemies created during game session
     // List of stats per level
-    public static EnemyStats[] difficulties = new EnemyStats[] {
-        new EnemyStats(1, 1, 1, 1),
-        new EnemyStats(2, 2, 1.2f, 1.2f),
-        new EnemyStats(2, 2, 1.25f, 1.2f),
-        new EnemyStats(3, 2, 1.5f, 1.2f),
-        new EnemyStats(3, 2, 1.5f, 1.2f)
+    public static EnemyStats[][] difficulties = new EnemyStats[][] {
+        // Stats for Normies
+        new EnemyStats[]
+        {
+            new EnemyStats(1, 1, 1, 1),
+            new EnemyStats(2, 2, 1.2f, 1.2f),
+            new EnemyStats(2, 2, 1.25f, 1.25f),
+            new EnemyStats(3, 2, 1.5f, 1.3f),
+            new EnemyStats(3, 2, 1.5f, 1.5f)
+        },
+        // Stats for Infuries
+        new EnemyStats[]
+        {
+            new EnemyStats(2, 1, 1, 1),
+            new EnemyStats(2, 2, 1.2f, 1.2f),
+            new EnemyStats(4, 3, 1.25f, 1.25f),
+            new EnemyStats(4, 3, 1.5f, 1.3f),
+            new EnemyStats(6, 3, 1.5f, 1.5f)
+        }
     };
+    public Animator anim;
     public int health = 2, // Current health 
                maxHP = 2, // Max health
                dmg = 1, // How much enemy can inflict to others
                id, // Unique way to identify this enemy
+               enemyID = 0, // Distinguishes what type of enemy this is
                attackCt, // Keeps track of attack for multiplayer synchronization
                level; // Used to determine what the stats are
     public float originalMoveSpd = 0.075f, // Default move speed
@@ -41,8 +57,12 @@ public class Enemy : MonoBehaviour
                  atkTimer, // Used to check if enemy can inflict damage
                  originalAttackSpd = 1f, // Default Attack Speed
                  effectiveAttackSpd; // Attack speed calculated and used
+    public bool isGrounded = false, isDoneMoving, isAttacking, isPerformingAction;
+    protected string actionPerformed = "idle", ename = "enemy";
+    public GameObject go;
     public GameObject target; // What the enemy prioritizes
     public Vector3 targetPos; // What the enemy faces and moves to
+    protected List<GameObject> grounds = new List<GameObject>();
 
     // Used to create the enemy and identify it
     public static void AssignEnemy(Enemy e)
@@ -58,18 +78,27 @@ public class Enemy : MonoBehaviour
     // Use this for initialization
     protected virtual void Start()
     {
-        maxHP = difficulties[level].maxHP;
+        isPerformingAction = false;
+        maxHP = difficulties[enemyID][level].maxHP;
         health = maxHP;
-        dmg = difficulties[level].dmg;
-        effectiveMoveSpd = originalMoveSpd * difficulties[level].moveSpd;
-        effectiveTimeToAttack = originalTimeToAttack / difficulties[level].atkSpd;
+        dmg = difficulties[enemyID][level].dmg;
+        effectiveMoveSpd = originalMoveSpd * difficulties[enemyID][level].moveSpd;
+        effectiveTimeToAttack = originalTimeToAttack / difficulties[enemyID][level].atkSpd;
         atkTimer = effectiveTimeToAttack;
-        effectiveAttackSpd = originalAttackSpd / difficulties[level].atkSpd;
+        effectiveAttackSpd = originalAttackSpd * difficulties[enemyID][level].atkSpd;
         attackCt = 0;
+        anim = GetComponent<Animator>();
+        isDoneMoving = true;
+        gameObject.AddComponent<ConstantForce>().force = new Vector3(0, -9, 0);
+        //print(ename);
+        if (ename == "infurie")
+            go = transform.Find("PivotPoint").Find("EnemyObject").gameObject;
+        else
+            go = transform.Find("EnemyObject").gameObject;
     }
 
     // Format: ENEMY|enemy id|enemy relative pos to target|target tag|target id|
-    public string NetworkInformation()
+    public virtual string NetworkInformation()
     {
         string msg = "";
 
@@ -83,7 +112,7 @@ public class Enemy : MonoBehaviour
 
         string tag = target.gameObject.tag;
         msg += tag + "|";
-        switch(tag) 
+        switch (tag)
         {
             case "Path":
                 msg += target.transform.GetComponent<PlatformPath>().id + "|";
@@ -96,14 +125,14 @@ public class Enemy : MonoBehaviour
     }
 
     // Extract Network Information
-    public void SetNetworkInformation(string[] data)
+    public virtual void SetNetworkInformation(string[] data)
     {
         string[] xyz = data[2].Split(',');
         Vector3 pos = new Vector3(float.Parse(xyz[0]), float.Parse(xyz[1]), float.Parse(xyz[2]));
         int tid = int.Parse(data[4]);
         string tag = data[3];
 
-        switch (tag){
+        switch (tag) {
             case "Path":
                 SetTarget(MapManager.mapManager.platforms[tid].gameObject);
                 break;
@@ -119,31 +148,112 @@ public class Enemy : MonoBehaviour
         transform.SetParent(parent);
     }
 
-    // Update is called once per frame
-    protected virtual void Update()
+    // Move forward while not reaching ground
+    public bool ReachGround()
     {
-        if (!GameManager.gm.inGame || GameManager.gm.gameOver)
-            return;
+        transform.position = Vector3.MoveTowards(transform.position, targetPos, effectiveMoveSpd);
+        return grounds.Count > 0; //|| isGrounded && anim.GetCurrentAnimatorStateInfo(0).IsName("enemy_fall");
+    }
+    // Move forward while haven't reached peak of jump
+    public bool ReachPeak()
+    {
+        Rigidbody rb = transform.GetComponent<Rigidbody>();
+        transform.position = Vector3.MoveTowards(transform.position, targetPos, effectiveMoveSpd);
+        return rb.velocity.y > 0;
+    }
+    // Check if current animation is falling
+    public bool IsFallingAnimation()
+    {
+        return anim.GetCurrentAnimatorStateInfo(0).IsName(ename + "_fall");
+    }
+    // Check if current animation is jumping
+    public bool IsJumpingAnimation()
+    {
+        return anim.GetCurrentAnimatorStateInfo(0).IsName(ename +"_jump");
+    }
+    // Check if current animation is pre-jumping
+    public bool IsPreJumpingAnimation()
+    {
+        return anim.GetCurrentAnimatorStateInfo(0).IsName(ename + "_prejump");
+    }
+    // Perform move animation
+    public virtual IEnumerator MoveAnimation()
+    {
+        // Denote current action moving
+        isPerformingAction = true;
 
-        if (NetworkManager.nm.isStarted && NetworkManager.nm.isDisconnected)
-        {
-            return;
-        }
+        // Animation before jumping
+        anim.Play(ename + "_prejump", -1, 0);
+        yield return new WaitUntil(IsPreJumpingAnimation);
+        anim.SetBool("isJumping", true);
+        yield return new WaitWhile(IsPreJumpingAnimation);
 
-        if (health <= 0)
-        {
-            Die();
-            return;
-        }
+        // Jump by adding upward force
+        Rigidbody rb = GetComponent<Rigidbody>();
+        GetComponent<Rigidbody>().AddForce(new Vector3(0, 400, 0));
+        yield return new WaitUntil(IsJumpingAnimation);
+        yield return new WaitUntil(ReachPeak);
 
+        // After reaching peak of jump, fall and detect landing
+        grounds.Clear();
+        isGrounded = false;
+        anim.SetBool("isGrounded", false);
+        anim.SetBool("isJumping", false);
+        anim.SetBool("isFalling", true);
+        yield return new WaitUntil(IsFallingAnimation);
+        yield return new WaitUntil(ReachGround);
+        
+        // Upon touching ground, perform land animation
+        rb.velocity -= new Vector3(0, rb.velocity.y, 0);
+        anim.SetBool("isFalling", false);
+        
+        // End of move action
+        isPerformingAction = false;
+        //}
+    }
+    
+    // Handles move action
+    public virtual void Move()
+    {
+        // Don't perform move action if already performing an action 
+        if(isPerformingAction)
+            return;
+        actionPerformed = "move";
+        anim.SetBool("isAttacking", false);
+        StartCoroutine(MoveAnimation());
+        actionPerformed = "idle";
+        //transform.position = Vector3.MoveTowards(transform.position, targetPos, effectiveMoveSpd);
+    }
+
+    // Handle turning action
+    public virtual void Turn()
+    {
+        transform.LookAt(targetPos);
+    }
+
+    // Handles performing action
+    public virtual void PerformAction()
+    {
+        //print(">>>>>>>>>>>>>>>" + isDoneMoving);
         if (target != null)
         {
-            float dist = Vector3.Distance(transform.position, targetPos);
+            Vector2 targetPos2d = new Vector2(targetPos.x, targetPos.z);
+            Vector2 pos2d = new Vector2(go.transform.position.x, go.transform.position.z);
+            float dist = Vector3.Distance(pos2d, targetPos2d);
+            //if (!isDoneMoving)
+            //{
+            //    Move();
+            //}
+            //print("DIST:::" + dist);
             // Move towards target if it is a Path
             if (target.tag == "Path")
             {
-                if (dist <= .1f)
+                if (enemyID == 1)
+                    print("outhere?");
+
+                if (dist <= .3f)
                 {
+                    //print("CHANGE PATH");
                     PlatformPath p = target.transform.GetComponent<PlatformPath>();
                     target = null;
                     // Get new path if reached destination
@@ -160,8 +270,9 @@ public class Enemy : MonoBehaviour
                 // Move and face towards target
                 else
                 {
-                    transform.position = Vector3.MoveTowards(transform.position, targetPos, effectiveMoveSpd);
-                    transform.LookAt(targetPos);
+                    if(enemyID == 1)
+                    print("here?");
+                    Move();
                 }
             }
             // Move towards objective and attack it if in range
@@ -169,44 +280,154 @@ public class Enemy : MonoBehaviour
             {
                 if (dist <= 2f)
                 {
-                    Attack(target);
+                    AttemptAttackAction();
                 }
                 else
                 {
-                    transform.position = Vector3.MoveTowards(transform.position, targetPos, effectiveMoveSpd);
-                    transform.LookAt(targetPos);
+                    Move();
                 }
             }
         }
         // No target? Find objective to attack then
         else
         {
-            SetTarget(GameManager.gm.objective);
+            ///*
+            GameObject go = new GameObject();
+            go.transform.position = new Vector3(1000, 0, 1000);
+            go.tag = "Objective";
+            SetTarget(go);
+            //*/
+            //SetTarget(GameManager.gm.objective);
         }
     }
 
+    // Provides a way to notify player that this object has been hit
     public IEnumerator IndicateHasBeenHit()
     {
-        Renderer r = GetComponent<Renderer>();
+        Renderer r = go.GetComponent<Renderer>();
         Color prevColor = r.material.color;
         r.material.color = Color.red;
-        Debug.Log(1);
+        //Debug.Log(1);
         yield return new WaitForSeconds(.15f);
         r.material.color = prevColor;
-        Debug.Log(2);
+        //Debug.Log(2);
     }
 
-    public void OnHit()
+    // Callable function to notify this object has been hit
+    public virtual void OnHit()
     {
         StartCoroutine(IndicateHasBeenHit());
     }
+ 
+    // Handles performing attack action
+    public virtual void AttemptAttackAction()
+    {
+        if(isPerformingAction)
+        //if (isAttacking || (actionPerformed != "idle" && actionPerformed != "attack"))
+            return;
+        actionPerformed = "attack";
+        anim.SetBool("isMoving", false);
+        StartCoroutine(PerformAttack());
+        //actionPerformed = "idle";
+    }
+    // Checks if current animation is charging
+    public bool IsChargingAnimation()
+    {
+        return anim.GetCurrentAnimatorStateInfo(0).IsName(ename +"_charge");
+    }
+    // Checks if current animation is reloading
+    public bool IsReloadingAnimation()
+    {
+        return anim.GetCurrentAnimatorStateInfo(0).IsName(ename + "_reload");
+    }
+    // Checks if current animation is attacking
+    public bool IsAttackingAnimation()
+    {
+        return anim.GetCurrentAnimatorStateInfo(0).IsName(ename + "_attack");
+    }
+    // Checks if enemy can attack after timer reaches 0
+    public bool CanAttack()
+    {
+        anim.SetFloat("timeToAtk", anim.GetFloat("timeToAtk") - Time.deltaTime);
+        return anim.GetFloat("timeToAtk") < .01f;
+    }
+    // Handles attack action and animation
+    public IEnumerator PerformAttack()
+    {
+        isAttacking = true;
+        isPerformingAction = true;
+        anim.SetFloat("timeToAtk", effectiveTimeToAttack);
+        float prevSpd = anim.speed;
+        anim.speed = effectiveAttackSpd;
+        // Enemy can attack after timer reaches 0
+        anim.Play(ename + "_timetoatk", -1, 0);
+        yield return new WaitUntil(CanAttack);
+
+        // Perform charge animation
+        yield return new WaitUntil(IsChargingAnimation);
+        yield return new WaitWhile(IsChargingAnimation);
+
+        // Perform attack animation
+        anim.SetBool("isAttacking", isAttacking);
+        yield return new WaitUntil(IsAttackingAnimation);
+        yield return new WaitWhile(IsAttackingAnimation);
+        
+        // After attack animation finishes, inflict damage
+        Attack(target);
+
+        // Perform reload animation
+        anim.SetBool("isReloading", true);
+        yield return new WaitUntil(IsReloadingAnimation);
+        
+        // End attack action
+        anim.speed = prevSpd;
+        anim.SetBool("isReloading", false);
+        isPerformingAction = false;
+        isAttacking = false;
+    }
+    /*
+     // Handles attack action and animation
+    public IEnumerator PerformAttack()
+    {
+        isAttacking = true;
+        isPerformingAction = true;
+        anim.SetFloat("timeToAtk", effectiveTimeToAttack);
+        float prevSpd = anim.speed;
+        anim.speed = effectiveAttackSpd;
+        // Enemy can attack after timer reaches 0
+        anim.Play("enemy_timetoatk", -1, 0);
+        yield return new WaitUntil(CanAttack);
+        
+        // Perform charge animation
+        yield return new WaitUntil(IsChargingAnimation);
+        yield return new WaitWhile(IsChargingAnimation);
+        
+        // Perform attack animation
+        anim.SetBool("isAttacking", isAttacking);
+        yield return new WaitUntil(IsAttackingAnimation);
+        yield return new WaitWhile(IsAttackingAnimation);
+
+        // After attack animation finishes, inflict damage
+        Attack(target);
+
+        // Perform reload animation
+        anim.SetBool("isReloading", true);
+        yield return new WaitUntil(IsReloadingAnimation);
+
+        // End attack action
+        anim.speed = prevSpd;
+        anim.SetBool("isReloading", false);
+        isPerformingAction = false;
+        isAttacking = false;
+    }
+     */
 
     // Attack target
     public virtual void Attack(GameObject target)
     {
-        atkTimer -= Time.deltaTime;
-        if (atkTimer > 0)
-            return;
+        //atkTimer -= Time.deltaTime;
+        //if (atkTimer > 0)
+        //    return;
         // If multiplayer, synchronize the attack to prevent duplicate attacks
         if (NetworkManager.nm.isStarted)
         {
@@ -249,6 +470,7 @@ public class Enemy : MonoBehaviour
                         g.transform.position.z
                        );
         targetPos = pos;
+        Turn();
     }
 
     // Inflict damage to health
@@ -256,5 +478,92 @@ public class Enemy : MonoBehaviour
     {
         health -= dmg;
         return true;
+    }
+
+    protected virtual void OnCollisionEnter(Collision collision)
+    {
+        // Ignore colliding with enemies
+        if (collision.gameObject.tag == "Enemy")
+        {
+
+            Collider c = collision.collider;
+            if (collision.gameObject.name != "EnemyObject")
+            {
+                c = collision.gameObject.GetComponent<Enemy>().go.GetComponent<Collider>();
+                
+            }
+            Physics.IgnoreCollision(c, go.GetComponent<Collider>());
+            return;
+        }
+        // Check if touching ground
+        if (collision.gameObject.tag == "Ground" || collision.gameObject.tag == "Path");
+        {
+            //print("GRND");
+            grounds.Add(collision.gameObject);
+            
+        }
+        isGrounded = grounds.Count > 0;
+        anim.SetBool("isGrounded", isGrounded);
+    }
+    protected virtual void OnCollisionStay(Collision collision)
+    {
+        if (collision.gameObject.tag == "Enemy")
+        {
+            Collider c = collision.collider;
+            if (collision.gameObject.name != "EnemyObject")
+            {
+                print(collision.gameObject.name);
+                c = collision.gameObject.GetComponent<Enemy>().go.GetComponent<Collider>();
+
+                print("?");
+            }
+            Physics.IgnoreCollision(c, go.GetComponent<Collider>());
+
+            return;
+        }
+    }
+    /*
+    private void OnTriggerStay(Collider collision)
+    {
+        if (grounds.Count > 0)
+        {
+            Rigidbody rb = GetComponent<Rigidbody>();
+            rb.velocity -= new Vector3(0, rb.velocity.y, 0);
+        }
+        // print(collision.gameObject.tag);
+    }*/
+    protected virtual void OnCollisionExit(Collision collision)
+    {
+        if (collision.gameObject.tag == "Ground" || collision.gameObject.tag == "Path")
+        {
+            //print("LEAVEING");
+            grounds.Add(collision.gameObject);
+        }
+        isGrounded = grounds.Count > 0;
+        anim.SetBool("isGrounded", isGrounded);
+    }
+
+
+    // Update is called once per frame
+    protected virtual void Update()
+    {
+        //print(isGrounded);
+        //PerformAction();
+        //AttemptAttackAction();
+        if (!GameManager.gm.inGame || GameManager.gm.gameOver)
+            return;
+
+        if (NetworkManager.nm.isStarted && NetworkManager.nm.isDisconnected)
+        {
+            return;
+        }
+
+        if (health <= 0)
+        {
+            Die();
+            return;
+        }
+        PerformAction();
+
     }
 }

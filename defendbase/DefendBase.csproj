@@ -97,6 +97,7 @@
     <Compile Include="Assets\scripts\ExpiringButton.cs" />
     <Compile Include="Assets\scripts\Explosion.cs" />
     <Compile Include="Assets\scripts\GameManager.cs" />
+    <Compile Include="Assets\scripts\Infurie.cs" />
     <Compile Include="Assets\scripts\MapLibrary.cs" />
     <Compile Include="Assets\scripts\MapManager.cs" />
     <Compile Include="Assets\scripts\MapViewCamera.cs" />
@@ -106,6 +107,7 @@
     <Compile Include="Assets\scripts\PlatformPath.cs" />
     <Compile Include="Assets\scripts\PlayerController.cs" />
     <Compile Include="Assets\scripts\Projectile.cs" />
+    <Compile Include="Assets\scripts\RotatingShield.cs" />
     <Compile Include="Assets\scripts\StatusIndicator.cs" />
     <Compile Include="Assets\scripts\Tnt.cs" />
     <Compile Include="Assets\scripts\Trap.cs" />

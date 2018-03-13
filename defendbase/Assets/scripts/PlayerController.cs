@@ -88,7 +88,7 @@ public class PlayerController : MonoBehaviour {
     {
         if (wep)
         {
-            Debug.Log("Unequipping weapon");
+            //Debug.Log("Unequipping weapon");
             wep.user = null;
         }
         

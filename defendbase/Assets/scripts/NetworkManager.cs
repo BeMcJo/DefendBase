@@ -156,6 +156,7 @@ public class NetworkManager : MonoBehaviour {
 
     private void Update()
     {
+        
         // Don't do anything unless using online feature
         if (!isStarted)
         {
@@ -643,6 +644,10 @@ public class NetworkManager : MonoBehaviour {
                     case "READY":
                         break;
                     // Client requests to repair objective
+                    // Host announces objective has been repaired by someone
+                    case "REMOVEDEFENSE":
+                        OnRemoveDefense(splitData);
+                        break;
                     case "REPAIROBJECTIVE":
                         OnRepairObjective(splitData);
                         break;
@@ -799,6 +804,16 @@ public class NetworkManager : MonoBehaviour {
                         OnReady(int.Parse(splitData[1]));
                         break;
                     // Host announces objective has been repaired by someone
+                    case "REMOVEDEFENSE":
+                        logID = int.Parse(splitData[1]);
+                        // Sync activity log if missing something
+                        if (logID != activityLog.Count)
+                        {
+                            RequestActivityLog();
+                            break;
+                        }
+                        OnRemoveDefense(splitData);
+                        break;
                     case "REPAIROBJECTIVE":
                         logID = int.Parse(splitData[1]);
                         // Sync activity log if missing something
@@ -1128,6 +1143,9 @@ public class NetworkManager : MonoBehaviour {
 
     public void NotifySpawnDefenseAt(string type, int typeID)
     {
+        GameManager.gm.mapUICanvas.SetActive(true);
+        GameManager.gm.playerStatusCanvas.SetActive(true);
+        isSpawningObject = true;
         string msg = "SPAWN|" + activityLog.Count + "|" + ourClientID + "|";
         if(type == "Trap")
         {
@@ -1142,9 +1160,6 @@ public class NetworkManager : MonoBehaviour {
             Send(msg, reliableChannel);
             GameManager.gm.addToMapBtn.SetActive(false);
         }
-        GameManager.gm.mapUICanvas.SetActive(true);
-        GameManager.gm.playerStatusCanvas.SetActive(true);
-        isSpawningObject = true;
     }
 
     public void OnSpawnObject(string[] data)
@@ -1159,9 +1174,17 @@ public class NetworkManager : MonoBehaviour {
         }
         if (type == "TRAP")
         {
+            type = "Trap";
             debugLog.Add("SPAWN TRAP " + typeID);
+            // If we requested to spawn defnese
             if(clientID == ourClientID)
             {
+                //GameObject trap = GameManager.gm.SpawnDefense(type, typeID);
+                Debug.Log("NETWORK SPAWNED DEF");// + trap.transform.localScale);
+                //trap.GetComponent<Trap>().SetNetworkInformation(new string[] { data[3], data[4], data[5] });
+
+
+
                 GameManager.gm.SpawnDefense(type, typeID, GameManager.gm.selectedDefense);
                 int id = typeID;
                 GameManager.gm.myTraps[id] -= 1;
@@ -1171,17 +1194,19 @@ public class NetworkManager : MonoBehaviour {
                 if (GameManager.gm.myTraps[id] == 0)
                     GameManager.gm.DeselectDescription();
                 GameManager.gm.selectedDefense.SetActive(false);
+                // Re-enable ability to spawn defenses once this has been confirmed as client
                 if(!isHost)
                     GameManager.gm.addToMapBtn.SetActive(true);
                 GameManager.gm.mapFingerID = -1;
                 GameManager.gm.selectedDefense = null;
                 isSpawningObject = false;
             }
+            // Another player requested to spawn defense
             else
             {
                 GameObject trap = GameManager.gm.SpawnDefense(type, typeID);
                 Debug.Log("NETWORK SPAWNED DEF" + trap.transform.localScale);
-                trap.GetComponent<Trap>().SetNetworkInformation(new string[] { data[3], data[4], data[5] });
+                trap.GetComponent<Trap>().SetNetworkInformation(new string[] { data[3], data[4], data[5],data[6] });
             }
         }
         if (isHost)
@@ -1189,6 +1214,48 @@ public class NetworkManager : MonoBehaviour {
             Send(msg, reliableChannel, players);
         }
         activityLog.Add(msg);
+        Debug.Log(isSpawningObject);
+    }
+
+    public void NotifyRemoveDefense(string type, int id)
+    {
+        string msg = "REMOVEDEFENSE|" + activityLog.Count + "|" + ourClientID + "|" + type + "|" + id + "|";
+        if (isHost)
+        {
+            Send(msg, reliableChannel, players);
+            OnRemoveDefense(msg.Split('|'));
+        }
+        else
+        {
+            Send(msg,reliableChannel);
+        }
+    }
+
+    public void OnRemoveDefense(string[] data)
+    {
+        int clientID = int.Parse(data[2]);
+        string type = data[3];
+        int id = int.Parse(data[4]);
+        if(type == "TRAP")
+        {
+            if (!GameManager.gm.traps.ContainsKey(id))
+                return;
+        }
+        if(clientID == ourClientID)
+        {
+            GameManager.gm.UpdateInGameCurrency(50);
+            GameManager.gm.selectedDefense = null;
+        }
+        string msg = data[0] + "|" + activityLog.Count + "|" + data[2] + "|" + data[3] + "|" + data[4] + "|";
+        activityLog.Add(msg);
+
+        if (isHost)
+        {
+            debugLog.Add(msg);
+            Send(msg, reliableChannel, players);
+        }
+
+        GameManager.gm.RemoveSelectedDefense(type, id);
     }
 
     // Notify players that source is damaged by target
@@ -1273,6 +1340,7 @@ public class NetworkManager : MonoBehaviour {
         // Inflict damage if enemy exists
         if (GameManager.gm.traps.ContainsKey(targetID))
         {
+            print("HAVE " + targetID);
             GameManager.gm.traps[targetID].TakeDamage(dmg, sourceID);
             // Remove enemy if non-existent or dead
             if (GameManager.gm.traps[targetID] == null || GameManager.gm.traps[targetID].hp <= 0)

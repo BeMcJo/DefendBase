@@ -9,7 +9,7 @@ public class Objective : MonoBehaviour {
     public int HP = 10, // Current health 
                maxHP = 10; // Max health
     public string objectiveType = "defend"; // Type of objective for different game modes
-    public GameObject[] storeUpgradeUIs;
+    public GameObject[] storeUpgradeUIs; // UI for objective (repair objective)
 	// Use this for initialization
 	void Start () {
         id = ObjectiveCount;
@@ -69,6 +69,7 @@ public class Objective : MonoBehaviour {
         if (HP < 0)
         {
             HP = 0;
+            GameManager.gm.DisplayDefeatNotification();
         }
         storeUpgradeUIs[0].transform.Find("BuyBtn").GetComponent<Button>().interactable = HP != maxHP;
         healthBarGauge.Find("Health Bar").localScale = new Vector3((float)HP / (float)maxHP, 1, 1);
@@ -77,11 +78,7 @@ public class Objective : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
         // Indicate gameover if losing objective
-		if(HP <= 0)
-        {
-            GameManager.gm.resultNotification.SetActive(true);
-            GameManager.gm.gameOver = true;
-        }
+		
 
 	}
 }
