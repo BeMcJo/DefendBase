@@ -1,0 +1,421 @@
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
+
+public class Rotator : MonoBehaviour, IPointerDownHandler, IPointerUpHandler,IDragHandler {
+    Vector2 initialPos;
+    float incrementor;
+    public float initialAngle, prevAngle,
+          dragSpd = 2,
+          rotateAcceleration,
+          rotateVelocity,
+          rotateSpd = 1,
+          rotateFriction = .8f;
+    bool reached45deg =false;
+    public bool isTouched = false,
+                isDragging;
+    public bool isInteractable;
+    public int[] itemOrder;
+    public float holdTimer;
+    public int curItem,
+               nextItem,
+               prevItem,
+               awaitingItem,
+               potentialAttribute,
+               itemSwapIndex;
+
+    public void OnDrag(PointerEventData eventData)
+    {
+        if (!isInteractable)
+            return;
+        if (!isTouched)
+            return;
+        if (holdTimer < 0)
+            return;
+        print("DRTAGGIN");
+        isDragging = true;
+        Transform wheel = transform;
+        Vector2 touchPos = eventData.position;
+        Vector2 C = new Vector2(wheel.position.x, wheel.position.y);
+        float distCA = Vector2.Distance(C, initialPos), distCB = Vector2.Distance(C, touchPos), distAB = Vector2.Distance(initialPos, touchPos);
+        float angle = GameManager.CosineFormula(distCA, distCB, distAB);
+        int dir = 1;
+        //print(t.position);
+        //print(">> " + wheel.transform.position);
+        //print("<<" + wheel.transform.localPosition);
+        //angle *= 360 / Mathf.PI;
+        int quadrant = 0;
+        if (initialPos.y > wheel.position.y)
+        {
+            if (initialPos.x < wheel.position.x)
+                quadrant = 1;
+        }
+        else
+        {
+            if (initialPos.x < wheel.position.x)
+                quadrant = 2;
+            else
+                quadrant = 3;
+        }
+        Vector2 dif = initialPos - touchPos;
+        float magX = Mathf.Abs(dif.x), magY = Mathf.Abs(dif.y);
+
+        if (magX > magY)
+        {
+            if (dif.x < 0)
+            {
+                if (quadrant < 2)
+                {
+                    dir = -1;
+                }
+                else
+                {
+                    dir = 1;
+                }
+            }
+            else
+            {
+                if (quadrant < 2)
+                {
+                    dir = 1;
+                }
+                else
+                {
+                    dir = -1;
+                }
+            }
+        }
+        else
+        {
+            if (dif.y < 0)
+            {
+                if (quadrant < 3 && quadrant > 0)
+                {
+                    dir = -1;
+                }
+                else
+                {
+                    dir = 1;
+                }
+            }
+            else
+            {
+                if (quadrant < 3 && quadrant > 0)
+                {
+                    dir = 1;
+                }
+                else
+                {
+                    dir = -1;
+                }
+            }
+
+        }
+        /*
+        if (t.position.x > wheel.position.x)
+        {
+            if (t.position.y > wheel.position.y)
+                dir = -1;
+            else
+                dir = -1;
+        }
+        else
+        {
+            if (t.position.y > wheel.position.y)
+                dir = 1;
+            else
+                dir = 1;
+        }*/
+        //print(incrementor);
+        //print(angle);
+        float dist = Vector2.Distance(initialPos, touchPos);
+        float offset = dir * angle * dragSpd; 
+        wheel.localEulerAngles = new Vector3(0, 0, offset + initialAngle);//dist * dir);
+                                                                           //if (angle > 179f)
+        initialAngle = wheel.localEulerAngles.z;
+        initialPos = touchPos;
+
+        incrementor = (incrementor + offset + 360) % 360;
+
+        CheckToSwapItem();
+       // print(incrementor + "..." + prevAngle);
+        /*
+        float angleMagnitude = Mathf.Abs(incrementor);
+        int sign = (int) -Mathf.Sign(incrementor);
+        if(angleMagnitude >= 45)
+        {
+            if (!reached45deg)
+            {
+                reached45deg = true;
+                ShiftItems(sign);
+            }
+        }
+        else if(angleMagnitude < 45)
+        {
+            if (reached45deg)
+            {
+                reached45deg = false;
+                ShiftItems(-sign);
+            }
+        }
+        print(sign);
+        if(angleMagnitude >= 90)
+        {
+            incrementor = (Mathf.Abs(incrementor) - 90) * sign;
+            reached45deg = false;
+            prevAngle = incrementor;
+            itemSwapIndex = (itemSwapIndex + sign +4) % 4;
+            curItem = (curItem + sign + GameManager.gm.attributePrefabs.Length) % GameManager.gm.attributePrefabs.Length;
+        }
+        /*
+        if(Mathf.Abs(prevAngle) < 45 && Mathf.Abs(incrementor) >= 45)
+        {
+            print("shift items");
+            ShiftItems(1);
+        }
+        else if(Mathf.Abs(prevAngle) >= 45 && Mathf.Abs(incrementor) < 45)
+        {
+            print("shift item2 ");
+            ShiftItems(-1);
+        }
+        if (Mathf.Abs(incrementor) >= 90)
+        {
+            print("move to next item");
+            //int sign = (int) Mathf.Sign(incrementor);
+            
+        }
+        */
+        rotateVelocity = dir * angle *rotateSpd;
+    }
+
+    public int GetSwapIndex()
+    {
+        int curItemSwapIndex = 0;
+        if (incrementor < 45 || incrementor >= 315)
+        {
+            curItemSwapIndex = 2;
+        }
+        else if (incrementor >= 45 && incrementor < 135)
+        {
+            curItemSwapIndex = 1;
+        }
+        else if (incrementor >= 135 && incrementor < 225)
+        {
+            curItemSwapIndex = 0;
+        }
+        else if (incrementor >= 225 && incrementor < 315)
+        {
+            curItemSwapIndex = 3;
+        }
+        return curItemSwapIndex;
+    }
+
+    public void CheckToSwapItem()
+    {
+        int curItemSwapIndex = GetSwapIndex();
+        
+        //print(itemSwapIndex + "..." + curItemSwapIndex + "......" + incrementor);
+        int nextIndex = (itemSwapIndex + 1) % 4, prevIndex = (itemSwapIndex + 3) % 4;
+        if (curItemSwapIndex != itemSwapIndex)
+        {
+
+            if (curItemSwapIndex == prevIndex)
+            {
+                print("rotate clockwise");
+                ShiftItems(-1);
+            }
+            else if (curItemSwapIndex == nextIndex)
+            {
+                print("rotate counter");
+                ShiftItems(1);
+            }
+        }
+        itemSwapIndex = curItemSwapIndex;
+    }
+
+    public void OnPointerDown(PointerEventData eventData)
+    {
+        if (!isInteractable)
+            return;
+        
+        //print(eventData.hovered[0]);
+        //print("ATTRIBUTE 111".Contains("ATTRIBUTE"));
+        isTouched = true;
+        initialPos = eventData.position;
+        initialAngle = transform.localEulerAngles.z;
+        foreach (GameObject go in eventData.hovered)
+        {
+            if (go.name.Contains("Attribute"))
+            {
+                if (isDragging)
+                    return;
+                string[] splitData = go.name.Split(' ');
+                int attributeID = int.Parse(splitData[1]);
+                
+                print("potential " + attributeID);
+                potentialAttribute = attributeID;
+                holdTimer = .5f;
+            }
+        }
+    }
+
+    public void OnPointerUp(PointerEventData eventData)
+    {
+        if (!isInteractable)
+            return;
+        foreach (GameObject go in eventData.hovered)
+        {
+            if (go.name.Contains("Attribute"))
+            {
+                string[] splitData = go.name.Split(' ');
+                int attributeID = int.Parse(splitData[1]);
+                if(attributeID == potentialAttribute && !isDragging)
+                {
+
+                    GameManager.gm.selectedAttribute = int.Parse(go.transform.GetChild(0).GetComponent<Text>().text.Split(' ')[1]);//potentialAttribute;
+                    print("SELECTED ATTR " + potentialAttribute);
+                    print(GameManager.gm.selectedAttribute);
+                    break;
+                }
+            }
+        }
+        potentialAttribute = -1;
+        holdTimer = 0;
+        isDragging = false;
+        isTouched = false;
+    }
+
+    public void SetInteractable(bool b)
+    {
+        isInteractable = b;
+        if (!b)
+        {
+            rotateVelocity = 0;
+            isTouched = false;
+        }
+    }
+
+    // Use this for initialization
+    void Start () {
+        itemOrder = new int[4];
+        for (int i = 0; i < 4; i++)//attributePrefabs.Length; i++)
+        {
+            GameObject icon = Instantiate(GameManager.gm.iconPrefab);
+            icon.transform.SetParent(transform);
+            float x = Mathf.Cos(90 * Mathf.Deg2Rad * (1 + i)), y = Mathf.Sin(90 * Mathf.Deg2Rad * (1 + i));
+            icon.transform.localPosition = new Vector3(x, y, 0) * 250;
+            icon.transform.localEulerAngles += new Vector3(0, 0, 90 * i);
+            icon.name = "Attribute " + i;
+            //icon.AddComponent<Selector>();
+            //icon.transform.GetChild(0).GetComponent<Text>().text = "Attribute " + i; ;
+        }
+        potentialAttribute = -1;
+        itemSwapIndex = 2;
+        curItem = itemOrder[0] = 0;
+        nextItem = itemOrder[1] = 1 % GameManager.gm.attributePrefabs.Length;
+        prevItem = itemOrder[3] = (GameManager.gm.attributePrefabs.Length - 1) % GameManager.gm.attributePrefabs.Length;
+        awaitingItem = itemOrder[2] = (nextItem + 1) % GameManager.gm.attributePrefabs.Length;
+        for (int i = 0; i < 4; i++)//attributePrefabs.Length; i++)
+        {
+            Transform icon = transform.GetChild(i);
+            icon.GetChild(0).GetComponent<Text>().text = "Attribute " + itemOrder[i];
+        }
+    }
+	
+    public void ShiftItems(int dir)
+    {
+        //itemSwapIndex = 2;
+        //int tmp = itemOrder[itemSwapIndex];
+        int attributeCt = GameManager.gm.attributePrefabs.Length;
+        //int nextCurrentItem;
+        //int nextItemSwapIndex;
+   
+        nextItem = (curItem + 1) % attributeCt;
+        prevItem = (curItem - 1 + attributeCt) % attributeCt;
+        if(dir == 1)
+        {
+            awaitingItem = (nextItem + 1) % attributeCt;
+            curItem = nextItem;
+            //nextCurrentItem = nextItem;
+            //nextItemSwapIndex = (itemSwapIndex + 1) % 4;
+             //transform.GetChild(nextItemSwapIndex).GetChild(0).GetComponent<Text>().text = "Attribute " + (nextItem + 2) % attributeCt;
+
+        }
+        else
+        {
+            curItem = prevItem;
+            //nextCurrentItem = prevItem;
+            //nextItemSwapIndex = (itemSwapIndex + 3) % 4;
+            awaitingItem = (prevItem - 1 + attributeCt) % attributeCt;
+            //transform.GetChild(itemSwapIndex).GetChild(0).GetComponent<Text>().text = "Attribute " + (prevItem - 1 + attributeCt) % attributeCt;
+
+        }
+        transform.GetChild(itemSwapIndex).GetChild(0).GetComponent<Text>().text = "Attribute " +awaitingItem;
+
+        //itemSwapIndex = nextItemSwapIndex;
+        /*
+        if (dir == 1)
+        {
+            //int prevItem = (GameManager.gm.attributePrefabs.Length - 1 + curItem) % GameManager.gm.attributePrefabs.Length;
+            transform.GetChild((itemSwapIndex + 1) % 4).GetChild(0).GetComponent<Text>().text = "Attribute " + (curItem + 3) % GameManager.gm.attributePrefabs.Length;
+            transform.GetChild(itemSwapIndex).GetChild(0).GetComponent<Text>().text = "Attribute " + (curItem + 2) % GameManager.gm.attributePrefabs.Length;
+            curItem = (curItem+1) % GameManager.gm.attributePrefabs.Length;
+            itemSwapIndex = (itemSwapIndex + 1) % 4;
+        }else if(dir == -1)
+        {
+            //int prevItem = (GameManager.gm.attributePrefabs.Length - 1 + curItem) % GameManager.gm.attributePrefabs.Length;
+            transform.GetChild((itemSwapIndex + 3) % 4).GetChild(0).GetComponent<Text>().text = "Attribute " + (curItem + GameManager.gm.attributePrefabs.Length - 1) % GameManager.gm.attributePrefabs.Length;
+            transform.GetChild(itemSwapIndex).GetChild(0).GetComponent<Text>().text = "Attribute " + (curItem -2 + GameManager.gm.attributePrefabs.Length) % GameManager.gm.attributePrefabs.Length;
+            curItem = (curItem - 1 + GameManager.gm.attributePrefabs.Length) % GameManager.gm.attributePrefabs.Length;
+            itemSwapIndex = (itemSwapIndex + 3) % 4;
+
+        }*/
+        //transform.GetChild((itemSwapIndex + 2) % 4).GetChild(0).GetComponent<Text>().text += "\n*";
+
+    }
+
+    // Update is called once per frame
+    void Update () {
+        if (!isInteractable)
+            return;
+        //return;
+        if (!isTouched)
+        {
+            transform.localEulerAngles += new Vector3(0, 0, rotateVelocity);
+            prevAngle = incrementor;
+            incrementor = (incrementor + rotateVelocity + 360) % 360;
+            CheckToSwapItem();
+            /*
+            if(incrementor != prevAngle)
+                print(incrementor + "..." + prevAngle);
+            if (Mathf.Abs(prevAngle) < 45 && Mathf.Abs(incrementor) >= 45)
+            {
+                print("shift items");
+                ShiftItems(1);
+            }
+            else if (Mathf.Abs(prevAngle) >= 45 && Mathf.Abs(incrementor) < 45)
+            {
+                print("shift item2 ");
+                ShiftItems(-1);
+            }
+            if (Mathf.Abs(incrementor) >= 90)
+            {
+                print("move to next item");
+                int sign = (int)Mathf.Sign(incrementor);
+                incrementor = (Mathf.Abs(incrementor) - 90) * sign;
+                prevAngle = incrementor;
+                curItem += sign;
+            }
+            */
+            rotateVelocity *= rotateFriction;
+        }
+        if (potentialAttribute != -1 && !isDragging)
+        {
+            holdTimer -= Time.deltaTime;
+            //print(holdTimer);
+        }
+    }
+}

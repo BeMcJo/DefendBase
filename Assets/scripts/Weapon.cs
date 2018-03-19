@@ -32,7 +32,7 @@ public abstract class Weapon : MonoBehaviour
         new WeaponStats
         ( 
             "Bow",
-            new int[] {1,2,3,4,5},
+            new int[] {1,1,2,2,3},
             new int[] {50,100,200,500},
             new float[] {1600, 1700,1900,2300,2900},
             new float[] {2f,1.75f,1.5f,1.25f,1f},
@@ -112,7 +112,7 @@ public abstract class Weapon : MonoBehaviour
             if (user && user.gameObject == GameManager.gm.player)
             {
                 //Debug.Log("?");
-                itemUI.transform.SetParent(GameManager.gm.mapUICanvas.transform.Find("DescriptionDisplay").Find("Inventory Descriptions").Find("Upgrade Descriptions"));
+                itemUI.transform.SetParent(GameManager.gm.quickAccessUpgradeDescription.transform);//GameManager.gm.quickAccessCanvas.transform.Find("DescriptionDisplay").Find("Inventory Descriptions").Find("Upgrade Descriptions"));
                 itemUI.transform.localPosition = new Vector3(0, 0, 0);
             }
         }

@@ -77,6 +77,8 @@ public class GameManager : MonoBehaviour {
     public GameObject[] trapPrefabs, // List of trap objects
                         trapSpawnPrefab, // Pre-image of trap being spawned on map
                         enemyPrefabs, // List of enemy objects
+                        projectilePrefabs, // List of projectile objects
+                        attributePrefabs, // List of attribute objects
                         weaponPrefabs; // List of weapon objects
 
     public GameObject statusIndicatorPrefab, // Shows health and other status for object
@@ -86,9 +88,13 @@ public class GameManager : MonoBehaviour {
                       itemUIPrefab, // Used to display items in store in game
                       descriptionPrefab, // Used to provide details about item
                       enemyArmorPrefab, // ???
+                      iconPrefab, // icon of item
                       enemyPrefab; // Enemy object
 
     public GameObject playerStatusCanvas, // Information used for player to see
+                      quickAccessCanvas, // Holds touch-interactive UI for quick access purposes
+                      quickAccessUpgradeDescription, // Used for toggling description of item to upgrade
+                      itemWheel, // Holds selectable UI. Touch/Drag to spin wheel
                       intermissionCanvas, // Displays things to do during break 
                       player, // Points to your player
                       playerSpawnPoints, // Container for all potentail spawn points for each player
@@ -128,17 +134,25 @@ public class GameManager : MonoBehaviour {
 
     public Camera mapCamera, // Bird eye view of map, used to also edit defenses onto map
                   selectedCamera; // Determines which camera is being used (unused)
-    public int mapFingerID; // Used for detecting player selecting/dragging item onto map
+    public int mapFingerID, // Used for detecting player selecting/dragging item onto map
+               quickAccessFingerID; // Used for holding down on quick-access buttons (upgrade weapon, swap arrows)
     public GameObject selectedDescription, // Selects type of item description to display
                       selectedDefense; // Currently selected defense to place onto map
     public Dictionary<int, int> myDefenses, // Counts number of each type of defense in inventory
+                                myProjectiles, // Counts number of each type of projectile in inventory
+                                myAttributes, // Counts number of each type of attribute in inventory
                                 myTraps; // Counts number of each type of trap in inventory 
     public string mapAction,
+                  quickAccessDetail,
                   objectDetail;
-
+    public int selectedAttribute; // Used to determine extra feature applied onto projectile
+               
     public GameObject hitIndicator; // indicates if you hit an enemy
-
+    Vector2 initialPos;
+    float initialAngle;
     Pattern pattern; // Points to enemy spawn pattern
+
+    //Button upgradeWepBtn;
 
     // Saves data based on the type
     public void Save(string type)
@@ -230,6 +244,8 @@ public class GameManager : MonoBehaviour {
         interactiveTouch = false;
         traps = new Dictionary<int, Trap>();
         myTraps = new Dictionary<int, int>();
+        myAttributes = new Dictionary<int, int>();
+        myProjectiles = new Dictionary<int, int>();
         myDefenses = new Dictionary<int, int>();
         playerOrientation = Vector3.zero;
         realTimeAction = true;
@@ -390,6 +406,10 @@ public class GameManager : MonoBehaviour {
         Weapon.WeaponCount = 0;
         Trap.TrapCount = 0;
 
+        mapFingerID = -1;
+        quickAccessFingerID = -1;
+        selectedAttribute = 1;
+
         intermissionCanvas = GameObject.Find("IntermissionCanvas");
         // If online, make sure everyone is ready to start next wave on intermission
         if (NetworkManager.nm.isStarted)
@@ -419,6 +439,9 @@ public class GameManager : MonoBehaviour {
         playerStatusCanvas = GameObject.Find("PlayerStatusCanvas").gameObject;
         playerStatusCanvas.transform.Find("OptionsBtn").GetComponent<Button>().onClick.AddListener(DisplayOptions);
         playerStatusCanvas.transform.Find("MapBtn").GetComponent<Button>().onClick.AddListener(ToggleMapUICanvas);
+
+        //upgradeWepBtn = playerStatusCanvas.transform.Find("UpgradeWepBtn").GetComponent<Button>();
+        //upgradeWepBtn.OnPointerDown()
 
         hitIndicator = playerStatusCanvas.transform.Find("HitIndicator").gameObject;
 
@@ -472,6 +495,15 @@ public class GameManager : MonoBehaviour {
         displayOptions.transform.Find("DisplayInventoryBtn").GetComponent<Button>().onClick.AddListener(DisplayInventoryOptions);
         displayOptions.transform.Find("DisplayStoreBtn").GetComponent<Button>().onClick.AddListener(DisplayStoreOptions);
         mapUICanvas.transform.Find("BackBtn").GetComponent<Button>().onClick.AddListener(ShowDisplayOptions);
+
+        quickAccessCanvas = GameObject.Find("QuickAccessCanvas");
+        quickAccessUpgradeDescription = quickAccessCanvas.transform.Find("DescriptionDisplay").Find("Inventory Descriptions").Find("Upgrade Descriptions").gameObject;
+        quickAccessUpgradeDescription.SetActive(false);
+        itemWheel = quickAccessCanvas.transform.Find("ItemWheel").gameObject;
+        itemWheel.SetActive(false);
+        
+        myProjectiles.Clear();
+
 
         trapSpawnPrefab = new GameObject[trapPrefabs.Length];
         Transform trapDescriptions = descriptionDisplay.transform.Find("Trap Descriptions");
@@ -671,12 +703,15 @@ public class GameManager : MonoBehaviour {
 
     public void ToggleMapUICanvas()
     {
+        if (quickAccessFingerID != -1)
+            return;
         mapFingerID = -1;
         edittingMap = !edittingMap;
         ShowDisplayOptions();
         //selectedOption = null;
         mapUICanvas.SetActive(edittingMap);
         mapCamera.gameObject.SetActive(edittingMap);//enabled = edittingMap;
+        quickAccessCanvas.SetActive(!edittingMap);
         player.GetComponent<PlayerController>().playerCam.gameObject.SetActive(!edittingMap);//.enabled = !edittingMap;
         playerStatusCanvas.transform.Find("ShootBtnMask(Clone)").gameObject.SetActive(!edittingMap);
         mapCamera.transform.GetComponent<MapViewCamera>().Reset();
@@ -868,6 +903,7 @@ public class GameManager : MonoBehaviour {
     public void UpdateInGameCurrency(int currency)
     {
         inGameCurrency += currency;
+        quickAccessUpgradeDescription.transform.Find("CurrencyTxt").GetChild(0).GetComponent<Text>().text = "$" + inGameCurrency;
         shopCanvas.transform.Find("Currency").GetChild(0).GetComponent<Text>().text = "$" + inGameCurrency;
     }
 
@@ -996,6 +1032,7 @@ public class GameManager : MonoBehaviour {
         paused = false;
         gameOver = false;
         inGameCurrency = 100;
+        UpdateInGameCurrency(0);
         score = 0;
         kills = 0;
         difficulty = 0;
@@ -1287,6 +1324,107 @@ public class GameManager : MonoBehaviour {
         //Debug.Log("HOLD");
     }
 
+    public static float CosineFormula(float a, float b, float c)
+    {
+        float sumOfSquares = a * a + b * b - c * c;
+        return Mathf.Acos(sumOfSquares / 2 / a / b) * Mathf.Rad2Deg;
+    }
+
+    public void HandleQuickAccessActivities()
+    {
+        if (edittingMap)
+            return;
+        //print("ct:" + Input.touchCount + "...mapfindgerid:" + mapFingerID + ", quickaccessid:" + quickAccessFingerID + ", detail;:" + quickAccessDetail);
+        for (int i = 0; i < Input.touchCount; i++)
+        {
+            Touch t = Input.GetTouch(i);
+            if (t.phase == TouchPhase.Began)
+            {
+                //print("BEING");
+                if (quickAccessFingerID != -1 && mapFingerID != -1)
+                    return;
+                // Is there an object we are touching?
+                if (EventSystem.current.IsPointerOverGameObject(t.fingerId))
+                {
+                    //if (EventSystem.current.currentSelectedGameObject)
+                    //    Debug.Log(EventSystem.current.currentSelectedGameObject.tag);
+                    // Is this a UI object?
+                    if (EventSystem.current.currentSelectedGameObject)
+                    {
+
+                        GameObject selected = EventSystem.current.currentSelectedGameObject;
+                        Debug.Log(selected.name + " " + EventSystem.current.currentSelectedGameObject.tag);
+                        string tag = selected.tag;
+                        if (tag != "QuickAccess")
+                            return;
+                        if (selected.name == "UpgradeWepBtn" && quickAccessDetail == "")
+                        {
+                            quickAccessDetail = "upgrade";
+                            quickAccessUpgradeDescription.SetActive(true);
+                            //print("upgrade wep");
+                            //mapUICanvas.SetActive(true);
+                        }
+                        else if (selected.name == "ChangeArrowsBtn" && quickAccessDetail == "")
+                        {
+                            quickAccessDetail = "change";
+                            //print("change arrow");
+                            itemWheel.SetActive(true);
+                            itemWheel.transform.GetComponent<Rotator>().SetInteractable(true);
+
+                            //mapUICanvas.SetActive(true);
+                        } 
+                        /*else if (selected.name == "ItemWheel" && quickAccessDetail == "change" && mapFingerID == -1)
+                        {
+                           // print("????");
+                            mapFingerID = t.fingerId;
+                            initialAngle = quickAccessCanvas.transform.Find("ItemWheel").localEulerAngles.z;
+                            initialPos = t.position;
+                        }*/
+                        if(quickAccessDetail != "" && quickAccessFingerID == -1)
+                        {
+                            quickAccessFingerID = t.fingerId;
+                            quickAccessCanvas.GetComponent<Canvas>().sortingOrder = 1;
+                        }
+
+                    }
+                }
+            }
+            else
+            {
+                
+                if (t.phase == TouchPhase.Ended)
+                {
+                   // print("ended");
+                    if (t.fingerId == mapFingerID)
+                    {
+                       // print("DROPPED");
+                        mapFingerID = -1;
+
+                    }
+                    else if (t.fingerId == quickAccessFingerID)
+                    {
+                        //print("qucikdrpo");
+                        if (quickAccessDetail == "upgrade")
+                        {
+                            //mapUICanvas.SetActive(false);
+                            quickAccessUpgradeDescription.SetActive(false);
+                        }
+                        else if (quickAccessDetail == "change")
+                        {
+                            // print("hide uui");
+                            itemWheel.transform.GetComponent<Rotator>().SetInteractable(false);
+                            itemWheel.SetActive(false);
+                            mapFingerID = -1;
+                        }
+                        quickAccessDetail = "";
+                        quickAccessCanvas.GetComponent<Canvas>().sortingOrder = 0;
+                        quickAccessFingerID = -1;
+                    }
+                }
+            }
+        }
+    }
+
     public void HandleMapEditActivities()
     {
         //mapUICanvas.SetActive(selectedDefense == null);
@@ -1571,6 +1709,8 @@ public class GameManager : MonoBehaviour {
         {
             return;
         }
+        // **** EVERYTHING BELOW IS WHEN GAME SESSION BEGINS ****
+        
 
         // Slowly fade out the hit indicator
         Color c = hitIndicator.GetComponent<Image>().color;
@@ -1581,6 +1721,7 @@ public class GameManager : MonoBehaviour {
                 c.a = 0;
             hitIndicator.GetComponent<Image>().color = c;
         }
+        HandleQuickAccessActivities();
         // Handle Map editting
         if (edittingMap)
         {

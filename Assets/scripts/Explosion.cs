@@ -28,7 +28,14 @@ public class Explosion : MonoBehaviour {
         if(other.tag == "Enemy")
         {
             Debug.Log("bomer");
-            Enemy e = other.transform.GetComponent<Enemy>();
+            Transform t = other.transform;
+            Enemy e = t.GetComponent<Enemy>();
+            while(e == null)
+            {
+                //print("WHY");
+                t = t.parent;
+                e = t.GetComponent<Enemy>();
+            }
             e.OnHit();
             if (NetworkManager.nm.isStarted)
             {

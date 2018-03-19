@@ -26,7 +26,7 @@ public class Enemy : MonoBehaviour
         // Stats for Normies
         new EnemyStats[]
         {
-            new EnemyStats(1, 1, 1, 1),
+            new EnemyStats(1, 0, 1, 1),
             new EnemyStats(2, 2, 1.2f, 1.2f),
             new EnemyStats(2, 2, 1.25f, 1.25f),
             new EnemyStats(3, 2, 1.5f, 1.3f),
@@ -35,7 +35,7 @@ public class Enemy : MonoBehaviour
         // Stats for Infuries
         new EnemyStats[]
         {
-            new EnemyStats(2, 1, 1, 1),
+            new EnemyStats(2, 0, 1, 1),
             new EnemyStats(2, 2, 1.2f, 1.2f),
             new EnemyStats(4, 3, 1.25f, 1.25f),
             new EnemyStats(4, 3, 1.5f, 1.3f),
@@ -59,6 +59,7 @@ public class Enemy : MonoBehaviour
                  effectiveAttackSpd; // Attack speed calculated and used
     public bool isGrounded = false, isDoneMoving, isAttacking, isPerformingAction;
     protected string actionPerformed = "idle", ename = "enemy";
+    protected Color originalColor;
     public GameObject go;
     public GameObject target; // What the enemy prioritizes
     public Vector3 targetPos; // What the enemy faces and moves to
@@ -95,9 +96,10 @@ public class Enemy : MonoBehaviour
             go = transform.Find("PivotPoint").Find("EnemyObject").gameObject;
         else
             go = transform.Find("EnemyObject").gameObject;
+        originalColor = go.GetComponent<Renderer>().material.color;
     }
 
-    // Format: ENEMY|enemy id|enemy relative pos to target|target tag|target id|
+    // Format: ENEMY|enemy id|enemy relative pos to target|target tag|target id
     public virtual string NetworkInformation()
     {
         string msg = "";
@@ -121,6 +123,7 @@ public class Enemy : MonoBehaviour
                 msg += target.transform.GetComponent<Objective>().id + "|";
                 break;
         }
+        //msg += enemyID + "|";
         return msg;
     }
 
@@ -234,11 +237,12 @@ public class Enemy : MonoBehaviour
     // Handles performing action
     public virtual void PerformAction()
     {
+        
         //print(">>>>>>>>>>>>>>>" + isDoneMoving);
         if (target != null)
         {
             Vector2 targetPos2d = new Vector2(targetPos.x, targetPos.z);
-            Vector2 pos2d = new Vector2(go.transform.position.x, go.transform.position.z);
+            Vector2 pos2d = new Vector2(transform.position.x, transform.position.z);//go.transform.position.x, go.transform.position.z);
             float dist = Vector3.Distance(pos2d, targetPos2d);
             //if (!isDoneMoving)
             //{
@@ -248,8 +252,8 @@ public class Enemy : MonoBehaviour
             // Move towards target if it is a Path
             if (target.tag == "Path")
             {
-                if (enemyID == 1)
-                    print("outhere?");
+                //if (enemyID == 1)
+                    //print("outhere?");
 
                 if (dist <= .3f)
                 {
@@ -270,15 +274,15 @@ public class Enemy : MonoBehaviour
                 // Move and face towards target
                 else
                 {
-                    if(enemyID == 1)
-                    print("here?");
+                    //if(enemyID == 1)
+                    //print("here?");
                     Move();
                 }
             }
             // Move towards objective and attack it if in range
             else if (target.tag == "Objective")
             {
-                if (dist <= 2f)
+                if (dist <= 2.3f)
                 {
                     AttemptAttackAction();
                 }
@@ -305,11 +309,11 @@ public class Enemy : MonoBehaviour
     public IEnumerator IndicateHasBeenHit()
     {
         Renderer r = go.GetComponent<Renderer>();
-        Color prevColor = r.material.color;
+        //Color prevColor = r.material.color;
         r.material.color = Color.red;
         //Debug.Log(1);
         yield return new WaitForSeconds(.15f);
-        r.material.color = prevColor;
+        r.material.color = originalColor;//prevColor;
         //Debug.Log(2);
     }
 

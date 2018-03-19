@@ -54,6 +54,13 @@ public abstract class Projectile : MonoBehaviour {
                     t = t.parent;
                     e = t.parent.GetComponent<Enemy>();
                 }
+
+                if (GameManager.gm.selectedAttribute == 1)
+                {
+                    GameObject explosion = Instantiate(GameManager.gm.attributePrefabs[1]);
+                    explosion.transform.position = transform.position;
+                    explosion.transform.GetComponent<Explosion>().id = id;
+                }
                 e.OnHit();
                 //e.transform.GetComponent<Rigidbody>().velocity = Vector3.zero; // Disable physics force applied when colliding
                 // If using online feature, let Network Manager handle this
@@ -82,6 +89,13 @@ public abstract class Projectile : MonoBehaviour {
             print(collision.transform.name);
             if (!isShot)
                 return;
+
+            if (GameManager.gm.selectedAttribute == 1)
+            {
+                GameObject explosion = Instantiate(GameManager.gm.attributePrefabs[1]);
+                explosion.transform.position = transform.position;
+                explosion.transform.GetComponent<Explosion>().id = id;
+            }
             hitGround = true;
             Destroy(gameObject);
         }
@@ -125,6 +139,7 @@ public abstract class Projectile : MonoBehaviour {
         }
         else if (collision.transform.tag == "Ground")
         {
+            print("!?");
             hitGround = true;
             Destroy(gameObject);
         }
