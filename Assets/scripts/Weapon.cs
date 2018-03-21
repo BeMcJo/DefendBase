@@ -137,11 +137,11 @@ public abstract class Weapon : MonoBehaviour
             return false;
         }
 
-        if (!GameManager.gm.startWaves)
-        {
-            CancelUse();
-            return false;
-        }
+        //if (!GameManager.gm.startWaves)
+        //{
+        //    CancelUse();
+        //    return false;
+        //}
 
         // Check to see if any finger touch ID is valid for shooting
         if (Input.touchCount > 0)
@@ -171,6 +171,10 @@ public abstract class Weapon : MonoBehaviour
             }
         }
         return true;
+    }
+
+    public virtual void ChangeAttribute()
+    {
     }
 
     // Stop using weapon, prevent charge and shooting

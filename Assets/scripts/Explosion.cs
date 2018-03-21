@@ -27,7 +27,7 @@ public class Explosion : MonoBehaviour {
         //Debug.Log("aa");
         if(other.tag == "Enemy")
         {
-            Debug.Log("bomer");
+            //Debug.Log("bomer");
             Transform t = other.transform;
             Enemy e = t.GetComponent<Enemy>();
             while(e == null)
@@ -44,7 +44,7 @@ public class Explosion : MonoBehaviour {
             }
             // If not using online feature, inflict damage to enemy
             e.TakeDamage(dmg);
-            Debug.Log("BOOM");
+            //Debug.Log("BOOM");
         }else if (other.tag == "Trap")
         {
             //if (!other.transform.GetComponent<ObjectPlacement>().isSet)

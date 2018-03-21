@@ -71,17 +71,45 @@ public class ObjectPlacement : MonoBehaviour {
         if(touchedObjs != null)
             touchedObjs.Clear();
     }
-
+    /*
     private void OnCollisionEnter(Collision collision)
     {
         //Debug.Log("enter " + collision.transform.tag);
         if (isSet)
             return;
+        if (collision.gameObject.tag == "Enemy")
+        {
+            print("bang");
+            Collider c = collision.collider;
+            if (collision.gameObject.name != "EnemyObject")
+            {
+                print(collision.gameObject.name);
+                c = collision.gameObject.GetComponent<Enemy>().go.GetComponent<Collider>();
+
+            }
+            Physics.IgnoreCollision(c, GetComponent<Collider>());
+        }
         touchedObjs.Add(collision.gameObject);
     }
+    */
     /*
     private void OnCollisionStay(Collision collision)
     {
+        if (collision.gameObject.tag == "Enemy")
+        {
+            print("bstayang");
+            Collider c = collision.collider;
+            if (collision.gameObject.name != "EnemyObject")
+            {
+                print(collision.gameObject.name);
+                c = collision.gameObject.GetComponent<Enemy>().go.GetComponent<Collider>();
+
+            }
+            Physics.IgnoreCollision(c, GetComponent<Collider>());
+
+            return;
+        }
+        /*
         Debug.Log("stay " + collision.transform.tag);
         if (isSet)
             return;
@@ -92,14 +120,51 @@ public class ObjectPlacement : MonoBehaviour {
         else
         {
             canSet = false;
-        }
-    }
-    */
+        }*/
+    //}
+    /*
     private void OnCollisionExit(Collision collision)
     {
         //Debug.Log("exit " + collision.transform.tag);
         if (isSet)
             return;
+        if (collision.gameObject.tag == "Enemy")
+        {
+            print("bangleave");
+            Collider c = collision.collider;
+            if (collision.gameObject.name != "EnemyObject")
+            {
+                print(collision.gameObject.name);
+                c = collision.gameObject.GetComponent<Enemy>().go.GetComponent<Collider>();
+
+            }
+            Physics.IgnoreCollision(c, GetComponent<Collider>());
+
+            return;
+        }
         touchedObjs.Remove(collision.gameObject);
     }
+    */
+    private void OnTriggerEnter(Collider collision)
+    {
+        //Debug.Log("enter " + collision.transform.tag);
+        if (isSet)
+            return;
+        touchedObjs.Add(collision.gameObject);
+    }
+
+    private void OnTriggerStay(Collider other)
+    {
+        
+    }
+
+    private void OnTriggerExit(Collider collision)
+    {
+
+        touchedObjs.Remove(collision.gameObject);
+    }
+
+
+
+
 }

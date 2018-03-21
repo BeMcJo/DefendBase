@@ -3,9 +3,14 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public abstract class Projectile : MonoBehaviour {
+    public static string[] names = new string[] {
+        "Projectile",
+        "Arrow"
+    };
     public int id; // ID based on which player shot this object
     public float activeDuration = 10f; // How long before destroying object
-    public int dmg = 1; // How much damage this can inflict
+    public int dmg = 1, // How much damage this can inflict
+               attributeID; // Unique attribute attached to projectile
     public bool hitGround, // Did this get dull from hitting ground/wall? Can't damage enemies if so 
                 isShot; // Did this get launched?
     protected bool deflected; // Did this not penetrate object? If so, bounce 
@@ -18,7 +23,9 @@ public abstract class Projectile : MonoBehaviour {
         tr = transform.GetComponent<TrailRenderer>();
         if (tr)
             tr.enabled = false;
-	}
+
+        SetAttribute(GameManager.gm.selectedAttribute);
+    }
 	
 	// Update is called once per frame
 	protected virtual void Update () {
@@ -35,12 +42,23 @@ public abstract class Projectile : MonoBehaviour {
         }
 
 	}
-    
+
+
+    public virtual void SetAttribute(int aID)
+    {
+        attributeID = aID;
+    }
+
     protected virtual void OnTriggerEnter(Collider collision)
     {
         //print(collision.gameObject.name + " " + collision.gameObject.tag);
         if (id != GameManager.gm.player.transform.GetComponent<PlayerController>().id || deflected)
             return;
+        if(collision.tag == "Reward")
+        {
+            print("HIT REWARD");
+            collision.GetComponent<Floater>().OnHit();
+        }
         if (collision.transform.tag == "Enemy")
         {
             GameManager.gm.OnHitEnemy();
@@ -55,9 +73,9 @@ public abstract class Projectile : MonoBehaviour {
                     e = t.parent.GetComponent<Enemy>();
                 }
 
-                if (GameManager.gm.selectedAttribute == 1)
+                if (attributeID == 1)
                 {
-                    GameObject explosion = Instantiate(GameManager.gm.attributePrefabs[1]);
+                    GameObject explosion = Instantiate(GameManager.gm.attributePrefabs[attributeID]);
                     explosion.transform.position = transform.position;
                     explosion.transform.GetComponent<Explosion>().id = id;
                 }
@@ -84,19 +102,20 @@ public abstract class Projectile : MonoBehaviour {
                 }
             }
         }
-        else if (collision.transform.tag == "Ground" || collision.transform.tag == "Impenetrable")
+        else if (collision.transform.tag == "Ground" || collision.transform.tag == "Impenetrable" || collision.transform.tag == "Path")
         {
             print(collision.transform.name);
             if (!isShot)
                 return;
 
-            if (GameManager.gm.selectedAttribute == 1)
+            if (attributeID == 1)
             {
-                GameObject explosion = Instantiate(GameManager.gm.attributePrefabs[1]);
+                GameObject explosion = Instantiate(GameManager.gm.attributePrefabs[attributeID]);
                 explosion.transform.position = transform.position;
                 explosion.transform.GetComponent<Explosion>().id = id;
             }
             hitGround = true;
+            deflected = true;
             Destroy(gameObject);
         }
         else if(collision.tag == "Trap")

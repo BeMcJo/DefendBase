@@ -26,6 +26,18 @@ public class Rotator : MonoBehaviour, IPointerDownHandler, IPointerUpHandler,IDr
                awaitingItem,
                potentialAttribute,
                itemSwapIndex;
+    Transform itemUIContainer;
+    Text currentItemTxt;
+
+    private void OnDisable()
+    {
+        currentItemTxt.gameObject.SetActive(false);
+    }
+
+    private void OnEnable()
+    {
+        currentItemTxt.gameObject.SetActive(true);
+    }
 
     public void OnDrag(PointerEventData eventData)
     {
@@ -35,7 +47,7 @@ public class Rotator : MonoBehaviour, IPointerDownHandler, IPointerUpHandler,IDr
             return;
         if (holdTimer < 0)
             return;
-        print("DRTAGGIN");
+        //print("DRTAGGIN");
         isDragging = true;
         Transform wheel = transform;
         Vector2 touchPos = eventData.position;
@@ -62,7 +74,7 @@ public class Rotator : MonoBehaviour, IPointerDownHandler, IPointerUpHandler,IDr
         }
         Vector2 dif = initialPos - touchPos;
         float magX = Mathf.Abs(dif.x), magY = Mathf.Abs(dif.y);
-
+        // Get direction to rotate wheel (clockwise = -1 or counter = 1)
         if (magX > magY)
         {
             if (dif.x < 0)
@@ -114,85 +126,24 @@ public class Rotator : MonoBehaviour, IPointerDownHandler, IPointerUpHandler,IDr
             }
 
         }
-        /*
-        if (t.position.x > wheel.position.x)
-        {
-            if (t.position.y > wheel.position.y)
-                dir = -1;
-            else
-                dir = -1;
-        }
-        else
-        {
-            if (t.position.y > wheel.position.y)
-                dir = 1;
-            else
-                dir = 1;
-        }*/
-        //print(incrementor);
-        //print(angle);
+
         float dist = Vector2.Distance(initialPos, touchPos);
-        float offset = dir * angle * dragSpd; 
-        wheel.localEulerAngles = new Vector3(0, 0, offset + initialAngle);//dist * dir);
-                                                                           //if (angle > 179f)
+        float offset = dir * angle * dragSpd;
+        wheel.localEulerAngles = new Vector3(0, 0, offset + initialAngle);
+
         initialAngle = wheel.localEulerAngles.z;
         initialPos = touchPos;
 
         incrementor = (incrementor + offset + 360) % 360;
 
         CheckToSwapItem();
-       // print(incrementor + "..." + prevAngle);
-        /*
-        float angleMagnitude = Mathf.Abs(incrementor);
-        int sign = (int) -Mathf.Sign(incrementor);
-        if(angleMagnitude >= 45)
-        {
-            if (!reached45deg)
-            {
-                reached45deg = true;
-                ShiftItems(sign);
-            }
-        }
-        else if(angleMagnitude < 45)
-        {
-            if (reached45deg)
-            {
-                reached45deg = false;
-                ShiftItems(-sign);
-            }
-        }
-        print(sign);
-        if(angleMagnitude >= 90)
-        {
-            incrementor = (Mathf.Abs(incrementor) - 90) * sign;
-            reached45deg = false;
-            prevAngle = incrementor;
-            itemSwapIndex = (itemSwapIndex + sign +4) % 4;
-            curItem = (curItem + sign + GameManager.gm.attributePrefabs.Length) % GameManager.gm.attributePrefabs.Length;
-        }
-        /*
-        if(Mathf.Abs(prevAngle) < 45 && Mathf.Abs(incrementor) >= 45)
-        {
-            print("shift items");
-            ShiftItems(1);
-        }
-        else if(Mathf.Abs(prevAngle) >= 45 && Mathf.Abs(incrementor) < 45)
-        {
-            print("shift item2 ");
-            ShiftItems(-1);
-        }
-        if (Mathf.Abs(incrementor) >= 90)
-        {
-            print("move to next item");
-            //int sign = (int) Mathf.Sign(incrementor);
-            
-        }
-        */
+      
         rotateVelocity = dir * angle *rotateSpd;
     }
 
     public int GetSwapIndex()
     {
+        //print("getswap");
         int curItemSwapIndex = 0;
         if (incrementor < 45 || incrementor >= 315)
         {
@@ -215,6 +166,7 @@ public class Rotator : MonoBehaviour, IPointerDownHandler, IPointerUpHandler,IDr
 
     public void CheckToSwapItem()
     {
+        //print("chckswap");
         int curItemSwapIndex = GetSwapIndex();
         
         //print(itemSwapIndex + "..." + curItemSwapIndex + "......" + incrementor);
@@ -234,6 +186,29 @@ public class Rotator : MonoBehaviour, IPointerDownHandler, IPointerUpHandler,IDr
             }
         }
         itemSwapIndex = curItemSwapIndex;
+        EditSelectableAttributes();
+    }
+
+    public void EditSelectableAttributes()
+    {
+        //print("editselec");
+        for (int i = 0; i < 4; i++)
+        {
+            Transform icon = itemUIContainer.GetChild(i);
+            string data = icon.GetChild(0).GetComponent<Text>().text;// = "Attribute " + itemOrder[i];
+            string[] splitData = data.Split(' ');
+            int attributeID = int.Parse(splitData[1]);
+
+            icon.GetComponent<Image>().sprite = GameManager.gm.itemIcons[attributeID];
+            //print(attributeID);
+            icon.GetChild(0).GetComponent<Text>().text = "Attribute " + attributeID + " \n" + GameManager.gm.myAttributes[attributeID];
+            if (attributeID == GameManager.gm.selectedAttribute)
+            {
+                icon.GetChild(0).GetComponent<Text>().text += " \n*";
+            }
+        }
+        print("INSIDE EDIT CUR :" + curItem);
+        currentItemTxt.text = Attribute.names[curItem] + '\n' + Projectile.names[1];
     }
 
     public void OnPointerDown(PointerEventData eventData)
@@ -274,10 +249,12 @@ public class Rotator : MonoBehaviour, IPointerDownHandler, IPointerUpHandler,IDr
                 int attributeID = int.Parse(splitData[1]);
                 if(attributeID == potentialAttribute && !isDragging)
                 {
-
-                    GameManager.gm.selectedAttribute = int.Parse(go.transform.GetChild(0).GetComponent<Text>().text.Split(' ')[1]);//potentialAttribute;
+                    GameManager.gm.ChangeSelectedAttribute(int.Parse(go.transform.GetChild(0).GetComponent<Text>().text.Split(' ')[1]));
+                    //GameManager.gm.selectedAttribute = ;//potentialAttribute;
+                    
                     print("SELECTED ATTR " + potentialAttribute);
                     print(GameManager.gm.selectedAttribute);
+                    EditSelectableAttributes();
                     break;
                 }
             }
@@ -299,12 +276,15 @@ public class Rotator : MonoBehaviour, IPointerDownHandler, IPointerUpHandler,IDr
     }
 
     // Use this for initialization
-    void Start () {
+    void Awake () {
+        print("start");
         itemOrder = new int[4];
+        currentItemTxt = transform.parent.Find("CurrentItemTxt").GetComponent<Text>();
+        itemUIContainer = transform.Find("ItemUIContainer");
         for (int i = 0; i < 4; i++)//attributePrefabs.Length; i++)
         {
             GameObject icon = Instantiate(GameManager.gm.iconPrefab);
-            icon.transform.SetParent(transform);
+            icon.transform.SetParent(itemUIContainer);
             float x = Mathf.Cos(90 * Mathf.Deg2Rad * (1 + i)), y = Mathf.Sin(90 * Mathf.Deg2Rad * (1 + i));
             icon.transform.localPosition = new Vector3(x, y, 0) * 250;
             icon.transform.localEulerAngles += new Vector3(0, 0, 90 * i);
@@ -314,17 +294,53 @@ public class Rotator : MonoBehaviour, IPointerDownHandler, IPointerUpHandler,IDr
         }
         potentialAttribute = -1;
         itemSwapIndex = 2;
-        curItem = itemOrder[0] = 0;
-        nextItem = itemOrder[1] = 1 % GameManager.gm.attributePrefabs.Length;
-        prevItem = itemOrder[3] = (GameManager.gm.attributePrefabs.Length - 1) % GameManager.gm.attributePrefabs.Length;
-        awaitingItem = itemOrder[2] = (nextItem + 1) % GameManager.gm.attributePrefabs.Length;
+    }
+    private void Start()
+    {
+
+        ResetItemWheel(0);
+    }
+
+    public void ResetItemWheel(int selectedAttribute)
+    {
+        print("RESET WHEEL");
+        initialAngle = 0;
+        transform.localEulerAngles = Vector3.zero;
+        incrementor = 0;
+        itemSwapIndex = 2;
+        curItem = itemOrder[0] = selectedAttribute;
+        nextItem = itemOrder[1] = GameManager.gm.GetNextItem(curItem);//1 % GameManager.gm.attributePrefabs.Length;
+        prevItem = itemOrder[3] = GameManager.gm.GetPrevItem(curItem);//(GameManager.gm.attributePrefabs.Length - 1) % GameManager.gm.attributePrefabs.Length;
+        awaitingItem = itemOrder[2] = GameManager.gm.GetNextItem(nextItem);//(nextItem + 1) % GameManager.gm.attributePrefabs.Length;
         for (int i = 0; i < 4; i++)//attributePrefabs.Length; i++)
         {
-            Transform icon = transform.GetChild(i);
-            icon.GetChild(0).GetComponent<Text>().text = "Attribute " + itemOrder[i];
+            Transform icon = itemUIContainer.GetChild(i);// + itemSwapIndex - 2 + 4)%4);
+            print("ITEM:"+i+".." + itemOrder[i]);
+            icon.GetChild(0).GetComponent<Text>().text = "Attribute " + itemOrder[i] + " \n" + GameManager.gm.myAttributes[itemOrder[i]];
+        }
+        print("CURIS:"+curItem);
+        UpdateItemUI();
+        EditSelectableAttributes();
+    }
+
+    public void UpdateItemUI()
+    {
+        for (int i = 0; i < 4; i++)//attributePrefabs.Length; i++)
+        {
+            Transform icon = itemUIContainer.GetChild(i);
+            string[] splitData = icon.GetChild(0).GetComponent<Text>().text.Split(' ');
+            int attributeID = int.Parse(splitData[1]);
+            icon.GetChild(0).GetComponent<Text>().text = "Attribute " + attributeID + " \n" + GameManager.gm.myAttributes[attributeID];
+            /*
+            if (attributeID == 0)
+                icon.GetChild(0).GetComponent<Text>().text += " \nINF";//GameManager.gm.myAttributes[attributeID];// "Attribute " + itemOrder[i];
+            else
+                icon.GetChild(0).GetComponent<Text>().text += " \n" + GameManager.gm.myAttributes[attributeID];// "Attribute " + itemOrder[i];
+            */
         }
     }
 	
+    // clockwise = -1, counter = 1
     public void ShiftItems(int dir)
     {
         //itemSwapIndex = 2;
@@ -332,12 +348,15 @@ public class Rotator : MonoBehaviour, IPointerDownHandler, IPointerUpHandler,IDr
         int attributeCt = GameManager.gm.attributePrefabs.Length;
         //int nextCurrentItem;
         //int nextItemSwapIndex;
-   
-        nextItem = (curItem + 1) % attributeCt;
-        prevItem = (curItem - 1 + attributeCt) % attributeCt;
-        if(dir == 1)
+
+        nextItem = GameManager.gm.GetNextItem(curItem);//(curItem + 1) % attributeCt;
+        prevItem = GameManager.gm.GetPrevItem(curItem);//(curItem - 1 + attributeCt) % attributeCt;
+        print("NEXT ITEM" + nextItem);
+        print("PREV ITEM" + prevItem);
+        print(curItem + ".....");
+        if (dir == 1)
         {
-            awaitingItem = (nextItem + 1) % attributeCt;
+            awaitingItem = GameManager.gm.GetNextItem(nextItem);
             curItem = nextItem;
             //nextCurrentItem = nextItem;
             //nextItemSwapIndex = (itemSwapIndex + 1) % 4;
@@ -349,12 +368,12 @@ public class Rotator : MonoBehaviour, IPointerDownHandler, IPointerUpHandler,IDr
             curItem = prevItem;
             //nextCurrentItem = prevItem;
             //nextItemSwapIndex = (itemSwapIndex + 3) % 4;
-            awaitingItem = (prevItem - 1 + attributeCt) % attributeCt;
+            awaitingItem = GameManager.gm.GetPrevItem(prevItem);
             //transform.GetChild(itemSwapIndex).GetChild(0).GetComponent<Text>().text = "Attribute " + (prevItem - 1 + attributeCt) % attributeCt;
 
         }
-        transform.GetChild(itemSwapIndex).GetChild(0).GetComponent<Text>().text = "Attribute " +awaitingItem;
-
+        print(curItem);
+        itemUIContainer.GetChild(itemSwapIndex).GetChild(0).GetComponent<Text>().text = "Attribute " + awaitingItem + " \n" + GameManager.gm.myAttributes[awaitingItem];
         //itemSwapIndex = nextItemSwapIndex;
         /*
         if (dir == 1)
@@ -384,6 +403,7 @@ public class Rotator : MonoBehaviour, IPointerDownHandler, IPointerUpHandler,IDr
         //return;
         if (!isTouched)
         {
+            //print("nottouching");
             transform.localEulerAngles += new Vector3(0, 0, rotateVelocity);
             prevAngle = incrementor;
             incrementor = (incrementor + rotateVelocity + 360) % 360;

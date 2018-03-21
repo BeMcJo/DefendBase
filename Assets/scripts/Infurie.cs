@@ -57,13 +57,13 @@ public class Infurie : Enemy
         //infuriated = dif <= 0;
         if (dif <= 0)
         {
-            print("RAGED");
+            //print("RAGED");
             //Color c = go.transform.GetComponent<Renderer>().material.color;
             originalColor.g = 120.0f / 255.0f;
             //c.g = 120.0f/255.0f;
             //c = Color.black;
             go.transform.GetComponent<Renderer>().material.color = originalColor;
-            print(go.transform.GetComponent<Renderer>().material.color);
+            //print(go.transform.GetComponent<Renderer>().material.color);
             effectiveMoveSpd = originalMoveSpd * difficulties[enemyID][level].moveSpd * 2f;
             effectiveTimeToAttack = originalTimeToAttack / difficulties[enemyID][level].atkSpd / 1.5f;
             atkTimer = effectiveTimeToAttack;

@@ -461,6 +461,17 @@ public class Enemy : MonoBehaviour
             NetworkManager.nm.RemoveEnemyAttacks(id);
         }
         GameManager.gm.enemies.Remove(id);
+        List<GameObject> rewards = new List<GameObject>();
+        GameManager.gm.UpdateItem("Attribute", 1, 1);
+        float spawnRewardChance = Random.Range(0.0f, 1.25f);
+        print((int)spawnRewardChance);
+        for (int i = 0; i < (int)spawnRewardChance; i++)
+        {
+            GameObject reward = Instantiate(GameManager.gm.rewardPrefabs[0]);
+            reward.transform.position = go.transform.position;
+            rewards.Add(reward);
+            reward.GetComponent<Collider>().enabled = false;
+        }
         Destroy(gameObject);
     }
 
@@ -507,7 +518,8 @@ public class Enemy : MonoBehaviour
             
         }
         isGrounded = grounds.Count > 0;
-        anim.SetBool("isGrounded", isGrounded);
+        if(enemyID == 0)
+            anim.SetBool("isGrounded", isGrounded);
     }
     protected virtual void OnCollisionStay(Collision collision)
     {
@@ -544,7 +556,8 @@ public class Enemy : MonoBehaviour
             grounds.Add(collision.gameObject);
         }
         isGrounded = grounds.Count > 0;
-        anim.SetBool("isGrounded", isGrounded);
+        if (enemyID == 0)
+            anim.SetBool("isGrounded", isGrounded);
     }
 
 

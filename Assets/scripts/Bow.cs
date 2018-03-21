@@ -96,6 +96,7 @@ public class Bow : Weapon
         arrow.transform.rotation = bulletSpawn.transform.rotation;
         arrow.transform.SetParent(transform);
         arrow.transform.localPosition = bulletSpawn.transform.localPosition;
+        //arrow.GetComponent<Projectile>().SetAttribute(GameManager.gm.selectedAttribute);//.attributeID = GameManager.gm.selectedAttribute;
     }
 
     // Charges up arrow, drawing it back until drawLimit
@@ -138,6 +139,15 @@ public class Bow : Weapon
         }
 
         return false;
+    }
+
+    public override void ChangeAttribute()
+    {
+        base.ChangeAttribute();
+        if (arrow)
+        {
+            arrow.GetComponent<Projectile>().SetAttribute(GameManager.gm.selectedAttribute);//.attributeID = GameManager.gm.selectedAttribute;
+        }
     }
 
     // Upon end use, shoot arrow
@@ -212,13 +222,17 @@ public class Bow : Weapon
             rb.constraints = RigidbodyConstraints.None; // Remove the fixed position of arrow
             rb.AddForce(user.playerCam.transform.forward * chargePower * statsByLevel[wepID].distance[lvl]); // Launch arrow
             rb.useGravity = true;
-            arrow.GetComponent<Arrow>().isShot = true;
-            arrow.GetComponent<Arrow>().id = user.id;
-            arrow.GetComponent<Arrow>().dmg = statsByLevel[wepID].dmg[lvl];
-            arrow.transform.Find("Tail").GetComponent<BoxCollider>().enabled = false;
-            arrow = null;
+            Arrow arrw = arrow.GetComponent<Arrow>();
+            arrw.isShot = true;
+            arrw.id = user.id;
+            arrw.dmg = statsByLevel[wepID].dmg[lvl];
+            arrw.transform.Find("Tail").GetComponent<BoxCollider>().enabled = false;
+            //arrw.attributeID = GameManager.gm.selectedAttribute;
+            arrw = null;
             reloading = true;
             reloadTime = statsByLevel[wepID].timeToReload[lvl];
+
+            GameManager.gm.UseItem("Attribute", GameManager.gm.selectedAttribute);
 
             // Reset bowstring vertices
             List<Vector3> positions = new List<Vector3>();

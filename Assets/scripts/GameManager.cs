@@ -79,6 +79,8 @@ public class GameManager : MonoBehaviour {
                         enemyPrefabs, // List of enemy objects
                         projectilePrefabs, // List of projectile objects
                         attributePrefabs, // List of attribute objects
+                        rewardPrefabs, // List of reward objects
+                        indicatorPrefabs, // List of indicator objects
                         weaponPrefabs; // List of weapon objects
 
     public GameObject statusIndicatorPrefab, // Shows health and other status for object
@@ -121,6 +123,7 @@ public class GameManager : MonoBehaviour {
                       selectedOption, // Selects which option container will be selected
                       selectedItem, // Potential item to purchase
                       addToMapBtn, // Button used to spawn defenses onto map
+                      changeArrowBtn, // Press and hold to display item wheel to change arrow
                       waveNotification; // Notifies player that enemies will spawn
 
     public Text scoreTxt; // Indicates how awesome you are
@@ -152,6 +155,7 @@ public class GameManager : MonoBehaviour {
     float initialAngle;
     Pattern pattern; // Points to enemy spawn pattern
 
+    public Sprite[] itemIcons;
     //Button upgradeWepBtn;
 
     // Saves data based on the type
@@ -237,6 +241,7 @@ public class GameManager : MonoBehaviour {
     void Start () {
         if (gm)
             return;
+        //Sprite icon = Instantiate(Resources.Load(")
         enemies = new Dictionary<int, Enemy>();
         gm = this;
         gm.data = new PlayerData();
@@ -408,7 +413,7 @@ public class GameManager : MonoBehaviour {
 
         mapFingerID = -1;
         quickAccessFingerID = -1;
-        selectedAttribute = 1;
+        selectedAttribute = 0;
 
         intermissionCanvas = GameObject.Find("IntermissionCanvas");
         // If online, make sure everyone is ready to start next wave on intermission
@@ -492,18 +497,23 @@ public class GameManager : MonoBehaviour {
         inventoryContainer.SetActive(false);
         storeContainer.SetActive(false);
         displayOptions.transform.Find("DisplayDefensesBtn").GetComponent<Button>().onClick.AddListener(DisplayDefensesOptions);
-        displayOptions.transform.Find("DisplayInventoryBtn").GetComponent<Button>().onClick.AddListener(DisplayInventoryOptions);
+        //displayOptions.transform.Find("DisplayInventoryBtn").GetComponent<Button>().onClick.AddListener(DisplayInventoryOptions);
         displayOptions.transform.Find("DisplayStoreBtn").GetComponent<Button>().onClick.AddListener(DisplayStoreOptions);
         mapUICanvas.transform.Find("BackBtn").GetComponent<Button>().onClick.AddListener(ShowDisplayOptions);
 
         quickAccessCanvas = GameObject.Find("QuickAccessCanvas");
         quickAccessUpgradeDescription = quickAccessCanvas.transform.Find("DescriptionDisplay").Find("Inventory Descriptions").Find("Upgrade Descriptions").gameObject;
         quickAccessUpgradeDescription.SetActive(false);
+        changeArrowBtn = quickAccessCanvas.transform.Find("ChangeArrowsBtn").gameObject;
         itemWheel = quickAccessCanvas.transform.Find("ItemWheel").gameObject;
         itemWheel.SetActive(false);
         
         myProjectiles.Clear();
-
+        myAttributes.Clear();
+        for(int i = 0; i < attributePrefabs.Length; i++)
+        {
+            myAttributes[i] = 2;
+        }
 
         trapSpawnPrefab = new GameObject[trapPrefabs.Length];
         Transform trapDescriptions = descriptionDisplay.transform.Find("Trap Descriptions");
@@ -551,6 +561,7 @@ public class GameManager : MonoBehaviour {
             trapSpawnPrefab[i].name = "Trap " + i;
             trapSpawnPrefab[i].layer = LayerMask.NameToLayer("Ignore Raycast");
             Collider c = trapSpawnPrefab[i].transform.GetComponent<Collider>();
+            c.isTrigger = true;
             if (c.GetType() == typeof(CapsuleCollider))
                 ((CapsuleCollider)c).center += new Vector3(0, -.75f, 0);
             //btn.transform.GetComponent<Button>().onClick.AddListener(Purchase);
@@ -589,6 +600,89 @@ public class GameManager : MonoBehaviour {
         b.transform.SetParent(inventoryContainer.transform);
         //b.transform.localPosition = new Vector3(0,0,0);
         b.SetActive(true);
+    }
+
+    public void UpdateItem(string itemType, int itemID, int qty)
+    {
+        if(itemType == "Attribute")
+        {
+            myAttributes[itemID] += qty;
+            UpdateArrowQty();
+            itemWheel.GetComponent<Rotator>().ResetItemWheel(selectedAttribute);
+        }
+    }
+
+    public void UseItem(string itemType, int itemID)
+    {
+        if(itemType == "Attribute")
+        {
+            if (itemID == 0)
+                return;
+            myAttributes[itemID]--;
+            print(itemID + ":" + myAttributes[itemID]);
+            if(myAttributes[itemID] == 0)
+            {
+                print("OUT OF ITEM");
+                ChangeSelectedAttribute(0);
+                itemWheel.GetComponent<Rotator>().ResetItemWheel(0);
+            }
+            else
+            {
+                UpdateArrowQty();
+                itemWheel.GetComponent<Rotator>().UpdateItemUI();
+            }
+        }
+    }
+
+    public int GetNextItem(int index)
+    {
+        for(int i = 1; i < attributePrefabs.Length; i++)
+        {
+            int nextIndex = (index + i) % attributePrefabs.Length;
+            if(myAttributes[nextIndex] > 0 || nextIndex == 0)
+            {
+                index = nextIndex;
+                break;
+            }
+        }
+        return index;
+    }
+
+    public int GetPrevItem(int index)
+    {
+        for (int i = 1; i < attributePrefabs.Length; i++)
+        {
+            int prevIndex = (index - i + attributePrefabs.Length) % attributePrefabs.Length;
+            if (myAttributes[prevIndex] > 0 || prevIndex == 0)
+            {
+                index = prevIndex;
+                break;
+            }
+        }
+        return index;
+    }
+
+    public void UpdateArrowQty()
+    {
+        changeArrowBtn.GetComponent<Image>().sprite = itemIcons[selectedAttribute];
+        changeArrowBtn.transform.Find("QtyTxt").GetComponent<Text>().text = "x";
+        if (selectedAttribute == 0)
+        {
+            changeArrowBtn.transform.Find("QtyTxt").GetComponent<Text>().text += "---";
+        }
+        else
+        {
+            changeArrowBtn.transform.Find("QtyTxt").GetComponent<Text>().text += myAttributes[selectedAttribute];
+        }
+    }
+
+    public void ChangeSelectedAttribute(int attributeID)
+    {
+        if (attributeID == selectedAttribute)
+            return;
+        selectedAttribute = attributeID;
+        player.GetComponent<PlayerController>().wep.ChangeAttribute();
+        UpdateArrowQty();
     }
 
     public void OnHitEnemy()
@@ -1024,6 +1118,7 @@ public class GameManager : MonoBehaviour {
         Weapon.WeaponCount = 0;
         Trap.TrapCount = 0;
         */
+        
         enemies.Clear();
         traps.Clear();
         edittingMap = false;
@@ -1092,6 +1187,7 @@ public class GameManager : MonoBehaviour {
         {
             pc.EquipWeapon(w);
         }
+        UpdateArrowQty();
         StartWave(wave);
     }
 
@@ -1383,7 +1479,7 @@ public class GameManager : MonoBehaviour {
                         if(quickAccessDetail != "" && quickAccessFingerID == -1)
                         {
                             quickAccessFingerID = t.fingerId;
-                            quickAccessCanvas.GetComponent<Canvas>().sortingOrder = 1;
+                            quickAccessCanvas.GetComponent<Canvas>().sortingOrder = playerStatusCanvas.GetComponent<Canvas>().sortingOrder+1;
                         }
 
                     }
@@ -1417,7 +1513,7 @@ public class GameManager : MonoBehaviour {
                             mapFingerID = -1;
                         }
                         quickAccessDetail = "";
-                        quickAccessCanvas.GetComponent<Canvas>().sortingOrder = 0;
+                        quickAccessCanvas.GetComponent<Canvas>().sortingOrder = playerStatusCanvas.GetComponent<Canvas>().sortingOrder - 1;
                         quickAccessFingerID = -1;
                     }
                 }
