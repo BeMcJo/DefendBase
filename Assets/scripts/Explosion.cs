@@ -5,7 +5,7 @@ using UnityEngine;
 public class Explosion : MonoBehaviour {
     public float growthRate = 1f;
     public float growthLimit = 20f;
-    public int dmg = 50,
+    public int dmg = 10,
                id; 
 	// Use this for initialization
 	void Start () {
@@ -39,7 +39,7 @@ public class Explosion : MonoBehaviour {
             e.OnHit();
             if (NetworkManager.nm.isStarted)
             {
-                NetworkManager.nm.NotifyObjectDamagedBy(other.gameObject, gameObject);
+                NetworkManager.nm.NotifyObjectDamagedBy(e.gameObject, gameObject);
                 return;
             }
             // If not using online feature, inflict damage to enemy
@@ -53,7 +53,7 @@ public class Explosion : MonoBehaviour {
             Trap t = other.GetComponent<Trap>();
             if (NetworkManager.nm.isStarted)
             {
-                NetworkManager.nm.NotifyObjectDamagedBy(other.gameObject, gameObject);
+                NetworkManager.nm.NotifyObjectDamagedBy(t.gameObject, gameObject);
                 return;
             }
             // If not using online feature, inflict damage to enemy

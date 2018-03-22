@@ -102,11 +102,13 @@ public class Bow : Weapon
     // Charges up arrow, drawing it back until drawLimit
     public override bool StartUse(Touch t)
     {
+        // print(gameObject);
+        //print(user);
+        //print(user.IsMyPlayer());
         // If playing online and not my weapon, set the arrow and drawstring to information received
         if (NetworkManager.nm.isStarted && !user.IsMyPlayer())
         {
             base.StartUse(t);
-            charging = true;
             return true;
         }
         // If not using Touch Interactive mode, check if shoot button is being touched
@@ -118,6 +120,7 @@ public class Bow : Weapon
                 // Is that object our Shoot Button?
                 if (EventSystem.current.currentSelectedGameObject && EventSystem.current.currentSelectedGameObject.tag == "Shoot")
                 {
+                    print("??");
                     base.StartUse(t);
                     shootTouchID = t.fingerId;
                 }
@@ -132,7 +135,6 @@ public class Bow : Weapon
         if (Physics.Raycast(ray, out hit) && hit.collider.name == "Tail")
         {
             base.StartUse(t);
-            charging = true;
             shootTouchID = t.fingerId;
             originalTouchPos = t.position;
             return true;
@@ -146,6 +148,7 @@ public class Bow : Weapon
         base.ChangeAttribute();
         if (arrow)
         {
+            print("change arrow attribute");
             arrow.GetComponent<Projectile>().SetAttribute(GameManager.gm.selectedAttribute);//.attributeID = GameManager.gm.selectedAttribute;
         }
     }
@@ -157,9 +160,10 @@ public class Bow : Weapon
         if(arrow)
             arrow.localPosition = bulletSpawn.localPosition;
         drawRange = drawOffset;
+        inUse = false;
         Shoot(chargePower);
-        charging = false;
-        chargePower = 0;
+        //charging = false;
+        //chargePower = 0;
         base.EndUse();
     }
     
@@ -228,7 +232,7 @@ public class Bow : Weapon
             arrw.dmg = statsByLevel[wepID].dmg[lvl];
             arrw.transform.Find("Tail").GetComponent<BoxCollider>().enabled = false;
             //arrw.attributeID = GameManager.gm.selectedAttribute;
-            arrw = null;
+            arrow = null;
             reloading = true;
             reloadTime = statsByLevel[wepID].timeToReload[lvl];
 
@@ -240,6 +244,7 @@ public class Bow : Weapon
             positions.Add(new Vector3(0, 0, drawRange));
             positions.Add(new Vector3(0, -.5f, -.475f));
             lr.SetPositions(positions.ToArray());
+            base.Shoot(chargePower);
         }
     }
 }

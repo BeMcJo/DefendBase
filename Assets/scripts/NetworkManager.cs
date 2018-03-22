@@ -404,7 +404,7 @@ public class NetworkManager : MonoBehaviour {
 
     // Extract Network Information about the other players
     public void OnPlayerInformation(string[] data)
-    {
+    {        
         int cnnID = int.Parse(data[1]);
         if (cnnID == ourClientID)
             return;
@@ -425,6 +425,7 @@ public class NetworkManager : MonoBehaviour {
         }
         else
         {
+            p.wep.Charge(chargePower);
             if (p.wep.inUse)
             {
                 p.wep.EndUse();
@@ -876,7 +877,10 @@ public class NetworkManager : MonoBehaviour {
                     {
                         // If failed to reconnect, leave game
                         if (isDisconnected)
+                        {
                             LeaveGame();
+                            return;
+                        }
                         debugLog.Add("HOST DC");
                         isDisconnected = true;
                         ReconnectTo(connectedHost);

@@ -43,6 +43,15 @@ public abstract class Projectile : MonoBehaviour {
 
 	}
 
+    public void CreateExplosion()
+    {
+        GameObject explosion = Instantiate(GameManager.gm.attributePrefabs[attributeID]);
+        explosion.transform.position = transform.position;
+        explosion.transform.GetComponent<Explosion>().dmg = 5;
+        explosion.transform.GetComponent<Explosion>().growthLimit = 14;
+        explosion.transform.GetComponent<Explosion>().id = id;
+    }
+
 
     public virtual void SetAttribute(int aID)
     {
@@ -51,7 +60,8 @@ public abstract class Projectile : MonoBehaviour {
 
     protected virtual void OnTriggerEnter(Collider collision)
     {
-        //print(collision.gameObject.name + " " + collision.gameObject.tag);
+        //print("ATTRIBUTE::>>>>>>>>>>>>>>" + attributeID);
+        print(collision.gameObject.name + " " + collision.gameObject.tag);
         if (id != GameManager.gm.player.transform.GetComponent<PlayerController>().id || deflected)
             return;
         if(collision.tag == "Reward")
@@ -75,9 +85,7 @@ public abstract class Projectile : MonoBehaviour {
 
                 if (attributeID == 1)
                 {
-                    GameObject explosion = Instantiate(GameManager.gm.attributePrefabs[attributeID]);
-                    explosion.transform.position = transform.position;
-                    explosion.transform.GetComponent<Explosion>().id = id;
+                    CreateExplosion();
                 }
                 e.OnHit();
                 //e.transform.GetComponent<Rigidbody>().velocity = Vector3.zero; // Disable physics force applied when colliding
@@ -104,15 +112,13 @@ public abstract class Projectile : MonoBehaviour {
         }
         else if (collision.transform.tag == "Ground" || collision.transform.tag == "Impenetrable" || collision.transform.tag == "Path")
         {
-            print(collision.transform.name);
+            //print(collision.transform.name);
             if (!isShot)
                 return;
 
             if (attributeID == 1)
             {
-                GameObject explosion = Instantiate(GameManager.gm.attributePrefabs[attributeID]);
-                explosion.transform.position = transform.position;
-                explosion.transform.GetComponent<Explosion>().id = id;
+                CreateExplosion();
             }
             hitGround = true;
             deflected = true;

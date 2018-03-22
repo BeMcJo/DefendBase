@@ -80,6 +80,7 @@ public abstract class Weapon : MonoBehaviour
         reloadTime = 0;
         shootTouchID = -1;
         reloading = false;
+        inUse = false;
         /*
         id = WeaponCount;
         WeaponCount++;
@@ -136,7 +137,8 @@ public abstract class Weapon : MonoBehaviour
             CancelUse();
             return false;
         }
-
+        if (!user.IsMyPlayer())
+            return false;
         //if (!GameManager.gm.startWaves)
         //{
         //    CancelUse();
@@ -260,12 +262,14 @@ public abstract class Weapon : MonoBehaviour
             chargeBarAlt = 1;
             chargeAccelerator = 0;
         }
+        print(1);
         return true;
     }
 
     // Handles the beginning of weapon usage
     public virtual bool StartUse(Touch t)
     {
+        print(2);
         inUse = true;
         charging = true;
         chargePower = 0;
@@ -277,6 +281,8 @@ public abstract class Weapon : MonoBehaviour
             chargeBarAlt = 1;
             chargeAccelerator = 0;
         }
+        if (NetworkManager.nm.isStarted && user.IsMyPlayer())
+            NetworkManager.nm.SendPlayerInformation();
         return true;
     }
 
@@ -284,16 +290,25 @@ public abstract class Weapon : MonoBehaviour
     public virtual void EndUse()
     {
         inUse = false;
+        chargePower = 0;
+        charging = false;
         chargeBarGuage.SetActive(false);
     }
 
     // Handles what happens when weapon shoots at a certain charge power
     public virtual void Shoot(float chargePower)
     {
+        if (NetworkManager.nm.isStarted)
+        {
+            NetworkManager.nm.SendPlayerInformation();
+            return;
+        }
+        /*
         charging = false;
         GameObject bullet = Instantiate(bulletPrefab);
         bullet.transform.position = bulletSpawn.transform.position;
         bullet.transform.GetComponent<Rigidbody>().AddForce(user.playerCam.transform.forward * chargePower * distance);
+        */
     }
 
     // Handle charging weapon

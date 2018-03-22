@@ -71,6 +71,7 @@ public class MapManager : MonoBehaviour {
         for (int i = 0; i < m.nodes.Count; i++)
         {
             platforms.Add(i,Instantiate(hexPlatformPrefab));
+            platforms[i].name = "Path " + i;
             platforms[i].transform.SetParent(mapContainer.transform);
         }
 
@@ -84,6 +85,32 @@ public class MapManager : MonoBehaviour {
             {
                 spawnPoints.Add(platforms[i]);
             }
+
+            // Check if platform needs a reference positioning
+            if(node.neighborReference != -1)
+            {
+                int j = node.neighborReference;
+                float x = dx, z = dz;
+                j = (j + 3) % 6;
+                if (j >= 2 && j <= 4)
+                {
+                    z = -z;
+                }
+                if (j != 0 && j != 3)
+                {
+                    z /= 2;
+                    if (j > 3)
+                    {
+                        x = -x;
+                    }
+                }
+                else
+                {
+                    x = 0;
+                }
+                src.transform.position = platforms[node.neighbors[node.neighborReference].id].transform.position + new Vector3(x, 0, z);
+            }
+
             // Check each neighbor to bind the hexNodes as source and destination nodes (creating digraph)
             for (int j = 0; j < 6; j++)
             {

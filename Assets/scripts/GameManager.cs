@@ -52,6 +52,7 @@ public class GameManager : MonoBehaviour {
                 doneSpawningWave, // Is current wave all spawned?
                 setupRotation, // Are you done setting up the orientation of your forward?
                 //gyroEnabled, // Used????
+                hasWon,
                 interactiveTouch, // Using touch interactions that isn't just shoot button?
                 onIntermission, // Are we on break from defending waves of enemies?
                 playingOnline, // Are we playing with players online?
@@ -430,8 +431,8 @@ public class GameManager : MonoBehaviour {
         }
 
         
-        intermissionCanvas.transform.Find("ShopBtn").GetComponent<Button>().onClick.AddListener(ToggleShopCanvas);
-        intermissionCanvas.transform.Find("ShopBtn").GetComponent<Button>().onClick.AddListener(ToggleIntermissionCanvas);
+        //intermissionCanvas.transform.Find("ShopBtn").GetComponent<Button>().onClick.AddListener(ToggleShopCanvas);
+        //intermissionCanvas.transform.Find("ShopBtn").GetComponent<Button>().onClick.AddListener(ToggleIntermissionCanvas);
         intermissionCanvas.SetActive(false);
 
         enemiesContainer = GameObject.Find("EnemiesContainer");
@@ -456,7 +457,7 @@ public class GameManager : MonoBehaviour {
         playerSpawnPoints = playerRotation.transform.Find("PlayerSpawnPoints").gameObject;
 
         resultNotification = playerStatusCanvas.transform.Find("Result Notification").gameObject;
-        resultNotification.transform.Find("RetryBtn").GetComponent<Button>().onClick.AddListener(ResetGame);
+        resultNotification.transform.Find("RetryBtn").GetComponent<Button>().onClick.AddListener(FinishGame);//ResetGame);
         resultNotification.SetActive(false);
 
         scoreTxt = playerStatusCanvas.transform.Find("ScoreTxt").GetComponent<Text>();
@@ -510,9 +511,11 @@ public class GameManager : MonoBehaviour {
         
         myProjectiles.Clear();
         myAttributes.Clear();
+        //Attribute.names = new string[attributePrefabs.Length];
         for(int i = 0; i < attributePrefabs.Length; i++)
         {
-            myAttributes[i] = 2;
+            //Attribute.names[i] = "Attr " + i;
+            myAttributes[i] = 0;
         }
 
         trapSpawnPrefab = new GameObject[trapPrefabs.Length];
@@ -619,7 +622,7 @@ public class GameManager : MonoBehaviour {
             if (itemID == 0)
                 return;
             myAttributes[itemID]--;
-            print(itemID + ":" + myAttributes[itemID]);
+            //print(itemID + ":" + myAttributes[itemID]);
             if(myAttributes[itemID] == 0)
             {
                 print("OUT OF ITEM");
@@ -742,6 +745,7 @@ public class GameManager : MonoBehaviour {
         selectedDefense = null;
 
         gameOver = true;
+        hasWon = true;
         resultNotification.SetActive(true);
         resultNotification.transform.Find("ResultTxt").GetComponent<Text>().text = "VICTORY!\nYou have successfully\ndefended the kingdom!";
     }
@@ -757,6 +761,7 @@ public class GameManager : MonoBehaviour {
         selectedDefense = null;
 
         gameOver = true;
+        hasWon = false;
         resultNotification.SetActive(true);
         resultNotification.transform.Find("ResultTxt").GetComponent<Text>().text = "Oh No! The enemies broke\nthrough our defenses!";
     }
@@ -929,17 +934,20 @@ public class GameManager : MonoBehaviour {
 
     public void NextWave()
     {
+        intermissionCanvas.GetComponent<Canvas>().sortingOrder = playerStatusCanvas.GetComponent<Canvas>().sortingOrder - 1;
         intermissionCanvas.SetActive(false);
         StartWave(wave);
     }
 
     public void DisplayIntermission()
     {
+        intermissionCanvas.GetComponent<Canvas>().sortingOrder = playerStatusCanvas.GetComponent<Canvas>().sortingOrder + 1;
+
         onIntermission = true;
         startWaves = false;
         intermissionCanvas.SetActive(true);
-        intermissionCanvas.transform.Find("StatsTxt").GetComponent<Text>().text = "Score: " + score + "\tKills: " + totalKills + "\nNext Wave: " + (wave + 1);
-        intermissionCanvas.transform.Find("ShopBtn").GetComponent<Button>().interactable = wave % 10 == 0;
+        //intermissionCanvas.transform.Find("StatsTxt").GetComponent<Text>().text = "Score: " + score + "\tKills: " + totalKills + "\nNext Wave: " + (wave + 1);
+        //intermissionCanvas.transform.Find("ShopBtn").GetComponent<Button>().interactable = false;// wave % 10 == 0;
         if (NetworkManager.nm.isStarted && NetworkManager.nm.isHost)
         {
             intermissionCanvas.transform.Find("ResumeBtn").GetComponent<Button>().interactable = false;
@@ -949,10 +957,12 @@ public class GameManager : MonoBehaviour {
     public void DisplayOptions()
     {
         optionsCanvas.SetActive(true);
+        optionsCanvas.GetComponent<Canvas>().sortingOrder = playerStatusCanvas.GetComponent<Canvas>().sortingOrder + 1;
     }
 
     public void ResumeGame()
     {
+        optionsCanvas.GetComponent<Canvas>().sortingOrder = playerStatusCanvas.GetComponent<Canvas>().sortingOrder - 1;
         optionsCanvas.SetActive(false);
     }
 
@@ -1094,6 +1104,14 @@ public class GameManager : MonoBehaviour {
         doneSpawningWave = false;
     }
 
+    public void FinishGame()
+    {
+        print("done game");
+        print(hasWon);
+        
+        LeaveGame();
+    }
+
     // Restart game session, (maybe remove)
     public void ResetGame()
     {
@@ -1168,7 +1186,10 @@ public class GameManager : MonoBehaviour {
         }
         //DisplayIntermission();
         if (NetworkManager.nm.isStarted)
+        {
+            UpdateArrowQty();
             return;
+        }
         // If not online, game manager handles creating player
         player = Instantiate(playerPrefab);
         PlayerController pc = player.transform.GetComponent<PlayerController>();
@@ -1449,7 +1470,7 @@ public class GameManager : MonoBehaviour {
                     {
 
                         GameObject selected = EventSystem.current.currentSelectedGameObject;
-                        Debug.Log(selected.name + " " + EventSystem.current.currentSelectedGameObject.tag);
+                        //Debug.Log(selected.name + " " + EventSystem.current.currentSelectedGameObject.tag);
                         string tag = selected.tag;
                         if (tag != "QuickAccess")
                             return;
@@ -1861,7 +1882,7 @@ public class GameManager : MonoBehaviour {
                 {
                     difficulty++;
                 }
-                if(wave >= 50)
+                if(wave >= EnemySpawnPattern.patternsBySpawnPointCt[0].Count)
                 {
                     Debug.Log("VICTORY");
                     DisplayVictoryNotification();

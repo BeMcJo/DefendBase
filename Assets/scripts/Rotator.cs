@@ -25,6 +25,7 @@ public class Rotator : MonoBehaviour, IPointerDownHandler, IPointerUpHandler,IDr
                prevItem,
                awaitingItem,
                potentialAttribute,
+               containerID,
                itemSwapIndex;
     Transform itemUIContainer;
     Text currentItemTxt;
@@ -171,6 +172,7 @@ public class Rotator : MonoBehaviour, IPointerDownHandler, IPointerUpHandler,IDr
         
         //print(itemSwapIndex + "..." + curItemSwapIndex + "......" + incrementor);
         int nextIndex = (itemSwapIndex + 1) % 4, prevIndex = (itemSwapIndex + 3) % 4;
+        
         if (curItemSwapIndex != itemSwapIndex)
         {
 
@@ -185,31 +187,12 @@ public class Rotator : MonoBehaviour, IPointerDownHandler, IPointerUpHandler,IDr
                 ShiftItems(1);
             }
         }
+        //ShiftItems((int) Mathf.Sign(curItemSwapIndex - itemSwapIndex));
         itemSwapIndex = curItemSwapIndex;
         EditSelectableAttributes();
     }
 
-    public void EditSelectableAttributes()
-    {
-        //print("editselec");
-        for (int i = 0; i < 4; i++)
-        {
-            Transform icon = itemUIContainer.GetChild(i);
-            string data = icon.GetChild(0).GetComponent<Text>().text;// = "Attribute " + itemOrder[i];
-            string[] splitData = data.Split(' ');
-            int attributeID = int.Parse(splitData[1]);
-
-            icon.GetComponent<Image>().sprite = GameManager.gm.itemIcons[attributeID];
-            //print(attributeID);
-            icon.GetChild(0).GetComponent<Text>().text = "Attribute " + attributeID + " \n" + GameManager.gm.myAttributes[attributeID];
-            if (attributeID == GameManager.gm.selectedAttribute)
-            {
-                icon.GetChild(0).GetComponent<Text>().text += " \n*";
-            }
-        }
-        print("INSIDE EDIT CUR :" + curItem);
-        currentItemTxt.text = Attribute.names[curItem] + '\n' + Projectile.names[1];
-    }
+    
 
     public void OnPointerDown(PointerEventData eventData)
     {
@@ -228,10 +211,10 @@ public class Rotator : MonoBehaviour, IPointerDownHandler, IPointerUpHandler,IDr
                 if (isDragging)
                     return;
                 string[] splitData = go.name.Split(' ');
-                int attributeID = int.Parse(splitData[1]);
+                containerID = int.Parse(splitData[1]);
                 
-                print("potential " + attributeID);
-                potentialAttribute = attributeID;
+                potentialAttribute = itemOrder[containerID];
+                print(containerID +"potential<<<<<<<<<<<<<<<<< " + potentialAttribute);
                 holdTimer = .5f;
             }
         }
@@ -246,14 +229,14 @@ public class Rotator : MonoBehaviour, IPointerDownHandler, IPointerUpHandler,IDr
             if (go.name.Contains("Attribute"))
             {
                 string[] splitData = go.name.Split(' ');
-                int attributeID = int.Parse(splitData[1]);
-                if(attributeID == potentialAttribute && !isDragging)
+                int cid = int.Parse(splitData[1]);
+                if(cid == containerID && !isDragging)
                 {
-                    GameManager.gm.ChangeSelectedAttribute(int.Parse(go.transform.GetChild(0).GetComponent<Text>().text.Split(' ')[1]));
+                    GameManager.gm.ChangeSelectedAttribute(itemOrder[cid]);//int.Parse(go.transform.GetChild(0).GetComponent<Text>().text.Split(' ')[1]));
                     //GameManager.gm.selectedAttribute = ;//potentialAttribute;
                     
-                    print("SELECTED ATTR " + potentialAttribute);
-                    print(GameManager.gm.selectedAttribute);
+                    //print("SELECTED ATTR " + potentialAttribute);
+                    //print(GameManager.gm.selectedAttribute);
                     EditSelectableAttributes();
                     break;
                 }
@@ -289,6 +272,7 @@ public class Rotator : MonoBehaviour, IPointerDownHandler, IPointerUpHandler,IDr
             icon.transform.localPosition = new Vector3(x, y, 0) * 250;
             icon.transform.localEulerAngles += new Vector3(0, 0, 90 * i);
             icon.name = "Attribute " + i;
+            icon.transform.localScale = new Vector3(1, 1, 1);
             //icon.AddComponent<Selector>();
             //icon.transform.GetChild(0).GetComponent<Text>().text = "Attribute " + i; ;
         }
@@ -312,25 +296,33 @@ public class Rotator : MonoBehaviour, IPointerDownHandler, IPointerUpHandler,IDr
         nextItem = itemOrder[1] = GameManager.gm.GetNextItem(curItem);//1 % GameManager.gm.attributePrefabs.Length;
         prevItem = itemOrder[3] = GameManager.gm.GetPrevItem(curItem);//(GameManager.gm.attributePrefabs.Length - 1) % GameManager.gm.attributePrefabs.Length;
         awaitingItem = itemOrder[2] = GameManager.gm.GetNextItem(nextItem);//(nextItem + 1) % GameManager.gm.attributePrefabs.Length;
+        /*
         for (int i = 0; i < 4; i++)//attributePrefabs.Length; i++)
         {
             Transform icon = itemUIContainer.GetChild(i);// + itemSwapIndex - 2 + 4)%4);
             print("ITEM:"+i+".." + itemOrder[i]);
             icon.GetChild(0).GetComponent<Text>().text = "Attribute " + itemOrder[i] + " \n" + GameManager.gm.myAttributes[itemOrder[i]];
         }
+        */
         print("CURIS:"+curItem);
-        UpdateItemUI();
+        //UpdateItemUI();
         EditSelectableAttributes();
     }
 
     public void UpdateItemUI()
     {
+        
         for (int i = 0; i < 4; i++)//attributePrefabs.Length; i++)
         {
             Transform icon = itemUIContainer.GetChild(i);
-            string[] splitData = icon.GetChild(0).GetComponent<Text>().text.Split(' ');
-            int attributeID = int.Parse(splitData[1]);
-            icon.GetChild(0).GetComponent<Text>().text = "Attribute " + attributeID + " \n" + GameManager.gm.myAttributes[attributeID];
+            //string[] splitData = icon.GetChild(0).GetComponent<Text>().text.Split(' ');
+            int attributeID = itemOrder[i];//int.Parse(splitData[1]);
+            //icon.GetChild(0).GetComponent<Text>().text = "Attribute " + attributeID + " \n" + GameManager.gm.myAttributes[attributeID];
+            icon.Find("QtyTxt").GetComponent<Text>().text = "x";
+            if (attributeID == 0)
+                icon.Find("QtyTxt").GetComponent<Text>().text += "---";
+            else
+                icon.Find("QtyTxt").GetComponent<Text>().text += GameManager.gm.myAttributes[itemOrder[i]];
             /*
             if (attributeID == 0)
                 icon.GetChild(0).GetComponent<Text>().text += " \nINF";//GameManager.gm.myAttributes[attributeID];// "Attribute " + itemOrder[i];
@@ -338,6 +330,44 @@ public class Rotator : MonoBehaviour, IPointerDownHandler, IPointerUpHandler,IDr
                 icon.GetChild(0).GetComponent<Text>().text += " \n" + GameManager.gm.myAttributes[attributeID];// "Attribute " + itemOrder[i];
             */
         }
+        /*
+        Transform icon = itemUIContainer.GetChild(itemSwapIndex);
+        int attributeID = itemOrder[itemSwapIndex];
+        icon.GetChild(0).GetComponent<Text>().text = "Attribute " + attributeID + " \n" + GameManager.gm.myAttributes[attributeID];
+
+        icon = itemUIContainer.GetChild(GameManager.gm.GetPrevItem(itemSwapIndex));
+        attributeID = itemOrder[itemSwapIndex];
+        icon.GetChild(0).GetComponent<Text>().text = "Attribute " + attributeID + " \n" + GameManager.gm.myAttributes[attributeID];
+        */
+    }
+
+    public void EditSelectableAttributes()
+    {
+        //print("editselec");
+        for (int i = 0; i < 4; i++)
+        {
+            Transform icon = itemUIContainer.GetChild(i);
+            //string data = icon.GetChild(0).GetComponent<Text>().text;// = "Attribute " + itemOrder[i];
+            //string[] splitData = data.Split(' ');
+            int attributeID = itemOrder[i];//int.Parse(splitData[1]);
+
+            icon.Find("ItemIcon").GetComponent<Image>().sprite = GameManager.gm.itemIcons[attributeID];
+            icon.Find("Selected BG").gameObject.SetActive(attributeID == GameManager.gm.selectedAttribute);
+            /*
+            icon.GetChild(0).GetComponent<Text>().text = "Attribute " + attributeID + " \n" + GameManager.gm.myAttributes[attributeID];
+            if (attributeID == GameManager.gm.selectedAttribute)
+            {
+                icon.GetChild(0).GetComponent<Text>().text += " \n*";
+            }
+            */
+            icon.Find("QtyTxt").GetComponent<Text>().text = "x";
+            if (attributeID == 0)
+                icon.Find("QtyTxt").GetComponent<Text>().text += "---";
+            else
+                icon.Find("QtyTxt").GetComponent<Text>().text += GameManager.gm.myAttributes[itemOrder[i]];
+        }
+        //print("INSIDE EDIT CUR :" + curItem);
+        currentItemTxt.text = Attribute.names[curItem] + '\n' + Projectile.names[1];
     }
 	
     // clockwise = -1, counter = 1
@@ -351,9 +381,9 @@ public class Rotator : MonoBehaviour, IPointerDownHandler, IPointerUpHandler,IDr
 
         nextItem = GameManager.gm.GetNextItem(curItem);//(curItem + 1) % attributeCt;
         prevItem = GameManager.gm.GetPrevItem(curItem);//(curItem - 1 + attributeCt) % attributeCt;
-        print("NEXT ITEM" + nextItem);
-        print("PREV ITEM" + prevItem);
-        print(curItem + ".....");
+        //print("NEXT ITEM" + nextItem);
+        //print("PREV ITEM" + prevItem);
+        //print(curItem + ".....");
         if (dir == 1)
         {
             awaitingItem = GameManager.gm.GetNextItem(nextItem);
@@ -373,7 +403,9 @@ public class Rotator : MonoBehaviour, IPointerDownHandler, IPointerUpHandler,IDr
 
         }
         print(curItem);
-        itemUIContainer.GetChild(itemSwapIndex).GetChild(0).GetComponent<Text>().text = "Attribute " + awaitingItem + " \n" + GameManager.gm.myAttributes[awaitingItem];
+        //int curItemIndex = (itemSwapIndex +)
+        //itemUIContainer.GetChild(itemSwapIndex).GetChild(0).GetComponent<Text>().text = "Attribute " + awaitingItem + " \n" + GameManager.gm.myAttributes[awaitingItem];
+        itemOrder[itemSwapIndex] = awaitingItem;
         //itemSwapIndex = nextItemSwapIndex;
         /*
         if (dir == 1)

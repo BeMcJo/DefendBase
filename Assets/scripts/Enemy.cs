@@ -26,7 +26,7 @@ public class Enemy : MonoBehaviour
         // Stats for Normies
         new EnemyStats[]
         {
-            new EnemyStats(1, 0, 1, 1),
+            new EnemyStats(1, 1, 1, 1),
             new EnemyStats(2, 2, 1.2f, 1.2f),
             new EnemyStats(2, 2, 1.25f, 1.25f),
             new EnemyStats(3, 2, 1.5f, 1.3f),
@@ -35,7 +35,7 @@ public class Enemy : MonoBehaviour
         // Stats for Infuries
         new EnemyStats[]
         {
-            new EnemyStats(2, 0, 1, 1),
+            new EnemyStats(2, 1, 1, 1),
             new EnemyStats(2, 2, 1.2f, 1.2f),
             new EnemyStats(4, 3, 1.25f, 1.25f),
             new EnemyStats(4, 3, 1.5f, 1.3f),
@@ -462,9 +462,9 @@ public class Enemy : MonoBehaviour
         }
         GameManager.gm.enemies.Remove(id);
         List<GameObject> rewards = new List<GameObject>();
-        GameManager.gm.UpdateItem("Attribute", 1, 1);
+        //GameManager.gm.UpdateItem("Attribute", 1, 1);
         float spawnRewardChance = Random.Range(0.0f, 1.25f);
-        print((int)spawnRewardChance);
+        //print((int)spawnRewardChance);
         for (int i = 0; i < (int)spawnRewardChance; i++)
         {
             GameObject reward = Instantiate(GameManager.gm.rewardPrefabs[0]);
