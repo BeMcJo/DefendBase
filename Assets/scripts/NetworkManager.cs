@@ -769,7 +769,7 @@ public class NetworkManager : MonoBehaviour {
                             RequestActivityLog();
                             break;
                         }
-                        SpawnEnemy(int.Parse(splitData[2]));
+                        SpawnEnemy(splitData);
                         break;
                     // Someone disconnected, handle it
                     case "DC":
@@ -1071,28 +1071,73 @@ public class NetworkManager : MonoBehaviour {
         activitiesToSend.Clear();
     }
 
+    // As client, spawn enemy and generate path
+    public void SpawnEnemy(string[] splitData)
+    {
+        int sp = int.Parse(splitData[2]);
+        string pathstr = null;
+        if (splitData.Length > 2) {
+            pathstr = splitData[3];
+        }
+        if (sp == -1)
+            sp = UnityEngine.Random.Range(0, MapManager.mapManager.spawnPoints.Count);
+        //GameObject spawnPoint = MapManager.mapManager.spawnPoints[sp];
+        List<GameObject> pathing = new List<GameObject>();//Enemy.GeneratePathing(spawnPoint);
+
+        if (pathstr != null)
+        {
+            string[] paths = pathstr.Split(',');
+            for(int i =0; i < paths.Length; i++)
+            {
+                string[] tagAndID = paths[i].Split(' ');
+                if(tagAndID[0] == "Path")
+                {
+                    pathing.Add(MapManager.mapManager.platforms[int.Parse(tagAndID[1])]);
+                }
+            }
+        }
+        NotifySpawnEnemyAt(sp, pathing);
+        StartCoroutine(GameManager.gm.SpawnEnemy(sp, pathing));
+    }
+
     // As host, tell game manager to spawn enemy and tell clients to do so as well
     public void SpawnEnemy(int sp)
     {
         if (sp == -1)
             sp = UnityEngine.Random.Range(0, MapManager.mapManager.spawnPoints.Count);
-        NotifySpawnEnemyAt(sp);
-        StartCoroutine(GameManager.gm.SpawnEnemy(sp));
+        GameObject spawnPoint = MapManager.mapManager.spawnPoints[sp];
+        List<GameObject> pathing = Enemy.GeneratePathing(spawnPoint);
+        NotifySpawnEnemyAt(sp, pathing);
+        StartCoroutine(GameManager.gm.SpawnEnemy(sp, pathing));
     }
 
     // Notify players to spawn enemies
-    public void NotifySpawnEnemyAt(int spawnPoint)
+    public void NotifySpawnEnemyAt(int spawnPoint, List<GameObject> pathing=null)
     {
         string msg = "ENEMYSPAWN|" + activityLog.Count + "|" + spawnPoint + "|";
+        if (pathing != null)
+        {
+            for(int i = 0; i < pathing.Count; i++)
+            {
+                msg += pathing[i].tag;
+                if(pathing[i].tag == "Path")
+                {
+                    msg += " " + pathing[i].GetComponent<PlatformPath>().id;
+                }
+                msg += ',';
+            }
+            msg.Trim(',');
+            msg += '|';
+        }
         if(isHost)
             Send(msg, reliableChannel, players);
         activityLog.Add(msg);
     }
 
     // Make request to repair objective
-    public void ConfirmObjectiveRepair(int oid, int hp)
+    public void ConfirmObjectiveRepair(int oid, int hp, bool isShopping)
     {
-        string msg = "REPAIROBJECTIVE|" + activityLog.Count + "|" + ourClientID + "|" + oid + "|" + hp;
+        string msg = "REPAIROBJECTIVE|" + activityLog.Count + "|" + ourClientID + "|" + oid + "|" + hp + "|" + isShopping;
         if (isHost)
         {
             OnRepairObjective(msg.Split('|'));
@@ -1109,15 +1154,17 @@ public class NetworkManager : MonoBehaviour {
         int cnnID = int.Parse(data[2]);
         int oid = int.Parse(data[3]);
         int hp = int.Parse(data[4]);
+        bool isShopping = bool.Parse(data[5]);
         Objective o = GameManager.gm.objective.transform.GetComponent<Objective>();
-        string msg = data[0] + "|" + activityLog.Count + "|" + data[2] + "|" + data[3] + "|" + data[4] + "|";
+        string msg = data[0] + "|" + activityLog.Count + "|" + data[2] + "|" + data[3] + "|" + data[4] + "|" + data[5] + "|";
         // As host, confirm that repairing the objective is valid
         if (isHost)
         {
-            if(o.HP < o.maxHP)
+            // If under max health to repair
+            if (o.HP < o.maxHP)
             {
-                // If I was the one making request, repair and pay price
-                if(cnnID == ourClientID)
+                // If I was the one making request, repair and pay price if shopping
+                if (cnnID == ourClientID && isShopping)
                 {
                     o.Repair();
                 }
@@ -1133,7 +1180,7 @@ public class NetworkManager : MonoBehaviour {
         // As client, check if I made request or not to repair
         else
         {
-            if (cnnID == ourClientID)
+            if (cnnID == ourClientID && isShopping)
             {
                 o.Repair();
             }

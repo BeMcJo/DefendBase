@@ -375,7 +375,7 @@ public class Rotator : MonoBehaviour, IPointerDownHandler, IPointerUpHandler,IDr
     {
         //itemSwapIndex = 2;
         //int tmp = itemOrder[itemSwapIndex];
-        int attributeCt = GameManager.gm.attributePrefabs.Length;
+        int attributeCt = Attribute.names.Length;
         //int nextCurrentItem;
         //int nextItemSwapIndex;
 

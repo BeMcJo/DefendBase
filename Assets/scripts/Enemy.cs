@@ -40,6 +40,15 @@ public class Enemy : MonoBehaviour
             new EnemyStats(4, 3, 1.25f, 1.25f),
             new EnemyStats(4, 3, 1.5f, 1.3f),
             new EnemyStats(6, 3, 1.5f, 1.5f)
+        },
+        // Stats for Flyies
+        new EnemyStats[]
+        {
+            new EnemyStats(1, 1, 1, 1),
+            new EnemyStats(2, 2, 1.2f, 1.2f),
+            new EnemyStats(4, 3, 1.25f, 1.25f),
+            new EnemyStats(4, 3, 1.5f, 1.3f),
+            new EnemyStats(6, 3, 1.5f, 1.5f)
         }
     };
     public Animator anim;
@@ -49,6 +58,7 @@ public class Enemy : MonoBehaviour
                id, // Unique way to identify this enemy
                enemyID = 0, // Distinguishes what type of enemy this is
                attackCt, // Keeps track of attack for multiplayer synchronization
+               curTarget, // Pursue current target
                level; // Used to determine what the stats are
     public float originalMoveSpd = 0.075f, // Default move speed
                  effectiveMoveSpd, // Move speed calculated and used 
@@ -63,6 +73,7 @@ public class Enemy : MonoBehaviour
     public GameObject go;
     public GameObject target; // What the enemy prioritizes
     public Vector3 targetPos; // What the enemy faces and moves to
+    public List<GameObject> pathing; // Path enemy follows
     protected List<GameObject> grounds = new List<GameObject>();
 
     // Used to create the enemy and identify it
@@ -88,6 +99,7 @@ public class Enemy : MonoBehaviour
         atkTimer = effectiveTimeToAttack;
         effectiveAttackSpd = originalAttackSpd * difficulties[enemyID][level].atkSpd;
         attackCt = 0;
+        curTarget = 0;
         anim = GetComponent<Animator>();
         isDoneMoving = true;
         gameObject.AddComponent<ConstantForce>().force = new Vector3(0, -9, 0);
@@ -99,7 +111,25 @@ public class Enemy : MonoBehaviour
         originalColor = go.GetComponent<Renderer>().material.color;
     }
 
-    // Format: ENEMY|enemy id|enemy relative pos to target|target tag|target id
+    public static List<GameObject> GeneratePathing(GameObject sp)
+    {
+        List<GameObject> pathing = new List<GameObject>();
+        if (sp == null)
+            return pathing;
+        pathing.Add(sp);
+        if(sp.tag == "Path")
+        {
+            PlatformPath pp = sp.GetComponent<PlatformPath>();
+            if (pp.destTargets.Count == 0)
+                return pathing;
+            int nextPath = Random.Range(0, pp.destTargets.Count);
+            sp = pp.destTargets[nextPath];
+            pathing.AddRange(GeneratePathing(sp));
+        }
+        return pathing;
+    }
+
+    // Format: ENEMY|enemy id|enemy relative pos to target|target tag|target id|pathing
     public virtual string NetworkInformation()
     {
         string msg = "";
@@ -121,6 +151,9 @@ public class Enemy : MonoBehaviour
                 break;
             case "Objective":
                 msg += target.transform.GetComponent<Objective>().id + "|";
+                break;
+            case "Player":
+                msg += target.transform.GetComponent<PlayerController>().id + "|";
                 break;
         }
         //msg += enemyID + "|";
@@ -260,10 +293,13 @@ public class Enemy : MonoBehaviour
                     //print("CHANGE PATH");
                     PlatformPath p = target.transform.GetComponent<PlatformPath>();
                     target = null;
+
+                    curTarget++;
                     // Get new path if reached destination
-                    if (p.destTargets.Count > 0)
+                    if (curTarget < pathing.Count) //p.destTargets.Count > 0)
                     {
-                        SetTarget(p.destTargets[Random.Range(0, p.destTargets.Count)]);
+                        SetTarget(pathing[curTarget]);
+                        //SetTarget(p.destTargets[Random.Range(0, p.destTargets.Count)]);
                     }
                     // No more paths, target objective
                     else
@@ -465,6 +501,7 @@ public class Enemy : MonoBehaviour
         //GameManager.gm.UpdateItem("Attribute", 1, 1);
         float spawnRewardChance = Random.Range(0.0f, 1.25f);
         //print((int)spawnRewardChance);
+        //spawnRewardChance = 1;
         for (int i = 0; i < (int)spawnRewardChance; i++)
         {
             GameObject reward = Instantiate(GameManager.gm.rewardPrefabs[0]);
@@ -528,10 +565,7 @@ public class Enemy : MonoBehaviour
             Collider c = collision.collider;
             if (collision.gameObject.name != "EnemyObject")
             {
-                print(collision.gameObject.name);
                 c = collision.gameObject.GetComponent<Enemy>().go.GetComponent<Collider>();
-
-                print("?");
             }
             Physics.IgnoreCollision(c, go.GetComponent<Collider>());
 

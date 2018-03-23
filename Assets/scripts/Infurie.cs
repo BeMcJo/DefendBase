@@ -104,53 +104,6 @@ public class Infurie : Enemy
         //StartCoroutine(MoveAnimation());
         //transform.position = Vector3.MoveTowards(transform.position, targetPos, effectiveMoveSpd);
     }
-
-    protected override void OnCollisionEnter(Collision collision)
-    {
-        // Ignore colliding with enemies
-        if (collision.gameObject.tag == "Enemy")
-        {
-
-            Collider c = collision.collider;
-            if (collision.gameObject.name != "EnemyObject")
-            {
-                c = collision.gameObject.GetComponent<Enemy>().go.GetComponent<Collider>();
-
-            }
-            Physics.IgnoreCollision(c, go.GetComponent<Collider>());
-            return;
-        }
-    }
-    protected override void OnCollisionStay(Collision collision)
-    {
-        if (collision.gameObject.tag == "Enemy")
-        {
-            Collider c = collision.collider;
-            if (collision.gameObject.name != "EnemyObject")
-            {
-                print(collision.gameObject.name);
-                c = collision.gameObject.GetComponent<Enemy>().go.GetComponent<Collider>();
-
-                print("?");
-            }
-            Physics.IgnoreCollision(c, go.GetComponent<Collider>());
-
-            return;
-        }
-    }
-    /*
-    private void OnTriggerStay(Collider collision)
-    {
-        if (grounds.Count > 0)
-        {
-            Rigidbody rb = GetComponent<Rigidbody>();
-            rb.velocity -= new Vector3(0, rb.velocity.y, 0);
-        }
-        // print(collision.gameObject.tag);
-    }*/
-    protected override void OnCollisionExit(Collision collision)
-    {
-    }
-
+    
 
 }

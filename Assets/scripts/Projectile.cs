@@ -2,23 +2,27 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public abstract class Projectile : MonoBehaviour {
+public class Projectile : MonoBehaviour {
     public static string[] names = new string[] {
         "Projectile",
         "Arrow"
     };
     public int id; // ID based on which player shot this object
     public float activeDuration = 10f; // How long before destroying object
+    public float moveSpd = 6f;
     public int dmg = 1, // How much damage this can inflict
                attributeID; // Unique attribute attached to projectile
     public bool hitGround, // Did this get dull from hitting ground/wall? Can't damage enemies if so 
+                isHoming = false, // Does this object lock on and chase target?
                 isShot; // Did this get launched?
+    public GameObject target; // Is there a target locked on to chase?
     protected bool deflected; // Did this not penetrate object? If so, bounce 
     public TrailRenderer tr; // Shows trajectory path tailing this object
+    public string ownerType; // What type of object shot me?
+    public int ownerID; // Who specifically shot me?
 	// Use this for initialization
 	protected virtual void Start () {
         hitGround = false;
-        isShot = false;
         deflected = false;
         tr = transform.GetComponent<TrailRenderer>();
         if (tr)
@@ -26,14 +30,29 @@ public abstract class Projectile : MonoBehaviour {
 
         SetAttribute(GameManager.gm.selectedAttribute);
     }
+
+    public virtual void Shoot(GameObject t, string ownerType, int ownerID)
+    {
+        //print("shoot");
+        isShot = true;
+        this.ownerType = ownerType;
+        this.ownerID = ownerID;
+        id = ownerID;
+        if (tr)
+            tr.enabled = true;
+        target = t;
+    }
 	
 	// Update is called once per frame
 	protected virtual void Update () {
         if (isShot)
         {
             activeDuration -= Time.deltaTime;
-            if (tr)
-                tr.enabled = true;
+            if (target)
+            {
+                transform.LookAt(target.transform);
+                transform.position += transform.forward * Time.deltaTime * moveSpd;
+            }
         }
         if(activeDuration <= 0)
         {
@@ -61,20 +80,35 @@ public abstract class Projectile : MonoBehaviour {
     protected virtual void OnTriggerEnter(Collider collision)
     {
         //print("ATTRIBUTE::>>>>>>>>>>>>>>" + attributeID);
-        print(collision.gameObject.name + " " + collision.gameObject.tag);
-        if (id != GameManager.gm.player.transform.GetComponent<PlayerController>().id || deflected)
+        //print(collision.gameObject.name + " " + collision.gameObject.tag + " " + ownerType);
+        //print((id != GameManager.gm.player.transform.GetComponent<PlayerController>().id));
+        //print(deflected);
+        //print(!isShot);
+        if (deflected || !isShot)
             return;
-        if(collision.tag == "Reward")
+        if(collision.tag == "Player" && ownerType == "Enemy" && collision.GetComponent<PlayerController>().IsMyPlayer())
+        {
+            print("SPLAT");
+            GameManager.gm.Blackout();
+            Destroy(gameObject);
+        }
+        if (ownerType != "Player")
+            return;
+        if (id != GameManager.gm.player.transform.GetComponent<PlayerController>().id)
+            return;
+        if (collision.tag == "Reward")
         {
             print("HIT REWARD");
             collision.GetComponent<Floater>().OnHit();
         }
-        if (collision.transform.tag == "Enemy")
+        if (collision.transform.tag == "Enemy" && ownerType != "Enemy")
         {
+            print("hit");
             GameManager.gm.OnHitEnemy();
             // If can damage enemy and this is shot by my player
             if (!hitGround && !deflected)
             {
+                print("hit2");
                 Transform t = collision.transform;
                 Enemy e = collision.transform.parent.GetComponent<Enemy>();
                 while (e == null)
@@ -88,10 +122,20 @@ public abstract class Projectile : MonoBehaviour {
                     CreateExplosion();
                 }
                 e.OnHit();
+                // If piercing attribute, don't stop arrow
+                if (attributeID != 2)
+                {
+                    deflected = true;
+                    transform.GetComponent<Rigidbody>().velocity = Vector3.zero;
+                    transform.GetComponent<Rigidbody>().useGravity = false;
+                    tr.enabled = false;
+                    transform.SetParent(collision.transform);
+                }
                 //e.transform.GetComponent<Rigidbody>().velocity = Vector3.zero; // Disable physics force applied when colliding
                 // If using online feature, let Network Manager handle this
                 if (NetworkManager.nm.isStarted)
                 {
+                    print("hit4");
                     NetworkManager.nm.NotifyObjectDamagedBy(e.gameObject, gameObject);
                     return;
                 }
@@ -99,14 +143,10 @@ public abstract class Projectile : MonoBehaviour {
                 if (e.TakeDamage(dmg))
                 {
                     // If enemy is still alive, leave arrow stuck in enemy
-                    if (e.health > 0)
-                    {
-                        deflected = true;
-                        transform.GetComponent<Rigidbody>().velocity = Vector3.zero;
-                        transform.GetComponent<Rigidbody>().useGravity = false;
-                        tr.enabled = false;
-                        transform.SetParent(collision.transform);
-                    }
+                    //if (e.health > 0 )
+                    //{
+                        
+                    //}
                 }
             }
         }
@@ -138,7 +178,8 @@ public abstract class Projectile : MonoBehaviour {
     //unused
     protected virtual void OnCollisionEnter(Collision collision)
     {
-        if (collision.transform.tag == "Enemy")
+        print(1);
+        if (collision.transform.tag == "Enemy" && ownerType != "Enemy")
         {
             if (!hitGround && id == GameManager.gm.player.transform.GetComponent<PlayerController>().id)
             {

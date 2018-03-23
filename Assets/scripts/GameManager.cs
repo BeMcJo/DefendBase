@@ -52,6 +52,7 @@ public class GameManager : MonoBehaviour {
                 doneSpawningWave, // Is current wave all spawned?
                 setupRotation, // Are you done setting up the orientation of your forward?
                 //gyroEnabled, // Used????
+                isBlackingOut, // Used for blackout effect for player view
                 hasWon,
                 interactiveTouch, // Using touch interactions that isn't just shoot button?
                 onIntermission, // Are we on break from defending waves of enemies?
@@ -96,6 +97,7 @@ public class GameManager : MonoBehaviour {
 
     public GameObject playerStatusCanvas, // Information used for player to see
                       quickAccessCanvas, // Holds touch-interactive UI for quick access purposes
+                      effectsCanvas, // Holds special effects in the view of the player
                       quickAccessUpgradeDescription, // Used for toggling description of item to upgrade
                       itemWheel, // Holds selectable UI. Touch/Drag to spin wheel
                       intermissionCanvas, // Displays things to do during break 
@@ -158,6 +160,7 @@ public class GameManager : MonoBehaviour {
 
     public Sprite[] itemIcons;
     //Button upgradeWepBtn;
+    Coroutine blackoutCoroutine;
 
     // Saves data based on the type
     public void Save(string type)
@@ -508,11 +511,13 @@ public class GameManager : MonoBehaviour {
         changeArrowBtn = quickAccessCanvas.transform.Find("ChangeArrowsBtn").gameObject;
         itemWheel = quickAccessCanvas.transform.Find("ItemWheel").gameObject;
         itemWheel.SetActive(false);
-        
+
+        effectsCanvas = GameObject.Find("EffectsCanvas");
+
         myProjectiles.Clear();
         myAttributes.Clear();
         //Attribute.names = new string[attributePrefabs.Length];
-        for(int i = 0; i < attributePrefabs.Length; i++)
+        for(int i = 0; i < Attribute.names.Length; i++)
         {
             //Attribute.names[i] = "Attr " + i;
             myAttributes[i] = 0;
@@ -639,9 +644,9 @@ public class GameManager : MonoBehaviour {
 
     public int GetNextItem(int index)
     {
-        for(int i = 1; i < attributePrefabs.Length; i++)
+        for(int i = 1; i < Attribute.names.Length; i++)
         {
-            int nextIndex = (index + i) % attributePrefabs.Length;
+            int nextIndex = (index + i) % Attribute.names.Length;
             if(myAttributes[nextIndex] > 0 || nextIndex == 0)
             {
                 index = nextIndex;
@@ -653,9 +658,9 @@ public class GameManager : MonoBehaviour {
 
     public int GetPrevItem(int index)
     {
-        for (int i = 1; i < attributePrefabs.Length; i++)
+        for (int i = 1; i < Attribute.names.Length; i++)
         {
-            int prevIndex = (index - i + attributePrefabs.Length) % attributePrefabs.Length;
+            int prevIndex = (index - i + Attribute.names.Length) % Attribute.names.Length;
             if (myAttributes[prevIndex] > 0 || prevIndex == 0)
             {
                 index = prevIndex;
@@ -733,6 +738,40 @@ public class GameManager : MonoBehaviour {
                 Debug.Log("BOUGHT");
                 break;
         }
+    }
+
+    public bool BlackoutFaded()
+    {
+        Transform blackout = effectsCanvas.transform.Find("Blackout Fader");
+        Color c = blackout.GetComponent<Image>().color;
+        c.a -= 1.0f/255.0f;
+        if (c.a <= 0)
+            c.a = 0;
+        blackout.GetComponent<Image>().color = c;
+        return c.a <= 0;
+    }
+
+    public IEnumerator FadeBlackout()
+    {
+        isBlackingOut = true;
+        yield return new WaitForSeconds(3);
+        yield return new WaitUntil(BlackoutFaded);
+        isBlackingOut = true;
+    }
+
+    public void Blackout()
+    {
+        if (isBlackingOut)
+        {
+            print("stahps");
+            StopCoroutine(blackoutCoroutine);
+        }
+        Transform blackout = effectsCanvas.transform.Find("Blackout Fader");
+        Color c = blackout.GetComponent<Image>().color;
+        c.a = 1;
+        blackout.GetComponent<Image>().color = c;
+        print("staht");
+        blackoutCoroutine = StartCoroutine(FadeBlackout());
     }
 
     public void DisplayVictoryNotification()
@@ -1224,7 +1263,7 @@ public class GameManager : MonoBehaviour {
     }
 
     // Spawn enemy at the spawn point sp
-    public IEnumerator SpawnEnemy(int sp)
+    public IEnumerator SpawnEnemy(int sp, List<GameObject> pathing=null)
     {
         if (inGame)
         {
@@ -1240,11 +1279,16 @@ public class GameManager : MonoBehaviour {
                                         spawnPoint.transform.position.x,
                                         enemy.transform.position.y + 1,
                                         spawnPoint.transform.position.z);
-            enemy.transform.GetComponent<Enemy>().SetTarget(spawnPoint);
+            Enemy e = enemy.transform.GetComponent<Enemy>();
+            e.SetTarget(spawnPoint);
+            if (pathing == null)
+                pathing = Enemy.GeneratePathing(spawnPoint);
+            print("path gen");
+            e.pathing = pathing;
             GameObject enemyUI = Instantiate(statusIndicatorPrefab);
             enemyUI.transform.GetComponent<StatusIndicator>().target = enemy;
             enemy.transform.SetParent(enemiesContainer.transform);
-            Enemy e = enemy.transform.GetComponent<Enemy>();
+            difficulty = 0;
             e.level = (pattern.enemyLvls[intervalIndex][spawnIndex] + difficulty) % Enemy.difficulties.Length;
 
             spawnIndex++;
@@ -1845,7 +1889,7 @@ public class GameManager : MonoBehaviour {
             HandleMapEditActivities();
         }
 
-        scoreTxt.text = "Score: " + score + ", spawned" + enemiesSpawned + "/kills" + kills + ", $" + inGameCurrency;
+        scoreTxt.text = "Score: " + score + ", spawned" + enemiesSpawned + "/kills" + kills + ", $" + inGameCurrency + ", Wave:" + (wave+1);
         if (!startWaves)
             return;
         // if there are enemies to spawn

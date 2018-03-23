@@ -8,6 +8,15 @@ public class Floater : MonoBehaviour {
     Vector3 biasedDir, biasedTorq;
     float ttl;
     bool isHit;
+    string[] rewardTypes = new string[]
+    {
+        "attribute",
+        "repair",
+        "money",
+        "score"
+    };
+
+    int rewardType;
 	// Use this for initialization
 	void Start () {
         rb = GetComponent<Rigidbody>();
@@ -16,6 +25,23 @@ public class Floater : MonoBehaviour {
         rb.AddForce(biasedDir* Random.Range(20,250));
         rb.AddTorque(biasedTorq* Random.Range(20, 250));
         //GetComponent<Collider>().enabled = true;
+        rewardType = Random.Range(0, rewardTypes.Length);
+        Renderer r = GetComponent<Renderer>();
+        Color c = r.material.color;
+        switch (rewardType)
+        {
+            case 1:
+                c = Color.gray;
+                break;
+            case 2:
+                c = Color.green;
+                break;
+            case 3:
+                c = Color.yellow;
+                break;
+        }
+        c.a = 135.0f / 255.0f;
+        r.material.color = c;
         StartCoroutine(Invincibility());
         ttl = 30f;
     }
@@ -59,15 +85,55 @@ public class Floater : MonoBehaviour {
         Destroy(gameObject);
     }
 
+    public void GenerateReward()
+    {
+        GameObject itemGainIndicator;
+        //rewardType = 1;
+        switch (rewardType)
+        {
+            // attribute
+            case 0:
+                GameManager.gm.UpdateItem("Attribute", 1, 2);
+                itemGainIndicator = Instantiate(GameManager.gm.indicatorPrefabs[0]);
+                itemGainIndicator.transform.position = transform.position;
+                itemGainIndicator.transform.GetChild(0).GetComponent<Text>().text = "+2 Bomb Arrow";
+                itemGainIndicator.transform.LookAt(GameManager.gm.player.GetComponent<PlayerController>().playerCam.transform);
+                break;
+
+            // repair
+            case 1:
+                GameManager.gm.objective.GetComponent<Objective>().Repair(-2);
+                itemGainIndicator = Instantiate(GameManager.gm.indicatorPrefabs[0]);
+                itemGainIndicator.transform.position = transform.position;
+                itemGainIndicator.transform.GetChild(0).GetComponent<Text>().text = "+2 Repair";
+                itemGainIndicator.transform.LookAt(GameManager.gm.player.GetComponent<PlayerController>().playerCam.transform);
+                break;
+
+            // money
+            case 2:
+                GameManager.gm.UpdateInGameCurrency(10);
+                itemGainIndicator = Instantiate(GameManager.gm.indicatorPrefabs[0]);
+                itemGainIndicator.transform.position = transform.position;
+                itemGainIndicator.transform.GetChild(0).GetComponent<Text>().text = "+$10";
+                itemGainIndicator.transform.LookAt(GameManager.gm.player.GetComponent<PlayerController>().playerCam.transform);
+                break;
+
+            // score
+            case 3:
+                GameManager.gm.AddScore(200);
+                itemGainIndicator = Instantiate(GameManager.gm.indicatorPrefabs[0]);
+                itemGainIndicator.transform.position = transform.position;
+                itemGainIndicator.transform.GetChild(0).GetComponent<Text>().text = "+200 Score";
+                itemGainIndicator.transform.LookAt(GameManager.gm.player.GetComponent<PlayerController>().playerCam.transform);
+                break;
+        }
+    }
+
     public void OnHit()
     {
         if (isHit)
             return;
-        GameManager.gm.UpdateItem("Attribute", 1, 2);
-        GameObject itemGainIndicator = Instantiate(GameManager.gm.indicatorPrefabs[0]);
-        itemGainIndicator.transform.position = transform.position;
-        itemGainIndicator.transform.GetChild(0).GetComponent<Text>().text = "+2 Bomb Arrow";
-        itemGainIndicator.transform.LookAt(GameManager.gm.player.GetComponent<PlayerController>().playerCam.transform);
+        GenerateReward();
         Die();
     }
 

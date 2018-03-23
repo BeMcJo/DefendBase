@@ -5,7 +5,8 @@ using UnityEngine;
 public class Attribute : MonoBehaviour {
     public static string[] names = new string[] {
         "",
-        "Bomb"
+        "Bomb",
+        "Piercing"
     };
 	// Use this for initialization
 	void Start () {

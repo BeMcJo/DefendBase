@@ -269,7 +269,7 @@ public abstract class Weapon : MonoBehaviour
     // Handles the beginning of weapon usage
     public virtual bool StartUse(Touch t)
     {
-        print(2);
+        //print(2);
         inUse = true;
         charging = true;
         chargePower = 0;

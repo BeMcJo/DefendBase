@@ -120,7 +120,7 @@ public class Bow : Weapon
                 // Is that object our Shoot Button?
                 if (EventSystem.current.currentSelectedGameObject && EventSystem.current.currentSelectedGameObject.tag == "Shoot")
                 {
-                    print("??");
+                    //print("??");
                     base.StartUse(t);
                     shootTouchID = t.fingerId;
                 }
@@ -227,10 +227,11 @@ public class Bow : Weapon
             rb.AddForce(user.playerCam.transform.forward * chargePower * statsByLevel[wepID].distance[lvl]); // Launch arrow
             rb.useGravity = true;
             Arrow arrw = arrow.GetComponent<Arrow>();
-            arrw.isShot = true;
-            arrw.id = user.id;
-            arrw.dmg = statsByLevel[wepID].dmg[lvl];
-            arrw.transform.Find("Tail").GetComponent<BoxCollider>().enabled = false;
+            arrw.Shoot(null, user.tag, user.id);
+            //arrw.isShot = true;
+            //arrw.id = user.id;
+            //arrw.dmg = statsByLevel[wepID].dmg[lvl];
+            //arrw.transform.Find("Tail").GetComponent<BoxCollider>().enabled = false;
             //arrw.attributeID = GameManager.gm.selectedAttribute;
             arrow = null;
             reloading = true;
