@@ -6,7 +6,8 @@ public class Explosion : MonoBehaviour {
     public float growthRate = 1f;
     public float growthLimit = 20f;
     public int dmg = 10,
-               id; 
+               ownerID;
+    public string ownerType;
 	// Use this for initialization
 	void Start () {
 		
@@ -22,7 +23,7 @@ public class Explosion : MonoBehaviour {
     private void OnTriggerEnter(Collider other)
     {
         //Debug.Log(other.tag);
-        if (id != GameManager.gm.player.transform.GetComponent<PlayerController>().id)
+        if (ownerID != GameManager.gm.player.transform.GetComponent<PlayerController>().id)
             return;
         //Debug.Log("aa");
         if(other.tag == "Enemy")
@@ -43,7 +44,7 @@ public class Explosion : MonoBehaviour {
                 return;
             }
             // If not using online feature, inflict damage to enemy
-            e.TakeDamage(dmg);
+            e.TakeDamageFrom(dmg, ownerType, ownerID);
             //Debug.Log("BOOM");
         }else if (other.tag == "Trap")
         {

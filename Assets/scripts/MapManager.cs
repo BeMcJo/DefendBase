@@ -142,7 +142,7 @@ public class MapManager : MonoBehaviour {
                 }
             }
         }
-        mapContainer.transform.localEulerAngles = GameManager.gm.playerOrientation; // Orient map to face in forward direction as player
+        //mapContainer.transform.localEulerAngles = GameManager.gm.playerOrientation; // Orient map to face in forward direction as player
         createdMap = true; // Done creating map
     }
 }

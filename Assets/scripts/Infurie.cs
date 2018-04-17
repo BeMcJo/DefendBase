@@ -4,8 +4,9 @@ using UnityEngine;
 
 public class Infurie : Enemy
 {
-    private void Awake()
+    protected override void Awake()
     {
+        base.Awake();
         ename = "infurie";
     }
     // Use this for initialization

@@ -406,6 +406,7 @@ public class Rotator : MonoBehaviour, IPointerDownHandler, IPointerUpHandler,IDr
         //int curItemIndex = (itemSwapIndex +)
         //itemUIContainer.GetChild(itemSwapIndex).GetChild(0).GetComponent<Text>().text = "Attribute " + awaitingItem + " \n" + GameManager.gm.myAttributes[awaitingItem];
         itemOrder[itemSwapIndex] = awaitingItem;
+        GameManager.gm.ChangeSelectedAttribute(curItem);
         //itemSwapIndex = nextItemSwapIndex;
         /*
         if (dir == 1)

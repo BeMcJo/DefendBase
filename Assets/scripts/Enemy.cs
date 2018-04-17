@@ -59,6 +59,7 @@ public class Enemy : MonoBehaviour
                enemyID = 0, // Distinguishes what type of enemy this is
                attackCt, // Keeps track of attack for multiplayer synchronization
                curTarget, // Pursue current target
+               dmgSourceID, // Damage Source ID ( most recent unit that attacked this object )
                level; // Used to determine what the stats are
     public float originalMoveSpd = 0.075f, // Default move speed
                  effectiveMoveSpd, // Move speed calculated and used 
@@ -68,7 +69,7 @@ public class Enemy : MonoBehaviour
                  originalAttackSpd = 1f, // Default Attack Speed
                  effectiveAttackSpd; // Attack speed calculated and used
     public bool isGrounded = false, isDoneMoving, isAttacking, isPerformingAction;
-    protected string actionPerformed = "idle", ename = "enemy";
+    protected string actionPerformed = "idle", ename = "enemy", dmgSourceType;
     protected Color originalColor;
     public GameObject go;
     public GameObject target; // What the enemy prioritizes
@@ -77,16 +78,39 @@ public class Enemy : MonoBehaviour
     protected List<GameObject> grounds = new List<GameObject>();
 
     // Used to create the enemy and identify it
-    public static void AssignEnemy(Enemy e)
+    /*public static void AssignEnemy(Enemy e)
     {
         e.id = EnemyCount;
         EnemyCount++;
         if (GameManager.gm.enemies != null)
         {
             GameManager.gm.enemies[e.id] = e;
+
+        }
+        else
+        {
+            print("DUPLICATE HOW");
+            NetworkManager.nm.debugLog.Add("DUPLICATE HOW" + e.id);
         }
         e.name = "Enemy " + e.id;
+    }*/
+
+    protected virtual void Awake()
+    {
+       id = EnemyCount;
+        EnemyCount++;
+        if (GameManager.gm.enemies != null)
+        {
+            GameManager.gm.enemies[id] = this;
+        }
+        else
+        {
+            print("DUPLICATE HOW");
+            NetworkManager.nm.debugLog.Add("DUPLICATE HOW" +id);
+        }
+        name = "Enemy " + id;
     }
+
     // Use this for initialization
     protected virtual void Start()
     {
@@ -129,7 +153,7 @@ public class Enemy : MonoBehaviour
         return pathing;
     }
 
-    // Format: ENEMY|enemy id|enemy relative pos to target|target tag|target id|pathing
+    // Format: ENEMY|enemy id|enemy relative pos to target|target tag|target id|current target index
     public virtual string NetworkInformation()
     {
         string msg = "";
@@ -156,6 +180,7 @@ public class Enemy : MonoBehaviour
                 msg += target.transform.GetComponent<PlayerController>().id + "|";
                 break;
         }
+        msg += curTarget + "|";
         //msg += enemyID + "|";
         return msg;
     }
@@ -167,6 +192,7 @@ public class Enemy : MonoBehaviour
         Vector3 pos = new Vector3(float.Parse(xyz[0]), float.Parse(xyz[1]), float.Parse(xyz[2]));
         int tid = int.Parse(data[4]);
         string tag = data[3];
+        int curTargetIndex = int.Parse(data[5]);
 
         switch (tag) {
             case "Path":
@@ -177,11 +203,15 @@ public class Enemy : MonoBehaviour
                 SetTarget(GameManager.gm.objective);
                 //target =;
                 break;
+            case "Player":
+                SetTarget(NetworkManager.nm.players[tid].playerGO);
+                break;
         }
         Transform parent = transform.parent;
         transform.SetParent(target.transform);
         transform.localPosition = pos;
         transform.SetParent(parent);
+        curTarget = curTargetIndex;
     }
 
     // Move forward while not reaching ground
@@ -462,6 +492,14 @@ public class Enemy : MonoBehaviour
     }
      */
 
+    public virtual void TakeDamageFrom(int dmg, string dmgSourceType, int sid)
+    {
+        TakeDamage(dmg);
+        this.dmgSourceType = dmgSourceType;
+        dmgSourceID = sid;
+        
+    }
+
     // Attack target
     public virtual void Attack(GameObject target)
     {
@@ -491,12 +529,24 @@ public class Enemy : MonoBehaviour
         GameManager.gm.AddScore(50);
         GameManager.gm.kills++;
         GameManager.gm.UpdateInGameCurrency(1);
+
+        
+        if(dmgSourceType == "Player")
+        {
+            if(dmgSourceID == GameManager.gm.player.GetComponent<PlayerController>().id)
+            {
+                print("I killed it IT");
+                GameManager.gm.personalKills++;
+            }
+        }
+        
+
         // If online, remove enemy attack that was queued
         if (NetworkManager.nm.isStarted)
         {
             NetworkManager.nm.RemoveEnemyAttacks(id);
         }
-        GameManager.gm.enemies.Remove(id);
+        //GameManager.gm.enemies.Remove(id);
         List<GameObject> rewards = new List<GameObject>();
         //GameManager.gm.UpdateItem("Attribute", 1, 1);
         float spawnRewardChance = Random.Range(0.0f, 1.25f);
@@ -528,6 +578,8 @@ public class Enemy : MonoBehaviour
     // Inflict damage to health
     public virtual bool TakeDamage(int dmg)
     {
+        print("enemy " + id + " took dmg" + dmg);
+        NetworkManager.nm.debugLog.Add("enemy " + id + " took dmg" + dmg);
         health -= dmg;
         return true;
     }
@@ -535,6 +587,11 @@ public class Enemy : MonoBehaviour
     protected virtual void OnCollisionEnter(Collision collision)
     {
         // Ignore colliding with enemies
+        //GameObject gameobject = collision.gameObject;
+        //while(gameobject.tag == "Untagged" && gameobject.transform.parent != null)
+        //{
+        //    gameobject = gameobject.transform.gameObject;
+        //}
         if (collision.gameObject.tag == "Enemy")
         {
 
@@ -584,6 +641,17 @@ public class Enemy : MonoBehaviour
     }*/
     protected virtual void OnCollisionExit(Collision collision)
     {
+        if (collision.gameObject.tag == "Enemy")
+        {
+            Collider c = collision.collider;
+            if (collision.gameObject.name != "EnemyObject")
+            {
+                c = collision.gameObject.GetComponent<Enemy>().go.GetComponent<Collider>();
+            }
+            Physics.IgnoreCollision(c, go.GetComponent<Collider>());
+
+            return;
+        }
         if (collision.gameObject.tag == "Ground" || collision.gameObject.tag == "Path")
         {
             //print("LEAVEING");

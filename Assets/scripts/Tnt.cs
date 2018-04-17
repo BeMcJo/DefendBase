@@ -11,13 +11,14 @@ public class Tnt : Trap {
 	}
 
     // Helps determine who shot this
-    public override void Activate(int sid)
+    public override void Activate(string sourceType, int sid)
     {
         NetworkManager.nm.debugLog.Add("Activate " + sid + " " + id);
         Debug.Log("Activate " + sid + " " + id);
-        base.Activate(sid);
+        base.Activate(sourceType, sid);
         GameObject explosion = Instantiate(explosionPrefab);
-        explosion.transform.GetComponent<Explosion>().id = sid;
+        explosion.transform.GetComponent<Explosion>().ownerID = sid;
+        explosion.transform.GetComponent<Explosion>().ownerType = sourceType;
         explosion.transform.position = transform.position;
         Destroy(gameObject);
     }
@@ -30,12 +31,14 @@ public class Tnt : Trap {
         Destroy(gameObject);
     }
 
+    
+
     public override void TakeDamage(int dmg, int sid)
     {
         base.TakeDamage(dmg, sid);
         if (hp > 0)
             return;
-        Activate(sid);
+        Activate(ownerType, sid);
 
     }
 

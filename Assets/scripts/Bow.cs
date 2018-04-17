@@ -236,8 +236,8 @@ public class Bow : Weapon
             arrow = null;
             reloading = true;
             reloadTime = statsByLevel[wepID].timeToReload[lvl];
-
-            GameManager.gm.UseItem("Attribute", GameManager.gm.selectedAttribute);
+            if(user.IsMyPlayer())
+                GameManager.gm.UseItem("Attribute", GameManager.gm.selectedAttribute);
 
             // Reset bowstring vertices
             List<Vector3> positions = new List<Vector3>();

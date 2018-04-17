@@ -50,7 +50,7 @@ public class GameManager : MonoBehaviour {
                 continuedGame, // Was this game saved then loaded? If so load game from data
                 spawning, // Determines if in process of spawning an enemy
                 doneSpawningWave, // Is current wave all spawned?
-                setupRotation, // Are you done setting up the orientation of your forward?
+                isSettingPlayerOrientation, // Are you done setting up the orientation of your forward?
                 //gyroEnabled, // Used????
                 isBlackingOut, // Used for blackout effect for player view
                 hasWon,
@@ -64,6 +64,8 @@ public class GameManager : MonoBehaviour {
     public int wave, // Determines current wave to spawn
                playerID, // Unique identifier for player
                kills, // Total enemies killed in one wave
+               personalKills, // Total enemies you killed in one wave (multiplayer purpose)
+               totalPersonalKills, // Total enemies you killed throughout game session
                totalKills, // Total enemies killed cumulative
                spawnIndex, // Which enemy to spawn in an interval
                intervalIndex, // Which group of enemies to spawn in a wave
@@ -96,6 +98,7 @@ public class GameManager : MonoBehaviour {
                       enemyPrefab; // Enemy object
 
     public GameObject playerStatusCanvas, // Information used for player to see
+                      playerOrientationObjects, // Holds objects pertaining to setting up player orientation
                       quickAccessCanvas, // Holds touch-interactive UI for quick access purposes
                       effectsCanvas, // Holds special effects in the view of the player
                       quickAccessUpgradeDescription, // Used for toggling description of item to upgrade
@@ -111,6 +114,8 @@ public class GameManager : MonoBehaviour {
                       resultNotification, // Notifies player of victory/defeat
                       mainMenuCanvas, // Displays what you can do when game starts
                       optionsCanvas, // Displays settings to adjust in game
+                      optionsPanel, // Holds buttons to available options
+                      settingsPanel, // Holds buttons for available settings
                       hostListCanvas, // Displays list of hosts broadcasting availability
                       multiplayerCanvas, // Displays host or client option
                       lobbyCanvas, // Displays players connected in the lobby
@@ -141,6 +146,7 @@ public class GameManager : MonoBehaviour {
     public Camera mapCamera, // Bird eye view of map, used to also edit defenses onto map
                   selectedCamera; // Determines which camera is being used (unused)
     public int mapFingerID, // Used for detecting player selecting/dragging item onto map
+               calibrateFingerID, // Used for settings purposes
                quickAccessFingerID; // Used for holding down on quick-access buttons (upgrade weapon, swap arrows)
     public GameObject selectedDescription, // Selects type of item description to display
                       selectedDefense; // Currently selected defense to place onto map
@@ -300,11 +306,13 @@ public class GameManager : MonoBehaviour {
     // Scene where you adjust your forward direction
     public void LoadCalibrationScene()
     {
+        calibrateFingerID = -1;
         scene = "calibration";
         player = GameObject.Find("Player");
-        setupRotation = false;
+        //player.GetComponent<PlayerController>().SetOrientation(playerOrientation);
+        isSettingPlayerOrientation = true;
         playerRotation = GameObject.Find("Player Rotation");
-        playerRotation.transform.eulerAngles = playerOrientation;
+        //playerRotation.transform.eulerAngles = playerOrientation;
         optionsCanvas = GameObject.Find("OptionsCanvas");
         optionsCanvas.transform.Find("FinishedBtn").GetComponent<Button>().onClick.AddListener(GoToMainScene);
     }
@@ -315,7 +323,7 @@ public class GameManager : MonoBehaviour {
         scene = "main";
         inGame = false;
 
-        setupRotation = true;
+        isSettingPlayerOrientation = false;
         mainMenuCanvas = GameObject.Find("MainMenuCanvas");
 
         Transform btnContainer = mainMenuCanvas.transform.Find("ButtonsContainer");
@@ -409,6 +417,7 @@ public class GameManager : MonoBehaviour {
         //gyroEnabled = true;
         //totalKills = 0;
         //////////////////////////
+        print("player orient:" + playerOrientation);
 
         Enemy.EnemyCount = 0;
         Objective.ObjectiveCount = 0;
@@ -443,12 +452,15 @@ public class GameManager : MonoBehaviour {
         particleEffectsContainer = GameObject.Find("ParticleEffectsContainer");
 
         playerRotation = GameObject.Find("Player Rotation");
-        playerRotation.transform.eulerAngles = playerOrientation;
+        //playerRotation.transform.eulerAngles = playerOrientation;
 
         playerStatusCanvas = GameObject.Find("PlayerStatusCanvas").gameObject;
         playerStatusCanvas.transform.Find("OptionsBtn").GetComponent<Button>().onClick.AddListener(DisplayOptions);
         playerStatusCanvas.transform.Find("MapBtn").GetComponent<Button>().onClick.AddListener(ToggleMapUICanvas);
-
+        playerOrientationObjects = playerStatusCanvas.transform.Find("PlayerOrientationObjects").gameObject;
+        playerOrientationObjects.transform.Find("SetOrientationBtn").GetComponent<Button>().onClick.AddListener(SetPlayerOrientation);
+        playerOrientationObjects.transform.Find("DoneSetupBtn").GetComponent<Button>().onClick.AddListener(TogglePlayerOrientationSetup);
+        playerOrientationObjects.SetActive(false);
         //upgradeWepBtn = playerStatusCanvas.transform.Find("UpgradeWepBtn").GetComponent<Button>();
         //upgradeWepBtn.OnPointerDown()
 
@@ -468,8 +480,21 @@ public class GameManager : MonoBehaviour {
         objective = playerRotation.transform.Find("Castle").Find("Gate").gameObject;
         
         optionsCanvas = GameObject.Find("OptionsCanvas");
-        optionsCanvas.transform.Find("ResumeBtn").GetComponent<Button>().onClick.AddListener(ResumeGame);
-        optionsCanvas.transform.Find("ExitBtn").GetComponent<Button>().onClick.AddListener(LeaveGame);
+        optionsPanel = optionsCanvas.transform.Find("OptionsPanel").gameObject;
+        optionsPanel.transform.Find("ResumeBtn").GetComponent<Button>().onClick.AddListener(ResumeGame);
+        optionsPanel.transform.Find("ExitBtn").GetComponent<Button>().onClick.AddListener(LeaveGame);
+        optionsPanel.transform.Find("SettingsBtn").GetComponent<Button>().onClick.AddListener(ToggleInGameSettings);
+
+        settingsPanel = optionsCanvas.transform.Find("SettingsPanel").gameObject;
+        settingsPanel.transform.Find("BackBtn").GetComponent<Button>().onClick.AddListener(ToggleInGameSettings);
+        settingsPanel.transform.Find("SetOrientationBtn").GetComponent<Button>().onClick.AddListener(TogglePlayerOrientationSetup);
+        string isOn = "ON";
+        if (!interactiveTouch)
+            isOn = "OFF";
+        settingsPanel.transform.Find("InteractiveTouchBtn").GetChild(0).GetComponent<Text>().text = "Interactive Touch: " + isOn;
+        settingsPanel.transform.Find("InteractiveTouchBtn").GetComponent<Button>().onClick.AddListener(ToggleInteractiveTouch);
+
+        settingsPanel.SetActive(false);
         optionsCanvas.SetActive(false);
 
         shopCanvas = GameObject.Find("ShopCanvas");
@@ -511,7 +536,7 @@ public class GameManager : MonoBehaviour {
         changeArrowBtn = quickAccessCanvas.transform.Find("ChangeArrowsBtn").gameObject;
         itemWheel = quickAccessCanvas.transform.Find("ItemWheel").gameObject;
         itemWheel.SetActive(false);
-
+        //quickAccessCanvas.SetActive(false);
         effectsCanvas = GameObject.Find("EffectsCanvas");
 
         myProjectiles.Clear();
@@ -520,7 +545,7 @@ public class GameManager : MonoBehaviour {
         for(int i = 0; i < Attribute.names.Length; i++)
         {
             //Attribute.names[i] = "Attr " + i;
-            myAttributes[i] = 0;
+            myAttributes[i] = 2;
         }
 
         trapSpawnPrefab = new GameObject[trapPrefabs.Length];
@@ -608,6 +633,18 @@ public class GameManager : MonoBehaviour {
         b.transform.SetParent(inventoryContainer.transform);
         //b.transform.localPosition = new Vector3(0,0,0);
         b.SetActive(true);
+    }
+
+
+    public void SetPlayerOrientation()
+    {
+        playerOrientation = new Vector3(0, player.transform.GetComponent<PlayerController>().playerCam.transform.eulerAngles.y, 0);// playerRotation.transform.eulerAngles;
+        print(player.transform.GetComponent<PlayerController>().playerCam.transform.eulerAngles.y);
+        print("ORIENTATIONT  " + playerOrientation);
+
+        playerOrientation = player.transform.GetComponent<PlayerController>().SetOrientation(playerOrientation);//.playerCam.transform.parent.eulerAngles = -playerOrientation;
+        print("player is now:" + player.transform.eulerAngles);
+        
     }
 
     public void UpdateItem(string itemType, int itemID, int qty)
@@ -839,9 +876,26 @@ public class GameManager : MonoBehaviour {
         selectedOption.SetActive(true);
     }
 
+    public void TogglePlayerOrientationSetup()
+    {
+        isSettingPlayerOrientation = !isSettingPlayerOrientation;
+        optionsCanvas.SetActive(!isSettingPlayerOrientation);
+        playerOrientationObjects.SetActive(isSettingPlayerOrientation);
+    }
+
+    public void ToggleInGameSettings()
+    {
+        optionsPanel.SetActive(!optionsPanel.activeSelf);
+        settingsPanel.SetActive(!settingsPanel.activeSelf);
+    }
+
     public void ToggleMapUICanvas()
     {
+        // Don't go to map if performing quick access methods
         if (quickAccessFingerID != -1)
+            return;
+        // Can't perform if setting up orientation
+        if (isSettingPlayerOrientation)
             return;
         mapFingerID = -1;
         edittingMap = !edittingMap;
@@ -853,6 +907,7 @@ public class GameManager : MonoBehaviour {
         player.GetComponent<PlayerController>().playerCam.gameObject.SetActive(!edittingMap);//.enabled = !edittingMap;
         playerStatusCanvas.transform.Find("ShootBtnMask(Clone)").gameObject.SetActive(!edittingMap);
         mapCamera.transform.GetComponent<MapViewCamera>().Reset();
+        settingsPanel.transform.Find("SetOrientationBtn").GetComponent<Button>().interactable = !edittingMap;
     }
 
     public void ToggleSettingsCanvas()
@@ -875,7 +930,13 @@ public class GameManager : MonoBehaviour {
         string isOn = "ON";
         if (!interactiveTouch)
             isOn = "OFF";
-        settingsCanvas.transform.Find("ButtonsContainer").Find("InteractiveTouchBtn").GetChild(0).GetComponent<Text>().text = "Interactive Touch: " + isOn;
+        if (!inGame)
+            settingsCanvas.transform.Find("ButtonsContainer").Find("InteractiveTouchBtn").GetChild(0).GetComponent<Text>().text = "Interactive Touch: " + isOn;
+        else
+        {
+            player.GetComponent<PlayerController>().wep.SetTouchInteraction(interactiveTouch);
+            settingsPanel.transform.Find("InteractiveTouchBtn").GetChild(0).GetComponent<Text>().text = "Interactive Touch: " + isOn;
+        }
     }
 
     public void ToggleRealTimeAction()
@@ -995,6 +1056,8 @@ public class GameManager : MonoBehaviour {
 
     public void DisplayOptions()
     {
+        if (isSettingPlayerOrientation)
+            return;
         optionsCanvas.SetActive(true);
         optionsCanvas.GetComponent<Canvas>().sortingOrder = playerStatusCanvas.GetComponent<Canvas>().sortingOrder + 1;
     }
@@ -1139,6 +1202,7 @@ public class GameManager : MonoBehaviour {
         intervalIndex = 0;
         wave = w;
         kills = 0;
+        personalKills = 0;
         enemiesSpawned = 0;
         doneSpawningWave = false;
     }
@@ -1184,9 +1248,12 @@ public class GameManager : MonoBehaviour {
         paused = false;
         gameOver = false;
         inGameCurrency = 100;
+        startWaves = false;
         UpdateInGameCurrency(0);
         score = 0;
         kills = 0;
+        personalKills = 0;
+        totalPersonalKills = 0;
         difficulty = 0;
         wave = 0;
         totalKills = 0;
@@ -1232,6 +1299,7 @@ public class GameManager : MonoBehaviour {
         // If not online, game manager handles creating player
         player = Instantiate(playerPrefab);
         PlayerController pc = player.transform.GetComponent<PlayerController>();
+        //pc.SetOrientation(playerOrientation);
         player.transform.position = playerSpawnPoints.transform.GetChild(0).position;
         player.transform.SetParent(playerRotation.transform);
         if (w == null)
@@ -1264,13 +1332,13 @@ public class GameManager : MonoBehaviour {
 
     // Spawn enemy at the spawn point sp
     public IEnumerator SpawnEnemy(int sp, List<GameObject> pathing=null)
-    {
+    { 
         if (inGame)
         {
             spawning = true; // Indicate currently spawning an enemy
             enemiesSpawned++;
             GameObject enemy = Instantiate(enemyPrefabs[pattern.spawnCts[intervalIndex][spawnIndex]]);
-            Enemy.AssignEnemy(enemy.transform.GetComponent<Enemy>());
+            //Enemy.AssignEnemy(enemy.transform.GetComponent<Enemy>());
             // Get random spawn point
             if (sp == -1)
                 sp = UnityEngine.Random.Range(0, MapManager.mapManager.spawnPoints.Count);
@@ -1283,7 +1351,7 @@ public class GameManager : MonoBehaviour {
             e.SetTarget(spawnPoint);
             if (pathing == null)
                 pathing = Enemy.GeneratePathing(spawnPoint);
-            print("path gen");
+            //print("path gen");
             e.pathing = pathing;
             GameObject enemyUI = Instantiate(statusIndicatorPrefab);
             enemyUI.transform.GetComponent<StatusIndicator>().target = enemy;
@@ -1853,8 +1921,23 @@ public class GameManager : MonoBehaviour {
                 // In calibration scene, tap anywhere to set direction forward
                 if (Input.touchCount > 0)
                 {
-                    playerRotation.transform.eulerAngles = new Vector3(0, player.transform.GetComponent<PlayerController>().playerCam.transform.eulerAngles.y, 0);
-                    playerOrientation = playerRotation.transform.eulerAngles;
+                    for (int i = 0; i < Input.touchCount; i++)
+                    {
+                        Touch t = Input.GetTouch(i);
+                        if (calibrateFingerID == -1 && t.phase == TouchPhase.Began)
+                            calibrateFingerID = t.fingerId;
+                        else if (calibrateFingerID != -1 && t.phase == TouchPhase.Ended && t.fingerId == calibrateFingerID)
+                        {
+                            calibrateFingerID = -1;
+                           //playerRotation.transform.eulerAngles = new Vector3(0, player.transform.GetComponent<PlayerController>().playerCam.transform.eulerAngles.y, 0);
+                            playerOrientation = new Vector3(0, player.transform.GetComponent<PlayerController>().playerCam.transform.eulerAngles.y, 0);// playerRotation.transform.eulerAngles;
+                            print(player.transform.GetComponent<PlayerController>().playerCam.transform.eulerAngles.y);
+                            print("ORIENTATIONT  " + playerOrientation);
+
+                            playerOrientation = player.transform.GetComponent<PlayerController>().SetOrientation(playerOrientation);//.playerCam.transform.parent.eulerAngles = -playerOrientation;
+                            print("player is now:" + player.transform.eulerAngles);
+                        }
+                    }
                 }
                 break;
 
@@ -1889,7 +1972,7 @@ public class GameManager : MonoBehaviour {
             HandleMapEditActivities();
         }
 
-        scoreTxt.text = "Score: " + score + ", spawned" + enemiesSpawned + "/kills" + kills + ", $" + inGameCurrency + ", Wave:" + (wave+1);
+        scoreTxt.text = "Score: " + score + ", Kills: " + kills + "/" + enemiesSpawned + ", My Kills: " + personalKills + ", $" + inGameCurrency + ", Wave: " + (wave+1);
         if (!startWaves)
             return;
         // if there are enemies to spawn
@@ -1919,6 +2002,8 @@ public class GameManager : MonoBehaviour {
                 startWaves = false; // indicate end of wave
                 wave++; // increment to next wave
                 totalKills += kills; // add to cumulative kills
+                totalPersonalKills += personalKills;
+                personalKills = 0;
                 kills = 0; // reset kill count
                 UpdateInGameCurrency(3 * wave);
                 // increment difficulty after every 10th wave

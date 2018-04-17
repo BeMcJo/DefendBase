@@ -65,7 +65,7 @@ public class Host
  */
 public class NetworkManager : MonoBehaviour {
     public static NetworkManager nm; // Singleton
-
+    int maxreq = 5;
     // Max number of host connections
     private const int MAX_CONNECTION = 100;
     private const int MAX_PLAYERS = 4;
@@ -104,7 +104,7 @@ public class NetworkManager : MonoBehaviour {
     private bool findingHosts = false; // Are we client looking for host room to join?
     public bool isSpawningObject;
 
-    private Dictionary<int, Player> players = new Dictionary<int, Player>(); // cnnID -> Player
+    public Dictionary<int, Player> players = new Dictionary<int, Player>(); // cnnID -> Player
     //Unused
     private Dictionary<int, int> client2player = new Dictionary<int, int>(); // cnnID -> Player Order Pos
     //Unused
@@ -175,7 +175,7 @@ public class NetworkManager : MonoBehaviour {
         {
             Text activity = GameManager.gm.playerStatusCanvas.transform.Find("ActivitiesTxt").GetComponent<Text>();
             string t = "";
-            for (int i = 0; i < 10; i++)
+            for (int i = 0; i < 150; i++)
             {
                 int j = activityLog.Count - 1 - i;
                 if (j >= 0)
@@ -183,7 +183,7 @@ public class NetworkManager : MonoBehaviour {
             }
             t = "Activity Log:" + t;
             activity.text = t;
-
+            activity.transform.GetComponent<RectTransform>().sizeDelta = new Vector2(300,50 * (2 + activityLog.Count));
             Text debug = GameManager.gm.playerStatusCanvas.transform.Find("DebugTxt").GetComponent<Text>();
             t = "";
             for (int i = 0; i < 10; i++)
@@ -235,7 +235,7 @@ public class NetworkManager : MonoBehaviour {
         string info = "PLAYERSTATS|" + ourClientID + "|";
         PlayerController p = GameManager.gm.player.transform.GetComponent<PlayerController>();
         Camera cam = p.playerCam;
-        Vector3 dir = cam.transform.eulerAngles - GameManager.gm.playerOrientation;
+        Vector3 dir = cam.transform.eulerAngles;// - GameManager.gm.playerOrientation;
         info += dir.x + "," + dir.y + "," + dir.z + "|" + p.wep.NetworkInformation();
         if (isHost)
         {
@@ -396,6 +396,7 @@ public class NetworkManager : MonoBehaviour {
         else
         {
             Debug.Log("Reconnected");
+            
             RequestActivityLog();
             isDisconnected = false;
             requestingConnection = false;
@@ -411,7 +412,7 @@ public class NetworkManager : MonoBehaviour {
         string[] orientation = data[2].Split(',');
 
         PlayerController p = players[cnnID].playerGO.transform.GetComponent<PlayerController>();
-        p.playerCam.transform.eulerAngles = GameManager.gm.playerOrientation + new Vector3(float.Parse(orientation[0]), float.Parse(orientation[01]), float.Parse(orientation[2]));
+        p.playerCam.transform.eulerAngles = new Vector3(float.Parse(orientation[0]), float.Parse(orientation[01]), float.Parse(orientation[2]));// + GameManager.gm.playerOrientation;
 
         bool wepInUse = bool.Parse(data[4]);
         float chargePower = float.Parse(data[5]);
@@ -431,6 +432,7 @@ public class NetworkManager : MonoBehaviour {
                 p.wep.EndUse();
             }
         }
+        
     }
 
     // Check if the received broadcast is a Host, display a join button for that host if new
@@ -505,7 +507,7 @@ public class NetworkManager : MonoBehaviour {
         //Debug.Log(cnnId);
         players.Add(cnnId, c);
         // Stop broadcasting if full room
-        if (players.Count == MAX_PLAYERS - 1)
+        if (players.Count == MAX_PLAYERS)
         {
             StopBroadcast();
         }
@@ -569,12 +571,19 @@ public class NetworkManager : MonoBehaviour {
         if (!GameManager.gm.inGame)
             return;
         int lastCommittedActivity = int.Parse(data[1]);
-
-        playerDC.Remove(cnnId); // Remove player from dc list
+        if(playerDC.ContainsKey(cnnId))
+            playerDC.Remove(cnnId); // Remove player from dc list
+        debugLog.Add(cnnId + " recon" + lastCommittedActivity);
+        print(debugLog[debugLog.Count - 1]);
+        
+        print(PLayerDCCount());
+        debugLog.Add("SEND ENEMYs ");
         ResendCommits(cnnId, lastCommittedActivity); // Send activity that client doesn't know about in game
         // Tell player about the enemies positioning and other network information
         foreach(KeyValuePair<int,Enemy> kvp in GameManager.gm.enemies)
         {
+            if (kvp.Value == null)
+                continue;
             string msg = kvp.Value.NetworkInformation();
             Send(msg,reliableChannel ,cnnId);
         }
@@ -636,6 +645,7 @@ public class NetworkManager : MonoBehaviour {
                     // Client provides information about own player details in game
                     case "PLAYERSTATS":
                         OnPlayerInformation(splitData);
+                        Send(msg, reliableChannel, players);
                         break;
                     // Client requests to approve being ready for the next step in the game
                     case "READY?":
@@ -667,11 +677,14 @@ public class NetworkManager : MonoBehaviour {
                 break;
             // Client disconnects
             case NetworkEventType.DisconnectEvent:
-                Debug.Log("Player " + connectionId + " has disconnected");
+                Debug.Log("Player " + connectionId + " has disconnected" + ourClientID);
                 // Keep track of player if in game
                 if (GameManager.gm.inGame)
                 {
-                    playerDC.Add(connectionId, Time.time);
+                    if (playerDC.ContainsKey(connectionId))
+                        playerDC[connectionId] = Time.time;
+                    else
+                        playerDC.Add(connectionId, Time.time);
                 }
                 // Remove player from lobby
                 else
@@ -736,10 +749,12 @@ public class NetworkManager : MonoBehaviour {
                     // Host states enemy has been damaged, make sure log is synced with the sequence of actions in game
                     case "ENEMYDMG":
                         logID = int.Parse(splitData[1]);
+                        debugLog.Add(logID + "," + activityLog.Count + ">>>>:" + msg);
                         //cnnID = int.Parse(splitData[3]);
                         // Request for sequential order of activity log since my log is missing something before this action
                         if (logID != activityLog.Count)
                         {
+                            print(logID + "," + activityLog.Count + ">>>>:" + msg);
                             RequestActivityLog();
                             break;
                         }
@@ -749,6 +764,7 @@ public class NetworkManager : MonoBehaviour {
                     // Receiving information about the enemies in the game
                     case "ENEMYINFO":
                         int eid = int.Parse(splitData[1]);
+                        debugLog.Add(msg);
                         // Make sure enemy is alive to adjust their details
                         if (GameManager.gm.enemies.ContainsKey(eid))
                         {
@@ -763,9 +779,11 @@ public class NetworkManager : MonoBehaviour {
                     // Spawn Enemy
                     case "ENEMYSPAWN":
                         logID = int.Parse(splitData[1]);
+                        debugLog.Add(logID + "," + activityLog.Count + ">>>>:" + msg);
                         // Sync activity log if missing something
                         if (logID != activityLog.Count)
                         {
+                            print(logID + "," + activityLog.Count + ">>>>:" + msg);
                             RequestActivityLog();
                             break;
                         }
@@ -782,10 +800,12 @@ public class NetworkManager : MonoBehaviour {
                     // Host states that objective has taken damage
                     case "OBJECTIVEDMG":
                         logID = int.Parse(splitData[1]);
+                        debugLog.Add(logID + "," + activityLog.Count + ">>>>:" + msg);
                         //cnnID = int.Parse(splitData[3]);
                         // Sync activity log if missing something
                         if (logID != activityLog.Count)
                         {
+                            print(logID + "," + activityLog.Count + ">>>>:" + msg);
                             RequestActivityLog();
                             break;
                         }
@@ -798,6 +818,7 @@ public class NetworkManager : MonoBehaviour {
                         break;
                     // Host asks why you connecting
                     case "PURPOSE":
+                        debugLog.Add("CONNECT " + connectionId + "........." + ourClientID);
                         OnPurpose();
                         break;
                     // Host states someone is ready
@@ -810,6 +831,7 @@ public class NetworkManager : MonoBehaviour {
                         // Sync activity log if missing something
                         if (logID != activityLog.Count)
                         {
+                            print(logID + "," + activityLog.Count + ">>>>:" + msg);
                             RequestActivityLog();
                             break;
                         }
@@ -817,9 +839,11 @@ public class NetworkManager : MonoBehaviour {
                         break;
                     case "REPAIROBJECTIVE":
                         logID = int.Parse(splitData[1]);
+                        debugLog.Add(logID + "," + activityLog.Count + ">>>>:" + msg);
                         // Sync activity log if missing something
                         if (logID != activityLog.Count)
                         {
+                            print(logID + "," + activityLog.Count + ">>>>:" + msg);
                             RequestActivityLog();
                             break;
                         }
@@ -828,9 +852,11 @@ public class NetworkManager : MonoBehaviour {
                         break;
                     case "SPAWN":
                         logID = int.Parse(splitData[1]);
+                        debugLog.Add(logID + "," + activityLog.Count + ">>>>:" + msg);
                         // Sync activity log if missing something
                         if (logID != activityLog.Count)
                         {
+                            print(logID + "," + activityLog.Count + ">>>>:" + msg);
                             RequestActivityLog();
                             break;
                         }
@@ -844,9 +870,11 @@ public class NetworkManager : MonoBehaviour {
                     // Host states to start wave
                     case "STARTWAVE":
                         logID = int.Parse(splitData[1]);
+                        debugLog.Add(logID + "," + activityLog.Count + ">>>>:" + msg);
                         // Sync log when missing something
-                        if(logID != activityLog.Count)
+                        if (logID != activityLog.Count)
                         {
+                            print(logID + "," + activityLog.Count + ">>>>:" + msg);
                             RequestActivityLog();
                             break;
                         }
@@ -855,10 +883,12 @@ public class NetworkManager : MonoBehaviour {
                     // Host states someone damaged trap
                     case "TRAPDMG":
                         logID = int.Parse(splitData[1]);
+                        debugLog.Add(logID + "," + activityLog.Count + ">>>>:" + msg);
                         //cnnID = int.Parse(splitData[3]);
                         // Request for sequential order of activity log since my log is missing something before this action
                         if (logID != activityLog.Count)
                         {
+                            print(logID + "," + activityLog.Count + ">>>>:" + msg);
                             RequestActivityLog();
                             break;
                         }
@@ -869,8 +899,10 @@ public class NetworkManager : MonoBehaviour {
                 break;
             // When someone disconnects
             case NetworkEventType.DisconnectEvent:
+                print("disc" + connectionId + "," + ourClientID);
+                debugLog.Add("DISCONNECT" + connectionId + "....." + ourClientID);
                 // If disconnection was our ID
-                if (connectionId == ourClientID)
+                if (connectionId == 1)//ourClientID)
                 {
                     // Request to reconnect if in game
                     if (GameManager.gm.inGame)
@@ -887,10 +919,18 @@ public class NetworkManager : MonoBehaviour {
                         timer = Time.time;
                         isStarted = true;
                     }
+                    // Reset client setup if failed to join lobby
+                    else if (requestingConnection)
+                    {
+                        Disconnect();
+                        SetupAsClient();
+                        StartUpNetworkActivities();
+                    }
                     // Leave lobby when disconnected
                     else
                         LeaveLobby();
                 }
+                /*
                 // If requesting connection when disconnected not in game, reset and search for host again
                 else if (requestingConnection)
                 {
@@ -898,6 +938,7 @@ public class NetworkManager : MonoBehaviour {
                     SetupAsClient();
                     StartUpNetworkActivities();
                 }
+                */
                 break;
         }
 
@@ -923,29 +964,47 @@ public class NetworkManager : MonoBehaviour {
         ConnectTo(h);
     }
 
+    public IEnumerator DamageEnemy(int eid, int dmg, string sourceType, int sid)
+    {
+        //print(GameManager.gm.enemies.ContainsKey(eid));
+        // Wait until enemy exists before inflicting damage
+        yield return new WaitUntil(() => GameManager.gm.enemies.ContainsKey(eid));
+        //print(GameManager.gm.enemies.ContainsKey(eid));
+        if(GameManager.gm.enemies[eid] != null)
+        {
+            GameManager.gm.enemies[eid].TakeDamageFrom(dmg,sourceType, sid);
+        }
+    }
+
     // Inflict damage to enemy
     public void OnEnemyDamaged(string[] data)
     {
-        debugLog.Add("ENEMY DAMAGED");
         int targetID = int.Parse(data[2]);
         int sourceID = int.Parse(data[3]);
         int dmg = int.Parse(data[4]);
+        string sourceType = data[5];
+        string msg = data[0] + "|" + activityLog.Count + "|" + data[2] + "|" + data[3] + "|" + data[4] + "|" + data[5];
+        debugLog.Add(msg);
         // Inflict damage if enemy exists
+        /*
         if (GameManager.gm.enemies.ContainsKey(targetID))
         {
             GameManager.gm.enemies[targetID].TakeDamage(dmg);
             // Remove enemy if non-existent or dead
             if (GameManager.gm.enemies[targetID] == null || GameManager.gm.enemies[targetID].health <= 0)
             {
-                GameManager.gm.enemies.Remove(targetID);
+               // GameManager.gm.enemies.Remove(targetID);
             }
-            string msg = data[0] + "|" + activityLog.Count + "|" + data[2] + "|" + data[3] + "|" + data[4] + "|";
-            activityLog.Add(msg);
             if (isHost)
             {
                 Send(msg, reliableChannel, players);
+                activityLog.Add(msg);
             }
-        }
+        }*/
+        StartCoroutine(DamageEnemy(targetID, dmg,sourceType, sourceID));
+        if(isHost)
+            Send(msg, reliableChannel, players);
+        activityLog.Add(msg);
     }
 
     // Remove enemy attacks from queue, usually when enemy dies
@@ -977,10 +1036,10 @@ public class NetworkManager : MonoBehaviour {
                     Objective o = GameManager.gm.objective.transform.GetComponent<Objective>();
                     o.TakeDamage(dmg);
 
+                    enemyAttacks[eid].Remove(atkID); // Remove attack from attack queue
+
                     Send(msg, reliableChannel, players);
                     activityLog.Add(msg);
-
-                    enemyAttacks[eid].Remove(atkID); // Remove attack from attack queue
                 }
             }
         }
@@ -1042,9 +1101,9 @@ public class NetworkManager : MonoBehaviour {
                     {
                         o.TakeDamage(enemyAttacks[e.id][atkID].dmg);
                         string msg = "OBJECTIVEDMG|" + activityLog.Count + "|" + tid + "|" + e.id + "|" + atkID + "|" + e.dmg + "|";
-                        Send(msg, reliableChannel, players);
                         activityLog.Add(msg);
                         enemyAttacks[e.id].Remove(atkID);
+                        Send(msg, reliableChannel, players);
                     }
                 }
             }
@@ -1052,7 +1111,7 @@ public class NetworkManager : MonoBehaviour {
             else
             {
                 string msg = "OBJECTIVEDMG|" + activityLog.Count + "|" + tid + "|" + e.id + "|" + atkID + "|" + e.dmg + "|";
-                Send(msg, reliableChannel, players);
+                Send(msg, reliableChannel);
             }
         }
     }
@@ -1060,6 +1119,9 @@ public class NetworkManager : MonoBehaviour {
     // As client out of sync, request the missing information as well as send information that weren't sent when/if disconnected
     public void RequestActivityLog()
     {
+        maxreq--;
+        if (maxreq == 0)
+            return;
         Debug.Log("OUT OF SYNC, REQUESTING LOG ORDER");
         debugLog.Add("OUT OF SYNC, REQUESTING LOG ACTIVITES");
         Send("RECONNECT|" + activityLog.Count + "|", reliableChannel);
@@ -1096,8 +1158,8 @@ public class NetworkManager : MonoBehaviour {
                 }
             }
         }
-        NotifySpawnEnemyAt(sp, pathing);
         StartCoroutine(GameManager.gm.SpawnEnemy(sp, pathing));
+        NotifySpawnEnemyAt(sp, pathing);
     }
 
     // As host, tell game manager to spawn enemy and tell clients to do so as well
@@ -1107,8 +1169,8 @@ public class NetworkManager : MonoBehaviour {
             sp = UnityEngine.Random.Range(0, MapManager.mapManager.spawnPoints.Count);
         GameObject spawnPoint = MapManager.mapManager.spawnPoints[sp];
         List<GameObject> pathing = Enemy.GeneratePathing(spawnPoint);
-        NotifySpawnEnemyAt(sp, pathing);
         StartCoroutine(GameManager.gm.SpawnEnemy(sp, pathing));
+        NotifySpawnEnemyAt(sp, pathing);
     }
 
     // Notify players to spawn enemies
@@ -1129,9 +1191,9 @@ public class NetworkManager : MonoBehaviour {
             msg.Trim(',');
             msg += '|';
         }
-        if(isHost)
-            Send(msg, reliableChannel, players);
         activityLog.Add(msg);
+        if (isHost)
+            Send(msg, reliableChannel, players);
     }
 
     // Make request to repair objective
@@ -1161,8 +1223,8 @@ public class NetworkManager : MonoBehaviour {
         if (isHost)
         {
             // If under max health to repair
-            if (o.HP < o.maxHP)
-            {
+            //if (o.HP < o.maxHP)
+            //{
                 // If I was the one making request, repair and pay price if shopping
                 if (cnnID == ourClientID && isShopping)
                 {
@@ -1173,9 +1235,9 @@ public class NetworkManager : MonoBehaviour {
                 {
                     o.TakeDamage(hp);
                 }
-                Send(msg, reliableChannel, players);
                 activityLog.Add(msg);
-            }
+                Send(msg, reliableChannel, players);
+            //}
         }
         // As client, check if I made request or not to repair
         else
@@ -1208,8 +1270,8 @@ public class NetworkManager : MonoBehaviour {
         }
         else
         {
-            Send(msg, reliableChannel);
             GameManager.gm.addToMapBtn.SetActive(false);
+            Send(msg, reliableChannel);
         }
     }
 
@@ -1260,12 +1322,12 @@ public class NetworkManager : MonoBehaviour {
                 trap.GetComponent<Trap>().SetNetworkInformation(new string[] { data[3], data[4], data[5],data[6] });
             }
         }
+        activityLog.Add(msg);
+        Debug.Log(isSpawningObject);
         if (isHost)
         {
             Send(msg, reliableChannel, players);
         }
-        activityLog.Add(msg);
-        Debug.Log(isSpawningObject);
     }
 
     public void NotifyRemoveDefense(string type, int id)
@@ -1273,8 +1335,8 @@ public class NetworkManager : MonoBehaviour {
         string msg = "REMOVEDEFENSE|" + activityLog.Count + "|" + ourClientID + "|" + type + "|" + id + "|";
         if (isHost)
         {
-            Send(msg, reliableChannel, players);
             OnRemoveDefense(msg.Split('|'));
+            //Send(msg, reliableChannel, players);
         }
         else
         {
@@ -1300,13 +1362,41 @@ public class NetworkManager : MonoBehaviour {
         string msg = data[0] + "|" + activityLog.Count + "|" + data[2] + "|" + data[3] + "|" + data[4] + "|";
         activityLog.Add(msg);
 
+        GameManager.gm.RemoveSelectedDefense(type, id);
         if (isHost)
         {
             debugLog.Add(msg);
             Send(msg, reliableChannel, players);
         }
 
-        GameManager.gm.RemoveSelectedDefense(type, id);
+    }
+
+    public void NotifyObjectDamagedBy(string targetType, string targetTag, int tid, int sid, int dmg, string ownerType)
+    {
+        string msg = targetType + "DMG|" + activityLog.Count + "|" + tid + "|" + sid + "|" + dmg + "|" + ownerType + "|";
+        //debugLog.Add(msg);
+        //debugLog.Add(source.tag + " " + source.name);
+        //Debug.Log(msg);
+        // As host, tell clients about target being damaged by source
+        if (isHost)
+        {
+            //Send(msg, reliableChannel,players);
+            //activityLog.Add(msg);
+            if (targetTag == "Enemy")
+                OnEnemyDamaged(msg.Split('|'));
+            else if (targetTag == "Trap")
+                OnTrapDamaged(msg.Split('|'));
+        }
+        // As client, notify host about target being attacked by source, if disconnected keep track of activity
+        else
+        {
+            if (isDisconnected)
+            {
+                activitiesToSend.Add(msg);
+                return;
+            }
+            Send(msg, reliableChannel);
+        }
     }
 
     // Notify players that source is damaged by target
@@ -1316,6 +1406,7 @@ public class NetworkManager : MonoBehaviour {
         int tid = -1, 
             sid = -1,
             dmg = 0;
+        string ownerType = "";
 
         if (target.tag == "Enemy")
         {
@@ -1341,6 +1432,7 @@ public class NetworkManager : MonoBehaviour {
             Projectile p = source.transform.GetComponent<Projectile>();
             sid = p.id;
             dmg = p.dmg;
+            ownerType = p.ownerType;
         }
         else if (source.tag == "Enemy")
         {
@@ -1351,11 +1443,13 @@ public class NetworkManager : MonoBehaviour {
         else if(source.tag == "Explosion")
         {
             Explosion ex = source.transform.GetComponent<Explosion>();
-            sid = ex.id;
+            sid = ex.ownerID;
             dmg = ex.dmg;
+            ownerType = ex.ownerType;
         }
-
-        msg += "DMG|" + activityLog.Count + "|" + tid + "|" + sid + "|" + dmg + "|";
+        NotifyObjectDamagedBy(msg, target.tag, tid, sid, dmg, ownerType);
+        /*
+        msg += "DMG|" + activityLog.Count + "|" + tid + "|" + sid + "|" + dmg + "|" + ownerType + "|";
         debugLog.Add(msg);
         debugLog.Add(source.tag + " " + source.name);
         Debug.Log(msg);
@@ -1378,6 +1472,16 @@ public class NetworkManager : MonoBehaviour {
                 return;
             }
             Send(msg, reliableChannel);
+        }*/
+    }
+
+    public IEnumerator DamageTrap(int id, int dmg)
+    {
+        // Wait until enemy exists before inflicting damage
+        yield return new WaitUntil(() => GameManager.gm.traps.ContainsKey(id));
+        if (GameManager.gm.traps[id] != null)
+        {
+            GameManager.gm.traps[id].TakeDamage(dmg);
         }
     }
 
@@ -1388,7 +1492,9 @@ public class NetworkManager : MonoBehaviour {
         int sourceID = int.Parse(data[3]);
         int dmg = int.Parse(data[4]);
         debugLog.Add("TRAP DAMAGED" + targetID);
+        string msg = data[0] + "|" + activityLog.Count + "|" + data[2] + "|" + data[3] + "|" + data[4] + "|";
         // Inflict damage if enemy exists
+        /*
         if (GameManager.gm.traps.ContainsKey(targetID))
         {
             print("HAVE " + targetID);
@@ -1399,7 +1505,6 @@ public class NetworkManager : MonoBehaviour {
                 //GameManager.gm.traps.Remove(targetID);
             }
 
-            string msg = data[0] + "|" + activityLog.Count + "|" + data[2] + "|" + data[3] + "|" + data[4] + "|";
             activityLog.Add(msg);
 
             if (isHost)
@@ -1408,6 +1513,11 @@ public class NetworkManager : MonoBehaviour {
                 Send(msg, reliableChannel, players);
             }
         }
+        */
+        StartCoroutine(DamageTrap(targetID, dmg));
+        if (isHost)
+            Send(msg, reliableChannel, players);
+        activityLog.Add(msg);
     }
 
     // Un-ready all players
@@ -1484,10 +1594,7 @@ public class NetworkManager : MonoBehaviour {
 
         inLobby = true;
         requestingConnection = false;
-
         ourClientID = int.Parse(data[1]);
-        // Send our name to server
-        Send("NAMEIS|" + "PLAYER", reliableChannel);
 
         // Create all the other players
         for (int i = 2; i < data.Length; i++)
@@ -1495,6 +1602,10 @@ public class NetworkManager : MonoBehaviour {
             string[] d = data[i].Split('%');
             SpawnPlayerUI(d[0], int.Parse(d[1]));
         }
+
+        // Send our name to server
+        Send("NAMEIS|" + "PLAYER", reliableChannel);
+
     }
 
     // Create lobby objects for player
@@ -1619,7 +1730,7 @@ public class NetworkManager : MonoBehaviour {
         {
             if (GameManager.gm.onIntermission)
             {
-                GameManager.gm.intermissionCanvas.transform.Find("ResumeBtn").GetComponent<Button>().interactable = readyToStart;
+                GameManager.gm.intermissionCanvas.transform.Find("ResumeBtn").GetComponent<Button>().interactable = !nm.isHost || readyToStart;
             }
         }
 
@@ -1806,7 +1917,7 @@ public class NetworkManager : MonoBehaviour {
                 players[i].playerGO.transform.GetComponent<PlayerController>().playerCam.gameObject.SetActive(false);
             }
         }
-        GameManager.gm.playerRotation.transform.eulerAngles = GameManager.gm.playerOrientation;
+        //GameManager.gm.playerRotation.transform.eulerAngles = GameManager.gm.playerOrientation;
     }
 
     // Send message to host

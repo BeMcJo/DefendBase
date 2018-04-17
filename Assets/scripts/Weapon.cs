@@ -75,7 +75,7 @@ public abstract class Weapon : MonoBehaviour
 
     //private Vector2 initialTouchPosition; // Used for determining 
     // Use this for initialization
-    protected virtual void Start () {
+    protected virtual void Start() {
         charging = false;
         reloadTime = 0;
         shootTouchID = -1;
@@ -85,28 +85,35 @@ public abstract class Weapon : MonoBehaviour
         id = WeaponCount;
         WeaponCount++;
         name = "Wep " + id;
-        */    
+        */
         bulletSpawn = transform.Find("BulletSpawn");
         chargeBarGuage = Instantiate(chargeBarGuage);
         chargeBar = chargeBarGuage.transform.GetChild(0).gameObject;
         shootBtn = Instantiate(shootBtn);
         // Display the non-Touch Interactive UIs if not using Touch Interaction and is my player
-        if (!GameManager.gm.interactiveTouch && GameManager.gm.player == user.gameObject)
-        {
-            chargeBarGuage.transform.SetParent(GameManager.gm.playerStatusCanvas.transform);
-            chargeBarGuage.transform.localScale = new Vector3(1, 1, 1);
-            chargeBarGuage.transform.localPosition = GameManager.gm.playerStatusCanvas.transform.Find("ChargeBarGaugePlaceholder").localPosition;
-            shootBtn.transform.SetParent(GameManager.gm.playerStatusCanvas.transform);
-            shootBtn.transform.localScale = new Vector3(1, 1, 1);
-            shootBtn.transform.localPosition = GameManager.gm.playerStatusCanvas.transform.Find("ShootBtnPlaceholder").localPosition;
-        }
+        bool canDisplay = !GameManager.gm.interactiveTouch && GameManager.gm.player == user.gameObject;
+        //{
+        chargeBarGuage.transform.SetParent(GameManager.gm.playerStatusCanvas.transform);
+        chargeBarGuage.transform.localScale = new Vector3(1, 1, 1);
+        chargeBarGuage.transform.localPosition = GameManager.gm.playerStatusCanvas.transform.Find("ChargeBarGaugePlaceholder").localPosition;
+        shootBtn.transform.SetParent(GameManager.gm.playerStatusCanvas.transform);
+        shootBtn.transform.localScale = new Vector3(1, 1, 1);
+        shootBtn.transform.localPosition = GameManager.gm.playerStatusCanvas.transform.Find("ShootBtnPlaceholder").localPosition;
+        //}
+        chargeBarGuage.SetActive(canDisplay);
+        shootBtn.SetActive(canDisplay);
+
         chargeBarGuage.SetActive(false);
 
         // Add item UI to store with respect to if item was purchased or not
         itemUI = Instantiate(itemUI);
-        itemUI.transform.Find("ItemDescription").GetComponent<Text>().text = statsByLevel[wepID].name + " Lvl" + lvl;
+        //itemUI.transform.Find("ItemDescription").GetComponent<RectTransform>().sizeDelta = new Vector2(1200,150);
+        //itemUI.transform.localPosition = new Vector3(-325, 0, 0);
+        itemUI.transform.Find("ItemDescription").transform.localPosition = new Vector3(-400, 0, 0);
+        SetItemDescription();
+        //itemUI.transform.Find("ItemDescription").GetComponent<Text>().text = statsByLevel[wepID].name + " Lvl " + lvl;
         itemUI.transform.Find("BuyBtn").GetComponent<Button>().onClick.AddListener(Purchase);
-        itemUI.transform.Find("ItemDescription").GetComponent<Text>().text = statsByLevel[wepID].name + " Lvl." + lvl;
+        //itemUI.transform.Find("ItemDescription").GetComponent<Text>().text = statsByLevel[wepID].name + " Lvl." + lvl;
         if (purchased)
         {
             itemUI.transform.Find("BuyBtn").GetChild(0).GetComponent<Text>().text = "Upgrade\n" + statsByLevel[wepID].costToUpgrade[lvl] + "\nLvl " + (lvl + 1);
@@ -114,7 +121,7 @@ public abstract class Weapon : MonoBehaviour
             {
                 //Debug.Log("?");
                 itemUI.transform.SetParent(GameManager.gm.quickAccessUpgradeDescription.transform);//GameManager.gm.quickAccessCanvas.transform.Find("DescriptionDisplay").Find("Inventory Descriptions").Find("Upgrade Descriptions"));
-                itemUI.transform.localPosition = new Vector3(0, 0, 0);
+                itemUI.transform.localPosition = new Vector3(-325, 0, 0);
             }
         }
         else
@@ -126,8 +133,13 @@ public abstract class Weapon : MonoBehaviour
         itemUI.transform.localScale = new Vector3(1, 1, 1);
     }
 	
-	// Update is called once per frame
-	protected virtual bool Update () {
+    public void SetItemDescription()
+    {
+        itemUI.transform.Find("ItemDescription").GetComponent<Text>().text = statsByLevel[wepID].name + " Lvl " + lvl + "   DMG:" + statsByLevel[wepID].dmg[lvl] + "   CHRG:" + (1.0f / statsByLevel[wepID].chargeAccelation[lvl]).ToString("F2") + "   RLD:" + statsByLevel[wepID].timeToReload[lvl] + "s   BOWSTR:" + statsByLevel[wepID].distance[lvl];
+    }
+
+    // Update is called once per frame
+    protected virtual bool Update () {
         // Don't do anything if no user exists or game is over
         if (!user || GameManager.gm.gameOver)
             return false;
@@ -173,6 +185,12 @@ public abstract class Weapon : MonoBehaviour
             }
         }
         return true;
+    }
+
+    public void SetTouchInteraction(bool isInteractive)
+    {
+        chargeBar.SetActive(!isInteractive);
+        shootBtn.SetActive(!isInteractive && !GameManager.gm.edittingMap);
     }
 
     public virtual void ChangeAttribute()
@@ -222,7 +240,8 @@ public abstract class Weapon : MonoBehaviour
                 {
                     itemUI.transform.Find("BuyBtn").GetChild(0).GetComponent<Text>().text = "Upgrade\n" + statsByLevel[wepID].costToUpgrade[lvl] + "\nLvl " + (lvl + 1);
                 }
-                itemUI.transform.Find("ItemDescription").GetComponent<Text>().text = statsByLevel[wepID].name + " Lvl." + lvl;
+                SetItemDescription();
+                //itemUI.transform.Find("ItemDescription").GetComponent<Text>().text = statsByLevel[wepID].name + " Lvl." + lvl;
             }
             else
             {
@@ -262,7 +281,7 @@ public abstract class Weapon : MonoBehaviour
             chargeBarAlt = 1;
             chargeAccelerator = 0;
         }
-        print(1);
+        //print(1);
         return true;
     }
 
@@ -298,7 +317,7 @@ public abstract class Weapon : MonoBehaviour
     // Handles what happens when weapon shoots at a certain charge power
     public virtual void Shoot(float chargePower)
     {
-        if (NetworkManager.nm.isStarted)
+        if (NetworkManager.nm.isStarted && user.IsMyPlayer())
         {
             NetworkManager.nm.SendPlayerInformation();
             return;

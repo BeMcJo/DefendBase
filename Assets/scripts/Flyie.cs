@@ -4,8 +4,9 @@ using UnityEngine;
 
 public class Flyie : Enemy {
     float height;
-    private void Awake()
+    protected override void Awake()
     {
+        base.Awake();
         ename = "flyie";
     }
     // Use this for initialization

@@ -36,6 +36,7 @@ public class PlayerController : MonoBehaviour {
         cameraContainer = transform.Find("Camera Container").gameObject;
         gyroEnabled = EnableGyro();
         playerCam.transform.SetParent(cameraContainer.transform);
+        SetOrientation(GameManager.gm.playerOrientation);
         useGyro = true;
 
 
@@ -81,6 +82,16 @@ public class PlayerController : MonoBehaviour {
         }
         PlayerMobileInput();
         PlayerPCInput();
+    }
+
+    public Vector3 SetOrientation(Vector3 orientation)
+    {
+        print("set orientatiation to" + orientation);
+        transform.eulerAngles = new Vector3(0, transform.eulerAngles.y - orientation.y, 0);
+        return -transform.eulerAngles;
+        //if (playerCam)
+        //    playerCam.transform.parent.eulerAngles = new Vector3(90, -orientation.y, -90);
+        //print(playerCam.transform.parent.eulerAngles);
     }
 
     // Bind weapon w to this player
@@ -169,7 +180,7 @@ public class PlayerController : MonoBehaviour {
 
         if (playerCam.transform.eulerAngles.x >= maxLookDownLimit && playerCam.transform.eulerAngles.x <= 90f)
         {
-            playerCam.transform.eulerAngles = new Vector3(maxLookDownLimit, playerCam.transform.eulerAngles.y, playerCam.transform.eulerAngles.z);
+            //playerCam.transform.eulerAngles = new Vector3(maxLookDownLimit, playerCam.transform.eulerAngles.y, playerCam.transform.eulerAngles.z);
         }
     }
 }

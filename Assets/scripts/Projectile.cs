@@ -68,7 +68,8 @@ public class Projectile : MonoBehaviour {
         explosion.transform.position = transform.position;
         explosion.transform.GetComponent<Explosion>().dmg = 5;
         explosion.transform.GetComponent<Explosion>().growthLimit = 14;
-        explosion.transform.GetComponent<Explosion>().id = id;
+        explosion.transform.GetComponent<Explosion>().ownerID = ownerID;
+        explosion.transform.GetComponent<Explosion>().ownerType = ownerType;
     }
 
 
@@ -86,6 +87,7 @@ public class Projectile : MonoBehaviour {
         //print(!isShot);
         if (deflected || !isShot)
             return;
+        //print("HIT");
         if(collision.tag == "Player" && ownerType == "Enemy" && collision.GetComponent<PlayerController>().IsMyPlayer())
         {
             print("SPLAT");
@@ -94,13 +96,40 @@ public class Projectile : MonoBehaviour {
         }
         if (ownerType != "Player")
             return;
+
         if (id != GameManager.gm.player.transform.GetComponent<PlayerController>().id)
             return;
+
+
+        print("HIT SOMTRHING:" + collision.tag + " " + collision.name);
+
         if (collision.tag == "Reward")
         {
             print("HIT REWARD");
             collision.GetComponent<Floater>().OnHit();
         }
+
+        if(collision.tag == "SweetSpot")
+        {
+            print("SWEET");
+            collision.GetComponent<SweetSpot>().TakeDamage(gameObject);
+
+            if (attributeID == 1)
+            {
+                CreateExplosion();
+            }
+            //e.OnHit();
+            // If piercing attribute, don't stop arrow
+            if (attributeID != 2)
+            {
+                deflected = true;
+                transform.GetComponent<Rigidbody>().velocity = Vector3.zero;
+                transform.GetComponent<Rigidbody>().useGravity = false;
+                tr.enabled = false;
+                transform.SetParent(collision.transform);
+            }
+        }
+
         if (collision.transform.tag == "Enemy" && ownerType != "Enemy")
         {
             print("hit");
@@ -140,14 +169,15 @@ public class Projectile : MonoBehaviour {
                     return;
                 }
                 // If not using online feature, inflict damage to enemy
-                if (e.TakeDamage(dmg))
-                {
+                e.TakeDamageFrom(dmg, ownerType, ownerID);
+                //if (e.TakeDamage(dmg))
+                //{
                     // If enemy is still alive, leave arrow stuck in enemy
                     //if (e.health > 0 )
                     //{
                         
                     //}
-                }
+                //}
             }
         }
         else if (collision.transform.tag == "Ground" || collision.transform.tag == "Impenetrable" || collision.transform.tag == "Path")
@@ -176,6 +206,7 @@ public class Projectile : MonoBehaviour {
         }
     }
     //unused
+    /*
     protected virtual void OnCollisionEnter(Collision collision)
     {
         print(1);
@@ -210,4 +241,5 @@ public class Projectile : MonoBehaviour {
             Destroy(gameObject);
         }
     }
+    */
 }

@@ -116,6 +116,7 @@
     <Compile Include="Assets\scripts\Selector.cs" />
     <Compile Include="Assets\scripts\Spinner.cs" />
     <Compile Include="Assets\scripts\StatusIndicator.cs" />
+    <Compile Include="Assets\scripts\SweetSpot.cs" />
     <Compile Include="Assets\scripts\Tnt.cs" />
     <Compile Include="Assets\scripts\Trap.cs" />
     <Compile Include="Assets\scripts\Weapon.cs" />

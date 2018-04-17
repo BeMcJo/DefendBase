@@ -41,6 +41,8 @@ public class Objective : MonoBehaviour {
     {
         if (GameManager.gm.inGameCurrency < 50)
             return;
+        if (HP >= maxHP)
+            return;
         NetworkManager.nm.ConfirmObjectiveRepair(id, -5, true);
         storeUpgradeUIs[0].transform.Find("BuyBtn").GetComponent<Button>().interactable = false;
     }

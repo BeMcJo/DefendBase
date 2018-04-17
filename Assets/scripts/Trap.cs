@@ -7,6 +7,7 @@ public abstract class Trap : MonoBehaviour {
     public static int TrapCount = 0; // Keep track of traps created in game
     public static int[] costs = new int[] { 20 ,1};
     public static string[] names = new string[] { "TNT","txt2" };
+    public string ownerType; // unused?
     public int hp, // Amount of damage before activating trap
                ownerID = -1, // Which player owns this trap? (-1 = No one)
                trapID, // Distinguishes type of trap this is
@@ -69,7 +70,7 @@ public abstract class Trap : MonoBehaviour {
 
     }
 
-    public virtual void Activate(int sid)
+    public virtual void Activate(string sourceType,int sid)
     {
 
     }

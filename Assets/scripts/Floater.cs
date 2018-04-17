@@ -26,6 +26,7 @@ public class Floater : MonoBehaviour {
         rb.AddTorque(biasedTorq* Random.Range(20, 250));
         //GetComponent<Collider>().enabled = true;
         rewardType = Random.Range(0, rewardTypes.Length);
+        //rewardType = 1;
         Renderer r = GetComponent<Renderer>();
         Color c = r.material.color;
         switch (rewardType)
