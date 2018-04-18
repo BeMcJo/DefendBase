@@ -78,10 +78,11 @@ public class Objective : MonoBehaviour {
         {
             HP = maxHP;
         }
-        if (HP < 0)
+        if (HP <= 0)
         {
             HP = 0;
-            GameManager.gm.DisplayDefeatNotification();
+            GameManager.gm.DisplayEndGameNotifications(false);
+            //GameManager.gm.DisplayDefeatNotification();
         }
         storeUpgradeUIs[0].transform.Find("BuyBtn").GetComponent<Button>().interactable = HP != maxHP;
         healthBarGauge.Find("Health Bar").localScale = new Vector3((float)HP / (float)maxHP, 1, 1);

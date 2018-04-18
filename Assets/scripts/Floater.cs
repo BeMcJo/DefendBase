@@ -121,7 +121,7 @@ public class Floater : MonoBehaviour {
 
             // score
             case 3:
-                GameManager.gm.AddScore(200);
+                GameManager.gm.UpdateScore(200);
                 itemGainIndicator = Instantiate(GameManager.gm.indicatorPrefabs[0]);
                 itemGainIndicator.transform.position = transform.position;
                 itemGainIndicator.transform.GetChild(0).GetComponent<Text>().text = "+200 Score";

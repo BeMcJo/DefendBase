@@ -34,7 +34,7 @@ public abstract class Weapon : MonoBehaviour
             "Bow",
             new int[] {1,1,2,2,3},
             new int[] {50,100,200,500},
-            new float[] {1600, 1700,1900,2300,2900},
+            new float[] {16, 17,19,23,29},
             new float[] {2f,1.75f,1.5f,1.25f,1f},
             new float[] {.75f,.70f,.65f,.55f,.5f}
         )
@@ -135,7 +135,12 @@ public abstract class Weapon : MonoBehaviour
 	
     public void SetItemDescription()
     {
-        itemUI.transform.Find("ItemDescription").GetComponent<Text>().text = statsByLevel[wepID].name + " Lvl " + lvl + "   DMG:" + statsByLevel[wepID].dmg[lvl] + "   CHRG:" + (1.0f / statsByLevel[wepID].chargeAccelation[lvl]).ToString("F2") + "   RLD:" + statsByLevel[wepID].timeToReload[lvl] + "s   BOWSTR:" + statsByLevel[wepID].distance[lvl];
+        Transform itemStats = itemUI.transform.Find("ItemStats");
+        itemStats.Find("Damage").Find("Text").GetComponent<Text>().text = statsByLevel[wepID].dmg[lvl] + "";
+        itemStats.Find("ChargeAcceleration").Find("Text").GetComponent<Text>().text = statsByLevel[wepID].chargeAccelation[lvl] + "";
+        itemStats.Find("Reload").Find("Text").GetComponent<Text>().text = statsByLevel[wepID].timeToReload[lvl] + "";
+        itemStats.Find("BowStr").Find("Text").GetComponent<Text>().text = statsByLevel[wepID].distance[lvl] + "";
+        itemUI.transform.Find("ItemDescription").GetComponent<Text>().text = statsByLevel[wepID].name + " Lvl " + lvl;// + "   DMG:" + statsByLevel[wepID].dmg[lvl] + "   CHRG:" + (1.0f / statsByLevel[wepID].chargeAccelation[lvl]).ToString("F2") + "   RLD:" + statsByLevel[wepID].timeToReload[lvl] + "s   BOWSTR:" + statsByLevel[wepID].distance[lvl];
     }
 
     // Update is called once per frame
@@ -189,7 +194,8 @@ public abstract class Weapon : MonoBehaviour
 
     public void SetTouchInteraction(bool isInteractive)
     {
-        chargeBar.SetActive(!isInteractive);
+        //chargeBar.SetActive(!isInteractive);
+        print(isInteractive);
         shootBtn.SetActive(!isInteractive && !GameManager.gm.edittingMap);
     }
 

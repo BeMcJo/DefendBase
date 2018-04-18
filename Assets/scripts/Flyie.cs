@@ -107,7 +107,7 @@ public class Flyie : Enemy {
         Projectile p = projectile.GetComponent<Projectile>();
         projectile.transform.position = transform.position;
         projectile.GetComponent<Rigidbody>().AddForce(0, 500, 0);
-        p.Shoot(target, tag, id);
+        p.Shoot(target, tag, id, 0);
 
     }
 

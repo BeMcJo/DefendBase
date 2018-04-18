@@ -811,10 +811,47 @@ public class GameManager : MonoBehaviour {
         blackoutCoroutine = StartCoroutine(FadeBlackout());
     }
 
+    public void DisplayEndGameNotifications(bool won)
+    {
+        if (selectedDefense)
+            selectedDefense.SetActive(false);
+
+        playerOrientationObjects.SetActive(false);
+        isSettingPlayerOrientation = false;
+        optionsCanvas.SetActive(false);
+        playerStatusCanvas.transform.Find("OptionsBtn").GetComponent<Button>().interactable = false;
+
+        quickAccessCanvas.SetActive(false);
+
+        mapUICanvas.SetActive(edittingMap);
+        playerStatusCanvas.SetActive(true);
+        mapFingerID = -1;
+        selectedDefense = null;
+
+        gameOver = true;
+        resultNotification.SetActive(true);
+
+        hasWon = won;
+        if (won)
+        {
+            resultNotification.transform.Find("ResultTxt").GetComponent<Text>().text = "VICTORY!\nYou have successfully\ndefended the kingdom!";
+        }
+        else
+        {
+            resultNotification.transform.Find("ResultTxt").GetComponent<Text>().text = "Oh No! The enemies broke\nthrough our defenses!";
+        }
+    }
+
     public void DisplayVictoryNotification()
     {
         if(selectedDefense)
             selectedDefense.SetActive(false);
+
+        playerOrientationObjects.SetActive(false);
+        isSettingPlayerOrientation = false;
+        optionsCanvas.SetActive(false);
+        playerStatusCanvas.transform.Find("OptionsBtn").GetComponent<Button>().interactable = false;
+
         mapUICanvas.SetActive(edittingMap);
         playerStatusCanvas.SetActive(true);
         mapFingerID = -1;
@@ -831,6 +868,10 @@ public class GameManager : MonoBehaviour {
         if(selectedDefense)
             selectedDefense.SetActive(false);
 
+        playerOrientationObjects.SetActive(false);
+        isSettingPlayerOrientation = false;
+        optionsCanvas.SetActive(false);
+        playerStatusCanvas.transform.Find("OptionsBtn").GetComponent<Button>().interactable = false;
         mapUICanvas.SetActive(edittingMap);
         playerStatusCanvas.SetActive(true);
         mapFingerID = -1;
@@ -1026,6 +1067,24 @@ public class GameManager : MonoBehaviour {
         intermissionCanvas.SetActive(!intermissionCanvas.activeSelf);
     }
 
+    public void UpdateKillCount(int kills)
+    {
+        personalKills += kills;
+        playerStatusCanvas.transform.Find("Kills").Find("Text").GetComponent<Text>().text = personalKills + "";
+    }
+
+    public void UpdateScore(int s)
+    {
+        score += s;
+        Transform scoreObj = playerStatusCanvas.transform.Find("Score");
+        string scoreTxt = "";
+        for(int i = 0; i < 9; i++)
+        {
+            scoreTxt = (score / (int)Mathf.Pow(10, i)) % 10 + scoreTxt;
+        }
+        scoreObj.Find("Text").GetComponent<Text>().text = scoreTxt;
+    }
+
     public void SaveAndQuit()
     {
         Save("continuedGame");
@@ -1109,6 +1168,7 @@ public class GameManager : MonoBehaviour {
     public void UpdateInGameCurrency(int currency)
     {
         inGameCurrency += currency;
+        playerStatusCanvas.transform.Find("Currency").Find("Text").GetComponent<Text>().text = inGameCurrency + "";
         quickAccessUpgradeDescription.transform.Find("CurrencyTxt").GetChild(0).GetComponent<Text>().text = "$" + inGameCurrency;
         shopCanvas.transform.Find("Currency").GetChild(0).GetComponent<Text>().text = "$" + inGameCurrency;
     }
@@ -1259,7 +1319,9 @@ public class GameManager : MonoBehaviour {
         totalKills = 0;
         MapManager.mapManager.LoadMap(0);
         Weapon w = null;
-
+        UpdateInGameCurrency(0);
+        UpdateKillCount(0);
+        UpdateScore(0);
         /*GameObject trap = Instantiate(trapPrefabs[0]);
         traps.Add(0, trap.GetComponent<Trap>());
         trap.transform.SetParent(playerRotation.transform);
@@ -1327,6 +1389,8 @@ public class GameManager : MonoBehaviour {
         pattern = EnemySpawnPattern.patternsBySpawnPointCt[0][w % EnemySpawnPattern.patternsBySpawnPointCt[0].Count]; // Get spawn pattern for the wave
         patternIterations = pattern.iterations;
         timeToSpawn = pattern.spawnTimes[intervalIndex] / pattern.spawnCts[intervalIndex].Count;
+
+        playerStatusCanvas.transform.Find("Wave").Find("Text").GetComponent<Text>().text = (wave + 1) + "";
         StartCoroutine(NotifyIncomingWave(w));
     }
 
@@ -2004,6 +2068,7 @@ public class GameManager : MonoBehaviour {
                 totalKills += kills; // add to cumulative kills
                 totalPersonalKills += personalKills;
                 personalKills = 0;
+                UpdateKillCount(0);
                 kills = 0; // reset kill count
                 UpdateInGameCurrency(3 * wave);
                 // increment difficulty after every 10th wave
@@ -2014,7 +2079,8 @@ public class GameManager : MonoBehaviour {
                 if(wave >= EnemySpawnPattern.patternsBySpawnPointCt[0].Count)
                 {
                     Debug.Log("VICTORY");
-                    DisplayVictoryNotification();
+                    DisplayEndGameNotifications(true);
+                    //DisplayVictoryNotification();
                     return;
                 }
                 // go on intermission after every 5th wave

@@ -28,9 +28,9 @@ public class Arrow : Projectile {
         }
     }
 
-    public override void Shoot(GameObject t, string ownerType, int ownerID)
+    public override void Shoot(GameObject t, string ownerType, int ownerID, int dmg)
     {
-        base.Shoot(t, ownerType, ownerID);
+        base.Shoot(t, ownerType, ownerID,dmg);
         transform.Find("Tail").GetComponent<BoxCollider>().enabled = false;
     }
 

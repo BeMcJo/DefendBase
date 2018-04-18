@@ -26,7 +26,7 @@ public class Enemy : MonoBehaviour
         // Stats for Normies
         new EnemyStats[]
         {
-            new EnemyStats(1, 1, 1, 1),
+            new EnemyStats(1, 0, 1, 1),
             new EnemyStats(2, 2, 1.2f, 1.2f),
             new EnemyStats(2, 2, 1.25f, 1.25f),
             new EnemyStats(3, 2, 1.5f, 1.3f),
@@ -526,7 +526,7 @@ public class Enemy : MonoBehaviour
     // Update game rewards upon death
     public virtual void Die()
     {
-        GameManager.gm.AddScore(50);
+        GameManager.gm.UpdateScore(50);
         GameManager.gm.kills++;
         GameManager.gm.UpdateInGameCurrency(1);
 
@@ -536,7 +536,8 @@ public class Enemy : MonoBehaviour
             if(dmgSourceID == GameManager.gm.player.GetComponent<PlayerController>().id)
             {
                 print("I killed it IT");
-                GameManager.gm.personalKills++;
+                GameManager.gm.UpdateKillCount(1);
+                //GameManager.gm.personalKills++;
             }
         }
         

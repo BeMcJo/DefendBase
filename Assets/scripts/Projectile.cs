@@ -31,10 +31,11 @@ public class Projectile : MonoBehaviour {
         SetAttribute(GameManager.gm.selectedAttribute);
     }
 
-    public virtual void Shoot(GameObject t, string ownerType, int ownerID)
+    public virtual void Shoot(GameObject t, string ownerType, int ownerID, int dmg)
     {
         //print("shoot");
         isShot = true;
+        this.dmg = dmg;
         this.ownerType = ownerType;
         this.ownerID = ownerID;
         id = ownerID;
