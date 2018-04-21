@@ -91,6 +91,7 @@ public class GameManager : MonoBehaviour {
                       playerPrefab, // Your player in game
                       playerUIPrefab, // Your object in lobby
                       buttonPrefab, // Used for any general purposes as button
+                      postedNoteButtonPrefab, // Button that looks like a post
                       itemUIPrefab, // Used to display items in store in game
                       descriptionPrefab, // Used to provide details about item
                       enemyArmorPrefab, // ???

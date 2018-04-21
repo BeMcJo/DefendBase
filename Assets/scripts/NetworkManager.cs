@@ -269,7 +269,7 @@ public class NetworkManager : MonoBehaviour {
 
         hostID = NetworkTransport.AddHost(topo, 0);
         ourClientID = hostID;
-        SpawnPlayerUI("HOST", ourClientID); // Spawn my player in the lobby
+        SpawnPlayerUI("Player " + (ourClientID+1), ourClientID); // Spawn my player in the lobby
         players[ourClientID].isReady = false; // Always ready to start game
         StartBroadcast(); // Announce my Network Manager is hosting
     }
@@ -461,7 +461,8 @@ public class NetworkManager : MonoBehaviour {
                 // Create new button for host if new
                 if (newHost)
                 {
-                    GameObject joinBtn = Instantiate(GameManager.gm.buttonPrefab) as GameObject;
+                    GameObject joinBtn = Instantiate(GameManager.gm.postedNoteButtonPrefab) as GameObject;
+                    //GameObject joinBtn = Instantiate(GameManager.gm.buttonPrefab) as GameObject;
                     joinBtn.AddComponent<ExpiringButton>();
                     joinBtn.transform.SetParent(GameManager.gm.hostListCanvas.transform.Find("ButtonsContainer"));
                     joinBtn.transform.GetComponent<ExpiringButton>().SetExpiringButton(host);
@@ -536,9 +537,10 @@ public class NetworkManager : MonoBehaviour {
         }
         Player sc = players[cnnId];
         sc.playerName = playerName;
-        sc.playerGO.transform.Find("NameText").GetComponent<Text>().text = playerName + cnnId;
+        sc.playerGO.transform.Find("NameText").GetComponent<Text>().text = playerName;
         sc.playerGO.transform.SetParent(GameManager.gm.lobbyCanvas.transform.Find("PlayerList"));
         sc.playerGO.SetActive(true);
+        sc.playerGO.transform.localScale = new Vector3(1, 1, 1);
         // Tell everybody that new player has connected
         Send("CNN|" + playerName + '|' + cnnId, reliableChannel, players);
     }
@@ -1604,7 +1606,7 @@ public class NetworkManager : MonoBehaviour {
         }
 
         // Send our name to server
-        Send("NAMEIS|" + "PLAYER", reliableChannel);
+        Send("NAMEIS|" + "Player " + (ourClientID+1), reliableChannel);
 
     }
 
@@ -1613,7 +1615,7 @@ public class NetworkManager : MonoBehaviour {
     {
         GameObject go = Instantiate(GameManager.gm.playerUIPrefab);
         
-        playerName += "" + cnnId;
+        //playerName += " " + (cnnId+1);
         Player p = new Player();
         p.playerGO = go;
         p.playerName = playerName;
@@ -1623,7 +1625,7 @@ public class NetworkManager : MonoBehaviour {
         // Our client?
         if (cnnId == ourClientID)
         {
-            p.playerGO.transform.Find("NameText").GetComponent<Text>().text = "ME";
+            //p.playerGO.transform.Find("NameText").GetComponent<Text>().text = "ME";
         }
         go.transform.localScale = new Vector3(1, 1, 1);
         players.Add(cnnId, p);
@@ -1722,7 +1724,10 @@ public class NetworkManager : MonoBehaviour {
         {
             players[cnnID].playerGO.transform.Find("NameText").GetComponent<Text>().text = players[cnnID].playerName;
             if (players[cnnID].isReady)
-                players[cnnID].playerGO.transform.Find("NameText").GetComponent<Text>().text += " READY";
+            {
+                //players[cnnID].playerGO.transform.Find("NameText").GetComponent<Text>().text += " READY";
+            }
+            players[cnnID].playerGO.transform.Find("Checkmark").gameObject.SetActive(players[cnnID].isReady);
             if (isHost)
                 GameManager.gm.lobbyCanvas.transform.Find("ReadyBtn").GetComponent<Button>().interactable = readyToStart && players.Count > 1;
         }
