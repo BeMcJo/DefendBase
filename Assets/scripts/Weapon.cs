@@ -94,7 +94,8 @@ public abstract class Weapon : MonoBehaviour
         bool canDisplay = !GameManager.gm.interactiveTouch && GameManager.gm.player == user.gameObject;
         //{
         chargeBarGuage.transform.SetParent(GameManager.gm.playerStatusCanvas.transform);
-        chargeBarGuage.transform.localScale = new Vector3(1, 1, 1);
+        chargeBarGuage.transform.localScale = new Vector3(.875f, .5f, 1);
+        chargeBarGuage.transform.localEulerAngles = new Vector3(0, 0, -90);
         chargeBarGuage.transform.localPosition = GameManager.gm.playerStatusCanvas.transform.Find("ChargeBarGaugePlaceholder").localPosition;
         shootBtn.transform.SetParent(GameManager.gm.playerStatusCanvas.transform);
         shootBtn.transform.localScale = new Vector3(1, 1, 1);

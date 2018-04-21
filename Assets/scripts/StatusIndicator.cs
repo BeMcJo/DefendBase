@@ -47,6 +47,7 @@ public class StatusIndicator : MonoBehaviour {
                 0);
 
         int hp = 0, maxHP = 1;
+        // fetch target's current hp
         if(target.tag == "Enemy")
         {
             Enemy e = target.transform.GetComponent<Enemy>();
@@ -59,7 +60,8 @@ public class StatusIndicator : MonoBehaviour {
             hp = o.HP;
             maxHP = o.maxHP;
         }
-        healthBar.localScale = new Vector3((float)hp / (float)maxHP, 1, 1);
+
+        // check if hp differed from previous known hp
         if(prevHP != -1 && prevHP != hp)
         {
             //Debug.Log("DIFFER");
@@ -70,8 +72,11 @@ public class StatusIndicator : MonoBehaviour {
             damageIndicator.transform.GetChild(0).GetComponent<Text>().text = "" + dif;
         }
 
-        if (hp < 0)
+        // make sure hp is valid
+        if (hp <= 0)
             hp = 0;
+        healthBar.localScale = new Vector3((float)hp / (float)maxHP, 1, 1);
+
         prevHP = hp;
         healthTxt.text = hp + "/" + maxHP;
         healthTxt.transform.position = healthBarGauge.position - new Vector3(0, .1f, 0);

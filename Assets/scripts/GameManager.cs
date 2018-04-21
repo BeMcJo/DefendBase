@@ -455,7 +455,7 @@ public class GameManager : MonoBehaviour {
         //playerRotation.transform.eulerAngles = playerOrientation;
 
         playerStatusCanvas = GameObject.Find("PlayerStatusCanvas").gameObject;
-        playerStatusCanvas.transform.Find("OptionsBtn").GetComponent<Button>().onClick.AddListener(DisplayOptions);
+        playerStatusCanvas.transform.Find("OptionsBtn").GetComponent<Button>().onClick.AddListener(ToggleOptionsCanvas);//DisplayOptions);
         playerStatusCanvas.transform.Find("MapBtn").GetComponent<Button>().onClick.AddListener(ToggleMapUICanvas);
         playerOrientationObjects = playerStatusCanvas.transform.Find("PlayerOrientationObjects").gameObject;
         playerOrientationObjects.transform.Find("SetOrientationBtn").GetComponent<Button>().onClick.AddListener(SetPlayerOrientation);
@@ -768,7 +768,8 @@ public class GameManager : MonoBehaviour {
                 Debug.Log("Buying trap");
                 if (inGameCurrency < Trap.costs[id])
                     return;
-                inGameCurrency -= Trap.costs[id];
+                UpdateInGameCurrency(-Trap.costs[id]);
+                //inGameCurrency -= Trap.costs[id];
                 myTraps[id] += 1;
                 defensesContainer.transform.GetChild(id).GetChild(0).GetComponent<Text>().text = Trap.names[id] + " x" + myTraps[id];
                 defensesContainer.transform.GetChild(id).gameObject.SetActive(true);
@@ -1113,6 +1114,24 @@ public class GameManager : MonoBehaviour {
         }
     }
 
+    public void ToggleOptionsCanvas()
+    {
+        if (isSettingPlayerOrientation)
+            return;
+
+        optionsCanvas.SetActive(!optionsCanvas.activeSelf);
+        if (optionsCanvas.activeSelf)
+        {
+            optionsCanvas.GetComponent<Canvas>().sortingOrder = playerStatusCanvas.GetComponent<Canvas>().sortingOrder + 1;
+        }
+        else
+        {
+            optionsCanvas.GetComponent<Canvas>().sortingOrder = playerStatusCanvas.GetComponent<Canvas>().sortingOrder - 1;
+        }
+        optionsCanvas.transform.Find("OptionsPanel").gameObject.SetActive(true);
+        optionsCanvas.transform.Find("SettingsPanel").gameObject.SetActive(false);
+    }
+
     public void DisplayOptions()
     {
         if (isSettingPlayerOrientation)
@@ -1169,7 +1188,7 @@ public class GameManager : MonoBehaviour {
     {
         inGameCurrency += currency;
         playerStatusCanvas.transform.Find("Currency").Find("Text").GetComponent<Text>().text = inGameCurrency + "";
-        quickAccessUpgradeDescription.transform.Find("CurrencyTxt").GetChild(0).GetComponent<Text>().text = "$" + inGameCurrency;
+        quickAccessUpgradeDescription.transform.Find("Currency").Find("Text").GetComponent<Text>().text = inGameCurrency + "";
         shopCanvas.transform.Find("Currency").GetChild(0).GetComponent<Text>().text = "$" + inGameCurrency;
     }
 

@@ -26,6 +26,7 @@ public class SweetSpot : MonoBehaviour {
             if(owner.tag == "Enemy")
             {
                 Enemy e = owner.GetComponent<Enemy>();
+                GameManager.gm.OnHitEnemy();
                 e.OnHit();
                 // If using online feature, let Network Manager handle this
                 if (NetworkManager.nm.isStarted)
