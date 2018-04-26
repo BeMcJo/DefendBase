@@ -25,7 +25,7 @@ public class Slime : Enemy {
         //}
         if (collision.gameObject.tag == "Enemy")
         {
-
+            print(1);
             Collider c = collision.collider;
             Physics.IgnoreCollision(c, GetComponentInChildren<Collider>());
             return;
@@ -45,7 +45,7 @@ public class Slime : Enemy {
     {
         if (collision.gameObject.tag == "Enemy")
         {
-            
+            print(2);
             Collider c = collision.collider;
             /*
             if (collision.gameObject.name != "EnemyObject")

@@ -594,12 +594,10 @@ public class Enemy : MonoBehaviour
         {
             if (target.tag == "Objective")
             {
-                print("?");
                 Objective o = target.transform.GetComponent<Objective>();
                 o.TakeDamage(dmg);
             }
         }
-        print(1231);
         atkTimer = effectiveTimeToAttack;
     }
 
