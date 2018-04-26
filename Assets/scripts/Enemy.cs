@@ -49,6 +49,14 @@ public class Enemy : MonoBehaviour
             new EnemyStats(4, 3, 1.25f, 1.25f),
             new EnemyStats(4, 3, 1.5f, 1.3f),
             new EnemyStats(6, 3, 1.5f, 1.5f)
+        },
+        new EnemyStats[]
+        {
+            new EnemyStats(1, 1, 1, 1),
+            new EnemyStats(2, 2, 1.2f, 1.2f),
+            new EnemyStats(2, 2, 1.25f, 1.25f),
+            new EnemyStats(3, 2, 1.5f, 1.3f),
+            new EnemyStats(3, 2, 1.5f, 1.5f)
         }
     };
     public Animator anim;
@@ -97,7 +105,7 @@ public class Enemy : MonoBehaviour
 
     protected virtual void Awake()
     {
-       id = EnemyCount;
+        id = EnemyCount;
         EnemyCount++;
         if (GameManager.gm.enemies != null)
         {
@@ -130,8 +138,9 @@ public class Enemy : MonoBehaviour
         //print(ename);
         if (ename == "infurie")
             go = transform.Find("PivotPoint").Find("EnemyObject").gameObject;
-        else
+        else //if (ename != "slime")
             go = transform.Find("EnemyObject").gameObject;
+
         originalColor = go.GetComponent<Renderer>().material.color;
     }
 
@@ -227,6 +236,12 @@ public class Enemy : MonoBehaviour
         transform.position = Vector3.MoveTowards(transform.position, targetPos, effectiveMoveSpd);
         return rb.velocity.y > 0;
     }
+
+    public bool IsLandingAnimation()
+    {
+        return anim.GetCurrentAnimatorStateInfo(0).IsName(ename + "_land");
+    }
+
     // Check if current animation is falling
     public bool IsFallingAnimation()
     {
@@ -268,12 +283,19 @@ public class Enemy : MonoBehaviour
         anim.SetBool("isFalling", true);
         yield return new WaitUntil(IsFallingAnimation);
         yield return new WaitUntil(ReachGround);
-        
+
         // Upon touching ground, perform land animation
         rb.velocity -= new Vector3(0, rb.velocity.y, 0);
         anim.SetBool("isFalling", false);
-        
+        anim.SetBool("isGrounded", true);
+
+        //if (ename == "slime")
+        //    anim.Play(ename + "_land", -1, 0);
+
+        //yield return new WaitForSeconds(1);
         // End of move action
+        anim.SetBool("isMoving", false);
+        actionPerformed = "idle";
         isPerformingAction = false;
         //}
     }
@@ -285,9 +307,10 @@ public class Enemy : MonoBehaviour
         if(isPerformingAction)
             return;
         actionPerformed = "move";
+        anim.SetBool("isMoving", true);
         anim.SetBool("isAttacking", false);
         StartCoroutine(MoveAnimation());
-        actionPerformed = "idle";
+        //actionPerformed = "idle";
         //transform.position = Vector3.MoveTowards(transform.position, targetPos, effectiveMoveSpd);
     }
 
@@ -300,7 +323,11 @@ public class Enemy : MonoBehaviour
     // Handles performing action
     public virtual void PerformAction()
     {
-        
+        if (!isGrounded)
+        {
+            print("not grounded");
+            return;
+        }
         //print(">>>>>>>>>>>>>>>" + isDoneMoving);
         if (target != null)
         {
@@ -424,11 +451,17 @@ public class Enemy : MonoBehaviour
     // Handles attack action and animation
     public IEnumerator PerformAttack()
     {
+        print(1);
         isAttacking = true;
         isPerformingAction = true;
-        anim.SetFloat("timeToAtk", effectiveTimeToAttack);
+
+        
+        //anim.SetFloat("timeToAtk", effectiveTimeToAttack);
         float prevSpd = anim.speed;
+        
         anim.speed = effectiveAttackSpd;
+        
+        /*
         // Enemy can attack after timer reaches 0
         anim.Play(ename + "_timetoatk", -1, 0);
         yield return new WaitUntil(CanAttack);
@@ -436,6 +469,12 @@ public class Enemy : MonoBehaviour
         // Perform charge animation
         yield return new WaitUntil(IsChargingAnimation);
         yield return new WaitWhile(IsChargingAnimation);
+        */
+
+        yield return new WaitForSeconds(effectiveTimeToAttack);
+
+        print(2);
+        anim.Play(ename + "_charge", -1, 0);
 
         // Perform attack animation
         anim.SetBool("isAttacking", isAttacking);
@@ -445,10 +484,12 @@ public class Enemy : MonoBehaviour
         // After attack animation finishes, inflict damage
         Attack(target);
 
+        print(4);
         // Perform reload animation
         anim.SetBool("isReloading", true);
         yield return new WaitUntil(IsReloadingAnimation);
-        
+
+        print(5);
         // End attack action
         anim.speed = prevSpd;
         anim.SetBool("isReloading", false);
@@ -516,10 +557,12 @@ public class Enemy : MonoBehaviour
         {
             if (target.tag == "Objective")
             {
+                print("?");
                 Objective o = target.transform.GetComponent<Objective>();
                 o.TakeDamage(dmg);
             }
         }
+        print(1231);
         atkTimer = effectiveTimeToAttack;
     }
 
@@ -683,7 +726,8 @@ public class Enemy : MonoBehaviour
             Die();
             return;
         }
-        PerformAction();
+        if(!isPerformingAction)
+            PerformAction();
 
     }
 }
