@@ -167,7 +167,8 @@ public class GameManager : MonoBehaviour {
 
     public Sprite[] itemIcons;
     //Button upgradeWepBtn;
-    Coroutine blackoutCoroutine;
+    Coroutine blackoutCoroutine,
+              waveNotificationCoroutine;
 
     // Saves data based on the type
     public void Save(string type)
@@ -1149,6 +1150,7 @@ public class GameManager : MonoBehaviour {
 
     public void LeaveGame()
     {
+        StopCoroutine(waveNotificationCoroutine);
         GoToMainScene();
     }
 
@@ -1411,7 +1413,8 @@ public class GameManager : MonoBehaviour {
         timeToSpawn = pattern.spawnTimes[intervalIndex] / pattern.spawnCts[intervalIndex].Count;
 
         playerStatusCanvas.transform.Find("Wave").Find("Text").GetComponent<Text>().text = (wave + 1) + "";
-        StartCoroutine(NotifyIncomingWave(w));
+        
+        waveNotificationCoroutine = StartCoroutine(NotifyIncomingWave(w));
     }
 
     // Spawn enemy at the spawn point sp

@@ -42,7 +42,7 @@ public class StatusIndicator : MonoBehaviour {
         healthBarGauge.position = target.transform.position +
             new Vector3(
                 0,
-                target.transform.localScale.y +
+                1 +
                 healthBarGauge.transform.GetComponent<RectTransform>().rect.height,
                 0);
 

@@ -15,4 +15,47 @@ public class Slime : Enemy {
         base.Start();
     }
 
+    protected override void OnCollisionEnter(Collision collision)
+    {
+        // Ignore colliding with enemies
+        //GameObject gameobject = collision.gameObject;
+        //while(gameobject.tag == "Untagged" && gameobject.transform.parent != null)
+        //{
+        //    gameobject = gameobject.transform.gameObject;
+        //}
+        if (collision.gameObject.tag == "Enemy")
+        {
+
+            Collider c = collision.collider;
+            Physics.IgnoreCollision(c, GetComponentInChildren<Collider>());
+            return;
+        }
+        // Check if touching ground
+        if (collision.gameObject.tag == "Ground" || collision.gameObject.tag == "Path") ;
+        {
+            //print("GRND");
+            grounds.Add(collision.gameObject);
+
+        }
+        isGrounded = grounds.Count > 0;
+        if (enemyID == 0)
+            anim.SetBool("isGrounded", isGrounded);
+    }
+    protected override void OnCollisionStay(Collision collision)
+    {
+        if (collision.gameObject.tag == "Enemy")
+        {
+            
+            Collider c = collision.collider;
+            /*
+            if (collision.gameObject.name != "EnemyObject")
+            {
+                c = collision.gameObject.GetComponent<Enemy>().go.GetComponent<Collider>();
+            }
+            Physics.IgnoreCollision(c, go.GetComponent<Collider>());
+            */
+            Physics.IgnoreCollision(c, GetComponentInChildren<Collider>());
+            return;
+        }
+    }
 }

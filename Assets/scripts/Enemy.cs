@@ -223,17 +223,25 @@ public class Enemy : MonoBehaviour
         curTarget = curTargetIndex;
     }
 
+    public void MoveForward()
+    {
+        transform.position = Vector3.MoveTowards(transform.position, targetPos, effectiveMoveSpd);
+        AssignMoveTargetIfReached();
+    }
+
     // Move forward while not reaching ground
     public bool ReachGround()
     {
-        transform.position = Vector3.MoveTowards(transform.position, targetPos, effectiveMoveSpd);
+        //transform.position = Vector3.MoveTowards(transform.position, targetPos, effectiveMoveSpd);
+        MoveForward();
         return grounds.Count > 0; //|| isGrounded && anim.GetCurrentAnimatorStateInfo(0).IsName("enemy_fall");
     }
     // Move forward while haven't reached peak of jump
     public bool ReachPeak()
     {
         Rigidbody rb = transform.GetComponent<Rigidbody>();
-        transform.position = Vector3.MoveTowards(transform.position, targetPos, effectiveMoveSpd);
+        MoveForward();
+        //transform.position = Vector3.MoveTowards(transform.position, targetPos, effectiveMoveSpd);
         return rb.velocity.y > 0;
     }
 
@@ -271,7 +279,7 @@ public class Enemy : MonoBehaviour
 
         // Jump by adding upward force
         Rigidbody rb = GetComponent<Rigidbody>();
-        GetComponent<Rigidbody>().AddForce(new Vector3(0, 400, 0));
+        GetComponent<Rigidbody>().AddForce(new Vector3(0, 600, 0));
         yield return new WaitUntil(IsJumpingAnimation);
         yield return new WaitUntil(ReachPeak);
 
@@ -320,12 +328,45 @@ public class Enemy : MonoBehaviour
         transform.LookAt(targetPos);
     }
 
+    public void AssignMoveTargetIfReached()
+    {
+        Vector2 targetPos2d = new Vector2(targetPos.x, targetPos.z);
+        Vector2 pos2d = new Vector2(transform.position.x, transform.position.z);//go.transform.position.x, go.transform.position.z);
+        float dist = Vector3.Distance(pos2d, targetPos2d);
+
+        // Move towards target if it is a Path
+        if (target.tag == "Path")
+        {
+            //if (enemyID == 1)
+            //print("outhere?");
+
+            if (dist <= .3f)
+            {
+                //print("CHANGE PATH");
+                PlatformPath p = target.transform.GetComponent<PlatformPath>();
+                target = null;
+
+                curTarget++;
+                // Get new path if reached destination
+                if (curTarget < pathing.Count) //p.destTargets.Count > 0)
+                {
+                    SetTarget(pathing[curTarget]);
+                    //SetTarget(p.destTargets[Random.Range(0, p.destTargets.Count)]);
+                }
+                // No more paths, target objective
+                else
+                {
+                    SetTarget(GameManager.gm.objective);
+                }
+            }
+        }
+    }
+
     // Handles performing action
     public virtual void PerformAction()
     {
         if (!isGrounded)
         {
-            print("not grounded");
             return;
         }
         //print(">>>>>>>>>>>>>>>" + isDoneMoving);
@@ -451,7 +492,6 @@ public class Enemy : MonoBehaviour
     // Handles attack action and animation
     public IEnumerator PerformAttack()
     {
-        print(1);
         isAttacking = true;
         isPerformingAction = true;
 
@@ -472,8 +512,7 @@ public class Enemy : MonoBehaviour
         */
 
         yield return new WaitForSeconds(effectiveTimeToAttack);
-
-        print(2);
+        
         anim.Play(ename + "_charge", -1, 0);
 
         // Perform attack animation
@@ -483,13 +522,11 @@ public class Enemy : MonoBehaviour
         
         // After attack animation finishes, inflict damage
         Attack(target);
-
-        print(4);
+        
         // Perform reload animation
         anim.SetBool("isReloading", true);
         yield return new WaitUntil(IsReloadingAnimation);
-
-        print(5);
+        
         // End attack action
         anim.speed = prevSpd;
         anim.SetBool("isReloading", false);
@@ -684,7 +721,7 @@ public class Enemy : MonoBehaviour
         // print(collision.gameObject.tag);
     }*/
     protected virtual void OnCollisionExit(Collision collision)
-    {
+    {/*
         if (collision.gameObject.tag == "Enemy")
         {
             Collider c = collision.collider;
@@ -695,7 +732,7 @@ public class Enemy : MonoBehaviour
             Physics.IgnoreCollision(c, go.GetComponent<Collider>());
 
             return;
-        }
+        }*/
         if (collision.gameObject.tag == "Ground" || collision.gameObject.tag == "Path")
         {
             //print("LEAVEING");
