@@ -58,6 +58,7 @@ public class EnemySpawnPattern {
         List<int> enemyLvls = new List<int>();
         List<int> spawnCt = new List<int>();
         for (int i = 0; i < 5; i++)
+        //for (int i = 0; i < 10; i++)
         {
             //spawnCt.Add(1);
             spawnCt.Add(0);
@@ -66,6 +67,7 @@ public class EnemySpawnPattern {
         }
         pattern.enemyLvls.Add(enemyLvls);
         pattern.spawnCts.Add(spawnCt);
+        //pattern.spawnTimes.Add(10f);
         pattern.spawnTimes.Add(50f);
 
         //////////////////////////////////////////////////

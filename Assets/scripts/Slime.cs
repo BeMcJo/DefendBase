@@ -27,7 +27,7 @@ public class Slime : Enemy {
         {
             print(1);
             Collider c = collision.collider;
-            Physics.IgnoreCollision(c, GetComponentInChildren<Collider>());
+            //Physics.IgnoreCollision(c, GetComponentInChildren<Collider>());
             return;
         }
         // Check if touching ground
@@ -54,7 +54,7 @@ public class Slime : Enemy {
             }
             Physics.IgnoreCollision(c, go.GetComponent<Collider>());
             */
-            Physics.IgnoreCollision(c, GetComponentInChildren<Collider>());
+            //Physics.IgnoreCollision(c, GetComponentInChildren<Collider>());
             return;
         }
     }

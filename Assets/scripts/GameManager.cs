@@ -965,6 +965,7 @@ public class GameManager : MonoBehaviour {
         string isOn = "ON";
         if (!Debugging)
             isOn = "OFF";
+        DebugManager.dbm.SetDebugMode(Debugging);
         settingsCanvas.transform.Find("ButtonsContainer").Find("DebugBtn").GetChild(0).GetComponent<Text>().text = "Debug Mode: " + isOn;
     }
 
@@ -1415,6 +1416,32 @@ public class GameManager : MonoBehaviour {
         playerStatusCanvas.transform.Find("Wave").Find("Text").GetComponent<Text>().text = (wave + 1) + "";
         
         waveNotificationCoroutine = StartCoroutine(NotifyIncomingWave(w));
+    }
+
+    public void SpawnEnemy(int sp,int useless, List<GameObject> pathing=null)
+    {
+        GameObject enemy = Instantiate(enemyPrefabs[pattern.spawnCts[intervalIndex][spawnIndex]]);
+        //Enemy.AssignEnemy(enemy.transform.GetComponent<Enemy>());
+        // Get random spawn point
+        if (sp == -1)
+            sp = UnityEngine.Random.Range(0, MapManager.mapManager.spawnPoints.Count);
+        GameObject spawnPoint = MapManager.mapManager.spawnPoints[sp];
+        enemy.transform.position = new Vector3(
+                                    spawnPoint.transform.position.x,
+                                    enemy.transform.position.y + 1,
+                                    spawnPoint.transform.position.z);
+        Enemy e = enemy.transform.GetComponent<Enemy>();
+        e.SetTarget(spawnPoint);
+        if (pathing == null)
+            pathing = Enemy.GeneratePathing(spawnPoint);
+        //print("path gen");
+        e.pathing = pathing;
+        GameObject enemyUI = Instantiate(statusIndicatorPrefab);
+        enemyUI.transform.GetComponent<StatusIndicator>().target = enemy;
+        enemy.transform.SetParent(enemiesContainer.transform);
+        difficulty = 0;
+        e.level = (pattern.enemyLvls[intervalIndex][spawnIndex] + difficulty) % Enemy.difficulties.Length;
+
     }
 
     // Spawn enemy at the spawn point sp
@@ -2041,7 +2068,12 @@ public class GameManager : MonoBehaviour {
             return;
         }
         // **** EVERYTHING BELOW IS WHEN GAME SESSION BEGINS ****
-        
+        /* DEBUG PURPOSE
+        if (Input.GetKeyDown(KeyCode.Space) || Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Ended)
+        {
+            print(1);
+            SpawnEnemy(0, 0);
+        }*/
 
         // Slowly fade out the hit indicator
         Color c = hitIndicator.GetComponent<Image>().color;

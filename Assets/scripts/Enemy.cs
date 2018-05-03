@@ -52,7 +52,7 @@ public class Enemy : MonoBehaviour
         },
         new EnemyStats[]
         {
-            new EnemyStats(1, 1, 1, 1),
+            new EnemyStats(1, 1, 1f, 1),
             new EnemyStats(2, 2, 1.2f, 1.2f),
             new EnemyStats(2, 2, 1.25f, 1.25f),
             new EnemyStats(3, 2, 1.5f, 1.3f),
@@ -117,6 +117,7 @@ public class Enemy : MonoBehaviour
             NetworkManager.nm.debugLog.Add("DUPLICATE HOW" +id);
         }
         name = "Enemy " + id;
+        Physics.IgnoreLayerCollision(8, 8, true);
     }
 
     // Use this for initialization

@@ -181,7 +181,7 @@ public class Bow : Weapon
         // If not using Touch Interactive mode, progressively increase the chargePower as long as user holds shoot button
         if (!GameManager.gm.interactiveTouch)
         {
-            chargePower = chargePower + .03f; // increment charge power
+            chargePower = chargePower + .03f/ (float) DebugManager.dbm.fps * 60.0f; // increment charge power
             if (chargePower >= chargeLimit)
                 chargePower = chargeLimit;
             chargeBar.transform.localScale = new Vector3(1, chargePower/chargeLimit, 1); // Visual indicator of charge percentage

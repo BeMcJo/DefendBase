@@ -39,9 +39,9 @@ public class StatusIndicator : MonoBehaviour {
         }
         float objHeight = 1;
 
-        if(target.tag == "Enemy")
+        if(target.tag == "Enemy")// && target.name.Contains("slime"))
         {
-            objHeight = target.transform.Find("EnemyObject").localScale.y;
+            objHeight = 1;// target.transform.Find("EnemyObject").localScale.y;
         }
         else
         {

@@ -78,29 +78,29 @@ public class Infurie : Enemy
     public override void Move()
     {
         // Don't perform move action if already performing an action 
-        if (isPerformingAction)
-        {
-            if (actionPerformed == "move")
-            {
+        //if (isPerformingAction)
+        //{
+            //if (actionPerformed == "move")
+            //{
                 /*
                 Vector2 targetPos2d = new Vector2(targetPos.x, targetPos.z);
                 Vector2 pos2d = new Vector2(transform.position.x, transform.position.z);
                 print("moving" + id + ",..." + Vector2.Distance(targetPos2d, pos2d));
                 */
                 transform.position = Vector3.MoveTowards(transform.position, targetPos, effectiveMoveSpd);
-            }
-            return;
-        }
+            //}
+          //  return;
+        //}
         anim.SetBool("isMoving", true);
-        if (health > (maxHP / 2))
+        if (health > (maxHP / 2) && !anim.GetCurrentAnimatorStateInfo(0).IsName(ename + "_move"))
             anim.Play(ename + "_move", -1, 0);
-        else
+        else if(health <= (maxHP / 2) && !anim.GetCurrentAnimatorStateInfo(0).IsName(ename + "_dash"))
         {
             anim.Play(ename + "_dash", -1, 0);
         }
         anim.SetBool("isAttacking", false);
         // Denote current action moving
-        isPerformingAction = true;
+        //isPerformingAction = true;
         actionPerformed = "move";
         //StartCoroutine(MoveAnimation());
         //transform.position = Vector3.MoveTowards(transform.position, targetPos, effectiveMoveSpd);
