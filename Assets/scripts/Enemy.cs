@@ -57,6 +57,14 @@ public class Enemy : MonoBehaviour
             new EnemyStats(2, 2, 1.25f, 1.25f),
             new EnemyStats(3, 2, 1.5f, 1.3f),
             new EnemyStats(3, 2, 1.5f, 1.5f)
+        },
+        new EnemyStats[]
+        {
+            new EnemyStats(1, 1, 1f, 1),
+            new EnemyStats(2, 2, 1.2f, 1.2f),
+            new EnemyStats(2, 2, 1.25f, 1.25f),
+            new EnemyStats(3, 2, 1.5f, 1.3f),
+            new EnemyStats(3, 2, 1.5f, 1.5f)
         }
     };
     public Animator anim;
@@ -143,6 +151,31 @@ public class Enemy : MonoBehaviour
             go = transform.Find("EnemyObject").gameObject;
 
         originalColor = go.GetComponent<Renderer>().material.color;
+    }
+
+
+    // Update is called once per frame
+    protected virtual void Update()
+    {
+        //print(isGrounded);
+        //PerformAction();
+        //AttemptAttackAction();
+        if (!GameManager.gm.inGame || GameManager.gm.gameOver)
+            return;
+
+        if (NetworkManager.nm.isStarted && NetworkManager.nm.isDisconnected)
+        {
+            return;
+        }
+
+        if (health <= 0)
+        {
+            Die();
+            return;
+        }
+        if (!isPerformingAction)
+            PerformAction();
+
     }
 
     public static List<GameObject> GeneratePathing(GameObject sp)
@@ -465,7 +498,7 @@ public class Enemy : MonoBehaviour
         //if (isAttacking || (actionPerformed != "idle" && actionPerformed != "attack"))
             return;
         actionPerformed = "attack";
-        anim.SetBool("isMoving", false);
+        //anim.SetBool("isMoving", false);
         StartCoroutine(PerformAttack());
         //actionPerformed = "idle";
     }
@@ -491,7 +524,7 @@ public class Enemy : MonoBehaviour
         return anim.GetFloat("timeToAtk") < .01f;
     }
     // Handles attack action and animation
-    public IEnumerator PerformAttack()
+    public virtual IEnumerator PerformAttack()
     {
         isAttacking = true;
         isPerformingAction = true;
@@ -743,27 +776,4 @@ public class Enemy : MonoBehaviour
     }
 
 
-    // Update is called once per frame
-    protected virtual void Update()
-    {
-        //print(isGrounded);
-        //PerformAction();
-        //AttemptAttackAction();
-        if (!GameManager.gm.inGame || GameManager.gm.gameOver)
-            return;
-
-        if (NetworkManager.nm.isStarted && NetworkManager.nm.isDisconnected)
-        {
-            return;
-        }
-
-        if (health <= 0)
-        {
-            Die();
-            return;
-        }
-        if(!isPerformingAction)
-            PerformAction();
-
-    }
 }

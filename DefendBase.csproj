@@ -101,6 +101,7 @@
     <Compile Include="Assets\scripts\Explosion.cs" />
     <Compile Include="Assets\scripts\Floater.cs" />
     <Compile Include="Assets\scripts\Flyie.cs" />
+    <Compile Include="Assets\scripts\Funguy.cs" />
     <Compile Include="Assets\scripts\GameManager.cs" />
     <Compile Include="Assets\scripts\HoldButton.cs" />
     <Compile Include="Assets\scripts\Infurie.cs" />

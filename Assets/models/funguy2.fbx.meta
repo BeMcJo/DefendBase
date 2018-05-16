@@ -1,0 +1,1161 @@
+fileFormatVersion: 2
+guid: 1504f155734d46c409aeabe2274f451b
+timeCreated: 1526445332
+licenseType: Free
+ModelImporter:
+  serializedVersion: 19
+  fileIDToRecycleName:
+    100000: arm.l
+    100002: arm.r
+    100004: Armature
+    100006: back
+    100008: Camera
+    100010: finger.l
+    100012: finger.l_end
+    100014: finger.r
+    100016: finger.r_end
+    100018: foot.l
+    100020: foot.l_end
+    100022: foot.r
+    100024: foot.r_end
+    100026: forearm.l
+    100028: forearm.r
+    100030: Funguy
+    100032: //RootNode
+    100034: Lamp
+    100036: leg.l
+    100038: leg.r
+    100040: legToFoot.l
+    100042: legToFoot.r
+    100044: neck
+    100046: neck_end
+    100048: spine
+    100050: thighToLeg.l
+    100052: thighToLeg.r
+    100054: thumb.l
+    100056: thumb.r
+    100058: thumbTip.l
+    100060: thumbTip.l_end
+    100062: thumbTip.r
+    100064: thumbTip.r_end
+    100066: torso.l
+    100068: torso.r
+    100070: wrist.l
+    100072: wrist.r
+    100074: wristToFinger.l
+    100076: wristToFinger.r
+    100078: wristToThumb.l
+    100080: wristToThumb.r
+    400000: arm.l
+    400002: arm.r
+    400004: Armature
+    400006: back
+    400008: Camera
+    400010: finger.l
+    400012: finger.l_end
+    400014: finger.r
+    400016: finger.r_end
+    400018: foot.l
+    400020: foot.l_end
+    400022: foot.r
+    400024: foot.r_end
+    400026: forearm.l
+    400028: forearm.r
+    400030: Funguy
+    400032: //RootNode
+    400034: Lamp
+    400036: leg.l
+    400038: leg.r
+    400040: legToFoot.l
+    400042: legToFoot.r
+    400044: neck
+    400046: neck_end
+    400048: spine
+    400050: thighToLeg.l
+    400052: thighToLeg.r
+    400054: thumb.l
+    400056: thumb.r
+    400058: thumbTip.l
+    400060: thumbTip.l_end
+    400062: thumbTip.r
+    400064: thumbTip.r_end
+    400066: torso.l
+    400068: torso.r
+    400070: wrist.l
+    400072: wrist.r
+    400074: wristToFinger.l
+    400076: wristToFinger.r
+    400078: wristToThumb.l
+    400080: wristToThumb.r
+    4300000: Funguy
+    7400000: Armature|ArmatureAction
+    7400002: Armature|ArmatureAction.001
+    7400004: idle
+    7400006: walk
+    7400008: charge
+    7400010: attack0
+    7400012: attack1
+    7400014: reload0
+    7400016: reload1
+    9500000: //RootNode
+    13700000: Funguy
+  materials:
+    importMaterials: 1
+    materialName: 0
+    materialSearch: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    resampleCurves: 1
+    optimizeGameObjects: 0
+    motionNodeName: 
+    rigImportErrors: 
+    rigImportWarnings: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    animationCompression: 1
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    clipAnimations:
+    - serializedVersion: 16
+      name: Armature|ArmatureAction
+      takeName: Armature|ArmatureAction
+      firstFrame: 0
+      lastFrame: 1
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask:
+      - path: 
+        weight: 1
+      - path: Armature
+        weight: 1
+      - path: Armature/back
+        weight: 1
+      - path: Armature/back/thighToLeg.l
+        weight: 1
+      - path: Armature/back/thighToLeg.l/leg.l
+        weight: 1
+      - path: Armature/back/thighToLeg.l/leg.l/legToFoot.l
+        weight: 1
+      - path: Armature/back/thighToLeg.l/leg.l/legToFoot.l/foot.l
+        weight: 1
+      - path: Armature/back/thighToLeg.l/leg.l/legToFoot.l/foot.l/foot.l_end
+        weight: 1
+      - path: Armature/back/thighToLeg.r
+        weight: 1
+      - path: Armature/back/thighToLeg.r/leg.r
+        weight: 1
+      - path: Armature/back/thighToLeg.r/leg.r/legToFoot.r
+        weight: 1
+      - path: Armature/back/thighToLeg.r/leg.r/legToFoot.r/foot.r
+        weight: 1
+      - path: Armature/back/thighToLeg.r/leg.r/legToFoot.r/foot.r/foot.r_end
+        weight: 1
+      - path: Armature/spine
+        weight: 1
+      - path: Armature/spine/neck
+        weight: 1
+      - path: Armature/spine/neck/neck_end
+        weight: 1
+      - path: Armature/spine/torso.l
+        weight: 1
+      - path: Armature/spine/torso.l/arm.l
+        weight: 1
+      - path: Armature/spine/torso.l/arm.l/forearm.l
+        weight: 1
+      - path: Armature/spine/torso.l/arm.l/forearm.l/wrist.l
+        weight: 1
+      - path: Armature/spine/torso.l/arm.l/forearm.l/wrist.l/wristToFinger.l
+        weight: 1
+      - path: Armature/spine/torso.l/arm.l/forearm.l/wrist.l/wristToFinger.l/finger.l
+        weight: 1
+      - path: Armature/spine/torso.l/arm.l/forearm.l/wrist.l/wristToFinger.l/finger.l/finger.l_end
+        weight: 1
+      - path: Armature/spine/torso.l/arm.l/forearm.l/wrist.l/wristToThumb.l
+        weight: 1
+      - path: Armature/spine/torso.l/arm.l/forearm.l/wrist.l/wristToThumb.l/thumb.l
+        weight: 1
+      - path: Armature/spine/torso.l/arm.l/forearm.l/wrist.l/wristToThumb.l/thumb.l/thumbTip.l
+        weight: 1
+      - path: Armature/spine/torso.l/arm.l/forearm.l/wrist.l/wristToThumb.l/thumb.l/thumbTip.l/thumbTip.l_end
+        weight: 1
+      - path: Armature/spine/torso.r
+        weight: 1
+      - path: Armature/spine/torso.r/arm.r
+        weight: 1
+      - path: Armature/spine/torso.r/arm.r/forearm.r
+        weight: 1
+      - path: Armature/spine/torso.r/arm.r/forearm.r/wrist.r
+        weight: 1
+      - path: Armature/spine/torso.r/arm.r/forearm.r/wrist.r/wristToFinger.r
+        weight: 1
+      - path: Armature/spine/torso.r/arm.r/forearm.r/wrist.r/wristToFinger.r/finger.r
+        weight: 1
+      - path: Armature/spine/torso.r/arm.r/forearm.r/wrist.r/wristToFinger.r/finger.r/finger.r_end
+        weight: 1
+      - path: Armature/spine/torso.r/arm.r/forearm.r/wrist.r/wristToThumb.r
+        weight: 1
+      - path: Armature/spine/torso.r/arm.r/forearm.r/wrist.r/wristToThumb.r/thumb.r
+        weight: 1
+      - path: Armature/spine/torso.r/arm.r/forearm.r/wrist.r/wristToThumb.r/thumb.r/thumbTip.r
+        weight: 1
+      - path: Armature/spine/torso.r/arm.r/forearm.r/wrist.r/wristToThumb.r/thumb.r/thumbTip.r/thumbTip.r_end
+        weight: 1
+      - path: Camera
+        weight: 1
+      - path: Funguy
+        weight: 1
+      - path: Lamp
+        weight: 1
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: Armature|ArmatureAction.001
+      takeName: Armature|ArmatureAction.001
+      firstFrame: 0
+      lastFrame: 299
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask:
+      - path: 
+        weight: 1
+      - path: Armature
+        weight: 1
+      - path: Armature/back
+        weight: 1
+      - path: Armature/back/thighToLeg.l
+        weight: 1
+      - path: Armature/back/thighToLeg.l/leg.l
+        weight: 1
+      - path: Armature/back/thighToLeg.l/leg.l/legToFoot.l
+        weight: 1
+      - path: Armature/back/thighToLeg.l/leg.l/legToFoot.l/foot.l
+        weight: 1
+      - path: Armature/back/thighToLeg.l/leg.l/legToFoot.l/foot.l/foot.l_end
+        weight: 1
+      - path: Armature/back/thighToLeg.r
+        weight: 1
+      - path: Armature/back/thighToLeg.r/leg.r
+        weight: 1
+      - path: Armature/back/thighToLeg.r/leg.r/legToFoot.r
+        weight: 1
+      - path: Armature/back/thighToLeg.r/leg.r/legToFoot.r/foot.r
+        weight: 1
+      - path: Armature/back/thighToLeg.r/leg.r/legToFoot.r/foot.r/foot.r_end
+        weight: 1
+      - path: Armature/spine
+        weight: 1
+      - path: Armature/spine/neck
+        weight: 1
+      - path: Armature/spine/neck/neck_end
+        weight: 1
+      - path: Armature/spine/torso.l
+        weight: 1
+      - path: Armature/spine/torso.l/arm.l
+        weight: 1
+      - path: Armature/spine/torso.l/arm.l/forearm.l
+        weight: 1
+      - path: Armature/spine/torso.l/arm.l/forearm.l/wrist.l
+        weight: 1
+      - path: Armature/spine/torso.l/arm.l/forearm.l/wrist.l/wristToFinger.l
+        weight: 1
+      - path: Armature/spine/torso.l/arm.l/forearm.l/wrist.l/wristToFinger.l/finger.l
+        weight: 1
+      - path: Armature/spine/torso.l/arm.l/forearm.l/wrist.l/wristToFinger.l/finger.l/finger.l_end
+        weight: 1
+      - path: Armature/spine/torso.l/arm.l/forearm.l/wrist.l/wristToThumb.l
+        weight: 1
+      - path: Armature/spine/torso.l/arm.l/forearm.l/wrist.l/wristToThumb.l/thumb.l
+        weight: 1
+      - path: Armature/spine/torso.l/arm.l/forearm.l/wrist.l/wristToThumb.l/thumb.l/thumbTip.l
+        weight: 1
+      - path: Armature/spine/torso.l/arm.l/forearm.l/wrist.l/wristToThumb.l/thumb.l/thumbTip.l/thumbTip.l_end
+        weight: 1
+      - path: Armature/spine/torso.r
+        weight: 1
+      - path: Armature/spine/torso.r/arm.r
+        weight: 1
+      - path: Armature/spine/torso.r/arm.r/forearm.r
+        weight: 1
+      - path: Armature/spine/torso.r/arm.r/forearm.r/wrist.r
+        weight: 1
+      - path: Armature/spine/torso.r/arm.r/forearm.r/wrist.r/wristToFinger.r
+        weight: 1
+      - path: Armature/spine/torso.r/arm.r/forearm.r/wrist.r/wristToFinger.r/finger.r
+        weight: 1
+      - path: Armature/spine/torso.r/arm.r/forearm.r/wrist.r/wristToFinger.r/finger.r/finger.r_end
+        weight: 1
+      - path: Armature/spine/torso.r/arm.r/forearm.r/wrist.r/wristToThumb.r
+        weight: 1
+      - path: Armature/spine/torso.r/arm.r/forearm.r/wrist.r/wristToThumb.r/thumb.r
+        weight: 1
+      - path: Armature/spine/torso.r/arm.r/forearm.r/wrist.r/wristToThumb.r/thumb.r/thumbTip.r
+        weight: 1
+      - path: Armature/spine/torso.r/arm.r/forearm.r/wrist.r/wristToThumb.r/thumb.r/thumbTip.r/thumbTip.r_end
+        weight: 1
+      - path: Camera
+        weight: 1
+      - path: Funguy
+        weight: 1
+      - path: Lamp
+        weight: 1
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: idle
+      takeName: Armature|ArmatureAction.001
+      firstFrame: 0
+      lastFrame: 30
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 1
+      loopBlend: 1
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask:
+      - path: 
+        weight: 1
+      - path: Armature
+        weight: 1
+      - path: Armature/back
+        weight: 1
+      - path: Armature/back/thighToLeg.l
+        weight: 1
+      - path: Armature/back/thighToLeg.l/leg.l
+        weight: 1
+      - path: Armature/back/thighToLeg.l/leg.l/legToFoot.l
+        weight: 1
+      - path: Armature/back/thighToLeg.l/leg.l/legToFoot.l/foot.l
+        weight: 1
+      - path: Armature/back/thighToLeg.l/leg.l/legToFoot.l/foot.l/foot.l_end
+        weight: 1
+      - path: Armature/back/thighToLeg.r
+        weight: 1
+      - path: Armature/back/thighToLeg.r/leg.r
+        weight: 1
+      - path: Armature/back/thighToLeg.r/leg.r/legToFoot.r
+        weight: 1
+      - path: Armature/back/thighToLeg.r/leg.r/legToFoot.r/foot.r
+        weight: 1
+      - path: Armature/back/thighToLeg.r/leg.r/legToFoot.r/foot.r/foot.r_end
+        weight: 1
+      - path: Armature/spine
+        weight: 1
+      - path: Armature/spine/neck
+        weight: 1
+      - path: Armature/spine/neck/neck_end
+        weight: 1
+      - path: Armature/spine/torso.l
+        weight: 1
+      - path: Armature/spine/torso.l/arm.l
+        weight: 1
+      - path: Armature/spine/torso.l/arm.l/forearm.l
+        weight: 1
+      - path: Armature/spine/torso.l/arm.l/forearm.l/wrist.l
+        weight: 1
+      - path: Armature/spine/torso.l/arm.l/forearm.l/wrist.l/wristToFinger.l
+        weight: 1
+      - path: Armature/spine/torso.l/arm.l/forearm.l/wrist.l/wristToFinger.l/finger.l
+        weight: 1
+      - path: Armature/spine/torso.l/arm.l/forearm.l/wrist.l/wristToFinger.l/finger.l/finger.l_end
+        weight: 1
+      - path: Armature/spine/torso.l/arm.l/forearm.l/wrist.l/wristToThumb.l
+        weight: 1
+      - path: Armature/spine/torso.l/arm.l/forearm.l/wrist.l/wristToThumb.l/thumb.l
+        weight: 1
+      - path: Armature/spine/torso.l/arm.l/forearm.l/wrist.l/wristToThumb.l/thumb.l/thumbTip.l
+        weight: 1
+      - path: Armature/spine/torso.l/arm.l/forearm.l/wrist.l/wristToThumb.l/thumb.l/thumbTip.l/thumbTip.l_end
+        weight: 1
+      - path: Armature/spine/torso.r
+        weight: 1
+      - path: Armature/spine/torso.r/arm.r
+        weight: 1
+      - path: Armature/spine/torso.r/arm.r/forearm.r
+        weight: 1
+      - path: Armature/spine/torso.r/arm.r/forearm.r/wrist.r
+        weight: 1
+      - path: Armature/spine/torso.r/arm.r/forearm.r/wrist.r/wristToFinger.r
+        weight: 1
+      - path: Armature/spine/torso.r/arm.r/forearm.r/wrist.r/wristToFinger.r/finger.r
+        weight: 1
+      - path: Armature/spine/torso.r/arm.r/forearm.r/wrist.r/wristToFinger.r/finger.r/finger.r_end
+        weight: 1
+      - path: Armature/spine/torso.r/arm.r/forearm.r/wrist.r/wristToThumb.r
+        weight: 1
+      - path: Armature/spine/torso.r/arm.r/forearm.r/wrist.r/wristToThumb.r/thumb.r
+        weight: 1
+      - path: Armature/spine/torso.r/arm.r/forearm.r/wrist.r/wristToThumb.r/thumb.r/thumbTip.r
+        weight: 1
+      - path: Armature/spine/torso.r/arm.r/forearm.r/wrist.r/wristToThumb.r/thumb.r/thumbTip.r/thumbTip.r_end
+        weight: 1
+      - path: Camera
+        weight: 1
+      - path: Funguy
+        weight: 1
+      - path: Lamp
+        weight: 1
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: walk
+      takeName: Armature|ArmatureAction.001
+      firstFrame: 40
+      lastFrame: 60
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 1
+      loopBlend: 1
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask:
+      - path: 
+        weight: 1
+      - path: Armature
+        weight: 1
+      - path: Armature/back
+        weight: 1
+      - path: Armature/back/thighToLeg.l
+        weight: 1
+      - path: Armature/back/thighToLeg.l/leg.l
+        weight: 1
+      - path: Armature/back/thighToLeg.l/leg.l/legToFoot.l
+        weight: 1
+      - path: Armature/back/thighToLeg.l/leg.l/legToFoot.l/foot.l
+        weight: 1
+      - path: Armature/back/thighToLeg.l/leg.l/legToFoot.l/foot.l/foot.l_end
+        weight: 1
+      - path: Armature/back/thighToLeg.r
+        weight: 1
+      - path: Armature/back/thighToLeg.r/leg.r
+        weight: 1
+      - path: Armature/back/thighToLeg.r/leg.r/legToFoot.r
+        weight: 1
+      - path: Armature/back/thighToLeg.r/leg.r/legToFoot.r/foot.r
+        weight: 1
+      - path: Armature/back/thighToLeg.r/leg.r/legToFoot.r/foot.r/foot.r_end
+        weight: 1
+      - path: Armature/spine
+        weight: 1
+      - path: Armature/spine/neck
+        weight: 1
+      - path: Armature/spine/neck/neck_end
+        weight: 1
+      - path: Armature/spine/torso.l
+        weight: 1
+      - path: Armature/spine/torso.l/arm.l
+        weight: 1
+      - path: Armature/spine/torso.l/arm.l/forearm.l
+        weight: 1
+      - path: Armature/spine/torso.l/arm.l/forearm.l/wrist.l
+        weight: 1
+      - path: Armature/spine/torso.l/arm.l/forearm.l/wrist.l/wristToFinger.l
+        weight: 1
+      - path: Armature/spine/torso.l/arm.l/forearm.l/wrist.l/wristToFinger.l/finger.l
+        weight: 1
+      - path: Armature/spine/torso.l/arm.l/forearm.l/wrist.l/wristToFinger.l/finger.l/finger.l_end
+        weight: 1
+      - path: Armature/spine/torso.l/arm.l/forearm.l/wrist.l/wristToThumb.l
+        weight: 1
+      - path: Armature/spine/torso.l/arm.l/forearm.l/wrist.l/wristToThumb.l/thumb.l
+        weight: 1
+      - path: Armature/spine/torso.l/arm.l/forearm.l/wrist.l/wristToThumb.l/thumb.l/thumbTip.l
+        weight: 1
+      - path: Armature/spine/torso.l/arm.l/forearm.l/wrist.l/wristToThumb.l/thumb.l/thumbTip.l/thumbTip.l_end
+        weight: 1
+      - path: Armature/spine/torso.r
+        weight: 1
+      - path: Armature/spine/torso.r/arm.r
+        weight: 1
+      - path: Armature/spine/torso.r/arm.r/forearm.r
+        weight: 1
+      - path: Armature/spine/torso.r/arm.r/forearm.r/wrist.r
+        weight: 1
+      - path: Armature/spine/torso.r/arm.r/forearm.r/wrist.r/wristToFinger.r
+        weight: 1
+      - path: Armature/spine/torso.r/arm.r/forearm.r/wrist.r/wristToFinger.r/finger.r
+        weight: 1
+      - path: Armature/spine/torso.r/arm.r/forearm.r/wrist.r/wristToFinger.r/finger.r/finger.r_end
+        weight: 1
+      - path: Armature/spine/torso.r/arm.r/forearm.r/wrist.r/wristToThumb.r
+        weight: 1
+      - path: Armature/spine/torso.r/arm.r/forearm.r/wrist.r/wristToThumb.r/thumb.r
+        weight: 1
+      - path: Armature/spine/torso.r/arm.r/forearm.r/wrist.r/wristToThumb.r/thumb.r/thumbTip.r
+        weight: 1
+      - path: Armature/spine/torso.r/arm.r/forearm.r/wrist.r/wristToThumb.r/thumb.r/thumbTip.r/thumbTip.r_end
+        weight: 1
+      - path: Camera
+        weight: 1
+      - path: Funguy
+        weight: 1
+      - path: Lamp
+        weight: 1
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: charge
+      takeName: Armature|ArmatureAction.001
+      firstFrame: 95
+      lastFrame: 96
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask:
+      - path: 
+        weight: 1
+      - path: Armature
+        weight: 1
+      - path: Armature/back
+        weight: 1
+      - path: Armature/back/thighToLeg.l
+        weight: 1
+      - path: Armature/back/thighToLeg.l/leg.l
+        weight: 1
+      - path: Armature/back/thighToLeg.l/leg.l/legToFoot.l
+        weight: 1
+      - path: Armature/back/thighToLeg.l/leg.l/legToFoot.l/foot.l
+        weight: 1
+      - path: Armature/back/thighToLeg.l/leg.l/legToFoot.l/foot.l/foot.l_end
+        weight: 1
+      - path: Armature/back/thighToLeg.r
+        weight: 1
+      - path: Armature/back/thighToLeg.r/leg.r
+        weight: 1
+      - path: Armature/back/thighToLeg.r/leg.r/legToFoot.r
+        weight: 1
+      - path: Armature/back/thighToLeg.r/leg.r/legToFoot.r/foot.r
+        weight: 1
+      - path: Armature/back/thighToLeg.r/leg.r/legToFoot.r/foot.r/foot.r_end
+        weight: 1
+      - path: Armature/spine
+        weight: 1
+      - path: Armature/spine/neck
+        weight: 1
+      - path: Armature/spine/neck/neck_end
+        weight: 1
+      - path: Armature/spine/torso.l
+        weight: 1
+      - path: Armature/spine/torso.l/arm.l
+        weight: 1
+      - path: Armature/spine/torso.l/arm.l/forearm.l
+        weight: 1
+      - path: Armature/spine/torso.l/arm.l/forearm.l/wrist.l
+        weight: 1
+      - path: Armature/spine/torso.l/arm.l/forearm.l/wrist.l/wristToFinger.l
+        weight: 1
+      - path: Armature/spine/torso.l/arm.l/forearm.l/wrist.l/wristToFinger.l/finger.l
+        weight: 1
+      - path: Armature/spine/torso.l/arm.l/forearm.l/wrist.l/wristToFinger.l/finger.l/finger.l_end
+        weight: 1
+      - path: Armature/spine/torso.l/arm.l/forearm.l/wrist.l/wristToThumb.l
+        weight: 1
+      - path: Armature/spine/torso.l/arm.l/forearm.l/wrist.l/wristToThumb.l/thumb.l
+        weight: 1
+      - path: Armature/spine/torso.l/arm.l/forearm.l/wrist.l/wristToThumb.l/thumb.l/thumbTip.l
+        weight: 1
+      - path: Armature/spine/torso.l/arm.l/forearm.l/wrist.l/wristToThumb.l/thumb.l/thumbTip.l/thumbTip.l_end
+        weight: 1
+      - path: Armature/spine/torso.r
+        weight: 1
+      - path: Armature/spine/torso.r/arm.r
+        weight: 1
+      - path: Armature/spine/torso.r/arm.r/forearm.r
+        weight: 1
+      - path: Armature/spine/torso.r/arm.r/forearm.r/wrist.r
+        weight: 1
+      - path: Armature/spine/torso.r/arm.r/forearm.r/wrist.r/wristToFinger.r
+        weight: 1
+      - path: Armature/spine/torso.r/arm.r/forearm.r/wrist.r/wristToFinger.r/finger.r
+        weight: 1
+      - path: Armature/spine/torso.r/arm.r/forearm.r/wrist.r/wristToFinger.r/finger.r/finger.r_end
+        weight: 1
+      - path: Armature/spine/torso.r/arm.r/forearm.r/wrist.r/wristToThumb.r
+        weight: 1
+      - path: Armature/spine/torso.r/arm.r/forearm.r/wrist.r/wristToThumb.r/thumb.r
+        weight: 1
+      - path: Armature/spine/torso.r/arm.r/forearm.r/wrist.r/wristToThumb.r/thumb.r/thumbTip.r
+        weight: 1
+      - path: Armature/spine/torso.r/arm.r/forearm.r/wrist.r/wristToThumb.r/thumb.r/thumbTip.r/thumbTip.r_end
+        weight: 1
+      - path: Camera
+        weight: 1
+      - path: Funguy
+        weight: 1
+      - path: Lamp
+        weight: 1
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: attack0
+      takeName: Armature|ArmatureAction.001
+      firstFrame: 95
+      lastFrame: 117
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask:
+      - path: 
+        weight: 1
+      - path: Armature
+        weight: 1
+      - path: Armature/back
+        weight: 1
+      - path: Armature/back/thighToLeg.l
+        weight: 1
+      - path: Armature/back/thighToLeg.l/leg.l
+        weight: 1
+      - path: Armature/back/thighToLeg.l/leg.l/legToFoot.l
+        weight: 1
+      - path: Armature/back/thighToLeg.l/leg.l/legToFoot.l/foot.l
+        weight: 1
+      - path: Armature/back/thighToLeg.l/leg.l/legToFoot.l/foot.l/foot.l_end
+        weight: 1
+      - path: Armature/back/thighToLeg.r
+        weight: 1
+      - path: Armature/back/thighToLeg.r/leg.r
+        weight: 1
+      - path: Armature/back/thighToLeg.r/leg.r/legToFoot.r
+        weight: 1
+      - path: Armature/back/thighToLeg.r/leg.r/legToFoot.r/foot.r
+        weight: 1
+      - path: Armature/back/thighToLeg.r/leg.r/legToFoot.r/foot.r/foot.r_end
+        weight: 1
+      - path: Armature/spine
+        weight: 1
+      - path: Armature/spine/neck
+        weight: 1
+      - path: Armature/spine/neck/neck_end
+        weight: 1
+      - path: Armature/spine/torso.l
+        weight: 1
+      - path: Armature/spine/torso.l/arm.l
+        weight: 1
+      - path: Armature/spine/torso.l/arm.l/forearm.l
+        weight: 1
+      - path: Armature/spine/torso.l/arm.l/forearm.l/wrist.l
+        weight: 1
+      - path: Armature/spine/torso.l/arm.l/forearm.l/wrist.l/wristToFinger.l
+        weight: 1
+      - path: Armature/spine/torso.l/arm.l/forearm.l/wrist.l/wristToFinger.l/finger.l
+        weight: 1
+      - path: Armature/spine/torso.l/arm.l/forearm.l/wrist.l/wristToFinger.l/finger.l/finger.l_end
+        weight: 1
+      - path: Armature/spine/torso.l/arm.l/forearm.l/wrist.l/wristToThumb.l
+        weight: 1
+      - path: Armature/spine/torso.l/arm.l/forearm.l/wrist.l/wristToThumb.l/thumb.l
+        weight: 1
+      - path: Armature/spine/torso.l/arm.l/forearm.l/wrist.l/wristToThumb.l/thumb.l/thumbTip.l
+        weight: 1
+      - path: Armature/spine/torso.l/arm.l/forearm.l/wrist.l/wristToThumb.l/thumb.l/thumbTip.l/thumbTip.l_end
+        weight: 1
+      - path: Armature/spine/torso.r
+        weight: 1
+      - path: Armature/spine/torso.r/arm.r
+        weight: 1
+      - path: Armature/spine/torso.r/arm.r/forearm.r
+        weight: 1
+      - path: Armature/spine/torso.r/arm.r/forearm.r/wrist.r
+        weight: 1
+      - path: Armature/spine/torso.r/arm.r/forearm.r/wrist.r/wristToFinger.r
+        weight: 1
+      - path: Armature/spine/torso.r/arm.r/forearm.r/wrist.r/wristToFinger.r/finger.r
+        weight: 1
+      - path: Armature/spine/torso.r/arm.r/forearm.r/wrist.r/wristToFinger.r/finger.r/finger.r_end
+        weight: 1
+      - path: Armature/spine/torso.r/arm.r/forearm.r/wrist.r/wristToThumb.r
+        weight: 1
+      - path: Armature/spine/torso.r/arm.r/forearm.r/wrist.r/wristToThumb.r/thumb.r
+        weight: 1
+      - path: Armature/spine/torso.r/arm.r/forearm.r/wrist.r/wristToThumb.r/thumb.r/thumbTip.r
+        weight: 1
+      - path: Armature/spine/torso.r/arm.r/forearm.r/wrist.r/wristToThumb.r/thumb.r/thumbTip.r/thumbTip.r_end
+        weight: 1
+      - path: Camera
+        weight: 1
+      - path: Funguy
+        weight: 1
+      - path: Lamp
+        weight: 1
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: attack1
+      takeName: Armature|ArmatureAction.001
+      firstFrame: 130
+      lastFrame: 152
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask:
+      - path: 
+        weight: 1
+      - path: Armature
+        weight: 1
+      - path: Armature/back
+        weight: 1
+      - path: Armature/back/thighToLeg.l
+        weight: 1
+      - path: Armature/back/thighToLeg.l/leg.l
+        weight: 1
+      - path: Armature/back/thighToLeg.l/leg.l/legToFoot.l
+        weight: 1
+      - path: Armature/back/thighToLeg.l/leg.l/legToFoot.l/foot.l
+        weight: 1
+      - path: Armature/back/thighToLeg.l/leg.l/legToFoot.l/foot.l/foot.l_end
+        weight: 1
+      - path: Armature/back/thighToLeg.r
+        weight: 1
+      - path: Armature/back/thighToLeg.r/leg.r
+        weight: 1
+      - path: Armature/back/thighToLeg.r/leg.r/legToFoot.r
+        weight: 1
+      - path: Armature/back/thighToLeg.r/leg.r/legToFoot.r/foot.r
+        weight: 1
+      - path: Armature/back/thighToLeg.r/leg.r/legToFoot.r/foot.r/foot.r_end
+        weight: 1
+      - path: Armature/spine
+        weight: 1
+      - path: Armature/spine/neck
+        weight: 1
+      - path: Armature/spine/neck/neck_end
+        weight: 1
+      - path: Armature/spine/torso.l
+        weight: 1
+      - path: Armature/spine/torso.l/arm.l
+        weight: 1
+      - path: Armature/spine/torso.l/arm.l/forearm.l
+        weight: 1
+      - path: Armature/spine/torso.l/arm.l/forearm.l/wrist.l
+        weight: 1
+      - path: Armature/spine/torso.l/arm.l/forearm.l/wrist.l/wristToFinger.l
+        weight: 1
+      - path: Armature/spine/torso.l/arm.l/forearm.l/wrist.l/wristToFinger.l/finger.l
+        weight: 1
+      - path: Armature/spine/torso.l/arm.l/forearm.l/wrist.l/wristToFinger.l/finger.l/finger.l_end
+        weight: 1
+      - path: Armature/spine/torso.l/arm.l/forearm.l/wrist.l/wristToThumb.l
+        weight: 1
+      - path: Armature/spine/torso.l/arm.l/forearm.l/wrist.l/wristToThumb.l/thumb.l
+        weight: 1
+      - path: Armature/spine/torso.l/arm.l/forearm.l/wrist.l/wristToThumb.l/thumb.l/thumbTip.l
+        weight: 1
+      - path: Armature/spine/torso.l/arm.l/forearm.l/wrist.l/wristToThumb.l/thumb.l/thumbTip.l/thumbTip.l_end
+        weight: 1
+      - path: Armature/spine/torso.r
+        weight: 1
+      - path: Armature/spine/torso.r/arm.r
+        weight: 1
+      - path: Armature/spine/torso.r/arm.r/forearm.r
+        weight: 1
+      - path: Armature/spine/torso.r/arm.r/forearm.r/wrist.r
+        weight: 1
+      - path: Armature/spine/torso.r/arm.r/forearm.r/wrist.r/wristToFinger.r
+        weight: 1
+      - path: Armature/spine/torso.r/arm.r/forearm.r/wrist.r/wristToFinger.r/finger.r
+        weight: 1
+      - path: Armature/spine/torso.r/arm.r/forearm.r/wrist.r/wristToFinger.r/finger.r/finger.r_end
+        weight: 1
+      - path: Armature/spine/torso.r/arm.r/forearm.r/wrist.r/wristToThumb.r
+        weight: 1
+      - path: Armature/spine/torso.r/arm.r/forearm.r/wrist.r/wristToThumb.r/thumb.r
+        weight: 1
+      - path: Armature/spine/torso.r/arm.r/forearm.r/wrist.r/wristToThumb.r/thumb.r/thumbTip.r
+        weight: 1
+      - path: Armature/spine/torso.r/arm.r/forearm.r/wrist.r/wristToThumb.r/thumb.r/thumbTip.r/thumbTip.r_end
+        weight: 1
+      - path: Camera
+        weight: 1
+      - path: Funguy
+        weight: 1
+      - path: Lamp
+        weight: 1
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: reload0
+      takeName: Armature|ArmatureAction.001
+      firstFrame: 117
+      lastFrame: 130
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask:
+      - path: 
+        weight: 1
+      - path: Armature
+        weight: 1
+      - path: Armature/back
+        weight: 1
+      - path: Armature/back/thighToLeg.l
+        weight: 1
+      - path: Armature/back/thighToLeg.l/leg.l
+        weight: 1
+      - path: Armature/back/thighToLeg.l/leg.l/legToFoot.l
+        weight: 1
+      - path: Armature/back/thighToLeg.l/leg.l/legToFoot.l/foot.l
+        weight: 1
+      - path: Armature/back/thighToLeg.l/leg.l/legToFoot.l/foot.l/foot.l_end
+        weight: 1
+      - path: Armature/back/thighToLeg.r
+        weight: 1
+      - path: Armature/back/thighToLeg.r/leg.r
+        weight: 1
+      - path: Armature/back/thighToLeg.r/leg.r/legToFoot.r
+        weight: 1
+      - path: Armature/back/thighToLeg.r/leg.r/legToFoot.r/foot.r
+        weight: 1
+      - path: Armature/back/thighToLeg.r/leg.r/legToFoot.r/foot.r/foot.r_end
+        weight: 1
+      - path: Armature/spine
+        weight: 1
+      - path: Armature/spine/neck
+        weight: 1
+      - path: Armature/spine/neck/neck_end
+        weight: 1
+      - path: Armature/spine/torso.l
+        weight: 1
+      - path: Armature/spine/torso.l/arm.l
+        weight: 1
+      - path: Armature/spine/torso.l/arm.l/forearm.l
+        weight: 1
+      - path: Armature/spine/torso.l/arm.l/forearm.l/wrist.l
+        weight: 1
+      - path: Armature/spine/torso.l/arm.l/forearm.l/wrist.l/wristToFinger.l
+        weight: 1
+      - path: Armature/spine/torso.l/arm.l/forearm.l/wrist.l/wristToFinger.l/finger.l
+        weight: 1
+      - path: Armature/spine/torso.l/arm.l/forearm.l/wrist.l/wristToFinger.l/finger.l/finger.l_end
+        weight: 1
+      - path: Armature/spine/torso.l/arm.l/forearm.l/wrist.l/wristToThumb.l
+        weight: 1
+      - path: Armature/spine/torso.l/arm.l/forearm.l/wrist.l/wristToThumb.l/thumb.l
+        weight: 1
+      - path: Armature/spine/torso.l/arm.l/forearm.l/wrist.l/wristToThumb.l/thumb.l/thumbTip.l
+        weight: 1
+      - path: Armature/spine/torso.l/arm.l/forearm.l/wrist.l/wristToThumb.l/thumb.l/thumbTip.l/thumbTip.l_end
+        weight: 1
+      - path: Armature/spine/torso.r
+        weight: 1
+      - path: Armature/spine/torso.r/arm.r
+        weight: 1
+      - path: Armature/spine/torso.r/arm.r/forearm.r
+        weight: 1
+      - path: Armature/spine/torso.r/arm.r/forearm.r/wrist.r
+        weight: 1
+      - path: Armature/spine/torso.r/arm.r/forearm.r/wrist.r/wristToFinger.r
+        weight: 1
+      - path: Armature/spine/torso.r/arm.r/forearm.r/wrist.r/wristToFinger.r/finger.r
+        weight: 1
+      - path: Armature/spine/torso.r/arm.r/forearm.r/wrist.r/wristToFinger.r/finger.r/finger.r_end
+        weight: 1
+      - path: Armature/spine/torso.r/arm.r/forearm.r/wrist.r/wristToThumb.r
+        weight: 1
+      - path: Armature/spine/torso.r/arm.r/forearm.r/wrist.r/wristToThumb.r/thumb.r
+        weight: 1
+      - path: Armature/spine/torso.r/arm.r/forearm.r/wrist.r/wristToThumb.r/thumb.r/thumbTip.r
+        weight: 1
+      - path: Armature/spine/torso.r/arm.r/forearm.r/wrist.r/wristToThumb.r/thumb.r/thumbTip.r/thumbTip.r_end
+        weight: 1
+      - path: Camera
+        weight: 1
+      - path: Funguy
+        weight: 1
+      - path: Lamp
+        weight: 1
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: reload1
+      takeName: Armature|ArmatureAction.001
+      firstFrame: 152
+      lastFrame: 165
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask:
+      - path: 
+        weight: 1
+      - path: Armature
+        weight: 1
+      - path: Armature/back
+        weight: 1
+      - path: Armature/back/thighToLeg.l
+        weight: 1
+      - path: Armature/back/thighToLeg.l/leg.l
+        weight: 1
+      - path: Armature/back/thighToLeg.l/leg.l/legToFoot.l
+        weight: 1
+      - path: Armature/back/thighToLeg.l/leg.l/legToFoot.l/foot.l
+        weight: 1
+      - path: Armature/back/thighToLeg.l/leg.l/legToFoot.l/foot.l/foot.l_end
+        weight: 1
+      - path: Armature/back/thighToLeg.r
+        weight: 1
+      - path: Armature/back/thighToLeg.r/leg.r
+        weight: 1
+      - path: Armature/back/thighToLeg.r/leg.r/legToFoot.r
+        weight: 1
+      - path: Armature/back/thighToLeg.r/leg.r/legToFoot.r/foot.r
+        weight: 1
+      - path: Armature/back/thighToLeg.r/leg.r/legToFoot.r/foot.r/foot.r_end
+        weight: 1
+      - path: Armature/spine
+        weight: 1
+      - path: Armature/spine/neck
+        weight: 1
+      - path: Armature/spine/neck/neck_end
+        weight: 1
+      - path: Armature/spine/torso.l
+        weight: 1
+      - path: Armature/spine/torso.l/arm.l
+        weight: 1
+      - path: Armature/spine/torso.l/arm.l/forearm.l
+        weight: 1
+      - path: Armature/spine/torso.l/arm.l/forearm.l/wrist.l
+        weight: 1
+      - path: Armature/spine/torso.l/arm.l/forearm.l/wrist.l/wristToFinger.l
+        weight: 1
+      - path: Armature/spine/torso.l/arm.l/forearm.l/wrist.l/wristToFinger.l/finger.l
+        weight: 1
+      - path: Armature/spine/torso.l/arm.l/forearm.l/wrist.l/wristToFinger.l/finger.l/finger.l_end
+        weight: 1
+      - path: Armature/spine/torso.l/arm.l/forearm.l/wrist.l/wristToThumb.l
+        weight: 1
+      - path: Armature/spine/torso.l/arm.l/forearm.l/wrist.l/wristToThumb.l/thumb.l
+        weight: 1
+      - path: Armature/spine/torso.l/arm.l/forearm.l/wrist.l/wristToThumb.l/thumb.l/thumbTip.l
+        weight: 1
+      - path: Armature/spine/torso.l/arm.l/forearm.l/wrist.l/wristToThumb.l/thumb.l/thumbTip.l/thumbTip.l_end
+        weight: 1
+      - path: Armature/spine/torso.r
+        weight: 1
+      - path: Armature/spine/torso.r/arm.r
+        weight: 1
+      - path: Armature/spine/torso.r/arm.r/forearm.r
+        weight: 1
+      - path: Armature/spine/torso.r/arm.r/forearm.r/wrist.r
+        weight: 1
+      - path: Armature/spine/torso.r/arm.r/forearm.r/wrist.r/wristToFinger.r
+        weight: 1
+      - path: Armature/spine/torso.r/arm.r/forearm.r/wrist.r/wristToFinger.r/finger.r
+        weight: 1
+      - path: Armature/spine/torso.r/arm.r/forearm.r/wrist.r/wristToFinger.r/finger.r/finger.r_end
+        weight: 1
+      - path: Armature/spine/torso.r/arm.r/forearm.r/wrist.r/wristToThumb.r
+        weight: 1
+      - path: Armature/spine/torso.r/arm.r/forearm.r/wrist.r/wristToThumb.r/thumb.r
+        weight: 1
+      - path: Armature/spine/torso.r/arm.r/forearm.r/wrist.r/wristToThumb.r/thumb.r/thumbTip.r
+        weight: 1
+      - path: Armature/spine/torso.r/arm.r/forearm.r/wrist.r/wristToThumb.r/thumb.r/thumbTip.r/thumbTip.r_end
+        weight: 1
+      - path: Camera
+        weight: 1
+      - path: Funguy
+        weight: 1
+      - path: Lamp
+        weight: 1
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    importBlendShapes: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    keepQuads: 0
+    weldVertices: 1
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+  tangentSpace:
+    normalSmoothAngle: 60
+    normalImportMode: 0
+    tangentImportMode: 3
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    serializedVersion: 2
+    human: []
+    skeleton: []
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
+    feetSpacing: 0
+    rootMotionBoneName: 
+    rootMotionBoneRotation: {x: 0, y: 0, z: 0, w: 1}
+    hasTranslationDoF: 0
+    hasExtraRoot: 0
+    skeletonHasParents: 1
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 2
+  humanoidOversampling: 1
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
