@@ -194,8 +194,8 @@ public class Flyglet : Enemy
 
         if (anim.GetCurrentAnimatorStateInfo(0).IsName("pre-flap") && len > 0)
         {
-            print(len + "...@@@@@@");
-            height -= .1f;
+            //print(len + "...@@@@@@");
+            height -= .05f;
 
             transform.position = Vector3.MoveTowards(transform.position, new Vector3(transform.position.x, height + originalPos.y, transform.position.z), .2f);
             //transform.position = new Vector3(transform.position.x, height + originalPos.y, transform.position.z); //-0.01f, 0);
@@ -215,11 +215,9 @@ public class Flyglet : Enemy
         //print(anim.GetCurrentAnimatorStateInfo(0).normalizedTime);
         //print(anim.GetCurrentAnimatorClipInfo(0)[0].clip.length);
         //print("##########");
-        print(anim.GetCurrentAnimatorClipInfo(0)[0].clip.length + ">>>>>>>");
         float len = anim.GetCurrentAnimatorClipInfo(0)[0].clip.length * anim.GetCurrentAnimatorStateInfo(0).normalizedTime;
         if (anim.GetCurrentAnimatorStateInfo(0).IsName("flap") && len > 0)
         {
-            print(len + "...#########");
             height += .2f;
             transform.position = Vector3.MoveTowards(transform.position, new Vector3(transform.position.x, height + originalPos.y, transform.position.z), .2f);
             //transform.position = new Vector3(transform.position.x, height + originalPos.y, transform.position.z);
@@ -242,7 +240,7 @@ public class Flyglet : Enemy
 
         if (anim.GetCurrentAnimatorStateInfo(0).IsName("post-flap") && len > 0)
         {
-            print(len + "...%%%%%%%%%%%%%d");
+            //print(len + "...%%%%%%%%%%%%%d");
             height -= .1f;
             transform.position = Vector3.MoveTowards(transform.position, new Vector3(transform.position.x, height + originalPos.y, transform.position.z),.2f);
             //transform.position += new Vector3(0, height, 0); //-0.01f, 0);
@@ -256,29 +254,29 @@ public class Flyglet : Enemy
     {
         if (actionPerformed != "move")
         {
-            print(1);
+            //print(1);
             actionPerformed = "move";
             height = 0;
             // Denote current action moving
             //isPerformingAction = true;
             yield return new WaitUntil(IsPreFlapping);
-            print(2);
+            //print(2);
             //targetPos += new Vector3(0, -1f, 0);
             yield return new WaitWhile(PreFlap);
-            print(3);
+            //print(3);
 
 
             yield return new WaitUntil(IsFlapping);
-            print(4);
+            //print(4);
             //targetPos += new Vector3(0, 2f, 0);
             yield return new WaitWhile(Flap);
 
-            print(5);
+            //print(5);
             yield return new WaitUntil(IsPostFlapping);
-            print(6);
+            //print(6);
             //targetPos += new Vector3(0, -1f, 0);
             yield return new WaitWhile(PostFlap);
-            print(7);
+            //print(7);
             //transform.position += new Vector3(0, -height, 0);
             //height = -1.5f;
             //yield return new WaitUntil(MoveDown);
@@ -327,5 +325,7 @@ public class Flyglet : Enemy
         StartCoroutine(MoveAnimation());
         //transform.position = Vector3.MoveTowards(transform.position, targetPos, effectiveMoveSpd);
     }
+
+
 
 }

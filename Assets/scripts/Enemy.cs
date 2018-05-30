@@ -515,17 +515,17 @@ public class Enemy : MonoBehaviour
     // Checks if current animation is charging
     public bool IsChargingAnimation()
     {
-        return anim.GetCurrentAnimatorStateInfo(0).IsName(ename +"_charge");
+        return anim.GetCurrentAnimatorStateInfo(0).IsName("charge");
     }
     // Checks if current animation is reloading
     public bool IsReloadingAnimation()
     {
-        return anim.GetCurrentAnimatorStateInfo(0).IsName(ename + "_reload");
+        return anim.GetCurrentAnimatorStateInfo(0).IsName("reload");
     }
     // Checks if current animation is attacking
     public bool IsAttackingAnimation()
     {
-        return anim.GetCurrentAnimatorStateInfo(0).IsName(ename + "_attack");
+        return anim.GetCurrentAnimatorStateInfo(0).IsName("attack");
     }
     // Checks if enemy can attack after timer reaches 0
     public bool CanAttack()
@@ -557,10 +557,10 @@ public class Enemy : MonoBehaviour
 
         yield return new WaitForSeconds(effectiveTimeToAttack);
         
-        anim.Play(ename + "_charge", -1, 0);
+        anim.Play("charge", -1, 0);
 
         // Perform attack animation
-        anim.SetBool("isAttacking", isAttacking);
+        //anim.SetBool("isAttacking", isAttacking);
         yield return new WaitUntil(IsAttackingAnimation);
         yield return new WaitWhile(IsAttackingAnimation);
         
@@ -568,12 +568,12 @@ public class Enemy : MonoBehaviour
         Attack(target);
         
         // Perform reload animation
-        anim.SetBool("isReloading", true);
+        //anim.SetBool("isReloading", true);
         yield return new WaitUntil(IsReloadingAnimation);
         
         // End attack action
         anim.speed = prevSpd;
-        anim.SetBool("isReloading", false);
+        //anim.SetBool("isReloading", false);
         isPerformingAction = false;
         isAttacking = false;
     }
