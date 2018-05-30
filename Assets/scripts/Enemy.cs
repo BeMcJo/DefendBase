@@ -72,6 +72,8 @@ public class Enemy : MonoBehaviour
                maxHP = 2, // Max health
                dmg = 1, // How much enemy can inflict to others
                id, // Unique way to identify this enemy
+               attackTypes, // Number of different unique attacks (animations and other purposes)
+               attackType, // Current attack option
                enemyID = 0, // Distinguishes what type of enemy this is
                attackCt, // Keeps track of attack for multiplayer synchronization
                curTarget, // Pursue current target
@@ -83,6 +85,7 @@ public class Enemy : MonoBehaviour
                  effectiveTimeToAttack, // Time calculated and used
                  atkTimer, // Used to check if enemy can inflict damage
                  originalAttackSpd = 1f, // Default Attack Speed
+                 attackRange, // Distance before being able to attack
                  effectiveAttackSpd; // Attack speed calculated and used
     public bool isGrounded = false, isDoneMoving, isAttacking, isPerformingAction;
     protected string actionPerformed = "idle", ename = "enemy", dmgSourceType;
@@ -90,6 +93,7 @@ public class Enemy : MonoBehaviour
     public GameObject go;
     public GameObject target; // What the enemy prioritizes
     public Vector3 targetPos; // What the enemy faces and moves to
+    public Vector3 originalPos; // Keeps track of original position 
     public List<GameObject> pathing; // Path enemy follows
     protected List<GameObject> grounds = new List<GameObject>();
 
@@ -145,12 +149,14 @@ public class Enemy : MonoBehaviour
         isDoneMoving = true;
         gameObject.AddComponent<ConstantForce>().force = new Vector3(0, -9, 0);
         //print(ename);
+        attackRange = 2.3f;
         if (ename == "infurie")
             go = transform.Find("PivotPoint").Find("EnemyObject").gameObject;
         else //if (ename != "slime")
             go = transform.Find("EnemyObject").gameObject;
 
         originalColor = go.GetComponent<Renderer>().material.color;
+        originalPos = transform.position;
     }
 
 
@@ -161,7 +167,11 @@ public class Enemy : MonoBehaviour
         //PerformAction();
         //AttemptAttackAction();
         if (!GameManager.gm.inGame || GameManager.gm.gameOver)
+        {
+            if (!anim.GetCurrentAnimatorStateInfo(0).IsName("idle"))
+                anim.Play("idle", -1, 0);
             return;
+        }
 
         if (NetworkManager.nm.isStarted && NetworkManager.nm.isDisconnected)
         {
@@ -450,7 +460,7 @@ public class Enemy : MonoBehaviour
             // Move towards objective and attack it if in range
             else if (target.tag == "Objective")
             {
-                if (dist <= 2.3f)
+                if (dist <= attackRange)
                 {
                     AttemptAttackAction();
                 }
@@ -722,7 +732,7 @@ public class Enemy : MonoBehaviour
         {
             //print("GRND");
             grounds.Add(collision.gameObject);
-            
+            GetComponent<Rigidbody>().velocity = Vector3.zero;
         }
         isGrounded = grounds.Count > 0;
         if(enemyID == 0)

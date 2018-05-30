@@ -14,6 +14,8 @@ public class Funguy : Enemy {
     {
         enemyID = 4;
         base.Start();
+        attackRange = 3.5f;
+        attackTypes = 2;
     }
 
     public override void Move()
@@ -21,20 +23,22 @@ public class Funguy : Enemy {
         if (!anim.GetCurrentAnimatorStateInfo(0).IsName("walk"))
         {
             actionPerformed = "move";
+            //anim.speed = difficulties[enemyID][level].moveSpd;
             anim.Play("walk", -1, 0);
+            
         }
         transform.position = Vector3.MoveTowards(transform.position, targetPos, effectiveMoveSpd);
     }
     // Checks if current animation is attacking
     public new bool IsAttackingAnimation()
     {
-        return anim.GetCurrentAnimatorStateInfo(0).IsName("attack0");
+        return anim.GetCurrentAnimatorStateInfo(0).IsName("attack" + attackType);
     }
 
     // Checks if current animation is reloading
     public new bool IsReloadingAnimation()
     {
-        return anim.GetCurrentAnimatorStateInfo(0).IsName( "reload0");
+        return anim.GetCurrentAnimatorStateInfo(0).IsName( "reload" + attackType);
     }
 
     public override IEnumerator PerformAttack()
@@ -47,8 +51,9 @@ public class Funguy : Enemy {
         anim.Play("charge", -1, 0);
 
         yield return new WaitForSeconds(effectiveTimeToAttack);
-
-        anim.Play("attack0", -1, 0);
+        attackType = Random.Range(0, attackTypes);
+        anim.Play("attack" + attackType, -1, 0);
+        //transform.
         yield return new WaitUntil(IsAttackingAnimation);
         yield return new WaitWhile(IsAttackingAnimation);
         Attack(target);

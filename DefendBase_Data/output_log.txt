@@ -7,17 +7,17 @@ Direct3D:
     VRAM:     2019 MB
     Driver:   22.21.13.8205
 Begin MonoManager ReloadAssembly
-Platform assembly: C:\Users\TwoTen512\Desktop\Unity Programs\DefendBase\DefendBase\DefendBase_Data\Managed\UnityEngine.dll (this message is harmless)
-Loading C:\Users\TwoTen512\Desktop\Unity Programs\DefendBase\DefendBase\DefendBase_Data\Managed\UnityEngine.dll into Unity Child Domain
-Platform assembly: C:\Users\TwoTen512\Desktop\Unity Programs\DefendBase\DefendBase\DefendBase_Data\Managed\Assembly-CSharp.dll (this message is harmless)
-Loading C:\Users\TwoTen512\Desktop\Unity Programs\DefendBase\DefendBase\DefendBase_Data\Managed\Assembly-CSharp.dll into Unity Child Domain
-Platform assembly: C:\Users\TwoTen512\Desktop\Unity Programs\DefendBase\DefendBase\DefendBase_Data\Managed\UnityEngine.UI.dll (this message is harmless)
-Loading C:\Users\TwoTen512\Desktop\Unity Programs\DefendBase\DefendBase\DefendBase_Data\Managed\UnityEngine.UI.dll into Unity Child Domain
-Platform assembly: C:\Users\TwoTen512\Desktop\Unity Programs\DefendBase\DefendBase\DefendBase_Data\Managed\UnityEngine.Networking.dll (this message is harmless)
-Loading C:\Users\TwoTen512\Desktop\Unity Programs\DefendBase\DefendBase\DefendBase_Data\Managed\UnityEngine.Networking.dll into Unity Child Domain
-- Completed reload, in  0.018 seconds
-Platform assembly: C:\Users\TwoTen512\Desktop\Unity Programs\DefendBase\DefendBase\DefendBase_Data\Managed\System.Core.dll (this message is harmless)
-Platform assembly: C:\Users\TwoTen512\Desktop\Unity Programs\DefendBase\DefendBase\DefendBase_Data\Managed\System.dll (this message is harmless)
+Platform assembly: C:\Users\TwoTen512\Desktop\Unity Programs\DefendBase\DefendBase_Data\Managed\UnityEngine.dll (this message is harmless)
+Loading C:\Users\TwoTen512\Desktop\Unity Programs\DefendBase\DefendBase_Data\Managed\UnityEngine.dll into Unity Child Domain
+Platform assembly: C:\Users\TwoTen512\Desktop\Unity Programs\DefendBase\DefendBase_Data\Managed\Assembly-CSharp.dll (this message is harmless)
+Loading C:\Users\TwoTen512\Desktop\Unity Programs\DefendBase\DefendBase_Data\Managed\Assembly-CSharp.dll into Unity Child Domain
+Platform assembly: C:\Users\TwoTen512\Desktop\Unity Programs\DefendBase\DefendBase_Data\Managed\UnityEngine.UI.dll (this message is harmless)
+Loading C:\Users\TwoTen512\Desktop\Unity Programs\DefendBase\DefendBase_Data\Managed\UnityEngine.UI.dll into Unity Child Domain
+Platform assembly: C:\Users\TwoTen512\Desktop\Unity Programs\DefendBase\DefendBase_Data\Managed\UnityEngine.Networking.dll (this message is harmless)
+Loading C:\Users\TwoTen512\Desktop\Unity Programs\DefendBase\DefendBase_Data\Managed\UnityEngine.Networking.dll into Unity Child Domain
+- Completed reload, in  0.085 seconds
+Platform assembly: C:\Users\TwoTen512\Desktop\Unity Programs\DefendBase\DefendBase_Data\Managed\System.Core.dll (this message is harmless)
+Platform assembly: C:\Users\TwoTen512\Desktop\Unity Programs\DefendBase\DefendBase_Data\Managed\System.dll (this message is harmless)
 OnLevelWasLoaded was found on GameManager
 This message has been deprecated and will be removed in a later version of Unity.
 Add a delegate to SceneManager.sceneLoaded instead to get notifications after scene loading has completed
@@ -36,7 +36,7 @@ Add a delegate to SceneManager.sceneLoaded instead to get notifications after sc
  
 (Filename:  Line: 376)
 
-desktop: 1920x1080 60Hz; virtual: 1920x1080 at 0,0
+desktop: 1920x1080 60Hz; virtual: 5760x2160 at 0,-1076
 <RI> Initializing input.
 <RI> Input initialized.
 <RI> Initialized touch support.
@@ -48,7 +48,24 @@ The class named 'Weapon' is abstract. The script class can't be abstract!
  
 (Filename:  Line: 1514)
 
-UnloadTime: 1.634204 ms
+UnloadTime: 4.624742 ms
+NullReferenceException: Object reference not set to an instance of an object
+  at Enemy.Awake () [0x00000] in <filename unknown>:0 
+  at Slime.Awake () [0x00000] in <filename unknown>:0 
+ 
+(Filename:  Line: -1)
+
+NullReferenceException: Object reference not set to an instance of an object
+  at Enemy.Awake () [0x00000] in <filename unknown>:0 
+  at Funguy.Awake () [0x00000] in <filename unknown>:0 
+ 
+(Filename:  Line: -1)
+
+NullReferenceException: Object reference not set to an instance of an object
+  at Enemy.Awake () [0x00000] in <filename unknown>:0 
+ 
+(Filename:  Line: -1)
+
 Instantiating Map Library
  
 (Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
@@ -57,7 +74,11 @@ Creating Map Blueprints
  
 (Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
 
-File Does Not Exists
+Creating Map 1
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+
+Done Creating Map 1
  
 (Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
 
@@ -65,194 +86,86 @@ Instantiate Enemy Spawn Patterns
  
 (Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
 
-Spawn player HOST0
+NullReferenceException: Object reference not set to an instance of an object
+  at Enemy.OnCollisionEnter (UnityEngine.Collision collision) [0x00000] in <filename unknown>:0 
  
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+(Filename:  Line: -1)
 
-ConnectEvent
+NullReferenceException: Object reference not set to an instance of an object
+  at Enemy.OnCollisionEnter (UnityEngine.Collision collision) [0x00000] in <filename unknown>:0 
  
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+(Filename:  Line: -1)
 
-Player 1 has connected
+NullReferenceException: Object reference not set to an instance of an object
+  at Enemy.OnCollisionEnter (UnityEngine.Collision collision) [0x00000] in <filename unknown>:0 
  
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+(Filename:  Line: -1)
 
-sendPURPOSE| 1
+NullReferenceException: Object reference not set to an instance of an object
+  at Enemy.OnCollisionEnter (UnityEngine.Collision collision) [0x00000] in <filename unknown>:0 
  
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+(Filename:  Line: -1)
 
-DataEvent
+NullReferenceException: Object reference not set to an instance of an object
+  at Enemy.OnCollisionExit (UnityEngine.Collision collision) [0x00000] in <filename unknown>:0 
  
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+(Filename:  Line: -1)
 
-Player 1 has sent: NEWCNN|
+NullReferenceException: Object reference not set to an instance of an object
+  at Enemy.OnCollisionExit (UnityEngine.Collision collision) [0x00000] in <filename unknown>:0 
  
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+(Filename:  Line: -1)
 
-sendASKNAME|1|ME%0 1
+NullReferenceException: Object reference not set to an instance of an object
+  at Enemy.OnCollisionEnter (UnityEngine.Collision collision) [0x00000] in <filename unknown>:0 
  
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+(Filename:  Line: -1)
 
-DataEvent
+NullReferenceException: Object reference not set to an instance of an object
+  at Slime.OnCollisionEnter (UnityEngine.Collision collision) [0x00000] in <filename unknown>:0 
  
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Player 1 has sent: NAMEIS|PLAYER
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Sending : CNN|PLAYER|1
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-DataEvent
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Player 1 has sent: READY?|
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Sending : READY|1
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Sending : STARTGAME|
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-The class named 'Weapon' is abstract. The script class can't be abstract!
- 
-(Filename:  Line: 1514)
+(Filename:  Line: -1)
 
 The class named 'Weapon' is abstract. The script class can't be abstract!
  
 (Filename:  Line: 1514)
 
 Unloading 5 Unused Serialized files (Serialized files now loaded: 0)
-UnloadTime: 1.963402 ms
-saved
+UnloadTime: 3.067322 ms
+start
  
 (Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
 
-2
+False 5
  
 (Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
 
-The class named 'Weapon' is abstract. The script class can't be abstract!
+Saved continuedGame
  
-(Filename:  Line: 1514)
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
 
-The class named 'Weapon' is abstract. The script class can't be abstract!
+player orient:(0.0, 0.0, 0.0)
  
-(Filename:  Line: 1514)
-
-The class named 'Weapon' is abstract. The script class can't be abstract!
- 
-(Filename:  Line: 1514)
-
-The class named 'Weapon' is abstract. The script class can't be abstract!
- 
-(Filename:  Line: 1514)
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
 
 Starting Game
  
 (Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
 
-
-Unloading 5 unused Assets to reduce memory usage. Loaded Objects now: 1109.
-Total: 0.425752 ms (FindLiveObjects: 0.053979 ms CreateObjectMapping: 0.023188 ms MarkObjects: 0.340982 ms  DeleteObjects: 0.007222 ms)
-
-DataEvent
+The class named 'Weapon' is abstract. The script class can't be abstract!
  
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+(Filename:  Line: 1514)
 
-Player 1 has sent: STARTGAME|
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
 
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-reactor filed to acomplish request with code {1234}, bytesReceived {0}
-Log: connection {1} has been disconnected by timeout; address {::ffff:192.168.1.7:62144}
-DisconnectEvent
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
+Unloading 35 unused Assets to reduce memory usage. Loaded Objects now: 3693.
+Total: 1.768775 ms (FindLiveObjects: 0.169540 ms CreateObjectMapping: 0.120503 ms MarkObjects: 1.387878 ms  DeleteObjects: 0.090472 ms)
 
-Player 1 has disconnected
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-DCS: 1
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Sending : DC|1
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-Wave started
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-SPAWED
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-SPAWED
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-SPAWED
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-attackingGate
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-attackingGate
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-attackingGate
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-attackingGate
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-SPAWED
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-attackingGate
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-attackingGate
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-attackingGate
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-attackingGate
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-attackingGate
- 
-(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
-
-attackingGate
+set orientatiation to(0.0, 0.0, 0.0)
  
 (Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
 
 Setting up 4 worker threads for Enlighten.
-  Thread -> id: d3c0 -> priority: 1 
-  Thread -> id: d3bc -> priority: 1 
-  Thread -> id: d3cc -> priority: 1 
-  Thread -> id: d060 -> priority: 1 
+  Thread -> id: 590 -> priority: 1 
+  Thread -> id: 46d8 -> priority: 1 
+  Thread -> id: 3eac -> priority: 1 
+  Thread -> id: 457c -> priority: 1 

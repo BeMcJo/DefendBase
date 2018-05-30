@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class Flyie : Enemy {
     float height;
+    bool isFalling;
     protected override void Awake()
     {
         base.Awake();
@@ -203,8 +204,8 @@ public class Flyie : Enemy {
                 Turn();
                 Vector2 targetPos2d = new Vector2(targetPos.x, targetPos.z);
                 Vector2 pos2d = new Vector2(transform.position.x, transform.position.z);
-                //print("moving" + id + ",..." + Vector2.Distance(targetPos2d, pos2d));
-                
+        //print("moving" + id + ",..." + Vector2.Distance(targetPos2d, pos2d));
+       
                 transform.position = Vector3.MoveTowards(transform.position, targetPos, effectiveMoveSpd);
         //    }
         //    return;
@@ -214,6 +215,7 @@ public class Flyie : Enemy {
         {
             anim.Play(ename + "_move", -1, 0);
         }
+        
         //if (health > (maxHP / 2))
         //else
         //{

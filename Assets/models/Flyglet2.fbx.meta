@@ -1,0 +1,1630 @@
+fileFormatVersion: 2
+guid: ddb8bb6337b326041b8b688cf5e84cb9
+timeCreated: 1527147279
+licenseType: Free
+ModelImporter:
+  serializedVersion: 19
+  fileIDToRecycleName:
+    100000: arm.L
+    100002: arm.R
+    100004: Armature
+    100006: bang
+    100008: Bone.012
+    100010: Bone.012_end
+    100012: Bone.014
+    100014: Bone.016.L
+    100016: Bone.016.R
+    100018: Bone.017.L
+    100020: Bone.017.R
+    100022: Bone.018.L
+    100024: Bone.018.R
+    100026: Bone.019.L
+    100028: Bone.019.R
+    100030: Bone.020.L
+    100032: Bone.020.R
+    100034: Bone.021.L
+    100036: Bone.021.L_end
+    100038: Bone.021.R
+    100040: Bone.021.R_end
+    100042: Bone.022.L
+    100044: Bone.022.R
+    100046: Bone.023.L
+    100048: Bone.023.R
+    100050: Bone.024.L
+    100052: Bone.024.L_end
+    100054: Bone.024.R
+    100056: Bone.024.R_end
+    100058: Bone.025.L
+    100060: Bone.025.R
+    100062: Bone.026.L
+    100064: Bone.026.R
+    100066: Bone.027.L
+    100068: Bone.027.L_end
+    100070: Bone.027.R
+    100072: Bone.027.R_end
+    100074: Bone.028.L
+    100076: Bone.028.R
+    100078: Bone.029.L
+    100080: Bone.029.R
+    100082: Bone.030.L
+    100084: Bone.030.R
+    100086: Bone.031.L
+    100088: Bone.031.L_end
+    100090: Bone.031.R
+    100092: Bone.031.R_end
+    100094: Bone.032
+    100096: Bone.033
+    100098: Bone.034
+    100100: Bone.035
+    100102: Bone.035_end
+    100104: face
+    100106: Flyglet
+    100108: //RootNode
+    100110: fronHoof.L
+    100112: fronHoof.L_end
+    100114: fronHoof.R
+    100116: fronHoof.R_end
+    100118: hindHoof.L
+    100120: hindHoof.L_end
+    100122: hindHoof.R
+    100124: hindHoof.R_end
+    100126: hindLeg.L
+    100128: hindLeg.R
+    100130: hip
+    100132: joint holder
+    100134: leg.L
+    100136: leg.R
+    100138: nose
+    100140: nose_end
+    100142: Plane
+    100144: shoulder.L
+    100146: shoulder.R
+    100148: tail
+    100150: thighBone.L
+    100152: thighBone.R
+    100154: torso
+    100156: torspToBang
+    100158: trunk
+    100160: wing.L
+    100162: wing.R
+    100164: wingConnector.L
+    100166: wingConnector.R
+    400000: arm.L
+    400002: arm.R
+    400004: Armature
+    400006: bang
+    400008: Bone.012
+    400010: Bone.012_end
+    400012: Bone.014
+    400014: Bone.016.L
+    400016: Bone.016.R
+    400018: Bone.017.L
+    400020: Bone.017.R
+    400022: Bone.018.L
+    400024: Bone.018.R
+    400026: Bone.019.L
+    400028: Bone.019.R
+    400030: Bone.020.L
+    400032: Bone.020.R
+    400034: Bone.021.L
+    400036: Bone.021.L_end
+    400038: Bone.021.R
+    400040: Bone.021.R_end
+    400042: Bone.022.L
+    400044: Bone.022.R
+    400046: Bone.023.L
+    400048: Bone.023.R
+    400050: Bone.024.L
+    400052: Bone.024.L_end
+    400054: Bone.024.R
+    400056: Bone.024.R_end
+    400058: Bone.025.L
+    400060: Bone.025.R
+    400062: Bone.026.L
+    400064: Bone.026.R
+    400066: Bone.027.L
+    400068: Bone.027.L_end
+    400070: Bone.027.R
+    400072: Bone.027.R_end
+    400074: Bone.028.L
+    400076: Bone.028.R
+    400078: Bone.029.L
+    400080: Bone.029.R
+    400082: Bone.030.L
+    400084: Bone.030.R
+    400086: Bone.031.L
+    400088: Bone.031.L_end
+    400090: Bone.031.R
+    400092: Bone.031.R_end
+    400094: Bone.032
+    400096: Bone.033
+    400098: Bone.034
+    400100: Bone.035
+    400102: Bone.035_end
+    400104: face
+    400106: Flyglet
+    400108: //RootNode
+    400110: fronHoof.L
+    400112: fronHoof.L_end
+    400114: fronHoof.R
+    400116: fronHoof.R_end
+    400118: hindHoof.L
+    400120: hindHoof.L_end
+    400122: hindHoof.R
+    400124: hindHoof.R_end
+    400126: hindLeg.L
+    400128: hindLeg.R
+    400130: hip
+    400132: joint holder
+    400134: leg.L
+    400136: leg.R
+    400138: nose
+    400140: nose_end
+    400142: Plane
+    400144: shoulder.L
+    400146: shoulder.R
+    400148: tail
+    400150: thighBone.L
+    400152: thighBone.R
+    400154: torso
+    400156: torspToBang
+    400158: trunk
+    400160: wing.L
+    400162: wing.R
+    400164: wingConnector.L
+    400166: wingConnector.R
+    2300000: Plane
+    3300000: Plane
+    4300000: Flyglet
+    4300002: Plane
+    7400000: Armature|ArmatureAction
+    7400002: pre-flap
+    7400004: flap
+    7400006: post-flap
+    7400008: charge
+    7400010: attack
+    7400012: reload
+    9500000: //RootNode
+    13700000: Flyglet
+  materials:
+    importMaterials: 1
+    materialName: 0
+    materialSearch: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    resampleCurves: 1
+    optimizeGameObjects: 0
+    motionNodeName: 
+    rigImportErrors: 
+    rigImportWarnings: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    animationCompression: 1
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    clipAnimations:
+    - serializedVersion: 16
+      name: Armature|ArmatureAction
+      takeName: Armature|ArmatureAction
+      firstFrame: 0
+      lastFrame: 247
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask:
+      - path: 
+        weight: 1
+      - path: Armature
+        weight: 1
+      - path: Armature/joint holder
+        weight: 1
+      - path: Armature/joint holder/hip
+        weight: 1
+      - path: Armature/joint holder/hip/tail
+        weight: 1
+      - path: Armature/joint holder/hip/tail/Bone.012
+        weight: 1
+      - path: Armature/joint holder/hip/tail/Bone.012/Bone.012_end
+        weight: 1
+      - path: Armature/joint holder/hip/thighBone.L
+        weight: 1
+      - path: Armature/joint holder/hip/thighBone.L/hindLeg.L
+        weight: 1
+      - path: Armature/joint holder/hip/thighBone.L/hindLeg.L/leg.L
+        weight: 1
+      - path: Armature/joint holder/hip/thighBone.L/hindLeg.L/leg.L/hindHoof.L
+        weight: 1
+      - path: Armature/joint holder/hip/thighBone.L/hindLeg.L/leg.L/hindHoof.L/hindHoof.L_end
+        weight: 1
+      - path: Armature/joint holder/hip/thighBone.R
+        weight: 1
+      - path: Armature/joint holder/hip/thighBone.R/hindLeg.R
+        weight: 1
+      - path: Armature/joint holder/hip/thighBone.R/hindLeg.R/leg.R
+        weight: 1
+      - path: Armature/joint holder/hip/thighBone.R/hindLeg.R/leg.R/hindHoof.R
+        weight: 1
+      - path: Armature/joint holder/hip/thighBone.R/hindLeg.R/leg.R/hindHoof.R/hindHoof.R_end
+        weight: 1
+      - path: Armature/joint holder/torso
+        weight: 1
+      - path: Armature/joint holder/torso/face
+        weight: 1
+      - path: Armature/joint holder/torso/face/torspToBang
+        weight: 1
+      - path: Armature/joint holder/torso/face/torspToBang/bang
+        weight: 1
+      - path: Armature/joint holder/torso/face/torspToBang/bang/Bone.014
+        weight: 1
+      - path: Armature/joint holder/torso/face/torspToBang/bang/Bone.014/Bone.032
+        weight: 1
+      - path: Armature/joint holder/torso/face/torspToBang/bang/Bone.014/Bone.032/Bone.033
+        weight: 1
+      - path: Armature/joint holder/torso/face/torspToBang/bang/Bone.014/Bone.032/Bone.033/Bone.034
+        weight: 1
+      - path: Armature/joint holder/torso/face/torspToBang/bang/Bone.014/Bone.032/Bone.033/Bone.034/Bone.035
+        weight: 1
+      - path: Armature/joint holder/torso/face/torspToBang/bang/Bone.014/Bone.032/Bone.033/Bone.034/Bone.035/Bone.035_end
+        weight: 1
+      - path: Armature/joint holder/torso/face/trunk
+        weight: 1
+      - path: Armature/joint holder/torso/face/trunk/nose
+        weight: 1
+      - path: Armature/joint holder/torso/face/trunk/nose/nose_end
+        weight: 1
+      - path: Armature/joint holder/torso/shoulder.L
+        weight: 1
+      - path: Armature/joint holder/torso/shoulder.L/arm.L
+        weight: 1
+      - path: Armature/joint holder/torso/shoulder.L/arm.L/fronHoof.L
+        weight: 1
+      - path: Armature/joint holder/torso/shoulder.L/arm.L/fronHoof.L/fronHoof.L_end
+        weight: 1
+      - path: Armature/joint holder/torso/shoulder.R
+        weight: 1
+      - path: Armature/joint holder/torso/shoulder.R/arm.R
+        weight: 1
+      - path: Armature/joint holder/torso/shoulder.R/arm.R/fronHoof.R
+        weight: 1
+      - path: Armature/joint holder/torso/shoulder.R/arm.R/fronHoof.R/fronHoof.R_end
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.016.L
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.016.L/Bone.017.L
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.016.L/Bone.017.L/Bone.018.L
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.016.L/Bone.017.L/Bone.018.L/Bone.028.L
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.016.L/Bone.017.L/Bone.018.L/Bone.028.L/Bone.029.L
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.016.L/Bone.017.L/Bone.018.L/Bone.028.L/Bone.029.L/Bone.030.L
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.016.L/Bone.017.L/Bone.018.L/Bone.028.L/Bone.029.L/Bone.030.L/Bone.031.L
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.016.L/Bone.017.L/Bone.018.L/Bone.028.L/Bone.029.L/Bone.030.L/Bone.031.L/Bone.031.L_end
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.016.L/Bone.017.L/Bone.025.L
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.016.L/Bone.017.L/Bone.025.L/Bone.026.L
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.016.L/Bone.017.L/Bone.025.L/Bone.026.L/Bone.027.L
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.016.L/Bone.017.L/Bone.025.L/Bone.026.L/Bone.027.L/Bone.027.L_end
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.016.L/Bone.022.L
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.016.L/Bone.022.L/Bone.023.L
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.016.L/Bone.022.L/Bone.023.L/Bone.024.L
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.016.L/Bone.022.L/Bone.023.L/Bone.024.L/Bone.024.L_end
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.019.L
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.019.L/Bone.020.L
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.019.L/Bone.020.L/Bone.021.L
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.019.L/Bone.020.L/Bone.021.L/Bone.021.L_end
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.016.R
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.016.R/Bone.017.R
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.016.R/Bone.017.R/Bone.018.R
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.016.R/Bone.017.R/Bone.018.R/Bone.028.R
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.016.R/Bone.017.R/Bone.018.R/Bone.028.R/Bone.029.R
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.016.R/Bone.017.R/Bone.018.R/Bone.028.R/Bone.029.R/Bone.030.R
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.016.R/Bone.017.R/Bone.018.R/Bone.028.R/Bone.029.R/Bone.030.R/Bone.031.R
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.016.R/Bone.017.R/Bone.018.R/Bone.028.R/Bone.029.R/Bone.030.R/Bone.031.R/Bone.031.R_end
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.016.R/Bone.017.R/Bone.025.R
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.016.R/Bone.017.R/Bone.025.R/Bone.026.R
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.016.R/Bone.017.R/Bone.025.R/Bone.026.R/Bone.027.R
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.016.R/Bone.017.R/Bone.025.R/Bone.026.R/Bone.027.R/Bone.027.R_end
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.016.R/Bone.022.R
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.016.R/Bone.022.R/Bone.023.R
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.016.R/Bone.022.R/Bone.023.R/Bone.024.R
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.016.R/Bone.022.R/Bone.023.R/Bone.024.R/Bone.024.R_end
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.019.R
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.019.R/Bone.020.R
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.019.R/Bone.020.R/Bone.021.R
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.019.R/Bone.020.R/Bone.021.R/Bone.021.R_end
+        weight: 1
+      - path: Flyglet
+        weight: 1
+      - path: Plane
+        weight: 1
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: pre-flap
+      takeName: Armature|ArmatureAction
+      firstFrame: 10
+      lastFrame: 25
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask:
+      - path: 
+        weight: 1
+      - path: Armature
+        weight: 1
+      - path: Armature/joint holder
+        weight: 1
+      - path: Armature/joint holder/hip
+        weight: 1
+      - path: Armature/joint holder/hip/tail
+        weight: 1
+      - path: Armature/joint holder/hip/tail/Bone.012
+        weight: 1
+      - path: Armature/joint holder/hip/tail/Bone.012/Bone.012_end
+        weight: 1
+      - path: Armature/joint holder/hip/thighBone.L
+        weight: 1
+      - path: Armature/joint holder/hip/thighBone.L/hindLeg.L
+        weight: 1
+      - path: Armature/joint holder/hip/thighBone.L/hindLeg.L/leg.L
+        weight: 1
+      - path: Armature/joint holder/hip/thighBone.L/hindLeg.L/leg.L/hindHoof.L
+        weight: 1
+      - path: Armature/joint holder/hip/thighBone.L/hindLeg.L/leg.L/hindHoof.L/hindHoof.L_end
+        weight: 1
+      - path: Armature/joint holder/hip/thighBone.R
+        weight: 1
+      - path: Armature/joint holder/hip/thighBone.R/hindLeg.R
+        weight: 1
+      - path: Armature/joint holder/hip/thighBone.R/hindLeg.R/leg.R
+        weight: 1
+      - path: Armature/joint holder/hip/thighBone.R/hindLeg.R/leg.R/hindHoof.R
+        weight: 1
+      - path: Armature/joint holder/hip/thighBone.R/hindLeg.R/leg.R/hindHoof.R/hindHoof.R_end
+        weight: 1
+      - path: Armature/joint holder/torso
+        weight: 1
+      - path: Armature/joint holder/torso/face
+        weight: 1
+      - path: Armature/joint holder/torso/face/torspToBang
+        weight: 1
+      - path: Armature/joint holder/torso/face/torspToBang/bang
+        weight: 1
+      - path: Armature/joint holder/torso/face/torspToBang/bang/Bone.014
+        weight: 1
+      - path: Armature/joint holder/torso/face/torspToBang/bang/Bone.014/Bone.032
+        weight: 1
+      - path: Armature/joint holder/torso/face/torspToBang/bang/Bone.014/Bone.032/Bone.033
+        weight: 1
+      - path: Armature/joint holder/torso/face/torspToBang/bang/Bone.014/Bone.032/Bone.033/Bone.034
+        weight: 1
+      - path: Armature/joint holder/torso/face/torspToBang/bang/Bone.014/Bone.032/Bone.033/Bone.034/Bone.035
+        weight: 1
+      - path: Armature/joint holder/torso/face/torspToBang/bang/Bone.014/Bone.032/Bone.033/Bone.034/Bone.035/Bone.035_end
+        weight: 1
+      - path: Armature/joint holder/torso/face/trunk
+        weight: 1
+      - path: Armature/joint holder/torso/face/trunk/nose
+        weight: 1
+      - path: Armature/joint holder/torso/face/trunk/nose/nose_end
+        weight: 1
+      - path: Armature/joint holder/torso/shoulder.L
+        weight: 1
+      - path: Armature/joint holder/torso/shoulder.L/arm.L
+        weight: 1
+      - path: Armature/joint holder/torso/shoulder.L/arm.L/fronHoof.L
+        weight: 1
+      - path: Armature/joint holder/torso/shoulder.L/arm.L/fronHoof.L/fronHoof.L_end
+        weight: 1
+      - path: Armature/joint holder/torso/shoulder.R
+        weight: 1
+      - path: Armature/joint holder/torso/shoulder.R/arm.R
+        weight: 1
+      - path: Armature/joint holder/torso/shoulder.R/arm.R/fronHoof.R
+        weight: 1
+      - path: Armature/joint holder/torso/shoulder.R/arm.R/fronHoof.R/fronHoof.R_end
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.016.L
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.016.L/Bone.017.L
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.016.L/Bone.017.L/Bone.018.L
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.016.L/Bone.017.L/Bone.018.L/Bone.028.L
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.016.L/Bone.017.L/Bone.018.L/Bone.028.L/Bone.029.L
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.016.L/Bone.017.L/Bone.018.L/Bone.028.L/Bone.029.L/Bone.030.L
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.016.L/Bone.017.L/Bone.018.L/Bone.028.L/Bone.029.L/Bone.030.L/Bone.031.L
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.016.L/Bone.017.L/Bone.018.L/Bone.028.L/Bone.029.L/Bone.030.L/Bone.031.L/Bone.031.L_end
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.016.L/Bone.017.L/Bone.025.L
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.016.L/Bone.017.L/Bone.025.L/Bone.026.L
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.016.L/Bone.017.L/Bone.025.L/Bone.026.L/Bone.027.L
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.016.L/Bone.017.L/Bone.025.L/Bone.026.L/Bone.027.L/Bone.027.L_end
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.016.L/Bone.022.L
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.016.L/Bone.022.L/Bone.023.L
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.016.L/Bone.022.L/Bone.023.L/Bone.024.L
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.016.L/Bone.022.L/Bone.023.L/Bone.024.L/Bone.024.L_end
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.019.L
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.019.L/Bone.020.L
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.019.L/Bone.020.L/Bone.021.L
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.019.L/Bone.020.L/Bone.021.L/Bone.021.L_end
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.016.R
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.016.R/Bone.017.R
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.016.R/Bone.017.R/Bone.018.R
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.016.R/Bone.017.R/Bone.018.R/Bone.028.R
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.016.R/Bone.017.R/Bone.018.R/Bone.028.R/Bone.029.R
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.016.R/Bone.017.R/Bone.018.R/Bone.028.R/Bone.029.R/Bone.030.R
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.016.R/Bone.017.R/Bone.018.R/Bone.028.R/Bone.029.R/Bone.030.R/Bone.031.R
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.016.R/Bone.017.R/Bone.018.R/Bone.028.R/Bone.029.R/Bone.030.R/Bone.031.R/Bone.031.R_end
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.016.R/Bone.017.R/Bone.025.R
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.016.R/Bone.017.R/Bone.025.R/Bone.026.R
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.016.R/Bone.017.R/Bone.025.R/Bone.026.R/Bone.027.R
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.016.R/Bone.017.R/Bone.025.R/Bone.026.R/Bone.027.R/Bone.027.R_end
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.016.R/Bone.022.R
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.016.R/Bone.022.R/Bone.023.R
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.016.R/Bone.022.R/Bone.023.R/Bone.024.R
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.016.R/Bone.022.R/Bone.023.R/Bone.024.R/Bone.024.R_end
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.019.R
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.019.R/Bone.020.R
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.019.R/Bone.020.R/Bone.021.R
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.019.R/Bone.020.R/Bone.021.R/Bone.021.R_end
+        weight: 1
+      - path: Flyglet
+        weight: 1
+      - path: Plane
+        weight: 1
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: flap
+      takeName: Armature|ArmatureAction
+      firstFrame: 25
+      lastFrame: 50
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask:
+      - path: 
+        weight: 1
+      - path: Armature
+        weight: 1
+      - path: Armature/joint holder
+        weight: 1
+      - path: Armature/joint holder/hip
+        weight: 1
+      - path: Armature/joint holder/hip/tail
+        weight: 1
+      - path: Armature/joint holder/hip/tail/Bone.012
+        weight: 1
+      - path: Armature/joint holder/hip/tail/Bone.012/Bone.012_end
+        weight: 1
+      - path: Armature/joint holder/hip/thighBone.L
+        weight: 1
+      - path: Armature/joint holder/hip/thighBone.L/hindLeg.L
+        weight: 1
+      - path: Armature/joint holder/hip/thighBone.L/hindLeg.L/leg.L
+        weight: 1
+      - path: Armature/joint holder/hip/thighBone.L/hindLeg.L/leg.L/hindHoof.L
+        weight: 1
+      - path: Armature/joint holder/hip/thighBone.L/hindLeg.L/leg.L/hindHoof.L/hindHoof.L_end
+        weight: 1
+      - path: Armature/joint holder/hip/thighBone.R
+        weight: 1
+      - path: Armature/joint holder/hip/thighBone.R/hindLeg.R
+        weight: 1
+      - path: Armature/joint holder/hip/thighBone.R/hindLeg.R/leg.R
+        weight: 1
+      - path: Armature/joint holder/hip/thighBone.R/hindLeg.R/leg.R/hindHoof.R
+        weight: 1
+      - path: Armature/joint holder/hip/thighBone.R/hindLeg.R/leg.R/hindHoof.R/hindHoof.R_end
+        weight: 1
+      - path: Armature/joint holder/torso
+        weight: 1
+      - path: Armature/joint holder/torso/face
+        weight: 1
+      - path: Armature/joint holder/torso/face/torspToBang
+        weight: 1
+      - path: Armature/joint holder/torso/face/torspToBang/bang
+        weight: 1
+      - path: Armature/joint holder/torso/face/torspToBang/bang/Bone.014
+        weight: 1
+      - path: Armature/joint holder/torso/face/torspToBang/bang/Bone.014/Bone.032
+        weight: 1
+      - path: Armature/joint holder/torso/face/torspToBang/bang/Bone.014/Bone.032/Bone.033
+        weight: 1
+      - path: Armature/joint holder/torso/face/torspToBang/bang/Bone.014/Bone.032/Bone.033/Bone.034
+        weight: 1
+      - path: Armature/joint holder/torso/face/torspToBang/bang/Bone.014/Bone.032/Bone.033/Bone.034/Bone.035
+        weight: 1
+      - path: Armature/joint holder/torso/face/torspToBang/bang/Bone.014/Bone.032/Bone.033/Bone.034/Bone.035/Bone.035_end
+        weight: 1
+      - path: Armature/joint holder/torso/face/trunk
+        weight: 1
+      - path: Armature/joint holder/torso/face/trunk/nose
+        weight: 1
+      - path: Armature/joint holder/torso/face/trunk/nose/nose_end
+        weight: 1
+      - path: Armature/joint holder/torso/shoulder.L
+        weight: 1
+      - path: Armature/joint holder/torso/shoulder.L/arm.L
+        weight: 1
+      - path: Armature/joint holder/torso/shoulder.L/arm.L/fronHoof.L
+        weight: 1
+      - path: Armature/joint holder/torso/shoulder.L/arm.L/fronHoof.L/fronHoof.L_end
+        weight: 1
+      - path: Armature/joint holder/torso/shoulder.R
+        weight: 1
+      - path: Armature/joint holder/torso/shoulder.R/arm.R
+        weight: 1
+      - path: Armature/joint holder/torso/shoulder.R/arm.R/fronHoof.R
+        weight: 1
+      - path: Armature/joint holder/torso/shoulder.R/arm.R/fronHoof.R/fronHoof.R_end
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.016.L
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.016.L/Bone.017.L
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.016.L/Bone.017.L/Bone.018.L
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.016.L/Bone.017.L/Bone.018.L/Bone.028.L
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.016.L/Bone.017.L/Bone.018.L/Bone.028.L/Bone.029.L
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.016.L/Bone.017.L/Bone.018.L/Bone.028.L/Bone.029.L/Bone.030.L
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.016.L/Bone.017.L/Bone.018.L/Bone.028.L/Bone.029.L/Bone.030.L/Bone.031.L
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.016.L/Bone.017.L/Bone.018.L/Bone.028.L/Bone.029.L/Bone.030.L/Bone.031.L/Bone.031.L_end
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.016.L/Bone.017.L/Bone.025.L
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.016.L/Bone.017.L/Bone.025.L/Bone.026.L
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.016.L/Bone.017.L/Bone.025.L/Bone.026.L/Bone.027.L
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.016.L/Bone.017.L/Bone.025.L/Bone.026.L/Bone.027.L/Bone.027.L_end
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.016.L/Bone.022.L
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.016.L/Bone.022.L/Bone.023.L
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.016.L/Bone.022.L/Bone.023.L/Bone.024.L
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.016.L/Bone.022.L/Bone.023.L/Bone.024.L/Bone.024.L_end
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.019.L
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.019.L/Bone.020.L
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.019.L/Bone.020.L/Bone.021.L
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.019.L/Bone.020.L/Bone.021.L/Bone.021.L_end
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.016.R
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.016.R/Bone.017.R
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.016.R/Bone.017.R/Bone.018.R
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.016.R/Bone.017.R/Bone.018.R/Bone.028.R
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.016.R/Bone.017.R/Bone.018.R/Bone.028.R/Bone.029.R
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.016.R/Bone.017.R/Bone.018.R/Bone.028.R/Bone.029.R/Bone.030.R
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.016.R/Bone.017.R/Bone.018.R/Bone.028.R/Bone.029.R/Bone.030.R/Bone.031.R
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.016.R/Bone.017.R/Bone.018.R/Bone.028.R/Bone.029.R/Bone.030.R/Bone.031.R/Bone.031.R_end
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.016.R/Bone.017.R/Bone.025.R
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.016.R/Bone.017.R/Bone.025.R/Bone.026.R
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.016.R/Bone.017.R/Bone.025.R/Bone.026.R/Bone.027.R
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.016.R/Bone.017.R/Bone.025.R/Bone.026.R/Bone.027.R/Bone.027.R_end
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.016.R/Bone.022.R
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.016.R/Bone.022.R/Bone.023.R
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.016.R/Bone.022.R/Bone.023.R/Bone.024.R
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.016.R/Bone.022.R/Bone.023.R/Bone.024.R/Bone.024.R_end
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.019.R
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.019.R/Bone.020.R
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.019.R/Bone.020.R/Bone.021.R
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.019.R/Bone.020.R/Bone.021.R/Bone.021.R_end
+        weight: 1
+      - path: Flyglet
+        weight: 1
+      - path: Plane
+        weight: 1
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: post-flap
+      takeName: Armature|ArmatureAction
+      firstFrame: 50
+      lastFrame: 70
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask:
+      - path: 
+        weight: 1
+      - path: Armature
+        weight: 1
+      - path: Armature/joint holder
+        weight: 1
+      - path: Armature/joint holder/hip
+        weight: 1
+      - path: Armature/joint holder/hip/tail
+        weight: 1
+      - path: Armature/joint holder/hip/tail/Bone.012
+        weight: 1
+      - path: Armature/joint holder/hip/tail/Bone.012/Bone.012_end
+        weight: 1
+      - path: Armature/joint holder/hip/thighBone.L
+        weight: 1
+      - path: Armature/joint holder/hip/thighBone.L/hindLeg.L
+        weight: 1
+      - path: Armature/joint holder/hip/thighBone.L/hindLeg.L/leg.L
+        weight: 1
+      - path: Armature/joint holder/hip/thighBone.L/hindLeg.L/leg.L/hindHoof.L
+        weight: 1
+      - path: Armature/joint holder/hip/thighBone.L/hindLeg.L/leg.L/hindHoof.L/hindHoof.L_end
+        weight: 1
+      - path: Armature/joint holder/hip/thighBone.R
+        weight: 1
+      - path: Armature/joint holder/hip/thighBone.R/hindLeg.R
+        weight: 1
+      - path: Armature/joint holder/hip/thighBone.R/hindLeg.R/leg.R
+        weight: 1
+      - path: Armature/joint holder/hip/thighBone.R/hindLeg.R/leg.R/hindHoof.R
+        weight: 1
+      - path: Armature/joint holder/hip/thighBone.R/hindLeg.R/leg.R/hindHoof.R/hindHoof.R_end
+        weight: 1
+      - path: Armature/joint holder/torso
+        weight: 1
+      - path: Armature/joint holder/torso/face
+        weight: 1
+      - path: Armature/joint holder/torso/face/torspToBang
+        weight: 1
+      - path: Armature/joint holder/torso/face/torspToBang/bang
+        weight: 1
+      - path: Armature/joint holder/torso/face/torspToBang/bang/Bone.014
+        weight: 1
+      - path: Armature/joint holder/torso/face/torspToBang/bang/Bone.014/Bone.032
+        weight: 1
+      - path: Armature/joint holder/torso/face/torspToBang/bang/Bone.014/Bone.032/Bone.033
+        weight: 1
+      - path: Armature/joint holder/torso/face/torspToBang/bang/Bone.014/Bone.032/Bone.033/Bone.034
+        weight: 1
+      - path: Armature/joint holder/torso/face/torspToBang/bang/Bone.014/Bone.032/Bone.033/Bone.034/Bone.035
+        weight: 1
+      - path: Armature/joint holder/torso/face/torspToBang/bang/Bone.014/Bone.032/Bone.033/Bone.034/Bone.035/Bone.035_end
+        weight: 1
+      - path: Armature/joint holder/torso/face/trunk
+        weight: 1
+      - path: Armature/joint holder/torso/face/trunk/nose
+        weight: 1
+      - path: Armature/joint holder/torso/face/trunk/nose/nose_end
+        weight: 1
+      - path: Armature/joint holder/torso/shoulder.L
+        weight: 1
+      - path: Armature/joint holder/torso/shoulder.L/arm.L
+        weight: 1
+      - path: Armature/joint holder/torso/shoulder.L/arm.L/fronHoof.L
+        weight: 1
+      - path: Armature/joint holder/torso/shoulder.L/arm.L/fronHoof.L/fronHoof.L_end
+        weight: 1
+      - path: Armature/joint holder/torso/shoulder.R
+        weight: 1
+      - path: Armature/joint holder/torso/shoulder.R/arm.R
+        weight: 1
+      - path: Armature/joint holder/torso/shoulder.R/arm.R/fronHoof.R
+        weight: 1
+      - path: Armature/joint holder/torso/shoulder.R/arm.R/fronHoof.R/fronHoof.R_end
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.016.L
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.016.L/Bone.017.L
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.016.L/Bone.017.L/Bone.018.L
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.016.L/Bone.017.L/Bone.018.L/Bone.028.L
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.016.L/Bone.017.L/Bone.018.L/Bone.028.L/Bone.029.L
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.016.L/Bone.017.L/Bone.018.L/Bone.028.L/Bone.029.L/Bone.030.L
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.016.L/Bone.017.L/Bone.018.L/Bone.028.L/Bone.029.L/Bone.030.L/Bone.031.L
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.016.L/Bone.017.L/Bone.018.L/Bone.028.L/Bone.029.L/Bone.030.L/Bone.031.L/Bone.031.L_end
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.016.L/Bone.017.L/Bone.025.L
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.016.L/Bone.017.L/Bone.025.L/Bone.026.L
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.016.L/Bone.017.L/Bone.025.L/Bone.026.L/Bone.027.L
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.016.L/Bone.017.L/Bone.025.L/Bone.026.L/Bone.027.L/Bone.027.L_end
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.016.L/Bone.022.L
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.016.L/Bone.022.L/Bone.023.L
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.016.L/Bone.022.L/Bone.023.L/Bone.024.L
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.016.L/Bone.022.L/Bone.023.L/Bone.024.L/Bone.024.L_end
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.019.L
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.019.L/Bone.020.L
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.019.L/Bone.020.L/Bone.021.L
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.019.L/Bone.020.L/Bone.021.L/Bone.021.L_end
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.016.R
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.016.R/Bone.017.R
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.016.R/Bone.017.R/Bone.018.R
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.016.R/Bone.017.R/Bone.018.R/Bone.028.R
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.016.R/Bone.017.R/Bone.018.R/Bone.028.R/Bone.029.R
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.016.R/Bone.017.R/Bone.018.R/Bone.028.R/Bone.029.R/Bone.030.R
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.016.R/Bone.017.R/Bone.018.R/Bone.028.R/Bone.029.R/Bone.030.R/Bone.031.R
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.016.R/Bone.017.R/Bone.018.R/Bone.028.R/Bone.029.R/Bone.030.R/Bone.031.R/Bone.031.R_end
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.016.R/Bone.017.R/Bone.025.R
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.016.R/Bone.017.R/Bone.025.R/Bone.026.R
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.016.R/Bone.017.R/Bone.025.R/Bone.026.R/Bone.027.R
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.016.R/Bone.017.R/Bone.025.R/Bone.026.R/Bone.027.R/Bone.027.R_end
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.016.R/Bone.022.R
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.016.R/Bone.022.R/Bone.023.R
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.016.R/Bone.022.R/Bone.023.R/Bone.024.R
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.016.R/Bone.022.R/Bone.023.R/Bone.024.R/Bone.024.R_end
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.019.R
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.019.R/Bone.020.R
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.019.R/Bone.020.R/Bone.021.R
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.019.R/Bone.020.R/Bone.021.R/Bone.021.R_end
+        weight: 1
+      - path: Flyglet
+        weight: 1
+      - path: Plane
+        weight: 1
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: charge
+      takeName: Armature|ArmatureAction
+      firstFrame: 80
+      lastFrame: 100
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask:
+      - path: 
+        weight: 1
+      - path: Armature
+        weight: 1
+      - path: Armature/joint holder
+        weight: 1
+      - path: Armature/joint holder/hip
+        weight: 1
+      - path: Armature/joint holder/hip/tail
+        weight: 1
+      - path: Armature/joint holder/hip/tail/Bone.012
+        weight: 1
+      - path: Armature/joint holder/hip/tail/Bone.012/Bone.012_end
+        weight: 1
+      - path: Armature/joint holder/hip/thighBone.L
+        weight: 1
+      - path: Armature/joint holder/hip/thighBone.L/hindLeg.L
+        weight: 1
+      - path: Armature/joint holder/hip/thighBone.L/hindLeg.L/leg.L
+        weight: 1
+      - path: Armature/joint holder/hip/thighBone.L/hindLeg.L/leg.L/hindHoof.L
+        weight: 1
+      - path: Armature/joint holder/hip/thighBone.L/hindLeg.L/leg.L/hindHoof.L/hindHoof.L_end
+        weight: 1
+      - path: Armature/joint holder/hip/thighBone.R
+        weight: 1
+      - path: Armature/joint holder/hip/thighBone.R/hindLeg.R
+        weight: 1
+      - path: Armature/joint holder/hip/thighBone.R/hindLeg.R/leg.R
+        weight: 1
+      - path: Armature/joint holder/hip/thighBone.R/hindLeg.R/leg.R/hindHoof.R
+        weight: 1
+      - path: Armature/joint holder/hip/thighBone.R/hindLeg.R/leg.R/hindHoof.R/hindHoof.R_end
+        weight: 1
+      - path: Armature/joint holder/torso
+        weight: 1
+      - path: Armature/joint holder/torso/face
+        weight: 1
+      - path: Armature/joint holder/torso/face/torspToBang
+        weight: 1
+      - path: Armature/joint holder/torso/face/torspToBang/bang
+        weight: 1
+      - path: Armature/joint holder/torso/face/torspToBang/bang/Bone.014
+        weight: 1
+      - path: Armature/joint holder/torso/face/torspToBang/bang/Bone.014/Bone.032
+        weight: 1
+      - path: Armature/joint holder/torso/face/torspToBang/bang/Bone.014/Bone.032/Bone.033
+        weight: 1
+      - path: Armature/joint holder/torso/face/torspToBang/bang/Bone.014/Bone.032/Bone.033/Bone.034
+        weight: 1
+      - path: Armature/joint holder/torso/face/torspToBang/bang/Bone.014/Bone.032/Bone.033/Bone.034/Bone.035
+        weight: 1
+      - path: Armature/joint holder/torso/face/torspToBang/bang/Bone.014/Bone.032/Bone.033/Bone.034/Bone.035/Bone.035_end
+        weight: 1
+      - path: Armature/joint holder/torso/face/trunk
+        weight: 1
+      - path: Armature/joint holder/torso/face/trunk/nose
+        weight: 1
+      - path: Armature/joint holder/torso/face/trunk/nose/nose_end
+        weight: 1
+      - path: Armature/joint holder/torso/shoulder.L
+        weight: 1
+      - path: Armature/joint holder/torso/shoulder.L/arm.L
+        weight: 1
+      - path: Armature/joint holder/torso/shoulder.L/arm.L/fronHoof.L
+        weight: 1
+      - path: Armature/joint holder/torso/shoulder.L/arm.L/fronHoof.L/fronHoof.L_end
+        weight: 1
+      - path: Armature/joint holder/torso/shoulder.R
+        weight: 1
+      - path: Armature/joint holder/torso/shoulder.R/arm.R
+        weight: 1
+      - path: Armature/joint holder/torso/shoulder.R/arm.R/fronHoof.R
+        weight: 1
+      - path: Armature/joint holder/torso/shoulder.R/arm.R/fronHoof.R/fronHoof.R_end
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.016.L
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.016.L/Bone.017.L
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.016.L/Bone.017.L/Bone.018.L
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.016.L/Bone.017.L/Bone.018.L/Bone.028.L
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.016.L/Bone.017.L/Bone.018.L/Bone.028.L/Bone.029.L
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.016.L/Bone.017.L/Bone.018.L/Bone.028.L/Bone.029.L/Bone.030.L
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.016.L/Bone.017.L/Bone.018.L/Bone.028.L/Bone.029.L/Bone.030.L/Bone.031.L
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.016.L/Bone.017.L/Bone.018.L/Bone.028.L/Bone.029.L/Bone.030.L/Bone.031.L/Bone.031.L_end
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.016.L/Bone.017.L/Bone.025.L
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.016.L/Bone.017.L/Bone.025.L/Bone.026.L
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.016.L/Bone.017.L/Bone.025.L/Bone.026.L/Bone.027.L
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.016.L/Bone.017.L/Bone.025.L/Bone.026.L/Bone.027.L/Bone.027.L_end
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.016.L/Bone.022.L
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.016.L/Bone.022.L/Bone.023.L
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.016.L/Bone.022.L/Bone.023.L/Bone.024.L
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.016.L/Bone.022.L/Bone.023.L/Bone.024.L/Bone.024.L_end
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.019.L
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.019.L/Bone.020.L
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.019.L/Bone.020.L/Bone.021.L
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.019.L/Bone.020.L/Bone.021.L/Bone.021.L_end
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.016.R
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.016.R/Bone.017.R
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.016.R/Bone.017.R/Bone.018.R
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.016.R/Bone.017.R/Bone.018.R/Bone.028.R
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.016.R/Bone.017.R/Bone.018.R/Bone.028.R/Bone.029.R
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.016.R/Bone.017.R/Bone.018.R/Bone.028.R/Bone.029.R/Bone.030.R
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.016.R/Bone.017.R/Bone.018.R/Bone.028.R/Bone.029.R/Bone.030.R/Bone.031.R
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.016.R/Bone.017.R/Bone.018.R/Bone.028.R/Bone.029.R/Bone.030.R/Bone.031.R/Bone.031.R_end
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.016.R/Bone.017.R/Bone.025.R
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.016.R/Bone.017.R/Bone.025.R/Bone.026.R
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.016.R/Bone.017.R/Bone.025.R/Bone.026.R/Bone.027.R
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.016.R/Bone.017.R/Bone.025.R/Bone.026.R/Bone.027.R/Bone.027.R_end
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.016.R/Bone.022.R
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.016.R/Bone.022.R/Bone.023.R
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.016.R/Bone.022.R/Bone.023.R/Bone.024.R
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.016.R/Bone.022.R/Bone.023.R/Bone.024.R/Bone.024.R_end
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.019.R
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.019.R/Bone.020.R
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.019.R/Bone.020.R/Bone.021.R
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.019.R/Bone.020.R/Bone.021.R/Bone.021.R_end
+        weight: 1
+      - path: Flyglet
+        weight: 1
+      - path: Plane
+        weight: 1
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: attack
+      takeName: Armature|ArmatureAction
+      firstFrame: 100
+      lastFrame: 105
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask:
+      - path: 
+        weight: 1
+      - path: Armature
+        weight: 1
+      - path: Armature/joint holder
+        weight: 1
+      - path: Armature/joint holder/hip
+        weight: 1
+      - path: Armature/joint holder/hip/tail
+        weight: 1
+      - path: Armature/joint holder/hip/tail/Bone.012
+        weight: 1
+      - path: Armature/joint holder/hip/tail/Bone.012/Bone.012_end
+        weight: 1
+      - path: Armature/joint holder/hip/thighBone.L
+        weight: 1
+      - path: Armature/joint holder/hip/thighBone.L/hindLeg.L
+        weight: 1
+      - path: Armature/joint holder/hip/thighBone.L/hindLeg.L/leg.L
+        weight: 1
+      - path: Armature/joint holder/hip/thighBone.L/hindLeg.L/leg.L/hindHoof.L
+        weight: 1
+      - path: Armature/joint holder/hip/thighBone.L/hindLeg.L/leg.L/hindHoof.L/hindHoof.L_end
+        weight: 1
+      - path: Armature/joint holder/hip/thighBone.R
+        weight: 1
+      - path: Armature/joint holder/hip/thighBone.R/hindLeg.R
+        weight: 1
+      - path: Armature/joint holder/hip/thighBone.R/hindLeg.R/leg.R
+        weight: 1
+      - path: Armature/joint holder/hip/thighBone.R/hindLeg.R/leg.R/hindHoof.R
+        weight: 1
+      - path: Armature/joint holder/hip/thighBone.R/hindLeg.R/leg.R/hindHoof.R/hindHoof.R_end
+        weight: 1
+      - path: Armature/joint holder/torso
+        weight: 1
+      - path: Armature/joint holder/torso/face
+        weight: 1
+      - path: Armature/joint holder/torso/face/torspToBang
+        weight: 1
+      - path: Armature/joint holder/torso/face/torspToBang/bang
+        weight: 1
+      - path: Armature/joint holder/torso/face/torspToBang/bang/Bone.014
+        weight: 1
+      - path: Armature/joint holder/torso/face/torspToBang/bang/Bone.014/Bone.032
+        weight: 1
+      - path: Armature/joint holder/torso/face/torspToBang/bang/Bone.014/Bone.032/Bone.033
+        weight: 1
+      - path: Armature/joint holder/torso/face/torspToBang/bang/Bone.014/Bone.032/Bone.033/Bone.034
+        weight: 1
+      - path: Armature/joint holder/torso/face/torspToBang/bang/Bone.014/Bone.032/Bone.033/Bone.034/Bone.035
+        weight: 1
+      - path: Armature/joint holder/torso/face/torspToBang/bang/Bone.014/Bone.032/Bone.033/Bone.034/Bone.035/Bone.035_end
+        weight: 1
+      - path: Armature/joint holder/torso/face/trunk
+        weight: 1
+      - path: Armature/joint holder/torso/face/trunk/nose
+        weight: 1
+      - path: Armature/joint holder/torso/face/trunk/nose/nose_end
+        weight: 1
+      - path: Armature/joint holder/torso/shoulder.L
+        weight: 1
+      - path: Armature/joint holder/torso/shoulder.L/arm.L
+        weight: 1
+      - path: Armature/joint holder/torso/shoulder.L/arm.L/fronHoof.L
+        weight: 1
+      - path: Armature/joint holder/torso/shoulder.L/arm.L/fronHoof.L/fronHoof.L_end
+        weight: 1
+      - path: Armature/joint holder/torso/shoulder.R
+        weight: 1
+      - path: Armature/joint holder/torso/shoulder.R/arm.R
+        weight: 1
+      - path: Armature/joint holder/torso/shoulder.R/arm.R/fronHoof.R
+        weight: 1
+      - path: Armature/joint holder/torso/shoulder.R/arm.R/fronHoof.R/fronHoof.R_end
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.016.L
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.016.L/Bone.017.L
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.016.L/Bone.017.L/Bone.018.L
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.016.L/Bone.017.L/Bone.018.L/Bone.028.L
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.016.L/Bone.017.L/Bone.018.L/Bone.028.L/Bone.029.L
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.016.L/Bone.017.L/Bone.018.L/Bone.028.L/Bone.029.L/Bone.030.L
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.016.L/Bone.017.L/Bone.018.L/Bone.028.L/Bone.029.L/Bone.030.L/Bone.031.L
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.016.L/Bone.017.L/Bone.018.L/Bone.028.L/Bone.029.L/Bone.030.L/Bone.031.L/Bone.031.L_end
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.016.L/Bone.017.L/Bone.025.L
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.016.L/Bone.017.L/Bone.025.L/Bone.026.L
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.016.L/Bone.017.L/Bone.025.L/Bone.026.L/Bone.027.L
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.016.L/Bone.017.L/Bone.025.L/Bone.026.L/Bone.027.L/Bone.027.L_end
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.016.L/Bone.022.L
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.016.L/Bone.022.L/Bone.023.L
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.016.L/Bone.022.L/Bone.023.L/Bone.024.L
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.016.L/Bone.022.L/Bone.023.L/Bone.024.L/Bone.024.L_end
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.019.L
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.019.L/Bone.020.L
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.019.L/Bone.020.L/Bone.021.L
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.019.L/Bone.020.L/Bone.021.L/Bone.021.L_end
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.016.R
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.016.R/Bone.017.R
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.016.R/Bone.017.R/Bone.018.R
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.016.R/Bone.017.R/Bone.018.R/Bone.028.R
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.016.R/Bone.017.R/Bone.018.R/Bone.028.R/Bone.029.R
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.016.R/Bone.017.R/Bone.018.R/Bone.028.R/Bone.029.R/Bone.030.R
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.016.R/Bone.017.R/Bone.018.R/Bone.028.R/Bone.029.R/Bone.030.R/Bone.031.R
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.016.R/Bone.017.R/Bone.018.R/Bone.028.R/Bone.029.R/Bone.030.R/Bone.031.R/Bone.031.R_end
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.016.R/Bone.017.R/Bone.025.R
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.016.R/Bone.017.R/Bone.025.R/Bone.026.R
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.016.R/Bone.017.R/Bone.025.R/Bone.026.R/Bone.027.R
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.016.R/Bone.017.R/Bone.025.R/Bone.026.R/Bone.027.R/Bone.027.R_end
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.016.R/Bone.022.R
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.016.R/Bone.022.R/Bone.023.R
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.016.R/Bone.022.R/Bone.023.R/Bone.024.R
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.016.R/Bone.022.R/Bone.023.R/Bone.024.R/Bone.024.R_end
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.019.R
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.019.R/Bone.020.R
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.019.R/Bone.020.R/Bone.021.R
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.019.R/Bone.020.R/Bone.021.R/Bone.021.R_end
+        weight: 1
+      - path: Flyglet
+        weight: 1
+      - path: Plane
+        weight: 1
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: reload
+      takeName: Armature|ArmatureAction
+      firstFrame: 105
+      lastFrame: 115
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask:
+      - path: 
+        weight: 1
+      - path: Armature
+        weight: 1
+      - path: Armature/joint holder
+        weight: 1
+      - path: Armature/joint holder/hip
+        weight: 1
+      - path: Armature/joint holder/hip/tail
+        weight: 1
+      - path: Armature/joint holder/hip/tail/Bone.012
+        weight: 1
+      - path: Armature/joint holder/hip/tail/Bone.012/Bone.012_end
+        weight: 1
+      - path: Armature/joint holder/hip/thighBone.L
+        weight: 1
+      - path: Armature/joint holder/hip/thighBone.L/hindLeg.L
+        weight: 1
+      - path: Armature/joint holder/hip/thighBone.L/hindLeg.L/leg.L
+        weight: 1
+      - path: Armature/joint holder/hip/thighBone.L/hindLeg.L/leg.L/hindHoof.L
+        weight: 1
+      - path: Armature/joint holder/hip/thighBone.L/hindLeg.L/leg.L/hindHoof.L/hindHoof.L_end
+        weight: 1
+      - path: Armature/joint holder/hip/thighBone.R
+        weight: 1
+      - path: Armature/joint holder/hip/thighBone.R/hindLeg.R
+        weight: 1
+      - path: Armature/joint holder/hip/thighBone.R/hindLeg.R/leg.R
+        weight: 1
+      - path: Armature/joint holder/hip/thighBone.R/hindLeg.R/leg.R/hindHoof.R
+        weight: 1
+      - path: Armature/joint holder/hip/thighBone.R/hindLeg.R/leg.R/hindHoof.R/hindHoof.R_end
+        weight: 1
+      - path: Armature/joint holder/torso
+        weight: 1
+      - path: Armature/joint holder/torso/face
+        weight: 1
+      - path: Armature/joint holder/torso/face/torspToBang
+        weight: 1
+      - path: Armature/joint holder/torso/face/torspToBang/bang
+        weight: 1
+      - path: Armature/joint holder/torso/face/torspToBang/bang/Bone.014
+        weight: 1
+      - path: Armature/joint holder/torso/face/torspToBang/bang/Bone.014/Bone.032
+        weight: 1
+      - path: Armature/joint holder/torso/face/torspToBang/bang/Bone.014/Bone.032/Bone.033
+        weight: 1
+      - path: Armature/joint holder/torso/face/torspToBang/bang/Bone.014/Bone.032/Bone.033/Bone.034
+        weight: 1
+      - path: Armature/joint holder/torso/face/torspToBang/bang/Bone.014/Bone.032/Bone.033/Bone.034/Bone.035
+        weight: 1
+      - path: Armature/joint holder/torso/face/torspToBang/bang/Bone.014/Bone.032/Bone.033/Bone.034/Bone.035/Bone.035_end
+        weight: 1
+      - path: Armature/joint holder/torso/face/trunk
+        weight: 1
+      - path: Armature/joint holder/torso/face/trunk/nose
+        weight: 1
+      - path: Armature/joint holder/torso/face/trunk/nose/nose_end
+        weight: 1
+      - path: Armature/joint holder/torso/shoulder.L
+        weight: 1
+      - path: Armature/joint holder/torso/shoulder.L/arm.L
+        weight: 1
+      - path: Armature/joint holder/torso/shoulder.L/arm.L/fronHoof.L
+        weight: 1
+      - path: Armature/joint holder/torso/shoulder.L/arm.L/fronHoof.L/fronHoof.L_end
+        weight: 1
+      - path: Armature/joint holder/torso/shoulder.R
+        weight: 1
+      - path: Armature/joint holder/torso/shoulder.R/arm.R
+        weight: 1
+      - path: Armature/joint holder/torso/shoulder.R/arm.R/fronHoof.R
+        weight: 1
+      - path: Armature/joint holder/torso/shoulder.R/arm.R/fronHoof.R/fronHoof.R_end
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.016.L
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.016.L/Bone.017.L
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.016.L/Bone.017.L/Bone.018.L
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.016.L/Bone.017.L/Bone.018.L/Bone.028.L
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.016.L/Bone.017.L/Bone.018.L/Bone.028.L/Bone.029.L
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.016.L/Bone.017.L/Bone.018.L/Bone.028.L/Bone.029.L/Bone.030.L
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.016.L/Bone.017.L/Bone.018.L/Bone.028.L/Bone.029.L/Bone.030.L/Bone.031.L
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.016.L/Bone.017.L/Bone.018.L/Bone.028.L/Bone.029.L/Bone.030.L/Bone.031.L/Bone.031.L_end
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.016.L/Bone.017.L/Bone.025.L
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.016.L/Bone.017.L/Bone.025.L/Bone.026.L
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.016.L/Bone.017.L/Bone.025.L/Bone.026.L/Bone.027.L
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.016.L/Bone.017.L/Bone.025.L/Bone.026.L/Bone.027.L/Bone.027.L_end
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.016.L/Bone.022.L
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.016.L/Bone.022.L/Bone.023.L
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.016.L/Bone.022.L/Bone.023.L/Bone.024.L
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.016.L/Bone.022.L/Bone.023.L/Bone.024.L/Bone.024.L_end
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.019.L
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.019.L/Bone.020.L
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.019.L/Bone.020.L/Bone.021.L
+        weight: 1
+      - path: Armature/joint holder/wingConnector.L/wing.L/Bone.019.L/Bone.020.L/Bone.021.L/Bone.021.L_end
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.016.R
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.016.R/Bone.017.R
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.016.R/Bone.017.R/Bone.018.R
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.016.R/Bone.017.R/Bone.018.R/Bone.028.R
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.016.R/Bone.017.R/Bone.018.R/Bone.028.R/Bone.029.R
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.016.R/Bone.017.R/Bone.018.R/Bone.028.R/Bone.029.R/Bone.030.R
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.016.R/Bone.017.R/Bone.018.R/Bone.028.R/Bone.029.R/Bone.030.R/Bone.031.R
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.016.R/Bone.017.R/Bone.018.R/Bone.028.R/Bone.029.R/Bone.030.R/Bone.031.R/Bone.031.R_end
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.016.R/Bone.017.R/Bone.025.R
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.016.R/Bone.017.R/Bone.025.R/Bone.026.R
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.016.R/Bone.017.R/Bone.025.R/Bone.026.R/Bone.027.R
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.016.R/Bone.017.R/Bone.025.R/Bone.026.R/Bone.027.R/Bone.027.R_end
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.016.R/Bone.022.R
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.016.R/Bone.022.R/Bone.023.R
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.016.R/Bone.022.R/Bone.023.R/Bone.024.R
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.016.R/Bone.022.R/Bone.023.R/Bone.024.R/Bone.024.R_end
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.019.R
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.019.R/Bone.020.R
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.019.R/Bone.020.R/Bone.021.R
+        weight: 1
+      - path: Armature/joint holder/wingConnector.R/wing.R/Bone.019.R/Bone.020.R/Bone.021.R/Bone.021.R_end
+        weight: 1
+      - path: Flyglet
+        weight: 1
+      - path: Plane
+        weight: 1
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    importBlendShapes: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    keepQuads: 0
+    weldVertices: 1
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+  tangentSpace:
+    normalSmoothAngle: 60
+    normalImportMode: 0
+    tangentImportMode: 3
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    serializedVersion: 2
+    human: []
+    skeleton: []
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
+    feetSpacing: 0
+    rootMotionBoneName: 
+    rootMotionBoneRotation: {x: 0, y: 0, z: 0, w: 1}
+    hasTranslationDoF: 0
+    hasExtraRoot: 0
+    skeletonHasParents: 1
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 2
+  humanoidOversampling: 1
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
