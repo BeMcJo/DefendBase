@@ -68,10 +68,23 @@ public class Objective : MonoBehaviour {
         }
     }
 
+    public void OnHit()
+    {
+        print(1);
+        GameManager.gm.hitObjectiveIndicator.GetComponent<ObjectiveHitIndicator>().SignalObjectiveIsHit();
+    }
+
     // Inflict damage and update uis related to health
     public void TakeDamage(int dmg)
     {
+        int curHP = HP;
         HP -= dmg;
+
+        // Signal that objective has taken damage
+        if(curHP > HP)
+        {
+            OnHit();
+        }
         Transform healthBarGauge = storeUpgradeUIs[0].transform.Find("Health Bar Gauge");
         
         if (HP > maxHP)

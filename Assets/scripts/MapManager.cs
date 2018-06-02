@@ -10,6 +10,7 @@ public class MapManager : MonoBehaviour {
     public GameObject mapContainer; // Holds all the HexNode objects representing the map
 
     public List<GameObject> spawnPoints; // List of areas where enemy can spawn
+    public Dictionary<int, List<List<GameObject>>> pathsBySpawnPoint; // List of paths given a map and based on the starting points
     public Dictionary<int, GameObject> platforms; // Keeps track of Platforms by their ID
     private bool createdMap; // Used to denote if map is done creating
 	// Use this for initialization
@@ -56,6 +57,46 @@ public class MapManager : MonoBehaviour {
         mapContainer.transform.SetParent(GameObject.Find("Player Rotation").transform);
         mapContainer.transform.localEulerAngles = Vector3.zero;
         yield return new WaitForSeconds(0);
+    }
+
+    public List<GameObject> CopyList(List<GameObject> path)
+    {
+        List<GameObject> cpy = new List<GameObject>();
+        foreach(GameObject p in path)
+        {
+            cpy.Add(p);
+        }
+        return cpy;
+    }
+
+    // Recursive DFS for all possible start-to-end routes from starting point(s) sp
+    public void FindAllPaths(List<GameObject> path, GameObject sp, int spIndex)
+    {
+        // Invalid if starting point is null
+        if (sp == null)
+            return;
+
+        if (sp.tag == "Path")
+        {
+            // Add current point to pathing list 
+            path.Add(sp);
+            PlatformPath pp = sp.GetComponent<PlatformPath>();
+
+            // if have destinations, branch and find all paths from those points
+            if (pp.destTargets.Count > 0)
+            {
+                for (int i = 0; i < pp.destTargets.Count; i++)
+                {
+                    List<GameObject> pathCpy = CopyList(path);
+                    FindAllPaths(pathCpy, pp.destTargets[i], spIndex);
+                }
+            }
+            // If no destinations, this is end point. Store current path
+            else
+            {
+                pathsBySpawnPoint[spIndex].Add(path);
+            }
+        }
     }
 
     // Instantiates the platforms from the Map Library based on the map
@@ -143,6 +184,16 @@ public class MapManager : MonoBehaviour {
             }
         }
         //mapContainer.transform.localEulerAngles = GameManager.gm.playerOrientation; // Orient map to face in forward direction as player
+
+        // Generate all possible pathing routes starting at each enemy spawn point
+        pathsBySpawnPoint = new Dictionary<int, List<List<GameObject>>>();
+        for(int i = 0; i < spawnPoints.Count; i++)
+        {
+            List<GameObject> path = new List<GameObject>();
+            pathsBySpawnPoint.Add(i, new List<List<GameObject>>());
+            FindAllPaths(path, spawnPoints[i], i);
+        }
+
         createdMap = true; // Done creating map
     }
 }

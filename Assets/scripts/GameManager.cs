@@ -133,6 +133,7 @@ public class GameManager : MonoBehaviour {
                       selectedItem, // Potential item to purchase
                       addToMapBtn, // Button used to spawn defenses onto map
                       changeArrowBtn, // Press and hold to display item wheel to change arrow
+                      hitObjectiveIndicator, // Warns player that the objective is under attack
                       waveNotification; // Notifies player that enemies will spawn
 
     public Text scoreTxt; // Indicates how awesome you are
@@ -459,6 +460,8 @@ public class GameManager : MonoBehaviour {
         playerStatusCanvas = GameObject.Find("PlayerStatusCanvas").gameObject;
         playerStatusCanvas.transform.Find("OptionsBtn").GetComponent<Button>().onClick.AddListener(ToggleOptionsCanvas);//DisplayOptions);
         playerStatusCanvas.transform.Find("MapBtn").GetComponent<Button>().onClick.AddListener(ToggleMapUICanvas);
+        hitObjectiveIndicator = playerStatusCanvas.transform.Find("ObjectiveHitIndicator").gameObject;
+
         playerOrientationObjects = playerStatusCanvas.transform.Find("PlayerOrientationObjects").gameObject;
         playerOrientationObjects.transform.Find("SetOrientationBtn").GetComponent<Button>().onClick.AddListener(SetPlayerOrientation);
         playerOrientationObjects.transform.Find("DoneSetupBtn").GetComponent<Button>().onClick.AddListener(TogglePlayerOrientationSetup);
@@ -1433,7 +1436,7 @@ public class GameManager : MonoBehaviour {
         Enemy e = enemy.transform.GetComponent<Enemy>();
         e.SetTarget(spawnPoint);
         if (pathing == null)
-            pathing = Enemy.GeneratePathing(spawnPoint);
+            pathing = MapManager.mapManager.pathsBySpawnPoint[sp][UnityEngine.Random.Range(0,MapManager.mapManager.pathsBySpawnPoint[sp].Count)];//Enemy.GeneratePathing(spawnPoint);
         //print("path gen");
         e.pathing = pathing;
         GameObject enemyUI = Instantiate(statusIndicatorPrefab);

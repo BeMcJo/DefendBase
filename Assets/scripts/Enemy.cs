@@ -23,16 +23,16 @@ public class Enemy : MonoBehaviour
     public static int EnemyCount = 0; // Keeps track of enemies created during game session
     // List of stats per level
     public static EnemyStats[][] difficulties = new EnemyStats[][] {
-        // Stats for Normies
+        // Stats for Slimes ignore -> Normies
         new EnemyStats[]
         {
-            new EnemyStats(1, 1, 1, 1),
+            new EnemyStats(1, 1, 2, 1),
             new EnemyStats(2, 2, 1.2f, 1.2f),
             new EnemyStats(2, 2, 1.25f, 1.25f),
             new EnemyStats(3, 2, 1.5f, 1.3f),
             new EnemyStats(3, 2, 1.5f, 1.5f)
         },
-        // Stats for Infuries
+        // Stats for Funguys ignore -> Infuries
         new EnemyStats[]
         {
             new EnemyStats(2, 1, 1, 1),
@@ -41,7 +41,7 @@ public class Enemy : MonoBehaviour
             new EnemyStats(4, 3, 1.5f, 1.3f),
             new EnemyStats(6, 3, 1.5f, 1.5f)
         },
-        // Stats for Flyies
+        // Stats for Flyglet ignore -> Flyies
         new EnemyStats[]
         {
             new EnemyStats(1, 1, 1, 1),
@@ -536,6 +536,7 @@ public class Enemy : MonoBehaviour
     // Handles attack action and animation
     public virtual IEnumerator PerformAttack()
     {
+        print(2);
         isAttacking = true;
         isPerformingAction = true;
 
@@ -576,6 +577,7 @@ public class Enemy : MonoBehaviour
         //anim.SetBool("isReloading", false);
         isPerformingAction = false;
         isAttacking = false;
+        print(3);
     }
     /*
      // Handles attack action and animation

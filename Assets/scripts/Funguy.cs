@@ -12,7 +12,7 @@ public class Funguy : Enemy {
     // Use this for initialization
     protected override void Start()
     {
-        enemyID = 4;
+        enemyID = 1;
         base.Start();
         attackRange = 3.5f;
         attackTypes = 2;

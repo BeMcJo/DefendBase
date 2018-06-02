@@ -11,7 +11,7 @@ public class Slime : Enemy {
     // Use this for initialization
     protected override void Start()
     {
-        enemyID = 3;
+        enemyID = 0;
         base.Start();
     }
 
