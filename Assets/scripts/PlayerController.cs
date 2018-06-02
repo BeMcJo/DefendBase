@@ -7,7 +7,9 @@ public class PlayerController : MonoBehaviour {
     public float noiseTolerance = .05f;
     public int id; // Used to assign who controls this player online
     public bool gyroEnabled, // Is there gyroscope feature on this device? 
-                useGyro; // Are we using gyroscope?
+                useGyro, // Are we using gyroscope?
+                canPerformActions; // Am I stunned, frozen, or restricted?
+
     private Gyroscope gyro; // Point to gyroscope object
     private GameObject cameraContainer; // Holds the camera that represents your view
     public Camera playerCam; // Your perspective in game
@@ -24,8 +26,10 @@ public class PlayerController : MonoBehaviour {
 
     public Weapon wep; // Weapon player is currently holding and using
 
-    Quaternion origin;
-    
+    //Quaternion origin; unused?
+
+    public Dictionary<int,Dictionary<int,Buff>> buffs; // Categorize buffs by buff types, then sorted by buff ID
+
     // Use this for initialization
 	void Start () {
         charging = false;
@@ -38,9 +42,10 @@ public class PlayerController : MonoBehaviour {
         playerCam.transform.SetParent(cameraContainer.transform);
         SetOrientation(GameManager.gm.playerOrientation);
         useGyro = true;
+        buffs = new Dictionary<int, Dictionary<int, Buff>>();
+        canPerformActions = true;
 
-
-        origin = Input.gyro.attitude;
+        //origin = Input.gyro.attitude;
     }
     
     // Disable using gyro if existent
@@ -82,6 +87,70 @@ public class PlayerController : MonoBehaviour {
         }
         PlayerMobileInput();
         PlayerPCInput();
+    }
+
+    // Calculates the status of player based on the buffType that changed
+    public void EvaluateBuffs(int buffType)
+    {
+        switch (buffType)
+        {
+            // can't perform actions
+            case 0:
+                CheckIfCanPerformActions();
+                break;
+        }
+    }
+
+    // Removes buff and re-evaluates player status
+    public void RemoveBuff(Buff b)
+    {
+        if (b == null)
+        {
+            print("INVALID BUFF... NULL");
+            return;
+        }
+        int buffType = b.buffType, buffID = b.buffID;
+        if (buffs[buffType].ContainsKey(buffID))
+        {
+            print("REMOVING BUFF" + buffType + "," + buffID);
+            Destroy(buffs[buffType][buffID].gameObject);
+            buffs[buffType].Remove(buffID);
+        }
+        else
+        {
+            print("BUFF DNE" + buffType + "," + buffID);
+        }
+        EvaluateBuffs(buffType);
+    }
+
+    // Adds buff and re-evaluates player status
+    public void AddBuff(int buffID, int buffType)
+    {
+        //int buffType = b.buffType, buffID = b.buffID;
+        if(!buffs.ContainsKey(buffType))
+        {
+            print("instantiating buff type list " + buffType);
+            buffs.Add(buffType, new Dictionary<int, Buff>());
+        }
+        if (buffs[buffType].ContainsKey(buffID))
+        {
+            print("Restarting BUFF" + buffType + "," + buffID);
+            buffs[buffType][buffID].ReActivate();
+            //buffs[buffType].Remove(buffID);
+        }
+        else
+        {
+            Buff b = Instantiate(GameManager.gm.buffs[buffID]).GetComponent<Buff>();
+            buffs[buffType].Add(buffID, b);
+            b.player = this;
+        }
+        EvaluateBuffs(buffType);
+    }
+
+    public void CheckIfCanPerformActions()
+    {
+        canPerformActions = buffs[0].Count == 0;
+
     }
 
     public Vector3 SetOrientation(Vector3 orientation)
@@ -163,6 +232,9 @@ public class PlayerController : MonoBehaviour {
     // Orient player perspective
     private void RotatePlayer()
     {
+        if (!canPerformActions)
+            return;
+
         float dist = Vector3.Distance(gyro.rotationRateUnbiased, Vector3.zero);
         //playerCam.transform.Rotate(Input.gyro.rotationRate);
         //Debug.Log(gyro.attitude + " ...." + gyro.rotationRateUnbiased + "...a>>" +dist );

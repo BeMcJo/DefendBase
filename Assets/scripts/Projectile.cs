@@ -92,7 +92,8 @@ public class Projectile : MonoBehaviour {
         if(collision.tag == "Player" && ownerType == "Enemy" && collision.GetComponent<PlayerController>().IsMyPlayer())
         {
             print("SPLAT");
-            GameManager.gm.Blackout();
+            //GameManager.gm.Blackout();
+            collision.GetComponent<PlayerController>().AddBuff(0, 0);
             Destroy(gameObject);
         }
         if (ownerType != "Player")

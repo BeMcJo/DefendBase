@@ -90,6 +90,7 @@
     <Compile Include="Assets\scripts\Arrow.cs" />
     <Compile Include="Assets\scripts\Attribute.cs" />
     <Compile Include="Assets\scripts\Bow.cs" />
+    <Compile Include="Assets\scripts\Buff.cs" />
     <Compile Include="Assets\scripts\CameraController.cs" />
     <Compile Include="Assets\scripts\Checkmark.cs" />
     <Compile Include="Assets\scripts\DamageIndicator.cs" />
@@ -106,6 +107,7 @@
     <Compile Include="Assets\scripts\GameManager.cs" />
     <Compile Include="Assets\scripts\HoldButton.cs" />
     <Compile Include="Assets\scripts\Infurie.cs" />
+    <Compile Include="Assets\scripts\InteractiveUI.cs" />
     <Compile Include="Assets\scripts\MapLibrary.cs" />
     <Compile Include="Assets\scripts\MapManager.cs" />
     <Compile Include="Assets\scripts\MapView.cs" />

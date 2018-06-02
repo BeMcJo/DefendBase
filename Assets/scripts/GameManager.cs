@@ -85,6 +85,8 @@ public class GameManager : MonoBehaviour {
                         attributePrefabs, // List of attribute objects
                         rewardPrefabs, // List of reward objects
                         indicatorPrefabs, // List of indicator objects
+                        buffs, // List of buffs
+                        interactiveUIPrefabs, // list of UIs used for buff conditions
                         weaponPrefabs; // List of weapon objects
 
     public GameObject statusIndicatorPrefab, // Shows health and other status for object
