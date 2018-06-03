@@ -29,6 +29,7 @@ public class PlayerController : MonoBehaviour {
     //Quaternion origin; unused?
 
     public Dictionary<int,Dictionary<int,Buff>> buffs; // Categorize buffs by buff types, then sorted by buff ID
+    public Dictionary<int, float> immunityTimers; // immune to certain buffs by ID after they expire 
 
     // Use this for initialization
 	void Start () {
@@ -43,6 +44,7 @@ public class PlayerController : MonoBehaviour {
         SetOrientation(GameManager.gm.playerOrientation);
         useGyro = true;
         buffs = new Dictionary<int, Dictionary<int, Buff>>();
+        immunityTimers = new Dictionary<int, float>();
         canPerformActions = true;
 
         //origin = Input.gyro.attitude;
@@ -95,7 +97,7 @@ public class PlayerController : MonoBehaviour {
         switch (buffType)
         {
             // can't perform actions
-            case 0:
+            case 1:
                 CheckIfCanPerformActions();
                 break;
         }
@@ -110,11 +112,28 @@ public class PlayerController : MonoBehaviour {
             return;
         }
         int buffType = b.buffType, buffID = b.buffID;
+
+        // Remove buff if player contains it
         if (buffs[buffType].ContainsKey(buffID))
         {
             print("REMOVING BUFF" + buffType + "," + buffID);
             Destroy(buffs[buffType][buffID].gameObject);
             buffs[buffType].Remove(buffID);
+
+            // if buff type is a disabler, grant player 3 second immunity
+            if (buffID > 0 && buffType == 1)
+            {
+                /*
+                if (!immunityTimers.ContainsKey(buffID))
+                {
+                    immunityTimers.Add(buffID, 3f + Time.time);
+                }
+                immunityTimers[buffID] = 3f + Time.time;
+                */
+                AddBuff(-buffID, -buffType);
+                //Buff immunity = Instantiate(GameManager.gm.buffs[0]).GetComponent<Buff>();
+                //buffs[buffType].Add(-buffID, immunity);
+            }
         }
         else
         {
@@ -127,11 +146,19 @@ public class PlayerController : MonoBehaviour {
     public void AddBuff(int buffID, int buffType)
     {
         //int buffType = b.buffType, buffID = b.buffID;
-        if(!buffs.ContainsKey(buffType))
+
+        if (buffType > 0 && buffID > 0 && buffs.ContainsKey(-buffType) && buffs[-buffType].ContainsKey(-buffID))
+        {
+            print("IMMUNE TO THIS BUFF");
+            return;
+        }
+
+        if (!buffs.ContainsKey(buffType))
         {
             print("instantiating buff type list " + buffType);
             buffs.Add(buffType, new Dictionary<int, Buff>());
         }
+
         if (buffs[buffType].ContainsKey(buffID))
         {
             print("Restarting BUFF" + buffType + "," + buffID);
@@ -140,7 +167,15 @@ public class PlayerController : MonoBehaviour {
         }
         else
         {
-            Buff b = Instantiate(GameManager.gm.buffs[buffID]).GetComponent<Buff>();
+            print("CREATING BUFF " + buffID + "," + buffType);
+            Buff b;
+            // if negative ID, instantiate an immunity buff
+            if(buffID < 0)
+                b = Instantiate(GameManager.gm.buffs[0]).GetComponent<Buff>();
+            else
+                b = Instantiate(GameManager.gm.buffs[buffID]).GetComponent<Buff>();
+            b.buffID = buffID;
+            b.buffType = buffType;
             buffs[buffType].Add(buffID, b);
             b.player = this;
         }
@@ -149,8 +184,12 @@ public class PlayerController : MonoBehaviour {
 
     public void CheckIfCanPerformActions()
     {
-        canPerformActions = buffs[0].Count == 0;
-
+        bool canPerformActions = buffs[1].Count == 0;
+        if(!canPerformActions && this.canPerformActions)
+        {
+            wep.CancelUse();
+        }
+        this.canPerformActions = canPerformActions;
     }
 
     public Vector3 SetOrientation(Vector3 orientation)

@@ -93,7 +93,7 @@ public class Projectile : MonoBehaviour {
         {
             print("SPLAT");
             //GameManager.gm.Blackout();
-            collision.GetComponent<PlayerController>().AddBuff(0, 0);
+            collision.GetComponent<PlayerController>().AddBuff(1, 1);
             Destroy(gameObject);
         }
         if (ownerType != "Player")

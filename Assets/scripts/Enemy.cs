@@ -536,7 +536,6 @@ public class Enemy : MonoBehaviour
     // Handles attack action and animation
     public virtual IEnumerator PerformAttack()
     {
-        print(2);
         isAttacking = true;
         isPerformingAction = true;
 
@@ -577,7 +576,6 @@ public class Enemy : MonoBehaviour
         //anim.SetBool("isReloading", false);
         isPerformingAction = false;
         isAttacking = false;
-        print(3);
     }
     /*
      // Handles attack action and animation

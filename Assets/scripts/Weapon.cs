@@ -150,7 +150,8 @@ public abstract class Weapon : MonoBehaviour
         if (!user || GameManager.gm.gameOver)
             return false;
         // If using online feature and disconnected, cancel using weapon, to prevent further complications
-        if(NetworkManager.nm.isStarted && NetworkManager.nm.isDisconnected)
+        // OR if can't perform action and was in process of charging
+        if(NetworkManager.nm.isStarted && NetworkManager.nm.isDisconnected || !user.canPerformActions)
         {
             CancelUse();
             return false;

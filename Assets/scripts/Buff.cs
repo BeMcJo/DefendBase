@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Buff : MonoBehaviour {
     public int buffID, // uniquely identifies the buff (ex: different cosmetics or name)
@@ -12,11 +13,15 @@ public class Buff : MonoBehaviour {
     public List<GameObject> conditions; // if buff requires UI interaction (ex: tap objects for frozen, swipe ink for blindness, ...)
 
     public PlayerController player; // target player receiving buff
+    public GameObject buffDurationUI; // visual indication of buff duration
 
 	// Use this for initialization
 	void Start ()
     {
         Activate();
+        buffDurationUI = Instantiate(buffDurationUI);
+        buffDurationUI.transform.SetParent(GameManager.gm.playerStatusCanvas.transform);
+        buffDurationUI.transform.localPosition = new Vector2(0, -200f);
     }
 
     /* unnecessary?
@@ -33,6 +38,7 @@ public class Buff : MonoBehaviour {
             print("DESTROYING CONDS");
             Destroy(cond);
         }
+        Destroy(buffDurationUI);
     }
 
     // Update is called once per frame
@@ -44,6 +50,7 @@ public class Buff : MonoBehaviour {
             player.RemoveBuff(this);
             //Destroy(gameObject);
         }
+        buffDurationUI.transform.GetChild(0).GetComponent<Image>().fillAmount = (timer - Time.time) / timeToLive;
 	}
 
     public void AddCondition(GameObject cond)
@@ -84,7 +91,7 @@ public class Buff : MonoBehaviour {
         switch (buffType)
         {
             // can't perform actions
-            case 0:
+            case 1:
                 AddCondition(Instantiate(GameManager.gm.interactiveUIPrefabs[0]));
                 break;
         }
@@ -92,7 +99,7 @@ public class Buff : MonoBehaviour {
 
     public bool isActive()
     {
-        print(timer + " " + Time.time);
+        //print(timer + " " + Time.time);
         return timer > Time.time;
     }
 }

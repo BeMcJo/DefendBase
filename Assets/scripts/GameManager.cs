@@ -422,7 +422,7 @@ public class GameManager : MonoBehaviour {
         //gyroEnabled = true;
         //totalKills = 0;
         //////////////////////////
-        print("player orient:" + playerOrientation);
+        //print("player orient:" + playerOrientation);
 
         Enemy.EnemyCount = 0;
         Objective.ObjectiveCount = 0;
