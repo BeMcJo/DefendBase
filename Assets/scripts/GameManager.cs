@@ -136,6 +136,8 @@ public class GameManager : MonoBehaviour {
                       addToMapBtn, // Button used to spawn defenses onto map
                       changeArrowBtn, // Press and hold to display item wheel to change arrow
                       hitObjectiveIndicator, // Warns player that the objective is under attack
+                      buffIconContainer, // holds buff icons
+                      interactiveUIContainer, // holds interactive UI
                       waveNotification; // Notifies player that enemies will spawn
 
     public Text scoreTxt; // Indicates how awesome you are
@@ -463,6 +465,8 @@ public class GameManager : MonoBehaviour {
         playerStatusCanvas.transform.Find("OptionsBtn").GetComponent<Button>().onClick.AddListener(ToggleOptionsCanvas);//DisplayOptions);
         playerStatusCanvas.transform.Find("MapBtn").GetComponent<Button>().onClick.AddListener(ToggleMapUICanvas);
         hitObjectiveIndicator = playerStatusCanvas.transform.Find("ObjectiveHitIndicator").gameObject;
+        buffIconContainer = playerStatusCanvas.transform.Find("BuffIconContainer").gameObject;
+        interactiveUIContainer = playerStatusCanvas.transform.Find("InteractiveUIContainer").gameObject;
 
         playerOrientationObjects = playerStatusCanvas.transform.Find("PlayerOrientationObjects").gameObject;
         playerOrientationObjects.transform.Find("SetOrientationBtn").GetComponent<Button>().onClick.AddListener(SetPlayerOrientation);

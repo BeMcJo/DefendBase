@@ -20,8 +20,9 @@ public class Buff : MonoBehaviour {
     {
         Activate();
         buffDurationUI = Instantiate(buffDurationUI);
-        buffDurationUI.transform.SetParent(GameManager.gm.playerStatusCanvas.transform);
+        buffDurationUI.transform.SetParent(GameManager.gm.buffIconContainer.transform);
         buffDurationUI.transform.localPosition = new Vector2(0, -200f);
+        buffDurationUI.transform.localScale = new Vector3(1, 1, 1);
     }
 
     /* unnecessary?
@@ -52,10 +53,11 @@ public class Buff : MonoBehaviour {
         }
         buffDurationUI.transform.GetChild(0).GetComponent<Image>().fillAmount = (timer - Time.time) / timeToLive;
 	}
-
+    
+    // Adds condition needed to satisfy in order to remove buff (an InteractiveUI)
     public void AddCondition(GameObject cond)
     {
-        cond.transform.SetParent(GameManager.gm.playerStatusCanvas.transform);
+        cond.transform.SetParent(GameManager.gm.interactiveUIContainer.transform);
         cond.transform.localPosition = new Vector2(0, 0);
         cond.GetComponent<InteractiveUI>().owner = this;
         conditions.Add(cond);
@@ -92,7 +94,8 @@ public class Buff : MonoBehaviour {
         {
             // can't perform actions
             case 1:
-                AddCondition(Instantiate(GameManager.gm.interactiveUIPrefabs[0]));
+                GameObject interactiveUI = Instantiate(GameManager.gm.interactiveUIPrefabs[0]);
+                AddCondition(interactiveUI);
                 break;
         }
     }
