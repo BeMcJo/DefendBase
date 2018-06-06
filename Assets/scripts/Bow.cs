@@ -16,12 +16,14 @@ public class Bow : Weapon
                   drawOffset; // Default position when arrow and bowstring isn't pulled
     private float maxScreenDrawRange; // Distance from middle of screen to corner
     public float drawElasticity = 15; // Determines how much string can stretch upon pulling
+    public GameObject[] bowstringPositionPlaceHolders;
+    protected Vector3[] bowstringPositions;
 	// Use this for initialization
 	protected override void Start ()
     {
         wepID = 0;
         base.Start();
-        distance = 2000;
+        //distance = 2000;
         arrow = transform.Find("Arrow");
         bow = transform.Find("Bow");
         lr = bow.GetComponent<LineRenderer>();
@@ -32,6 +34,10 @@ public class Bow : Weapon
         reloadTime = 0;
         timeToReload = 1f;
         maxScreenDrawRange = Vector2.Distance(new Vector2(0, 0), new Vector2(Screen.width, Screen.height) / 2);
+        bowstringPositions = new Vector3[3];
+        for (int i = 0; i < bowstringPositionPlaceHolders.Length; i++)
+            bowstringPositions[i] = bowstringPositionPlaceHolders[i].transform.position;
+        lr.SetPositions(bowstringPositions);
     }
 	
     // Key information to have NetworkManager send to other players
@@ -55,7 +61,19 @@ public class Bow : Weapon
      */
 	protected override bool Update () {
         //Debug.Log(lvl);
-        if (reloading)
+        bowstringPositions[0] = bowstringPositionPlaceHolders[0].transform.position;
+        //bowstringPositions[1] = bowstringPositionPlaceHolders[1].transform.position;
+
+        bowstringPositions[1] = bowstringPositionPlaceHolders[1].transform.position;
+        if (!reloading && arrow != null)
+            //    bowstringPositions[1] += (new Vector3(0, 0, 0));// drawRange)); // Default position of middle vertex
+            //else
+            //{
+            bowstringPositions[1] = arrow.transform.Find("Tail").position;// (new Vector3(0,0,-chargePower*2.35f));//arrow.position.z - 2.35f)); // Position of arrow tail
+        //}
+        bowstringPositions[2] = bowstringPositionPlaceHolders[2].transform.position;
+        lr.SetPositions(bowstringPositions);//positions.ToArray()); // Assign vertices positions
+        if (reloading || arrow == null)
         {
             Reload();
             return true;
@@ -67,21 +85,17 @@ public class Bow : Weapon
         {
             Charge(chargePower);
         }
-        if(arrow == null)
+        /*
+        if (arrow == null)
         {
             Reload();
             return true;
-        }
-        List<Vector3> positions = new List<Vector3>(); // Keeps track of the vertices of the bowstring
-        positions.Add(new Vector3(0, .5f, -.475f)); // Vertex at top of bow
-        if (reloading)
-            positions.Add(new Vector3(0, 0, drawRange)); // Default position of middle vertex
-        else
-        {
-            positions.Add(new Vector3(0, 0, drawRange + arrow.localPosition.z - 2.35f)); // Position of arrow tail
-        }
-        positions.Add(new Vector3(0, -.5f, -.475f)); // Vertex at bottom of bow
-        lr.SetPositions(positions.ToArray()); // Assign vertices positions
+        }*/
+        //List<Vector3> positions = new List<Vector3>(); // Keeps track of the vertices of the bowstring
+        //positions.Add(new Vector3(0, .5f, -.475f)); // Vertex at top of bow
+        
+        //positions.Add(new Vector3(0, -.5f, -.475f)); // Vertex at bottom of bow
+
         return true;    
 	}
 
@@ -111,6 +125,7 @@ public class Bow : Weapon
             base.StartUse(t);
             return true;
         }
+        anim.speed = 0;
         // If not using Touch Interactive mode, check if shoot button is being touched
         if (!GameManager.gm.interactiveTouch)
         {
@@ -161,6 +176,7 @@ public class Bow : Weapon
             arrow.localPosition = bulletSpawn.localPosition;
         drawRange = drawOffset;
         inUse = false;
+        anim.speed = 1;
         Shoot(chargePower);
         //charging = false;
         //chargePower = 0;
@@ -214,6 +230,7 @@ public class Bow : Weapon
         drawRange = drawOffset + chargePower * drawLimit * drawElasticity; // Calculate how far arrow and bowstring is drawn
         arrow.localPosition = bulletSpawn.localPosition + new Vector3(0, 0, chargePower * drawLimit); // Move arrow backwards based on charge power 
         this.chargePower = chargePower;
+        anim.Play("charge", -1, chargePower);
     }
 
     // Launch arrow if charge exceeds minimum
@@ -240,12 +257,17 @@ public class Bow : Weapon
                 GameManager.gm.UseItem("Attribute", GameManager.gm.selectedAttribute);
 
             // Reset bowstring vertices
-            List<Vector3> positions = new List<Vector3>();
-            positions.Add(new Vector3(0, .5f, -.475f));
-            positions.Add(new Vector3(0, 0, drawRange));
-            positions.Add(new Vector3(0, -.5f, -.475f));
-            lr.SetPositions(positions.ToArray());
+
+            //for (int i = 0; i < bowstringPositionPlaceHolders.Length; i++)
+            //    bowstringPositions[i] = bowstringPositionPlaceHolders[i].transform.position;
+            //lr.SetPositions(bowstringPositions);
+            if (!anim.GetCurrentAnimatorStateInfo(0).IsName("release"))
+                anim.Play("release", -1, 1 - chargePower);
             base.Shoot(chargePower);
+        }
+        else
+        {
+            anim.Play("default", -1, 0);
         }
     }
 }

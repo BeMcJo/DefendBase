@@ -65,6 +65,8 @@ public abstract class Weapon : MonoBehaviour
     protected int shootTouchID, // Finger ID that is used for shooting
                   aimTouchID; // Finger ID that is used for aiming camera perspective
 
+    protected Animator anim;
+
     // Use this for initialization
     protected virtual void Awake()
     {
@@ -81,6 +83,8 @@ public abstract class Weapon : MonoBehaviour
         shootTouchID = -1;
         reloading = false;
         inUse = false;
+
+        anim = GetComponent<Animator>();
         /*
         id = WeaponCount;
         WeaponCount++;

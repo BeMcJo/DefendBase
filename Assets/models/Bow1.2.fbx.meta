@@ -1,0 +1,376 @@
+fileFormatVersion: 2
+guid: f2428fce85a68684b9e25455d641f741
+timeCreated: 1528236412
+licenseType: Free
+ModelImporter:
+  serializedVersion: 19
+  fileIDToRecycleName:
+    100000: arm1.l
+    100002: arm1.r
+    100004: arm2.l
+    100006: arm2.r
+    100008: arm3.l
+    100010: arm3.r
+    100012: arm4.l
+    100014: arm4.r
+    100016: arm5.l
+    100018: arm5.l_end
+    100020: arm5.r
+    100022: arm5.r_end
+    100024: Armature
+    100026: Bone
+    100028: Bow
+    100030: //RootNode
+    100032: center_to_arm.l
+    100034: center_to_arm.r
+    400000: arm1.l
+    400002: arm1.r
+    400004: arm2.l
+    400006: arm2.r
+    400008: arm3.l
+    400010: arm3.r
+    400012: arm4.l
+    400014: arm4.r
+    400016: arm5.l
+    400018: arm5.l_end
+    400020: arm5.r
+    400022: arm5.r_end
+    400024: Armature
+    400026: Bone
+    400028: Bow
+    400030: //RootNode
+    400032: center_to_arm.l
+    400034: center_to_arm.r
+    4300000: Bow
+    7400000: Armature|ArmatureAction
+    7400002: charge
+    7400004: release
+    7400006: default
+    9500000: //RootNode
+    13700000: Bow
+  materials:
+    importMaterials: 1
+    materialName: 0
+    materialSearch: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    resampleCurves: 1
+    optimizeGameObjects: 0
+    motionNodeName: 
+    rigImportErrors: 
+    rigImportWarnings: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    animationCompression: 1
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    clipAnimations:
+    - serializedVersion: 16
+      name: Armature|ArmatureAction
+      takeName: Armature|ArmatureAction
+      firstFrame: 0
+      lastFrame: 45
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask:
+      - path: 
+        weight: 1
+      - path: Armature
+        weight: 1
+      - path: Armature/Bone
+        weight: 1
+      - path: Armature/Bone/center_to_arm.l
+        weight: 1
+      - path: Armature/Bone/center_to_arm.l/arm1.l
+        weight: 1
+      - path: Armature/Bone/center_to_arm.l/arm1.l/arm2.l
+        weight: 1
+      - path: Armature/Bone/center_to_arm.l/arm1.l/arm2.l/arm3.l
+        weight: 1
+      - path: Armature/Bone/center_to_arm.l/arm1.l/arm2.l/arm3.l/arm4.l
+        weight: 1
+      - path: Armature/Bone/center_to_arm.l/arm1.l/arm2.l/arm3.l/arm4.l/arm5.l
+        weight: 1
+      - path: Armature/Bone/center_to_arm.l/arm1.l/arm2.l/arm3.l/arm4.l/arm5.l/arm5.l_end
+        weight: 1
+      - path: Armature/Bone/center_to_arm.r
+        weight: 1
+      - path: Armature/Bone/center_to_arm.r/arm1.r
+        weight: 1
+      - path: Armature/Bone/center_to_arm.r/arm1.r/arm2.r
+        weight: 1
+      - path: Armature/Bone/center_to_arm.r/arm1.r/arm2.r/arm3.r
+        weight: 1
+      - path: Armature/Bone/center_to_arm.r/arm1.r/arm2.r/arm3.r/arm4.r
+        weight: 1
+      - path: Armature/Bone/center_to_arm.r/arm1.r/arm2.r/arm3.r/arm4.r/arm5.r
+        weight: 1
+      - path: Armature/Bone/center_to_arm.r/arm1.r/arm2.r/arm3.r/arm4.r/arm5.r/arm5.r_end
+        weight: 1
+      - path: Bow
+        weight: 1
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: charge
+      takeName: Armature|ArmatureAction
+      firstFrame: 0
+      lastFrame: 30
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask:
+      - path: 
+        weight: 1
+      - path: Armature
+        weight: 1
+      - path: Armature/Bone
+        weight: 1
+      - path: Armature/Bone/center_to_arm.l
+        weight: 1
+      - path: Armature/Bone/center_to_arm.l/arm1.l
+        weight: 1
+      - path: Armature/Bone/center_to_arm.l/arm1.l/arm2.l
+        weight: 1
+      - path: Armature/Bone/center_to_arm.l/arm1.l/arm2.l/arm3.l
+        weight: 1
+      - path: Armature/Bone/center_to_arm.l/arm1.l/arm2.l/arm3.l/arm4.l
+        weight: 1
+      - path: Armature/Bone/center_to_arm.l/arm1.l/arm2.l/arm3.l/arm4.l/arm5.l
+        weight: 1
+      - path: Armature/Bone/center_to_arm.l/arm1.l/arm2.l/arm3.l/arm4.l/arm5.l/arm5.l_end
+        weight: 1
+      - path: Armature/Bone/center_to_arm.r
+        weight: 1
+      - path: Armature/Bone/center_to_arm.r/arm1.r
+        weight: 1
+      - path: Armature/Bone/center_to_arm.r/arm1.r/arm2.r
+        weight: 1
+      - path: Armature/Bone/center_to_arm.r/arm1.r/arm2.r/arm3.r
+        weight: 1
+      - path: Armature/Bone/center_to_arm.r/arm1.r/arm2.r/arm3.r/arm4.r
+        weight: 1
+      - path: Armature/Bone/center_to_arm.r/arm1.r/arm2.r/arm3.r/arm4.r/arm5.r
+        weight: 1
+      - path: Armature/Bone/center_to_arm.r/arm1.r/arm2.r/arm3.r/arm4.r/arm5.r/arm5.r_end
+        weight: 1
+      - path: Bow
+        weight: 1
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: release
+      takeName: Armature|ArmatureAction
+      firstFrame: 30
+      lastFrame: 45
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask:
+      - path: 
+        weight: 1
+      - path: Armature
+        weight: 1
+      - path: Armature/Bone
+        weight: 1
+      - path: Armature/Bone/center_to_arm.l
+        weight: 1
+      - path: Armature/Bone/center_to_arm.l/arm1.l
+        weight: 1
+      - path: Armature/Bone/center_to_arm.l/arm1.l/arm2.l
+        weight: 1
+      - path: Armature/Bone/center_to_arm.l/arm1.l/arm2.l/arm3.l
+        weight: 1
+      - path: Armature/Bone/center_to_arm.l/arm1.l/arm2.l/arm3.l/arm4.l
+        weight: 1
+      - path: Armature/Bone/center_to_arm.l/arm1.l/arm2.l/arm3.l/arm4.l/arm5.l
+        weight: 1
+      - path: Armature/Bone/center_to_arm.l/arm1.l/arm2.l/arm3.l/arm4.l/arm5.l/arm5.l_end
+        weight: 1
+      - path: Armature/Bone/center_to_arm.r
+        weight: 1
+      - path: Armature/Bone/center_to_arm.r/arm1.r
+        weight: 1
+      - path: Armature/Bone/center_to_arm.r/arm1.r/arm2.r
+        weight: 1
+      - path: Armature/Bone/center_to_arm.r/arm1.r/arm2.r/arm3.r
+        weight: 1
+      - path: Armature/Bone/center_to_arm.r/arm1.r/arm2.r/arm3.r/arm4.r
+        weight: 1
+      - path: Armature/Bone/center_to_arm.r/arm1.r/arm2.r/arm3.r/arm4.r/arm5.r
+        weight: 1
+      - path: Armature/Bone/center_to_arm.r/arm1.r/arm2.r/arm3.r/arm4.r/arm5.r/arm5.r_end
+        weight: 1
+      - path: Bow
+        weight: 1
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: default
+      takeName: Armature|ArmatureAction
+      firstFrame: 0
+      lastFrame: 0
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask:
+      - path: 
+        weight: 1
+      - path: Armature
+        weight: 1
+      - path: Armature/Bone
+        weight: 1
+      - path: Armature/Bone/center_to_arm.l
+        weight: 1
+      - path: Armature/Bone/center_to_arm.l/arm1.l
+        weight: 1
+      - path: Armature/Bone/center_to_arm.l/arm1.l/arm2.l
+        weight: 1
+      - path: Armature/Bone/center_to_arm.l/arm1.l/arm2.l/arm3.l
+        weight: 1
+      - path: Armature/Bone/center_to_arm.l/arm1.l/arm2.l/arm3.l/arm4.l
+        weight: 1
+      - path: Armature/Bone/center_to_arm.l/arm1.l/arm2.l/arm3.l/arm4.l/arm5.l
+        weight: 1
+      - path: Armature/Bone/center_to_arm.l/arm1.l/arm2.l/arm3.l/arm4.l/arm5.l/arm5.l_end
+        weight: 1
+      - path: Armature/Bone/center_to_arm.r
+        weight: 1
+      - path: Armature/Bone/center_to_arm.r/arm1.r
+        weight: 1
+      - path: Armature/Bone/center_to_arm.r/arm1.r/arm2.r
+        weight: 1
+      - path: Armature/Bone/center_to_arm.r/arm1.r/arm2.r/arm3.r
+        weight: 1
+      - path: Armature/Bone/center_to_arm.r/arm1.r/arm2.r/arm3.r/arm4.r
+        weight: 1
+      - path: Armature/Bone/center_to_arm.r/arm1.r/arm2.r/arm3.r/arm4.r/arm5.r
+        weight: 1
+      - path: Armature/Bone/center_to_arm.r/arm1.r/arm2.r/arm3.r/arm4.r/arm5.r/arm5.r_end
+        weight: 1
+      - path: Bow
+        weight: 1
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    importBlendShapes: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    keepQuads: 0
+    weldVertices: 1
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+  tangentSpace:
+    normalSmoothAngle: 60
+    normalImportMode: 0
+    tangentImportMode: 3
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    serializedVersion: 2
+    human: []
+    skeleton: []
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
+    feetSpacing: 0
+    rootMotionBoneName: 
+    rootMotionBoneRotation: {x: 0, y: 0, z: 0, w: 1}
+    hasTranslationDoF: 0
+    hasExtraRoot: 0
+    skeletonHasParents: 1
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 2
+  humanoidOversampling: 1
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
