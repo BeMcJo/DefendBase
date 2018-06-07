@@ -65,7 +65,10 @@ public abstract class Weapon : MonoBehaviour
     protected int shootTouchID, // Finger ID that is used for shooting
                   aimTouchID; // Finger ID that is used for aiming camera perspective
 
-    protected Animator anim;
+    protected Animator anim; // controls animation
+
+    protected AudioSource audioSrc; // controls audio
+    public List<AudioClip> soundClips; // List of sounds used for weapon
 
     // Use this for initialization
     protected virtual void Awake()
@@ -85,6 +88,7 @@ public abstract class Weapon : MonoBehaviour
         inUse = false;
 
         anim = GetComponent<Animator>();
+        audioSrc = GetComponent<AudioSource>();
         /*
         id = WeaponCount;
         WeaponCount++;

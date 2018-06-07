@@ -182,7 +182,7 @@ public class Bow : Weapon
         //chargePower = 0;
         base.EndUse();
     }
-    
+
     public override void Charge(float chargePower)
     {
         // Assign charge to bow if multiplayer and not my weapon
@@ -190,17 +190,32 @@ public class Bow : Weapon
         {
             this.chargePower = chargePower;
             drawRange = drawOffset + chargePower * drawLimit * drawElasticity;
-            if(arrow)
+            if (arrow)
                 arrow.localPosition = bulletSpawn.localPosition + new Vector3(0, 0, chargePower * drawLimit);
             return;
         }
+
+
+        audioSrc.clip = soundClips[0];
+
         // If not using Touch Interactive mode, progressively increase the chargePower as long as user holds shoot button
         if (!GameManager.gm.interactiveTouch)
         {
-            chargePower = chargePower + .03f/ (float) DebugManager.dbm.fps * 60.0f; // increment charge power
+            chargePower = chargePower + .03f / (float)DebugManager.dbm.fps * 60.0f; // increment charge power
             if (chargePower >= chargeLimit)
                 chargePower = chargeLimit;
-            chargeBar.transform.localScale = new Vector3(1, chargePower/chargeLimit, 1); // Visual indicator of charge percentage
+            chargeBar.transform.localScale = new Vector3(1, chargePower / chargeLimit, 1); // Visual indicator of charge percentage
+
+
+            float chargeDif = chargePower - this.chargePower;
+            print(chargeDif);
+            if ((!audioSrc.isPlaying && chargeDif > .03f))// || audioSrc.time > .1f * (1 + percentile) * audioSrc.clip.length)// || audioSrc.time / audioSrc.clip.length > .55f)
+            {
+                audioSrc.volume = .4f;
+                audioSrc.time = audioSrc.clip.length * (chargePower*.6f);// * percentile;
+                audioSrc.Play();
+            }
+
         }
         // Using Touch Interactive
         else
@@ -226,11 +241,38 @@ public class Bow : Weapon
                     break;
                 }
             }
+            /*
+            print(chargePower +" " + this.chargePower);
+            int percentile = ((int)(chargePower * 100)) / 33;
+            int oldPercentile = ((int)(this.chargePower * 100)) / 33;
+            print(percentile + "," + oldPercentile);
+            if (percentile != oldPercentile)
+            {
+                if (percentile > 1)
+                    audioSrc.time = audioSrc.clip.length * (.6f);
+                else if (percentile > 0)
+                    audioSrc.time = audioSrc.clip.length * (.5f);
+                else
+                    audioSrc.time = audioSrc.clip.length * (.4f);
+                audioSrc.Play();
+            }
+            float audioTimePercentage = audioSrc.time / audioSrc.clip.length;
+            if (percentile < 2 && audioTimePercentage >= .6f)
+                audioSrc.Stop();
+            else if (percentile < 1 && audioTimePercentage >= .5f)
+                audioSrc.Stop();
+                */
         }
+
         drawRange = drawOffset + chargePower * drawLimit * drawElasticity; // Calculate how far arrow and bowstring is drawn
         arrow.localPosition = bulletSpawn.localPosition + new Vector3(0, 0, chargePower * drawLimit); // Move arrow backwards based on charge power 
+        
+
         this.chargePower = chargePower;
         anim.Play("charge", -1, chargePower);
+        
+       // print(audioSrc.time);
+        //print(audioSrc.clip.length);
     }
 
     // Launch arrow if charge exceeds minimum
@@ -264,9 +306,16 @@ public class Bow : Weapon
             if (!anim.GetCurrentAnimatorStateInfo(0).IsName("release"))
                 anim.Play("release", -1, 1 - chargePower);
             base.Shoot(chargePower);
+            audioSrc.clip = soundClips[1];
+            audioSrc.time = .2f;
+            audioSrc.volume = 1f;
+            audioSrc.Play();
         }
         else
         {
+            if (audioSrc.isPlaying)
+                audioSrc.Stop();
+
             anim.Play("default", -1, 0);
         }
     }
