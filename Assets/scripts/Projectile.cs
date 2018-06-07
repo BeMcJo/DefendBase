@@ -89,6 +89,8 @@ public class Projectile : MonoBehaviour {
         if (deflected || !isShot)
             return;
         //print("HIT");
+
+        // If projectile is an enemy's hitting me as the player?
         if(collision.tag == "Player" && ownerType == "Enemy" && collision.GetComponent<PlayerController>().IsMyPlayer())
         {
             print("SPLAT");

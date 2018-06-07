@@ -98,6 +98,7 @@ public class GameManager : MonoBehaviour {
                       descriptionPrefab, // Used to provide details about item
                       enemyArmorPrefab, // ???
                       iconPrefab, // icon of item
+                      enemyDeathVFXPrefab, // used after enemy dies
                       enemyPrefab; // Enemy object
 
     public GameObject playerStatusCanvas, // Information used for player to see
@@ -174,6 +175,10 @@ public class GameManager : MonoBehaviour {
     //Button upgradeWepBtn;
     Coroutine blackoutCoroutine,
               waveNotificationCoroutine;
+
+    public AudioClip onEnemyHitSFX;
+    //public List<AudioClip> 
+    public AudioSource audioSrc;
 
     // Saves data based on the type
     public void Save(string type)
@@ -269,6 +274,7 @@ public class GameManager : MonoBehaviour {
         myAttributes = new Dictionary<int, int>();
         myProjectiles = new Dictionary<int, int>();
         myDefenses = new Dictionary<int, int>();
+        audioSrc = gameObject.AddComponent<AudioSource>();
         playerOrientation = Vector3.zero;
         realTimeAction = true;
         Screen.orientation = ScreenOrientation.Landscape; // Landscape mode for mobile phones
@@ -746,6 +752,9 @@ public class GameManager : MonoBehaviour {
         Color c = hitIndicator.GetComponent<Image>().color;
         c.a = 1;
         hitIndicator.GetComponent<Image>().color = c;
+        audioSrc.clip = onEnemyHitSFX;
+        audioSrc.time = .01f;
+        audioSrc.Play();
     }
 
     public void SpawnPotentialDefense()

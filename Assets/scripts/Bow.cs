@@ -212,7 +212,7 @@ public class Bow : Weapon
             if ((!audioSrc.isPlaying && chargeDif > .03f))// || audioSrc.time > .1f * (1 + percentile) * audioSrc.clip.length)// || audioSrc.time / audioSrc.clip.length > .55f)
             {
                 audioSrc.volume = .4f;
-                audioSrc.time = audioSrc.clip.length * (chargePower*.6f);// * percentile;
+                audioSrc.time = audioSrc.clip.length * (chargePower*.62f);// * percentile;
                 audioSrc.Play();
             }
 
@@ -307,8 +307,9 @@ public class Bow : Weapon
                 anim.Play("release", -1, 1 - chargePower);
             base.Shoot(chargePower);
             audioSrc.clip = soundClips[1];
-            audioSrc.time = .2f;
+            audioSrc.time = .1f;
             audioSrc.volume = 1f;
+            print(audioSrc.clip.length);
             audioSrc.Play();
         }
         else

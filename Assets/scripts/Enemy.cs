@@ -26,7 +26,7 @@ public class Enemy : MonoBehaviour
         // Stats for Slimes ignore -> Normies
         new EnemyStats[]
         {
-            new EnemyStats(1, 0, 1, 1),
+            new EnemyStats(2, 0, 1, 1),
             new EnemyStats(2, 2, 1.2f, 1.2f),
             new EnemyStats(2, 2, 1.25f, 1.25f),
             new EnemyStats(3, 2, 1.5f, 1.3f),
@@ -97,6 +97,9 @@ public class Enemy : MonoBehaviour
     public List<GameObject> pathing; // Path enemy follows
     protected List<GameObject> grounds = new List<GameObject>();
 
+    protected AudioSource audioSrc;
+    public List<AudioClip> soundClips; 
+
     // Used to create the enemy and identify it
     /*public static void AssignEnemy(Enemy e)
     {
@@ -148,6 +151,7 @@ public class Enemy : MonoBehaviour
         anim = GetComponent<Animator>();
         isDoneMoving = true;
         gameObject.AddComponent<ConstantForce>().force = new Vector3(0, -9, 0);
+        audioSrc = gameObject.AddComponent<AudioSource>();// GetComponent<AudioSource>();
         //print(ename);
         attackRange = 2.3f;
         if (ename == "infurie")
@@ -499,6 +503,8 @@ public class Enemy : MonoBehaviour
     public virtual void OnHit()
     {
         StartCoroutine(IndicateHasBeenHit());
+        //audioSrc.clip = soundClips[0];
+        //audioSrc.Play();
     }
  
     // Handles performing attack action
@@ -682,6 +688,10 @@ public class Enemy : MonoBehaviour
             rewards.Add(reward);
             reward.GetComponent<Collider>().enabled = false;
         }
+
+        GameObject ps = Instantiate(GameManager.gm.enemyDeathVFXPrefab);
+        ps.transform.position = transform.position;
+
         Destroy(gameObject);
     }
 

@@ -116,6 +116,7 @@
     <Compile Include="Assets\scripts\ObjectPlacement.cs" />
     <Compile Include="Assets\scripts\Objective.cs" />
     <Compile Include="Assets\scripts\ObjectiveHitIndicator.cs" />
+    <Compile Include="Assets\scripts\ParticleSystemHandler.cs" />
     <Compile Include="Assets\scripts\PlatformPath.cs" />
     <Compile Include="Assets\scripts\PlayerController.cs" />
     <Compile Include="Assets\scripts\Projectile.cs" />
