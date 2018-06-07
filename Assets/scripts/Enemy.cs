@@ -665,7 +665,6 @@ public class Enemy : MonoBehaviour
             {
                 print("I killed it IT");
                 GameManager.gm.UpdateKillCount(1);
-                //GameManager.gm.personalKills++;
             }
         }
         
