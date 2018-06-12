@@ -206,7 +206,7 @@ public class Bow : Weapon
                 chargePower = chargeLimit;
             chargeBar.transform.localScale = new Vector3(1, chargePower / chargeLimit, 1); // Visual indicator of charge percentage
 
-
+            /*
             float chargeDif = chargePower - this.chargePower;
             print(chargeDif);
             if ((!audioSrc.isPlaying && chargeDif > .03f))// || audioSrc.time > .1f * (1 + percentile) * audioSrc.clip.length)// || audioSrc.time / audioSrc.clip.length > .55f)
@@ -215,7 +215,7 @@ public class Bow : Weapon
                 audioSrc.time = audioSrc.clip.length * (chargePower*.62f);// * percentile;
                 audioSrc.Play();
             }
-
+            */
         }
         // Using Touch Interactive
         else

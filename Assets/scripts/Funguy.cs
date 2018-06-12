@@ -27,7 +27,7 @@ public class Funguy : Enemy {
             anim.Play("walk", -1, 0);
             
         }
-        transform.position = Vector3.MoveTowards(transform.position, targetPos, effectiveMoveSpd);
+        transform.position = Vector3.MoveTowards(transform.position, targetPos, effectiveMoveSpd * 60f / (float)DebugManager.dbm.fps);
     }
     // Checks if current animation is attacking
     public new bool IsAttackingAnimation()

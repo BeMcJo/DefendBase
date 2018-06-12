@@ -26,7 +26,7 @@ public class Enemy : MonoBehaviour
         // Stats for Slimes ignore -> Normies
         new EnemyStats[]
         {
-            new EnemyStats(2, 0, 1, 1),
+            new EnemyStats(1, 1, 1, 1),
             new EnemyStats(2, 2, 1.2f, 1.2f),
             new EnemyStats(2, 2, 1.25f, 1.25f),
             new EnemyStats(3, 2, 1.5f, 1.3f),
@@ -184,7 +184,7 @@ public class Enemy : MonoBehaviour
 
         if (health <= 0)
         {
-            Die();
+            //Die();
             return;
         }
         if (!isPerformingAction)
@@ -192,6 +192,13 @@ public class Enemy : MonoBehaviour
 
     }
 
+    // Based on enemy type, will determine how player targets will be selected
+    protected virtual GameObject SelectPlayerTarget()
+    {
+        return GameManager.gm.player;
+    }
+
+    // Generates random pathing towards objective
     public static List<GameObject> GeneratePathing(GameObject sp)
     {
         List<GameObject> pathing = new List<GameObject>();
@@ -273,7 +280,7 @@ public class Enemy : MonoBehaviour
 
     public void MoveForward()
     {
-        transform.position = Vector3.MoveTowards(transform.position, targetPos, effectiveMoveSpd);
+        transform.position = Vector3.MoveTowards(transform.position, targetPos, effectiveMoveSpd * 60f / (float)DebugManager.dbm.fps);
         AssignMoveTargetIfReached();
     }
 
@@ -626,6 +633,10 @@ public class Enemy : MonoBehaviour
         this.dmgSourceType = dmgSourceType;
         dmgSourceID = sid;
         
+        if(health <= 0)
+        {
+            Die();
+        }
     }
 
     // Attack target
@@ -654,17 +665,16 @@ public class Enemy : MonoBehaviour
     // Update game rewards upon death
     public virtual void Die()
     {
-        GameManager.gm.UpdateScore(50);
-        GameManager.gm.kills++;
         GameManager.gm.UpdateInGameCurrency(1);
+        GameManager.gm.kills++;
 
-        
-        if(dmgSourceType == "Player")
+        if (dmgSourceType == "Player")
         {
             if(dmgSourceID == GameManager.gm.player.GetComponent<PlayerController>().id)
             {
                 print("I killed it IT");
                 GameManager.gm.UpdateKillCount(1);
+                GameManager.gm.UpdateScore(50);
             }
         }
         

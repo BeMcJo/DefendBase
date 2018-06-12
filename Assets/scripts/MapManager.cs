@@ -69,7 +69,7 @@ public class MapManager : MonoBehaviour {
         return cpy;
     }
 
-    // Recursive DFS for all possible start-to-end routes from starting point(s) sp
+    // Recursive DFS for all possible start-to-end routes from starting point(s) sp and its index
     public void FindAllPaths(List<GameObject> path, GameObject sp, int spIndex)
     {
         // Invalid if starting point is null

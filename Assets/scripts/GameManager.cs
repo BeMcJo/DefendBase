@@ -1092,7 +1092,7 @@ public class GameManager : MonoBehaviour {
     public void UpdateKillCount(int kills)
     {
         personalKills += kills;
-        playerStatusCanvas.transform.Find("Kills").Find("Text").GetComponent<Text>().text = personalKills + "";
+        playerStatusCanvas.transform.Find("Kills").Find("Text").GetComponent<Text>().text = (totalPersonalKills + personalKills) + "";
     }
 
     public void UpdateScore(int s)
@@ -1436,9 +1436,11 @@ public class GameManager : MonoBehaviour {
         waveNotificationCoroutine = StartCoroutine(NotifyIncomingWave(w));
     }
 
-    public void SpawnEnemy(int sp,int useless, List<GameObject> pathing=null)
+    // Spawns enemy and selects pre-determined path (spPath) from map manager at a spawn point (sp)
+    public void SpawnEnemy(int sp,int spPath = -1)
     {
         GameObject enemy = Instantiate(enemyPrefabs[pattern.spawnCts[intervalIndex][spawnIndex]]);
+        List<GameObject> pathing;
         //Enemy.AssignEnemy(enemy.transform.GetComponent<Enemy>());
         // Get random spawn point
         if (sp == -1)
@@ -1450,8 +1452,10 @@ public class GameManager : MonoBehaviour {
                                     spawnPoint.transform.position.z);
         Enemy e = enemy.transform.GetComponent<Enemy>();
         e.SetTarget(spawnPoint);
-        if (pathing == null)
-            pathing = MapManager.mapManager.pathsBySpawnPoint[sp][UnityEngine.Random.Range(0,MapManager.mapManager.pathsBySpawnPoint[sp].Count)];//Enemy.GeneratePathing(spawnPoint);
+        if (spPath == -1)
+            pathing = MapManager.mapManager.pathsBySpawnPoint[sp][UnityEngine.Random.Range(0, MapManager.mapManager.pathsBySpawnPoint[sp].Count)];//Enemy.GeneratePathing(spawnPoint);
+        else
+            pathing = MapManager.mapManager.pathsBySpawnPoint[sp][spPath];
         //print("path gen");
         e.pathing = pathing;
         GameObject enemyUI = Instantiate(statusIndicatorPrefab);
@@ -1463,12 +1467,13 @@ public class GameManager : MonoBehaviour {
     }
 
     // Spawn enemy at the spawn point sp
-    public IEnumerator SpawnEnemy(int sp, List<GameObject> pathing=null)
+    public IEnumerator SpawnEnemyCoroutine(int sp, int spPath = -1)
     { 
         if (inGame)
         {
             spawning = true; // Indicate currently spawning an enemy
             enemiesSpawned++;
+            /*
             GameObject enemy = Instantiate(enemyPrefabs[pattern.spawnCts[intervalIndex][spawnIndex]]);
             //Enemy.AssignEnemy(enemy.transform.GetComponent<Enemy>());
             // Get random spawn point
@@ -1481,8 +1486,8 @@ public class GameManager : MonoBehaviour {
                                         spawnPoint.transform.position.z);
             Enemy e = enemy.transform.GetComponent<Enemy>();
             e.SetTarget(spawnPoint);
-            if (pathing == null)
-                pathing = Enemy.GeneratePathing(spawnPoint);
+            //if (pathing == null)
+            //    pathing = Enemy.GeneratePathing(spawnPoint);
             //print("path gen");
             e.pathing = pathing;
             GameObject enemyUI = Instantiate(statusIndicatorPrefab);
@@ -1490,7 +1495,8 @@ public class GameManager : MonoBehaviour {
             enemy.transform.SetParent(enemiesContainer.transform);
             difficulty = 0;
             e.level = (pattern.enemyLvls[intervalIndex][spawnIndex] + difficulty) % Enemy.difficulties.Length;
-
+            */
+            SpawnEnemy(sp, spPath);
             spawnIndex++;
             
             // If reached end of spawning enemies in current group
@@ -2126,7 +2132,7 @@ public class GameManager : MonoBehaviour {
                         NetworkManager.nm.SpawnEnemy(-1);
                     // not online, spawn the enmy
                     else
-                        StartCoroutine(SpawnEnemy(-1));
+                        StartCoroutine(SpawnEnemyCoroutine(-1));
                 }
             }
         }

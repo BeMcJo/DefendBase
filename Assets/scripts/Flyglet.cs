@@ -18,7 +18,9 @@ public class Flyglet : Enemy
         enemyID = 2;
         base.Start();
         //anim.SetInteger("hp", health);
-        SetTarget(GameManager.gm.player);
+        SetTarget(SelectPlayerTarget());
+        if (NetworkManager.nm.isStarted && NetworkManager.nm.isHost)
+            NetworkManager.nm.SendEnemyInfo(this);
         //anim.Play(ename + "_move", -1, 0);
     }
 
@@ -32,6 +34,15 @@ public class Flyglet : Enemy
         //print(id + " " + actionPerformed);
     }
 
+    // Chooses player target at random if multiplayer
+    protected override GameObject SelectPlayerTarget()
+    {
+        if(!NetworkManager.nm.isStarted)
+            return base.SelectPlayerTarget();
+
+        return NetworkManager.nm.players[Random.Range(0, NetworkManager.nm.players.Count)].playerGO;
+    }
+
     public override void PerformAction()
     {
         //print("perf");
@@ -43,11 +54,7 @@ public class Flyglet : Enemy
             Vector2 targetPos2d = new Vector2(targetPos.x, targetPos.z);
             Vector2 pos2d = new Vector2(transform.position.x, transform.position.z);//go.transform.position.x, go.transform.position.z);
             float dist = Vector3.Distance(pos2d, targetPos2d);
-            //if (!isDoneMoving)
-            //{
-            //    Move();
-            //}
-            //print("DIST:::" + dist);
+
             // Move towards target if it is a Path
             if (target.tag == "Player")
             {
@@ -55,26 +62,11 @@ public class Flyglet : Enemy
                 //print("outhere?");
                 if (dist <= 15f)
                 {
-                    //print("CHANGE PATH");
-                    /*PlatformPath p = target.transform.GetComponent<PlatformPath>();
-                    target = null;
-                    // Get new path if reached destination
-                    if (p.destTargets.Count > 0)
-                    {
-                        SetTarget(p.destTargets[Random.Range(0, p.destTargets.Count)]);
-                    }
-                    // No more paths, target objective
-                    else
-                    {
-                        SetTarget(GameManager.gm.objective);
-                    }*/
                     AttemptAttackAction();
                 }
                 // Move and face towards target
                 else
                 {
-                    //if(enemyID == 1)
-                    //print("here?");
                     Move();
                 }
             }
@@ -197,7 +189,7 @@ public class Flyglet : Enemy
             //print(len + "...@@@@@@");
             height -= .05f;
 
-            transform.position = Vector3.MoveTowards(transform.position, new Vector3(transform.position.x, height + originalPos.y, transform.position.z), .2f);
+            transform.position = Vector3.MoveTowards(transform.position, new Vector3(transform.position.x, height + originalPos.y, transform.position.z), .2f * 60f / (float) DebugManager.dbm.fps);
             //transform.position = new Vector3(transform.position.x, height + originalPos.y, transform.position.z); //-0.01f, 0);
         }
         return anim.GetCurrentAnimatorStateInfo(0).IsName("pre-flap");
@@ -219,7 +211,7 @@ public class Flyglet : Enemy
         if (anim.GetCurrentAnimatorStateInfo(0).IsName("flap") && len > 0)
         {
             height += .2f;
-            transform.position = Vector3.MoveTowards(transform.position, new Vector3(transform.position.x, height + originalPos.y, transform.position.z), .2f);
+            transform.position = Vector3.MoveTowards(transform.position, new Vector3(transform.position.x, height + originalPos.y, transform.position.z), .2f * 60f / (float)DebugManager.dbm.fps);
             //transform.position = new Vector3(transform.position.x, height + originalPos.y, transform.position.z);
             //transform.position += new Vector3(0, height, 0); //-0.01f, 0);
         }
@@ -242,7 +234,7 @@ public class Flyglet : Enemy
         {
             //print(len + "...%%%%%%%%%%%%%d");
             height -= .1f;
-            transform.position = Vector3.MoveTowards(transform.position, new Vector3(transform.position.x, height + originalPos.y, transform.position.z),.2f);
+            transform.position = Vector3.MoveTowards(transform.position, new Vector3(transform.position.x, height + originalPos.y, transform.position.z),.2f * 60f / (float)DebugManager.dbm.fps);
             //transform.position += new Vector3(0, height, 0); //-0.01f, 0);
         }
         return anim.GetCurrentAnimatorStateInfo(0).IsName("post-flap");
@@ -304,7 +296,7 @@ public class Flyglet : Enemy
         //Vector2 pos2d = new Vector2(transform.position.x, transform.position.z);
         //print("moving" + id + ",..." + Vector2.Distance(targetPos2d, pos2d));
         
-        transform.position = Vector3.MoveTowards(transform.position, targetPos, effectiveMoveSpd);
+        transform.position = Vector3.MoveTowards(transform.position, targetPos, effectiveMoveSpd * 60f / (float)DebugManager.dbm.fps);
         
         //    }
         //    return;

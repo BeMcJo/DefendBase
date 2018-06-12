@@ -91,10 +91,11 @@ public class Projectile : MonoBehaviour {
         //print("HIT");
 
         // If projectile is an enemy's hitting me as the player?
-        if(collision.tag == "Player" && ownerType == "Enemy" && collision.GetComponent<PlayerController>().IsMyPlayer())
+        if(collision.tag == "Player" && ownerType == "Enemy" )
         {
             print("SPLAT");
-            //GameManager.gm.Blackout();
+            //GameManager.gm.Blackout();&& 
+            //if(collision.GetComponent<PlayerController>().IsMyPlayer())
             collision.GetComponent<PlayerController>().AddBuff(1, 1);
             Destroy(gameObject);
         }
@@ -134,9 +135,11 @@ public class Projectile : MonoBehaviour {
             }
         }
 
+        // If non-enemy projectile hits enemy
         if (collision.transform.tag == "Enemy" && ownerType != "Enemy")
         {
             print("hit");
+            // Indicate you hit enemy (sound + visual)
             GameManager.gm.OnHitEnemy();
             // If can damage enemy and this is shot by my player
             if (!hitGround && !deflected)

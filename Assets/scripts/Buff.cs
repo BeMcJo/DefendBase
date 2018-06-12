@@ -18,8 +18,10 @@ public class Buff : MonoBehaviour {
 	// Use this for initialization
 	void Start ()
     {
-        Activate();
         buffDurationUI = Instantiate(buffDurationUI);
+        if (!player.IsMyPlayer())
+            return;
+        Activate();
         buffDurationUI.transform.SetParent(GameManager.gm.buffIconContainer.transform);
         buffDurationUI.transform.localPosition = new Vector2(0, -200f);
         buffDurationUI.transform.localScale = new Vector3(1, 1, 1);
@@ -96,6 +98,7 @@ public class Buff : MonoBehaviour {
             case 1:
                 GameObject interactiveUI = Instantiate(GameManager.gm.interactiveUIPrefabs[0]);
                 AddCondition(interactiveUI);
+                interactiveUI.transform.localScale = new Vector3(1, 1, 1);
                 break;
         }
     }

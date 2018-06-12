@@ -978,6 +978,15 @@ public class NetworkManager : MonoBehaviour {
         }
     }
 
+    // Send network information about Enemy e
+    public void SendEnemyInfo(Enemy e)
+    {
+        if (isHost)
+        {
+            Send(e.NetworkInformation(), reliableChannel, players);
+        }
+    }
+
     // Inflict damage to enemy
     public void OnEnemyDamaged(string[] data)
     {
@@ -1138,16 +1147,27 @@ public class NetworkManager : MonoBehaviour {
     // As client, spawn enemy and generate path
     public void SpawnEnemy(string[] splitData)
     {
-        int sp = int.Parse(splitData[2]);
-        string pathstr = null;
-        if (splitData.Length > 2) {
-            pathstr = splitData[3];
+        int sp = int.Parse(splitData[2]), spPath = int.Parse(splitData[3]);
+        //string pathstr = null;
+        //if (splitData.Length > 2) {
+        //    pathstr = splitData[3];
+        //}
+        // Shouldn't need to worry about spawn point and path as client
+        if(sp < 0 || spPath < 0)
+        {
+            print("HOW CAN THIS BE?");
+            throw new System.Exception("Spawn Point or Path not provided");
+            
         }
         if (sp == -1)
-            sp = UnityEngine.Random.Range(0, MapManager.mapManager.spawnPoints.Count);
-        //GameObject spawnPoint = MapManager.mapManager.spawnPoints[sp];
-        List<GameObject> pathing = new List<GameObject>();//Enemy.GeneratePathing(spawnPoint);
+            sp = Random.Range(0, MapManager.mapManager.spawnPoints.Count);
+        if (spPath == -1)
+            spPath = Random.Range(0, MapManager.mapManager.pathsBySpawnPoint[sp].Count);
 
+        //GameObject spawnPoint = MapManager.mapManager.spawnPoints[sp];
+        //List<GameObject> pathing = new List<GameObject>();//Enemy.GeneratePathing(spawnPoint);
+
+        /*
         if (pathstr != null)
         {
             string[] paths = pathstr.Split(',');
@@ -1160,25 +1180,31 @@ public class NetworkManager : MonoBehaviour {
                 }
             }
         }
-        StartCoroutine(GameManager.gm.SpawnEnemy(sp, pathing));
-        NotifySpawnEnemyAt(sp, pathing);
+        */
+        StartCoroutine(GameManager.gm.SpawnEnemyCoroutine(sp,spPath));
+        NotifySpawnEnemyAt(sp, spPath);
     }
 
     // As host, tell game manager to spawn enemy and tell clients to do so as well
-    public void SpawnEnemy(int sp)
+    public void SpawnEnemy(int sp, int spPath = -1)
     {
         if (sp == -1)
-            sp = UnityEngine.Random.Range(0, MapManager.mapManager.spawnPoints.Count);
+            sp = Random.Range(0, MapManager.mapManager.spawnPoints.Count);
+        if (spPath == -1)
+            spPath = Random.Range(0, MapManager.mapManager.pathsBySpawnPoint[sp].Count);
         GameObject spawnPoint = MapManager.mapManager.spawnPoints[sp];
-        List<GameObject> pathing = Enemy.GeneratePathing(spawnPoint);
-        StartCoroutine(GameManager.gm.SpawnEnemy(sp, pathing));
-        NotifySpawnEnemyAt(sp, pathing);
+
+        //List<GameObject> pathing = Enemy.GeneratePathing(spawnPoint);
+        //StartCoroutine(GameManager.gm.SpawnEnemy(sp, pathing));
+        StartCoroutine(GameManager.gm.SpawnEnemyCoroutine(sp, spPath));
+        NotifySpawnEnemyAt(sp, spPath);
     }
 
     // Notify players to spawn enemies
-    public void NotifySpawnEnemyAt(int spawnPoint, List<GameObject> pathing=null)
+    public void NotifySpawnEnemyAt(int spawnPoint, int spPath)
     {
-        string msg = "ENEMYSPAWN|" + activityLog.Count + "|" + spawnPoint + "|";
+        string msg = "ENEMYSPAWN|" + activityLog.Count + "|" + spawnPoint + "|" + spPath + "|";
+        /*
         if (pathing != null)
         {
             for(int i = 0; i < pathing.Count; i++)
@@ -1193,6 +1219,8 @@ public class NetworkManager : MonoBehaviour {
             msg.Trim(',');
             msg += '|';
         }
+        */
+        
         activityLog.Add(msg);
         if (isHost)
             Send(msg, reliableChannel, players);
