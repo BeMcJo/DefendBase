@@ -9,6 +9,7 @@ public class StatusIndicator : MonoBehaviour {
                      healthBarGauge; // Visual indicator of max health
     public GameObject damageIndicatorPrefab;
     public Text healthTxt;
+    public bool followTarget = true;
     public int prevHP;
     // Use this for initialization
     void Start()
@@ -49,13 +50,18 @@ public class StatusIndicator : MonoBehaviour {
         }
 
         // Update health bar based on target's health
-        healthBarGauge.position = target.transform.position +
-            new Vector3(
-                0,
-                objHeight +
-                //1 +
-                healthBarGauge.transform.GetComponent<RectTransform>().rect.height,
-                0);
+
+        // Follow Target
+        if (followTarget)
+        {
+            healthBarGauge.position = target.transform.position +
+                new Vector3(
+                    0,
+                    objHeight +
+                    //1 +
+                    healthBarGauge.transform.GetComponent<RectTransform>().rect.height,
+                    0);
+        }
 
         int hp = 0, maxHP = 1;
         // fetch target's current hp

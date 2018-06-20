@@ -35,7 +35,7 @@ public class ObjectiveHitIndicator : MonoBehaviour {
 
     public void SignalObjectiveIsHit()
     {
-        print(blinker == null);
+        //print(blinker == null);
         timeToLive = 5f + Time.time;
 
     }

@@ -287,7 +287,7 @@ public class Rotator : MonoBehaviour, IPointerDownHandler, IPointerUpHandler,IDr
 
     public void ResetItemWheel(int selectedAttribute)
     {
-        print("RESET WHEEL");
+        //print("RESET WHEEL");
         initialAngle = 0;
         transform.localEulerAngles = Vector3.zero;
         incrementor = 0;
@@ -304,7 +304,7 @@ public class Rotator : MonoBehaviour, IPointerDownHandler, IPointerUpHandler,IDr
             icon.GetChild(0).GetComponent<Text>().text = "Attribute " + itemOrder[i] + " \n" + GameManager.gm.myAttributes[itemOrder[i]];
         }
         */
-        print("CURIS:"+curItem);
+        //print("CURIS:"+curItem);
         //UpdateItemUI();
         EditSelectableAttributes();
     }
@@ -402,7 +402,7 @@ public class Rotator : MonoBehaviour, IPointerDownHandler, IPointerUpHandler,IDr
             //transform.GetChild(itemSwapIndex).GetChild(0).GetComponent<Text>().text = "Attribute " + (prevItem - 1 + attributeCt) % attributeCt;
 
         }
-        print(curItem);
+        //print(curItem);
         //int curItemIndex = (itemSwapIndex +)
         //itemUIContainer.GetChild(itemSwapIndex).GetChild(0).GetComponent<Text>().text = "Attribute " + awaitingItem + " \n" + GameManager.gm.myAttributes[awaitingItem];
         itemOrder[itemSwapIndex] = awaitingItem;

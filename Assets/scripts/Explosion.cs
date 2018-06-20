@@ -10,11 +10,13 @@ public class Explosion : MonoBehaviour {
     public string ownerType;
 	// Use this for initialization
 	void Start () {
-		
+        GameObject vfx = Instantiate(GameManager.gm.VFXPrefabs[1]);
+        vfx.transform.position = gameObject.transform.position;
 	}
-	
-	// Update is called once per frame
-	void Update () {
+    
+
+    // Update is called once per frame
+    void Update () {
         transform.localScale += new Vector3(growthRate, growthRate, growthRate);
         if (transform.localScale.x >= growthLimit)
             Destroy(gameObject);

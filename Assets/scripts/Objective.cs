@@ -9,11 +9,12 @@ public class Objective : MonoBehaviour {
     public int HP = 10, // Current health 
                maxHP = 10; // Max health
     public string objectiveType = "defend"; // Type of objective for different game modes
-    public GameObject[] storeUpgradeUIs; // UI for objective (repair objective)
+    //public GameObject[] storeUpgradeUIs; // UI for objective (repair objective)
 	// Use this for initialization
 	void Start () {
         id = ObjectiveCount;
         ObjectiveCount++;
+        /*
         Transform upgradeObjectivesDisplay = GameManager.gm.shopCanvas.transform.Find("Displays").Find("UpgradeObjectivesDisplay");
         for(int i = 0; i < storeUpgradeUIs.Length; i++)
         {
@@ -29,6 +30,7 @@ public class Objective : MonoBehaviour {
             storeUpgradeUIs[0].transform.Find("BuyBtn").GetComponent<Button>().onClick.AddListener(Repair);
         }
         storeUpgradeUIs[0].transform.Find("BuyBtn").GetComponent<Button>().interactable = HP == maxHP;
+        */
     }
 
     public void Reset()
@@ -44,7 +46,7 @@ public class Objective : MonoBehaviour {
         if (HP >= maxHP)
             return;
         NetworkManager.nm.ConfirmObjectiveRepair(id, -5, true);
-        storeUpgradeUIs[0].transform.Find("BuyBtn").GetComponent<Button>().interactable = false;
+        //storeUpgradeUIs[0].transform.Find("BuyBtn").GetComponent<Button>().interactable = false;
     }
 
     public void Repair(int hp)
@@ -85,7 +87,7 @@ public class Objective : MonoBehaviour {
         {
             OnHit();
         }
-        Transform healthBarGauge = storeUpgradeUIs[0].transform.Find("Health Bar Gauge");
+        //Transform healthBarGauge = storeUpgradeUIs[0].transform.Find("Health Bar Gauge");
         
         if (HP > maxHP)
         {
@@ -97,8 +99,8 @@ public class Objective : MonoBehaviour {
             GameManager.gm.DisplayEndGameNotifications(false);
             //GameManager.gm.DisplayDefeatNotification();
         }
-        storeUpgradeUIs[0].transform.Find("BuyBtn").GetComponent<Button>().interactable = HP != maxHP;
-        healthBarGauge.Find("Health Bar").localScale = new Vector3((float)HP / (float)maxHP, 1, 1);
+        //storeUpgradeUIs[0].transform.Find("BuyBtn").GetComponent<Button>().interactable = HP != maxHP;
+        //healthBarGauge.Find("Health Bar").localScale = new Vector3((float)HP / (float)maxHP, 1, 1);
     }
 
 	// Update is called once per frame

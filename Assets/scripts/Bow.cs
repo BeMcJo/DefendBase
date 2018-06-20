@@ -163,7 +163,7 @@ public class Bow : Weapon
         base.ChangeAttribute();
         if (arrow)
         {
-            print("change arrow attribute");
+            //print("change arrow attribute");
             arrow.GetComponent<Projectile>().SetAttribute(GameManager.gm.selectedAttribute);//.attributeID = GameManager.gm.selectedAttribute;
         }
     }
@@ -309,7 +309,7 @@ public class Bow : Weapon
             audioSrc.clip = soundClips[1];
             audioSrc.time = .1f;
             audioSrc.volume = 1f;
-            print(audioSrc.clip.length);
+            //print(audioSrc.clip.length);
             audioSrc.Play();
         }
         else

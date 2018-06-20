@@ -87,7 +87,7 @@ public class Enemy : MonoBehaviour
                  originalAttackSpd = 1f, // Default Attack Speed
                  attackRange, // Distance before being able to attack
                  effectiveAttackSpd; // Attack speed calculated and used
-    public bool isGrounded = false, isDoneMoving, isAttacking, isPerformingAction;
+    public bool isGrounded = false, isDoneMoving, isAttacking, isPerformingAction, isDead=false;
     protected string actionPerformed = "idle", ename = "enemy", dmgSourceType;
     protected Color originalColor;
     public GameObject go;
@@ -665,6 +665,8 @@ public class Enemy : MonoBehaviour
     // Update game rewards upon death
     public virtual void Die()
     {
+        if (isDead)
+            return;
         GameManager.gm.UpdateInGameCurrency(1);
         GameManager.gm.kills++;
 
@@ -672,7 +674,6 @@ public class Enemy : MonoBehaviour
         {
             if(dmgSourceID == GameManager.gm.player.GetComponent<PlayerController>().id)
             {
-                print("I killed it IT");
                 GameManager.gm.UpdateKillCount(1);
                 GameManager.gm.UpdateScore(50);
             }
@@ -698,9 +699,9 @@ public class Enemy : MonoBehaviour
             reward.GetComponent<Collider>().enabled = false;
         }
 
-        GameObject ps = Instantiate(GameManager.gm.enemyDeathVFXPrefab);
+        GameObject ps = Instantiate(GameManager.gm.VFXPrefabs[0]);//enemyDeathVFXPrefab);
         ps.transform.position = transform.position;
-
+        isDead = true;
         Destroy(gameObject);
     }
 
