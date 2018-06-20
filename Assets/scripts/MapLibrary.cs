@@ -212,9 +212,9 @@ public class MapLibrary {
 
         newMap.nodes[47].neighbors[2] = newMap.nodes[48];
 
-        newMap.nodes[48].neighbors[3] = newMap.nodes[49];
+        //newMap.nodes[48].neighbors[3] = newMap.nodes[49];
 
-        newMap.nodes[49].neighbors[2] = newMap.nodes[15];
+        //newMap.nodes[49].neighbors[2] = newMap.nodes[15];
 
         newMap.nodes[48].neighbors[2] = newMap.nodes[14];
 

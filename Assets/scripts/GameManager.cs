@@ -1453,6 +1453,7 @@ public class GameManager : MonoBehaviour {
                                     spawnPoint.transform.position.z);
         Enemy e = enemy.transform.GetComponent<Enemy>();
         e.SetTarget(spawnPoint);
+      
         if (spPath == -1)
             pathing = MapManager.mapManager.pathsBySpawnPoint[sp][UnityEngine.Random.Range(0, MapManager.mapManager.pathsBySpawnPoint[sp].Count)];//Enemy.GeneratePathing(spawnPoint);
         else

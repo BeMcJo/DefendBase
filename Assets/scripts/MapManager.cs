@@ -152,6 +152,8 @@ public class MapManager : MonoBehaviour {
                 src.transform.position = platforms[node.neighbors[node.neighborReference].id].transform.position + new Vector3(x, 0, z);
             }
 
+            bool hasNeighbors = false;
+
             // Check each neighbor to bind the hexNodes as source and destination nodes (creating digraph)
             for (int j = 0; j < 6; j++)
             {
@@ -180,8 +182,15 @@ public class MapManager : MonoBehaviour {
                         x = 0;
                     }
                     dest.transform.position = src.transform.position + new Vector3(x, 0, z);
+                    hasNeighbors = true;
                 }
             }
+
+            if (!hasNeighbors)
+            {
+                print("NODE " + i + " has no nebrs");
+            }
+            
         }
         //mapContainer.transform.localEulerAngles = GameManager.gm.playerOrientation; // Orient map to face in forward direction as player
 

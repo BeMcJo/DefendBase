@@ -99,7 +99,7 @@ public class Flyglet : Enemy
 
     public void Shoot(GameObject target)
     {
-        GameObject projectile = Instantiate(GameManager.gm.projectilePrefabs[0]);
+        GameObject projectile = Instantiate(GameManager.gm.projectilePrefabs[1]);
         Projectile p = projectile.GetComponent<Projectile>();
         projectile.transform.position = transform.position;
         projectile.GetComponent<Rigidbody>().AddForce(0, 500, 0);
