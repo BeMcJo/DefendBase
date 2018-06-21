@@ -93,6 +93,7 @@
     <Compile Include="Assets\scripts\Buff.cs" />
     <Compile Include="Assets\scripts\CameraController.cs" />
     <Compile Include="Assets\scripts\Checkmark.cs" />
+    <Compile Include="Assets\scripts\ContentSizeFitter.cs" />
     <Compile Include="Assets\scripts\DamageIndicator.cs" />
     <Compile Include="Assets\scripts\DebugManager.cs" />
     <Compile Include="Assets\scripts\Enemy.cs" />

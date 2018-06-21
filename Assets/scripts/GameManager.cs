@@ -140,6 +140,7 @@ public class GameManager : MonoBehaviour {
                       hitObjectiveIndicator, // Warns player that the objective is under attack
                       buffIconContainer, // holds buff icons
                       interactiveUIContainer, // holds interactive UI
+                      itemDropdownList, // holds list of (attribute) items
                       waveNotification; // Notifies player that enemies will spawn
 
     public Text scoreTxt; // Indicates how awesome you are
@@ -554,17 +555,31 @@ public class GameManager : MonoBehaviour {
         changeArrowBtn = quickAccessCanvas.transform.Find("ChangeArrowsBtn").gameObject;
         itemWheel = quickAccessCanvas.transform.Find("ItemWheel").gameObject;
         itemWheel.SetActive(false);
+
+        itemDropdownList = quickAccessCanvas.transform.Find("ItemDropdownList").GetChild(0).GetChild(0).gameObject;
+        ContentSizeFitter csf = itemDropdownList.GetComponent<ContentSizeFitter>();
         //quickAccessCanvas.SetActive(false);
         effectsCanvas = GameObject.Find("EffectsCanvas");
 
         myProjectiles.Clear();
         myAttributes.Clear();
         //Attribute.names = new string[attributePrefabs.Length];
+
+        // Add all attributes to inventory and instantiate them
         for(int i = 0; i < Attribute.names.Length; i++)
         {
             //Attribute.names[i] = "Attr " + i;
             myAttributes[i] = 2;
+            GameObject icon = Instantiate(iconPrefab);
+            icon.GetComponent<Selector>().id = i;
+            csf.AddItem(icon);
+            //icon.transform.SetParent(itemDropdownList.transform);
+            icon.name = "Attribute " + i;
+            icon.transform.localScale = new Vector3(1, 1, 1);
+            icon.transform.Find("ItemIcon").GetComponent<Image>().sprite = itemIcons[i];
+            icon.transform.Find("Selected BG").gameObject.SetActive(i == 0);
         }
+        itemDropdownList.transform.parent.parent.gameObject.SetActive(false);
 
         trapSpawnPrefab = new GameObject[trapPrefabs.Length];
         Transform trapDescriptions = descriptionDisplay.transform.Find("Trap Descriptions");
@@ -670,8 +685,8 @@ public class GameManager : MonoBehaviour {
         if(itemType == "Attribute")
         {
             myAttributes[itemID] += qty;
-            UpdateArrowQty();
-            itemWheel.GetComponent<Rotator>().ResetItemWheel(selectedAttribute);
+            UpdateArrowQty(itemID);
+            //itemWheel.GetComponent<Rotator>().ResetItemWheel(selectedAttribute);
         }
     }
 
@@ -687,13 +702,11 @@ public class GameManager : MonoBehaviour {
             {
                 print("OUT OF ITEM");
                 ChangeSelectedAttribute(0);
-                itemWheel.GetComponent<Rotator>().ResetItemWheel(0);
+                //itemWheel.GetComponent<Rotator>().ResetItemWheel(0);
             }
-            else
-            {
-                UpdateArrowQty();
-                itemWheel.GetComponent<Rotator>().UpdateItemUI();
-            }
+            UpdateArrowQty(itemID);
+                //itemWheel.GetComponent<Rotator>().UpdateItemUI();
+            
         }
     }
 
@@ -725,27 +738,39 @@ public class GameManager : MonoBehaviour {
         return index;
     }
 
-    public void UpdateArrowQty()
+    // Updates the visual indication of arrow amount
+    public void UpdateArrowQty(int itemID)
     {
-        changeArrowBtn.GetComponent<Image>().sprite = itemIcons[selectedAttribute];
-        changeArrowBtn.transform.Find("QtyTxt").GetComponent<Text>().text = "x";
-        if (selectedAttribute == 0)
+        if (itemID == selectedAttribute)
         {
-            changeArrowBtn.transform.Find("QtyTxt").GetComponent<Text>().text += "---";
+            changeArrowBtn.GetComponent<Image>().sprite = itemIcons[itemID];
+            changeArrowBtn.transform.Find("QtyTxt").GetComponent<Text>().text = "x";
+            if (itemID == 0)
+            {
+                changeArrowBtn.transform.Find("QtyTxt").GetComponent<Text>().text += "---";
+            }
+            else
+            {
+                changeArrowBtn.transform.Find("QtyTxt").GetComponent<Text>().text += myAttributes[itemID];
+            }
         }
-        else
-        {
-            changeArrowBtn.transform.Find("QtyTxt").GetComponent<Text>().text += myAttributes[selectedAttribute];
-        }
+        itemDropdownList.transform.GetChild(itemID).Find("QtyTxt").GetComponent<Text>().text = "x" + ((itemID == 0) ? "---" : ""+myAttributes[itemID]);
+        bool isEmpty = myAttributes[itemID] == 0;
+        
+        itemDropdownList.transform.GetChild(itemID).gameObject.SetActive(!isEmpty);
+        itemDropdownList.GetComponent<ContentSizeFitter>().SetItemActive(itemID, !isEmpty);
+        
     }
 
     public void ChangeSelectedAttribute(int attributeID)
     {
         if (attributeID == selectedAttribute)
             return;
+        itemDropdownList.transform.GetChild(selectedAttribute).GetComponent<Selector>().SetSelected(false);
+        itemDropdownList.transform.GetChild(attributeID).GetComponent<Selector>().SetSelected(true);
         selectedAttribute = attributeID;
         player.GetComponent<PlayerController>().wep.ChangeAttribute();
-        UpdateArrowQty();
+        UpdateArrowQty(attributeID);
     }
 
     public void OnHitEnemy()
@@ -831,6 +856,13 @@ public class GameManager : MonoBehaviour {
         blackout.GetComponent<Image>().color = c;
         print("staht");
         blackoutCoroutine = StartCoroutine(FadeBlackout());
+    }
+
+    public void ToggleArrowQtyList()
+    {
+        print(1);
+        GameObject arrowQtyList = itemDropdownList.transform.parent.parent.gameObject;
+        arrowQtyList.SetActive(!arrowQtyList.activeSelf);
     }
 
     public void DisplayEndGameNotifications(bool won)
@@ -1397,7 +1429,8 @@ public class GameManager : MonoBehaviour {
         //DisplayIntermission();
         if (NetworkManager.nm.isStarted)
         {
-            UpdateArrowQty();
+            for(int i = 0; i < myAttributes.Count; i++)
+                UpdateArrowQty(i);
             return;
         }
         // If not online, game manager handles creating player
@@ -1419,7 +1452,8 @@ public class GameManager : MonoBehaviour {
         {
             pc.EquipWeapon(w);
         }
-        UpdateArrowQty();
+        for (int i = 0; i < myAttributes.Count; i++)
+            UpdateArrowQty(i);
         StartWave(wave);
     }
 
@@ -1682,15 +1716,6 @@ public class GameManager : MonoBehaviour {
     {
         GameObject defense = SpawnDefense(type, typeID);
         defense.transform.position = location.transform.position;
-        //selectedDefense.transform.GetComponent<Collider>().enabled = false;
-        //selectedDefense.layer = LayerMask.NameToLayer("Ignore Raycast");
-        //Debug.Log(selectedDefense.transform.GetComponent<Collider>().GetType());
-        //Collider c = selectedDefense.transform.GetComponent<Collider>();
-        //if (c.GetType() == typeof(CapsuleCollider))
-        //    ((CapsuleCollider)c).center += new Vector3(0, -.75f, 0);
-        //Vector3 cam2world = mapCamera.ScreenToWorldPoint(t.position);
-        //selectedDefense.transform.position = new Vector3(cam2world.x, 2, cam2world.z + (15 * (mapCamera.orthographicSize / 55)));
-        //Debug.Log("HOLD");
     }
 
     public static float CosineFormula(float a, float b, float c)
@@ -1737,8 +1762,8 @@ public class GameManager : MonoBehaviour {
                         {
                             quickAccessDetail = "change";
                             //print("change arrow");
-                            itemWheel.SetActive(true);
-                            itemWheel.transform.GetComponent<Rotator>().SetInteractable(true);
+                            //itemWheel.SetActive(true);
+                            //itemWheel.transform.GetComponent<Rotator>().SetInteractable(true);
 
                             //mapUICanvas.SetActive(true);
                         } 
@@ -1781,8 +1806,9 @@ public class GameManager : MonoBehaviour {
                         else if (quickAccessDetail == "change")
                         {
                             // print("hide uui");
-                            itemWheel.transform.GetComponent<Rotator>().SetInteractable(false);
-                            itemWheel.SetActive(false);
+                            ToggleArrowQtyList();
+                            //itemWheel.transform.GetComponent<Rotator>().SetInteractable(false);
+                            //itemWheel.SetActive(false);
                             mapFingerID = -1;
                         }
                         quickAccessDetail = "";
