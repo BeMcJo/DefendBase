@@ -569,7 +569,7 @@ public class GameManager : MonoBehaviour {
         for(int i = 0; i < Attribute.names.Length; i++)
         {
             //Attribute.names[i] = "Attr " + i;
-            myAttributes[i] = 2;
+            myAttributes[i] = 0;
             GameObject icon = Instantiate(iconPrefab);
             icon.GetComponent<Selector>().id = i;
             csf.AddItem(icon);
@@ -755,7 +755,7 @@ public class GameManager : MonoBehaviour {
             }
         }
         itemDropdownList.transform.GetChild(itemID).Find("QtyTxt").GetComponent<Text>().text = "x" + ((itemID == 0) ? "---" : ""+myAttributes[itemID]);
-        bool isEmpty = myAttributes[itemID] == 0;
+        bool isEmpty = myAttributes[itemID] == 0 && itemID != 0;
         
         itemDropdownList.transform.GetChild(itemID).gameObject.SetActive(!isEmpty);
         itemDropdownList.GetComponent<ContentSizeFitter>().SetItemActive(itemID, !isEmpty);
@@ -860,7 +860,6 @@ public class GameManager : MonoBehaviour {
 
     public void ToggleArrowQtyList()
     {
-        print(1);
         GameObject arrowQtyList = itemDropdownList.transform.parent.parent.gameObject;
         arrowQtyList.SetActive(!arrowQtyList.activeSelf);
     }
@@ -1381,7 +1380,7 @@ public class GameManager : MonoBehaviour {
         onIntermission = false;
         paused = false;
         gameOver = false;
-        inGameCurrency = 100;
+        inGameCurrency = 0;
         startWaves = false;
         UpdateInGameCurrency(0);
         score = 0;

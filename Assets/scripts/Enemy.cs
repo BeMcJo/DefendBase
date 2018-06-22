@@ -26,8 +26,8 @@ public class Enemy : MonoBehaviour
         // Stats for Slimes ignore -> Normies
         new EnemyStats[]
         {
-            new EnemyStats(1, 0, 1, 1),
-            new EnemyStats(2, 2, 1.2f, 1.2f),
+            new EnemyStats(1, 1, 1, 1),
+            new EnemyStats(2, 1, 1.2f, 1.2f),
             new EnemyStats(2, 2, 1.25f, 1.25f),
             new EnemyStats(3, 2, 1.5f, 1.3f),
             new EnemyStats(3, 2, 1.5f, 1.5f)
