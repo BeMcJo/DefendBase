@@ -32,7 +32,7 @@ public abstract class Weapon : MonoBehaviour
         new WeaponStats
         ( 
             "Bow",
-            new int[] {1,1,1,2,2},
+            new int[] {1,1,1,1,2},
             new int[] {50,100,200,500},
             new float[] {16, 17,19,23,29},
             new float[] {2f,1.75f,1.5f,1.25f,1f},

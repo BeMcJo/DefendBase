@@ -124,6 +124,7 @@
     <Compile Include="Assets\scripts\RotatingShield.cs" />
     <Compile Include="Assets\scripts\Rotator.cs" />
     <Compile Include="Assets\scripts\Selector.cs" />
+    <Compile Include="Assets\scripts\Slider.cs" />
     <Compile Include="Assets\scripts\Slime.cs" />
     <Compile Include="Assets\scripts\Spinner.cs" />
     <Compile Include="Assets\scripts\StatusIndicator.cs" />

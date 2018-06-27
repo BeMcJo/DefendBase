@@ -176,7 +176,8 @@ public class GameManager : MonoBehaviour {
     public Sprite[] itemIcons;
     //Button upgradeWepBtn;
     Coroutine blackoutCoroutine,
-              waveNotificationCoroutine;
+              waveNotificationCoroutine,
+              frostBorderCoroutine;
 
     public AudioClip onEnemyHitSFX;
     //public List<AudioClip> 
@@ -472,6 +473,7 @@ public class GameManager : MonoBehaviour {
         playerStatusCanvas = GameObject.Find("PlayerStatusCanvas").gameObject;
         playerStatusCanvas.transform.Find("OptionsBtn").GetComponent<Button>().onClick.AddListener(ToggleOptionsCanvas);//DisplayOptions);
         playerStatusCanvas.transform.Find("MapBtn").GetComponent<Button>().onClick.AddListener(ToggleMapUICanvas);
+        playerStatusCanvas.transform.Find("MapBtn").gameObject.SetActive(false);
         hitObjectiveIndicator = playerStatusCanvas.transform.Find("ObjectiveHitIndicator").gameObject;
         buffIconContainer = playerStatusCanvas.transform.Find("BuffIconContainer").gameObject;
         interactiveUIContainer = playerStatusCanvas.transform.Find("InteractiveUIContainer").gameObject;
@@ -503,6 +505,9 @@ public class GameManager : MonoBehaviour {
         optionsPanel.transform.Find("ResumeBtn").GetComponent<Button>().onClick.AddListener(ResumeGame);
         optionsPanel.transform.Find("ExitBtn").GetComponent<Button>().onClick.AddListener(LeaveGame);
         optionsPanel.transform.Find("SettingsBtn").GetComponent<Button>().onClick.AddListener(ToggleInGameSettings);
+        //Transform leaveGameNotif = optionsPanel.transform.Find("LeaveGameNotification");//.GetComponent<Button>().onClick.AddListener(ToggleInGameSettings);
+        //leaveGameNotif.Find("CancelBtn").GetComponent<Button>().onClick.AddListener(ToggleLeaveGameNotification);
+        //leaveGameNotif.Find("LeaveBtn").GetComponent<Button>().onClick.AddListener(LeaveGame);
 
         settingsPanel = optionsCanvas.transform.Find("SettingsPanel").gameObject;
         settingsPanel.transform.Find("BackBtn").GetComponent<Button>().onClick.AddListener(ToggleInGameSettings);
@@ -569,17 +574,18 @@ public class GameManager : MonoBehaviour {
         for(int i = 0; i < Attribute.names.Length; i++)
         {
             //Attribute.names[i] = "Attr " + i;
-            myAttributes[i] = 0;
+            myAttributes[i] = 1;
             GameObject icon = Instantiate(iconPrefab);
             icon.GetComponent<Selector>().id = i;
             csf.AddItem(icon);
             //icon.transform.SetParent(itemDropdownList.transform);
             icon.name = "Attribute " + i;
+            icon.tag = "QuickAccess";
             icon.transform.localScale = new Vector3(1, 1, 1);
             icon.transform.Find("ItemIcon").GetComponent<Image>().sprite = itemIcons[i];
             icon.transform.Find("Selected BG").gameObject.SetActive(i == 0);
         }
-        itemDropdownList.transform.parent.parent.gameObject.SetActive(false);
+        //itemDropdownList.transform.parent.parent.gameObject.SetActive(false);
 
         trapSpawnPrefab = new GameObject[trapPrefabs.Length];
         Transform trapDescriptions = descriptionDisplay.transform.Find("Trap Descriptions");
@@ -668,6 +674,11 @@ public class GameManager : MonoBehaviour {
         b.SetActive(true);
     }
 
+    public void ToggleLeaveGameNotification()
+    {
+        Transform leaveGameNotif = optionsPanel.transform.Find("LeaveGameNotification");//.GetComponent<Button>().onClick.AddListener(ToggleInGameSettings);
+        leaveGameNotif.gameObject.SetActive(!leaveGameNotif.gameObject.activeSelf);//.GetComponent<Button>().onClick.AddListener(ToggleInGameSettings);
+    }
 
     public void SetPlayerOrientation()
     {
@@ -764,13 +775,18 @@ public class GameManager : MonoBehaviour {
 
     public void ChangeSelectedAttribute(int attributeID)
     {
-        if (attributeID == selectedAttribute)
-            return;
-        itemDropdownList.transform.GetChild(selectedAttribute).GetComponent<Selector>().SetSelected(false);
-        itemDropdownList.transform.GetChild(attributeID).GetComponent<Selector>().SetSelected(true);
-        selectedAttribute = attributeID;
-        player.GetComponent<PlayerController>().wep.ChangeAttribute();
-        UpdateArrowQty(attributeID);
+        if (attributeID != selectedAttribute)
+        {
+            //return;
+            itemDropdownList.transform.GetChild(selectedAttribute).GetComponent<Selector>().SetSelected(false);
+            itemDropdownList.transform.GetChild(attributeID).GetComponent<Selector>().SetSelected(true);
+            selectedAttribute = attributeID;
+            player.GetComponent<PlayerController>().wep.ChangeAttribute();
+            UpdateArrowQty(attributeID);
+        }
+        itemDropdownList.GetComponent<Slider>().SlideInDirection(true);
+        //ToggleArrowQtyList();
+        //itemDropdownList.transform.parent.parent.gameObject.SetActive(false);
     }
 
     public void OnHitEnemy()
@@ -860,8 +876,9 @@ public class GameManager : MonoBehaviour {
 
     public void ToggleArrowQtyList()
     {
-        GameObject arrowQtyList = itemDropdownList.transform.parent.parent.gameObject;
-        arrowQtyList.SetActive(!arrowQtyList.activeSelf);
+        itemDropdownList.GetComponent<Slider>().ToggleSlider();
+        //GameObject arrowQtyList = itemDropdownList.transform.parent.parent.gameObject;
+        //arrowQtyList.SetActive(!arrowQtyList.activeSelf);
     }
 
     public void DisplayEndGameNotifications(bool won)
@@ -893,6 +910,50 @@ public class GameManager : MonoBehaviour {
         {
             resultNotification.transform.Find("ResultTxt").GetComponent<Text>().text = "Oh No! The enemies broke\nthrough our defenses!";
         }
+    }
+
+    public bool FrostBorderIsVisible()
+    {
+        Transform frostBorder = effectsCanvas.transform.Find("Frost Border");
+        Color c = frostBorder.GetComponent<Image>().color;
+        c.a += .05f;
+        frostBorder.GetComponent<Image>().color = c;
+        return c.a >= .83f;
+    }
+
+    public bool FrostBorderIsInvisible()
+    {
+        Transform frostBorder = effectsCanvas.transform.Find("Frost Border");
+        Color c = frostBorder.GetComponent<Image>().color;
+        c.a -= .04f;
+        if (c.a <= 0f)
+            c.a = 0f;
+        frostBorder.GetComponent<Image>().color = c;
+        return c.a <= 0f;
+    }
+
+    public IEnumerator ShowFrostBorder()
+    {
+        yield return new WaitUntil(FrostBorderIsVisible);
+    }
+
+    public IEnumerator HideFrostBorder()
+    {
+        yield return new WaitUntil(FrostBorderIsInvisible);
+    }
+
+    public void FreezePlayer()
+    {
+        if (frostBorderCoroutine != null)
+            StopCoroutine(frostBorderCoroutine);
+        frostBorderCoroutine = StartCoroutine(ShowFrostBorder());
+    }
+
+    public void UnfreezePlayer()
+    {
+        if (frostBorderCoroutine != null)
+            StopCoroutine(frostBorderCoroutine);
+        frostBorderCoroutine = StartCoroutine(HideFrostBorder());
     }
 
     public void DisplayVictoryNotification()
@@ -1765,7 +1826,7 @@ public class GameManager : MonoBehaviour {
                             //itemWheel.transform.GetComponent<Rotator>().SetInteractable(true);
 
                             //mapUICanvas.SetActive(true);
-                        } 
+                        }
                         /*else if (selected.name == "ItemWheel" && quickAccessDetail == "change" && mapFingerID == -1)
                         {
                            // print("????");
@@ -1813,6 +1874,10 @@ public class GameManager : MonoBehaviour {
                         quickAccessDetail = "";
                         quickAccessCanvas.GetComponent<Canvas>().sortingOrder = playerStatusCanvas.GetComponent<Canvas>().sortingOrder - 1;
                         quickAccessFingerID = -1;
+                    }
+                    else
+                    {
+                        //itemDropdownList.GetComponent<Slider>().SlideInDirection(true);
                     }
                 }
             }

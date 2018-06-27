@@ -25,6 +25,12 @@ public class Buff : MonoBehaviour {
         buffDurationUI.transform.SetParent(GameManager.gm.buffIconContainer.transform);
         buffDurationUI.transform.localPosition = new Vector2(0, -200f);
         buffDurationUI.transform.localScale = new Vector3(1, 1, 1);
+        switch(buffName)
+        {
+            case "frozen":
+                GameManager.gm.FreezePlayer();
+                break;
+        }
     }
 
     /* unnecessary?
@@ -42,6 +48,12 @@ public class Buff : MonoBehaviour {
             Destroy(cond);
         }
         Destroy(buffDurationUI);
+        switch (buffName)
+        {
+            case "frozen":
+                GameManager.gm.UnfreezePlayer();
+                break;
+        }
     }
 
     // Update is called once per frame
