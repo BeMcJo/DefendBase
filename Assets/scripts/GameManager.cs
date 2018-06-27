@@ -1784,6 +1784,7 @@ public class GameManager : MonoBehaviour {
         return Mathf.Acos(sumOfSquares / 2 / a / b) * Mathf.Rad2Deg;
     }
 
+    // Handle quick access actions (upgrade weapon or switch arrows) and other tap actions
     public void HandleQuickAccessActivities()
     {
         if (edittingMap)
@@ -1809,6 +1810,7 @@ public class GameManager : MonoBehaviour {
                         GameObject selected = EventSystem.current.currentSelectedGameObject;
                         //Debug.Log(selected.name + " " + EventSystem.current.currentSelectedGameObject.tag);
                         string tag = selected.tag;
+                       
                         if (tag != "QuickAccess")
                             return;
                         if (selected.name == "UpgradeWepBtn" && quickAccessDetail == "")

@@ -67,7 +67,7 @@ public class Projectile : MonoBehaviour {
     {
         GameObject explosion = Instantiate(GameManager.gm.attributePrefabs[attributeID]);
         explosion.transform.position = transform.position;
-        explosion.transform.GetComponent<Explosion>().dmg = 5;
+        explosion.transform.GetComponent<Explosion>().dmg = 1;
         explosion.transform.GetComponent<Explosion>().growthLimit = 14;
         explosion.transform.GetComponent<Explosion>().ownerID = ownerID;
         explosion.transform.GetComponent<Explosion>().ownerType = ownerType;

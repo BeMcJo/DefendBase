@@ -8,8 +8,15 @@ public class Explosion : MonoBehaviour {
     public int dmg = 10,
                ownerID;
     public string ownerType;
-	// Use this for initialization
-	void Start () {
+    public List<GameObject> alreadyHit;
+
+    private void Awake()
+    {
+        alreadyHit = new List<GameObject>();
+    }
+
+    // Use this for initialization
+    void Start () {
         GameObject vfx = Instantiate(GameManager.gm.VFXPrefabs[1]);
         vfx.transform.position = gameObject.transform.position;
 	}
@@ -39,6 +46,9 @@ public class Explosion : MonoBehaviour {
                 t = t.parent;
                 e = t.GetComponent<Enemy>();
             }
+            if (alreadyHit.Contains(e.gameObject))
+                return;
+            alreadyHit.Add(e.gameObject);
             e.OnHit();
             if (NetworkManager.nm.isStarted)
             {

@@ -83,12 +83,22 @@ public class PlayerController : MonoBehaviour {
     // Update is called once per frame
     void Update () {
         // Don't do anything if this player isn't in my control
-        if (!IsMyPlayer())
+        if (!IsMyPlayer() || !canPerformActions)
         {
             return;
         }
         PlayerMobileInput();
         PlayerPCInput();
+        if(Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Began)
+        {
+            Ray raycast = playerCam.ScreenPointToRay(Input.GetTouch(0).position);
+            RaycastHit raycastHit;
+            if(Physics.Raycast(raycast, out raycastHit))
+            {
+                if (raycastHit.collider.tag == "Reward")
+                    raycastHit.collider.GetComponent<Floater>().OnHit();
+            }
+        }
     }
 
     // Calculates the status of player based on the buffType that changed
@@ -271,8 +281,6 @@ public class PlayerController : MonoBehaviour {
     // Orient player perspective
     private void RotatePlayer()
     {
-        if (!canPerformActions)
-            return;
 
         float dist = Vector3.Distance(gyro.rotationRateUnbiased, Vector3.zero);
         //playerCam.transform.Rotate(Input.gyro.rotationRate);
