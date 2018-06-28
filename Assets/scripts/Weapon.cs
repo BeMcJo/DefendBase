@@ -125,6 +125,7 @@ public abstract class Weapon : MonoBehaviour
         //itemUI.transform.Find("ItemDescription").GetComponent<Text>().text = statsByLevel[wepID].name + " Lvl." + lvl;
         if (purchased)
         {
+            print(1);
             itemUI.transform.Find("BuyBtn").GetChild(0).GetComponent<Text>().text = "Upgrade\n" + statsByLevel[wepID].costToUpgrade[lvl] + "\nLvl " + (lvl + 1);
             if (user && user.gameObject == GameManager.gm.player)
             {
@@ -135,6 +136,7 @@ public abstract class Weapon : MonoBehaviour
         }
         else
         {
+            print(2);
             itemUI.transform.Find("BuyBtn").GetChild(0).GetComponent<Text>().text = "Purchase\n" + statsByLevel[wepID].price;
             if (user == null)
                 itemUI.transform.SetParent(GameManager.gm.shopCanvas.transform.Find("Displays").Find("StoreWeaponsDisplay").GetChild(0));

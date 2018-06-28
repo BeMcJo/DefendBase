@@ -688,7 +688,7 @@ public class Enemy : MonoBehaviour
         //GameManager.gm.enemies.Remove(id);
         List<GameObject> rewards = new List<GameObject>();
         //GameManager.gm.UpdateItem("Attribute", 1, 1);
-        float spawnRewardChance = Random.Range(1.0f, 1.25f);
+        float spawnRewardChance = Random.Range(0.0f, 1.25f);
         //print((int)spawnRewardChance);
         //spawnRewardChance = 1;
         for (int i = 0; i < (int)spawnRewardChance; i++)

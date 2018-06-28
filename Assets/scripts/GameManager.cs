@@ -21,6 +21,7 @@ public class PlayerData
                wepLvl,
                wepID,
                totalKills;
+    public int[] arrowQuantities;
 
     public PlayerData()
     {
@@ -33,6 +34,19 @@ public class PlayerData
         totalKills = 0;
         wepID = 0;
         wepLvl = 0;
+        arrowQuantities = new int[Attribute.names.Length];
+    }
+}
+
+[Serializable]
+// Saves data outside game session
+public class PersonalData
+{
+    public int playerCurrency;
+
+    public PersonalData()
+    {
+        playerCurrency = 0;
     }
 }
 
@@ -40,6 +54,7 @@ public class GameManager : MonoBehaviour {
     public static GameManager gm; // Single existing game manager
     public static bool Debugging; // Enables in game debugging
     public PlayerData data; // Information about any saved game
+    public PersonalData personalData; // Information about player stats and records
 
     public Dictionary<int, Enemy> enemies; // Keeps track of enemies spawned in game
     public Dictionary<int, Trap> traps; // Keeps track of traps spawned in game
@@ -188,11 +203,17 @@ public class GameManager : MonoBehaviour {
     {
         BinaryFormatter bf = new BinaryFormatter();
         string path = Application.persistentDataPath + "/" + type + ".dat";
+        FileStream file;
         if (!File.Exists(path))
         {
-            File.Create(path);
+            print("nonexistent making");
+            file = File.Create(path);
         }
-        FileStream file = File.Open(path, FileMode.Open);
+        else
+        {
+            print("found");
+            file = File.Open(path, FileMode.Open);
+        }
 
         switch (type)
         {
@@ -204,6 +225,15 @@ public class GameManager : MonoBehaviour {
                 data.inGameCurrency = inGameCurrency;
                 data.score = score;
                 data.difficulty = difficulty;
+                if (myAttributes != null)
+                {
+                    print(Attribute.names.Length + " " + myAttributes.Count);
+                    foreach(KeyValuePair<int,int> kvp in myAttributes)
+                    {
+                        data.arrowQuantities[kvp.Key] = kvp.Value;
+                    }
+                }
+                //data.currency = playerCurrency;
                 Debug.Log(inGame + " " + wave);
                 if (objective != null)
                 {
@@ -221,6 +251,15 @@ public class GameManager : MonoBehaviour {
                 data.wave = wave;
                 bf.Serialize(file, data);
                 break;
+
+            case "setupMain":
+                print("seting");
+                PersonalData personalData = new PersonalData();
+                if (gm.personalData != null)
+                    personalData = gm.personalData;
+                    //personalData.playerCurrency = playerCurrency;
+                bf.Serialize(file, personalData);
+                break;
         }
         
         file.Close();
@@ -230,6 +269,7 @@ public class GameManager : MonoBehaviour {
     // Load data based on the type
     public void Load(string type)
     {
+        print(Application.persistentDataPath);
         string path = Application.persistentDataPath + "/" + type + ".dat";
         if (File.Exists(path))
         {
@@ -249,6 +289,12 @@ public class GameManager : MonoBehaviour {
                 case "continuedGame":
                     PlayerData data = (PlayerData)bf.Deserialize(file);
                     gm.data = data;
+                    break;
+
+                // Load player stats/achievements
+                case "setupMain":
+                    PersonalData personalData = (PersonalData)bf.Deserialize(file);
+                    gm.personalData = personalData;
                     break;
             }
             //Debug.Log(file.Length);
@@ -336,11 +382,14 @@ public class GameManager : MonoBehaviour {
     public void LoadMainScene()
     {
         Load("continuedGame");
+        Load("setupMain");
         scene = "main";
         inGame = false;
 
         isSettingPlayerOrientation = false;
         mainMenuCanvas = GameObject.Find("MainMenuCanvas");
+
+        mainMenuCanvas.transform.Find("PlayerCurrency").GetChild(0).GetComponent<Text>().text = "" + personalData.playerCurrency;
 
         Transform btnContainer = mainMenuCanvas.transform.Find("ButtonsContainer");
         btnContainer.Find("PlayBtn").GetComponent<Button>().onClick.AddListener(GoToGameScene);
@@ -883,6 +932,7 @@ public class GameManager : MonoBehaviour {
 
     public void DisplayEndGameNotifications(bool won)
     {
+        print("ENDGAME");
         if (selectedDefense)
             selectedDefense.SetActive(false);
 
@@ -910,6 +960,8 @@ public class GameManager : MonoBehaviour {
         {
             resultNotification.transform.Find("ResultTxt").GetComponent<Text>().text = "Oh No! The enemies broke\nthrough our defenses!";
         }
+        personalData.playerCurrency += score / 1000 + inGameCurrency / 20;
+        Save("setupMain");
     }
 
     public bool FrostBorderIsVisible()
@@ -1443,7 +1495,7 @@ public class GameManager : MonoBehaviour {
         gameOver = false;
         inGameCurrency = 0;
         startWaves = false;
-        UpdateInGameCurrency(0);
+        UpdateInGameCurrency(20);
         score = 0;
         kills = 0;
         personalKills = 0;
@@ -1453,9 +1505,6 @@ public class GameManager : MonoBehaviour {
         totalKills = 0;
         MapManager.mapManager.LoadMap(0);
         Weapon w = null;
-        UpdateInGameCurrency(0);
-        UpdateKillCount(0);
-        UpdateScore(0);
         /*GameObject trap = Instantiate(trapPrefabs[0]);
         traps.Add(0, trap.GetComponent<Trap>());
         trap.transform.SetParent(playerRotation.transform);
@@ -1465,6 +1514,23 @@ public class GameManager : MonoBehaviour {
         trap.transform.SetParent(playerRotation.transform);
         trap.transform.localPosition = new Vector3(5, 2, -72);
        */
+        //DisplayIntermission();
+        if (NetworkManager.nm.isStarted)
+        {
+            UpdateInGameCurrency(0);
+            UpdateKillCount(0);
+            UpdateScore(0);
+            for (int i = 0; i < myAttributes.Count; i++)
+                UpdateArrowQty(i);
+            return;
+        }
+        
+        // If not online, game manager handles creating player
+        player = Instantiate(playerPrefab);
+        PlayerController pc = player.transform.GetComponent<PlayerController>();
+        //pc.SetOrientation(playerOrientation);
+        player.transform.position = playerSpawnPoints.transform.GetChild(0).position;
+        player.transform.SetParent(playerRotation.transform);
         if (continuedGame)
         {
             Debug.Log("Continued Game");
@@ -1473,47 +1539,47 @@ public class GameManager : MonoBehaviour {
                 Debug.Log("fetching saved data");
                 score = data.score;
                 totalKills = data.totalKills;
+                personalKills = totalKills;
                 wave = data.wave;
                 inGameCurrency = data.inGameCurrency;
+                print(score + " " + totalKills + " " + wave + " " + inGameCurrency);
                 objective.transform.GetComponent<Objective>().HP = data.objectiveHP;
                 w = Instantiate(weaponPrefabs[data.wepID]).transform.GetComponent<Weapon>();
                 w.lvl = data.wepLvl;
-                w.purchased = true;
-            }
-            if (wave % 10 == 0)
-            {
-                DisplayIntermission();
-                return;
+                //w.user = player;
+                //w.purchased = true;
+                for (int i = 0; i < Attribute.names.Length; i++)
+                {
+                    myAttributes[i] = data.arrowQuantities[i];
+                }
             }
         }
-        //DisplayIntermission();
-        if (NetworkManager.nm.isStarted)
-        {
-            for(int i = 0; i < myAttributes.Count; i++)
-                UpdateArrowQty(i);
-            return;
-        }
-        // If not online, game manager handles creating player
-        player = Instantiate(playerPrefab);
-        PlayerController pc = player.transform.GetComponent<PlayerController>();
-        //pc.SetOrientation(playerOrientation);
-        player.transform.position = playerSpawnPoints.transform.GetChild(0).position;
-        player.transform.SetParent(playerRotation.transform);
         if (w == null)
         {
             for (int i = 0; i < 1; i++)
             {
                 GameObject wep = Instantiate(weaponPrefabs[0]);
                 pc.EquipWeapon(wep.transform.GetComponent<Weapon>());
-                pc.wep.purchased = true;
             }
         }
         else
         {
             pc.EquipWeapon(w);
         }
+
+        pc.wep.purchased = true;
+        UpdateInGameCurrency(0);
+        UpdateKillCount(0);
+        UpdateScore(0);
+        playerStatusCanvas.transform.Find("Wave").Find("Text").GetComponent<Text>().text = (wave) + "";
         for (int i = 0; i < myAttributes.Count; i++)
             UpdateArrowQty(i);
+
+        if (wave % 5 == 0)
+        {
+            DisplayIntermission();
+            return;
+        }
         StartWave(wave);
     }
 

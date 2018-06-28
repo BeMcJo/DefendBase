@@ -18,12 +18,12 @@ public class Selector : MonoBehaviour, IPointerClickHandler,IPointerUpHandler {
 
     public void OnPointerUp(PointerEventData eventData)
     {
-        print("FINUP");
+        //print("FINUP");
     }
 
     public void SetSelected(bool isSelected)
     {
-        print("SELECTED");
+        //print("SELECTED");
         transform.Find("Selected BG").gameObject.SetActive(isSelected);
     }
 
