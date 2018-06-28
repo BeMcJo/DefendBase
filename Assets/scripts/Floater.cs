@@ -23,7 +23,7 @@ public class Floater : MonoBehaviour {
         biasedDir = new Vector3(Random.Range(-.5f, 0.5f) / 5, Random.Range(0, 0.5f), Random.Range(-.5f, 0.5f)/5);
         biasedTorq = new Vector3(Random.Range(-.5f, 0.5f), Random.Range(-.5f, 0.5f), Random.Range(-.5f, 0.5f));
         rb.AddForce(biasedDir* Random.Range(20,250));
-        rb.AddTorque(biasedTorq* Random.Range(20, 250));
+        rb.AddTorque(biasedTorq* Random.Range(100, 250));
         //GetComponent<Collider>().enabled = true;
         rewardType = Random.Range(0, rewardTypes.Length);
         //rewardType = 1;
@@ -41,8 +41,9 @@ public class Floater : MonoBehaviour {
                 c = Color.yellow;
                 break;
         }
+        transform.Find("RewardOptions").GetChild(rewardType).gameObject.SetActive(true);
         c.a = 135.0f / 255.0f;
-        r.material.color = c;
+        //r.material.color = c;
         StartCoroutine(Invincibility());
         ttl = 30f;
     }
@@ -92,7 +93,7 @@ public class Floater : MonoBehaviour {
         //rewardType = 1;
         switch (rewardType)
         {
-            // attribute
+            // attribute (arrow types)
             case 0:
                 GameManager.gm.UpdateItem("Attribute", 1, 2);
                 itemGainIndicator = Instantiate(GameManager.gm.indicatorPrefabs[0]);
