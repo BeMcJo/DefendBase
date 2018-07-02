@@ -110,6 +110,7 @@ public class Bow : Weapon
         arrow.transform.rotation = bulletSpawn.transform.rotation;
         arrow.transform.SetParent(transform);
         arrow.transform.localPosition = bulletSpawn.transform.localPosition;
+        arrow.GetComponent<Arrow>().attributeID = user.selectedAttribute;
         //arrow.GetComponent<Projectile>().SetAttribute(GameManager.gm.selectedAttribute);//.attributeID = GameManager.gm.selectedAttribute;
     }
 
@@ -158,13 +159,13 @@ public class Bow : Weapon
         return false;
     }
 
-    public override void ChangeAttribute()
+    public override void SetAttribute(int attributeID)
     {
-        base.ChangeAttribute();
+        base.SetAttribute(attributeID);
         if (arrow)
         {
             //print("change arrow attribute");
-            arrow.GetComponent<Projectile>().SetAttribute(GameManager.gm.selectedAttribute);//.attributeID = GameManager.gm.selectedAttribute;
+            arrow.GetComponent<Projectile>().SetAttribute(attributeID);//.attributeID = GameManager.gm.selectedAttribute;
         }
     }
 
@@ -295,8 +296,7 @@ public class Bow : Weapon
             arrow = null;
             reloading = true;
             reloadTime = statsByLevel[wepID].timeToReload[lvl];
-            if(user.IsMyPlayer())
-                GameManager.gm.UseItem("Attribute", GameManager.gm.selectedAttribute);
+            
 
             // Reset bowstring vertices
 
@@ -311,6 +311,8 @@ public class Bow : Weapon
             audioSrc.volume = 1f;
             //print(audioSrc.clip.length);
             audioSrc.Play();
+            if (user.IsMyPlayer())
+                GameManager.gm.UseItem("Attribute", user.selectedAttribute);//GameManager.gm.selectedArrowAttribute);
         }
         else
         {

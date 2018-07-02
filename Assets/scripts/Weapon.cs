@@ -211,7 +211,7 @@ public abstract class Weapon : MonoBehaviour
         shootBtn.SetActive(!isInteractive && !GameManager.gm.edittingMap);
     }
 
-    public virtual void ChangeAttribute()
+    public virtual void SetAttribute(int attributeID)
     {
     }
 
@@ -225,6 +225,7 @@ public abstract class Weapon : MonoBehaviour
     // Handle either buying weapon or upgrading it
     public void Purchase()
     {
+        // If buying from store
         if (!purchased)
         {
             if(GameManager.gm.inGameCurrency >= statsByLevel[wepID].price)
@@ -239,6 +240,7 @@ public abstract class Weapon : MonoBehaviour
                 Debug.Log("CANT BUYT");
             }
         }
+        // If upgrading weapon
         else
         {
             if(GameManager.gm.inGameCurrency >= statsByLevel[wepID].costToUpgrade[lvl])
@@ -259,6 +261,10 @@ public abstract class Weapon : MonoBehaviour
                     itemUI.transform.Find("BuyBtn").GetChild(0).GetComponent<Text>().text = "Upgrade\n" + statsByLevel[wepID].costToUpgrade[lvl] + "\nLvl " + (lvl + 1);
                 }
                 SetItemDescription();
+                if (NetworkManager.nm.isStarted)
+                {
+                    NetworkManager.nm.NotifyWeaponUpgraded(wepID, lvl);
+                }
                 //itemUI.transform.Find("ItemDescription").GetComponent<Text>().text = statsByLevel[wepID].name + " Lvl." + lvl;
             }
             else
@@ -274,10 +280,10 @@ public abstract class Weapon : MonoBehaviour
     }
 
     // Format:
-    // WEP|Using weapon|charge power|
+    // WEP|Using weapon|charge power|wep ID|wep lvl|
     public virtual string NetworkInformation()
     {
-        return "WEP|" + inUse + "|" + chargePower + "|";
+        return "WEP|" + inUse + "|" + chargePower + "|" + wepID + "|" + lvl + "|";
     }
     
     // Extract network information

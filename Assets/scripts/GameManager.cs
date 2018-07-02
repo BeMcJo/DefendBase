@@ -830,8 +830,12 @@ public class GameManager : MonoBehaviour {
             itemDropdownList.transform.GetChild(selectedAttribute).GetComponent<Selector>().SetSelected(false);
             itemDropdownList.transform.GetChild(attributeID).GetComponent<Selector>().SetSelected(true);
             selectedAttribute = attributeID;
-            player.GetComponent<PlayerController>().wep.ChangeAttribute();
+            player.GetComponent<PlayerController>().SetAttribute(attributeID);//.wep.ChangeAttribute();
             UpdateArrowQty(attributeID);
+            if (NetworkManager.nm.isStarted)
+            {
+                NetworkManager.nm.NotifyPlayerChangedArrowAttribute(attributeID);
+            }
         }
         itemDropdownList.GetComponent<Slider>().SlideInDirection(true);
         //ToggleArrowQtyList();
@@ -1495,7 +1499,7 @@ public class GameManager : MonoBehaviour {
         gameOver = false;
         inGameCurrency = 0;
         startWaves = false;
-        UpdateInGameCurrency(20);
+        UpdateInGameCurrency(100);
         score = 0;
         kills = 0;
         personalKills = 0;

@@ -11,11 +11,14 @@ public class StatusIndicator : MonoBehaviour {
     public Text healthTxt;
     public bool followTarget = true;
     public int prevHP;
+    public float animateRate;
+    public Image healthBarTrailer;
     // Use this for initialization
     void Start()
     {
         healthBar = transform.Find("Health Bar Gauge").Find("Health Bar");
         healthTxt = transform.Find("HealthTxt").GetComponent<Text>();
+        healthBarTrailer = healthBar.parent.Find("Health Bar Trailer").GetComponent<Image>();
         healthBarGauge = healthBar.parent;
         prevHP = -1;
     }
@@ -77,7 +80,7 @@ public class StatusIndicator : MonoBehaviour {
             hp = o.HP;
             maxHP = o.maxHP;
         }
-
+        float healthPercentage = (float) hp / maxHP;
         // check if hp differed from previous known hp
         if(prevHP != -1 && prevHP != hp)
         {
@@ -87,6 +90,8 @@ public class StatusIndicator : MonoBehaviour {
             damageIndicator.transform.position = healthBarGauge.position + new Vector3(0,healthBarGauge.GetComponent<RectTransform>().rect.height,0);
             damageIndicator.transform.LookAt(GameManager.gm.player.transform.GetComponent<PlayerController>().playerCam.transform);
             damageIndicator.transform.GetChild(0).GetComponent<Text>().text = "" + dif;
+            if (dif > 0)
+                healthBarTrailer.fillAmount = healthPercentage;
         }
 
         // make sure hp is valid
@@ -97,5 +102,8 @@ public class StatusIndicator : MonoBehaviour {
         prevHP = hp;
         healthTxt.text = hp + "/" + maxHP;
         healthTxt.transform.position = healthBarGauge.position - new Vector3(0, .1f, 0);
+        healthBarTrailer.fillAmount *= animateRate;
+        if (healthBarTrailer.fillAmount < healthPercentage)
+            healthBarTrailer.fillAmount = healthPercentage;
     }
 }

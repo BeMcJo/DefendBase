@@ -6,6 +6,7 @@ using UnityEngine.UI;
 public class PlayerController : MonoBehaviour {
     public float noiseTolerance = .05f;
     public int id; // Used to assign who controls this player online
+    public int selectedAttribute; // current arrow selected
     public bool gyroEnabled, // Is there gyroscope feature on this device? 
                 useGyro, // Are we using gyroscope?
                 canPerformActions; // Am I stunned, frozen, or restricted?
@@ -78,6 +79,13 @@ public class PlayerController : MonoBehaviour {
     public bool IsMyPlayer()
     {
         return gameObject == GameManager.gm.player;
+    }
+
+    // Sets arrow attribute to aID
+    public void SetAttribute(int aID)
+    {
+        selectedAttribute = aID;
+        wep.SetAttribute(aID);
     }
 
     // Update is called once per frame

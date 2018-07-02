@@ -28,7 +28,7 @@ public class Projectile : MonoBehaviour {
         if (tr)
             tr.enabled = false;
 
-        SetAttribute(GameManager.gm.selectedAttribute);
+        //SetAttribute(GameManager.gm.selectedArrowAttribute);
     }
 
     public virtual void Shoot(GameObject t, string ownerType, int ownerID, int dmg)
@@ -102,11 +102,74 @@ public class Projectile : MonoBehaviour {
         if (ownerType != "Player")
             return;
 
+        // If not my projectile
         if (id != GameManager.gm.player.transform.GetComponent<PlayerController>().id)
+        {
+
+            if (collision.tag == "SweetSpot")
+            {
+                //print("SWEET");
+                //collision.GetComponent<SweetSpot>().TakeDamage(gameObject);
+
+                if (attributeID == 1)
+                {
+                    CreateExplosion();
+                }
+                //e.OnHit();
+                // If piercing attribute, don't stop arrow
+                if (attributeID != 2)
+                {
+                    deflected = true;
+                    transform.GetComponent<Rigidbody>().velocity = Vector3.zero;
+                    transform.GetComponent<Rigidbody>().useGravity = false;
+                    tr.enabled = false;
+                    transform.SetParent(collision.transform);
+                }
+            }
+
+            // If non-enemy projectile hits enemy
+            else if (collision.transform.tag == "Enemy" && ownerType != "Enemy")
+            {
+                //print("PLAYER OTHERhit");
+                // Indicate you hit enemy (sound + visual)
+                //GameManager.gm.OnHitEnemy();
+                // If can damage enemy and this is shot by my player
+                if (!hitGround && !deflected)
+                {
+                    if (attributeID == 1)
+                    {
+                        CreateExplosion();
+                    }
+                    // If piercing attribute, don't stop arrow
+                    if (attributeID != 2)
+                    {
+                        deflected = true;
+                        transform.GetComponent<Rigidbody>().velocity = Vector3.zero;
+                        transform.GetComponent<Rigidbody>().useGravity = false;
+                        tr.enabled = false;
+                        transform.SetParent(collision.transform);
+                    }
+                   
+                }
+            }
+            else if (collision.transform.tag == "Ground" || collision.transform.tag == "Impenetrable" || collision.transform.tag == "Path")
+            {
+                //print(collision.transform.name);
+                if (!isShot)
+                    return;
+
+                if (attributeID == 1)
+                {
+                    CreateExplosion();
+                }
+                hitGround = true;
+                deflected = true;
+                Destroy(gameObject);
+            }
             return;
+        }
 
-
-        print("HIT SOMTRHING:" + collision.tag + " " + collision.name);
+        //print("HIT SOMTRHING:" + collision.tag + " " + collision.name);
 
         if (collision.tag == "Reward")
         {
@@ -114,7 +177,7 @@ public class Projectile : MonoBehaviour {
             collision.GetComponent<Floater>().OnHit();
         }
 
-        if(collision.tag == "SweetSpot")
+        else if(collision.tag == "SweetSpot")
         {
             print("SWEET");
             collision.GetComponent<SweetSpot>().TakeDamage(gameObject);
@@ -136,7 +199,7 @@ public class Projectile : MonoBehaviour {
         }
 
         // If non-enemy projectile hits enemy
-        if (collision.transform.tag == "Enemy" && ownerType != "Enemy")
+        else if (collision.transform.tag == "Enemy" && ownerType != "Enemy")
         {
             print("hit");
             // Indicate you hit enemy (sound + visual)

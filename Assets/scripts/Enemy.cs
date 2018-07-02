@@ -721,7 +721,7 @@ public class Enemy : MonoBehaviour
     // Inflict damage to health
     public virtual bool TakeDamage(int dmg)
     {
-        print("enemy " + id + " took dmg" + dmg);
+        //print("enemy " + id + " took dmg" + dmg);
         NetworkManager.nm.debugLog.Add("enemy " + id + " took dmg" + dmg);
         health -= dmg;
         return true;

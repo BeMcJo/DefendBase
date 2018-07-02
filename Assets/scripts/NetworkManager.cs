@@ -416,6 +416,10 @@ public class NetworkManager : MonoBehaviour {
 
         bool wepInUse = bool.Parse(data[4]);
         float chargePower = float.Parse(data[5]);
+        int wepID = int.Parse(data[6]);
+        int wepLvl = int.Parse(data[7]);
+
+        p.wep.SetLevel(wepLvl);
         if (wepInUse)
         {
             if (!p.wep.inUse)
@@ -433,6 +437,62 @@ public class NetworkManager : MonoBehaviour {
             }
         }
         
+    }
+    
+    // Tell other players that I have upgraded my weapon
+    public void NotifyWeaponUpgraded(int wepID, int lvl)
+    {
+        print("telling others uopgrading wep");
+        string msg = "WEPUPGRADE|" + ourClientID + "|" + wepID + "|" + lvl + "|";
+        if (isHost)
+        {
+            Send(msg, reliableChannel);
+        }
+        else
+        {
+            Send(msg, reliableChannel, hostID);
+        }
+    }
+
+    // Update player weapon stats
+    public void OnWeaponUpgraded(string[] data)
+    {
+        int cnnID = int.Parse(data[1]);
+        if (cnnID == ourClientID)
+            return;
+
+        int wepID = int.Parse(data[2]);
+        int lvl = int.Parse(data[3]);
+        players[cnnID].playerGO.GetComponent<PlayerController>().wep.SetLevel(lvl);
+        print("PLAYER " + cnnID + " lvled wep to " + lvl);
+        
+    }
+
+    // Tell other players I have changed my arrow attribute
+    public void NotifyPlayerChangedArrowAttribute(int attributeID)
+    {
+        print("changing attribute");
+        string msg = "ARROWCHANGE|" + ourClientID + "|" + attributeID + "|";
+        if (isHost)
+        {
+            Send(msg, reliableChannel);
+        }
+        else
+        {
+            Send(msg, reliableChannel, hostID);
+        }
+    }
+
+    // Update player arrow attribute
+    public void OnPlayerChangedArrowAttribute(string[] data)
+    {
+        int cnnID = int.Parse(data[1]);
+        if (cnnID == ourClientID)
+            return;
+
+        int aID = int.Parse(data[2]);
+        players[cnnID].playerGO.GetComponent<PlayerController>().SetAttribute(aID);
+        print("set attr id");
     }
 
     // Check if the received broadcast is a Host, display a join button for that host if new
@@ -618,6 +678,11 @@ public class NetworkManager : MonoBehaviour {
 
                 switch (splitData[0])
                 {
+                    // Client changed their arrow attribute
+                    case "ARROWCHANGE":
+                        OnPlayerChangedArrowAttribute(splitData);
+                        Send(msg, reliableChannel);
+                        break;
                     // Client says they damaged enemy, relay that to other players
                     case "ENEMYDMG":
                         //Debug.Log(msg);
@@ -674,6 +739,11 @@ public class NetworkManager : MonoBehaviour {
                     // Client states he/she has damaged trap
                     case "TRAPDMG":
                         OnTrapDamaged(splitData);
+                        break;
+                    // Client upgraded weapon
+                    case "WEPUPGRADE":
+                        OnWeaponUpgraded(splitData);
+                        Send(msg, reliableChannel);
                         break;
                 }
                 break;
@@ -739,6 +809,10 @@ public class NetworkManager : MonoBehaviour {
                 int cnnID;
                 switch (splitData[0])
                 {
+                    // Someone changed their arrow attribute
+                    case "ARROWCHANGE":
+                        OnPlayerChangedArrowAttribute(splitData);
+                        break;
                     // Host ask for your name while providing all players in lobby
                     case "ASKNAME":
                         OnAskName(splitData);
@@ -896,6 +970,10 @@ public class NetworkManager : MonoBehaviour {
                         }
                         OnTrapDamaged(splitData);
                         //activityLog.Add(msg);
+                        break;
+                    // Host announces that someone upgraded their weapon
+                    case "WEPUPGRADE":
+                        OnWeaponUpgraded(splitData);
                         break;
                 }
                 break;

@@ -72,7 +72,6 @@ public class Objective : MonoBehaviour {
 
     public void OnHit()
     {
-        print(1);
         GameManager.gm.hitObjectiveIndicator.GetComponent<ObjectiveHitIndicator>().SignalObjectiveIsHit();
     }
 
