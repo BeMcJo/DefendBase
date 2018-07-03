@@ -25,6 +25,11 @@ public class SweetSpot : MonoBehaviour {
             particleEffect.transform.position = transform.position;//owner.transform.Find("ParticleEffectPlaceHolders").GetChild(ssid).position;
             if(owner.tag == "Enemy")
             {
+                PlayerController pc = GameManager.gm.player.GetComponent<PlayerController>();
+                if(p.ownerID == pc.id)
+                { print("MY PLAYER");
+                    pc.criticalShotCount++;
+                }
                 Enemy e = owner.GetComponent<Enemy>();
                 GameManager.gm.OnHitEnemy();
                 e.OnHit();

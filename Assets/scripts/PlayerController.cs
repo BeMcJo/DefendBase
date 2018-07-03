@@ -6,7 +6,10 @@ using UnityEngine.UI;
 public class PlayerController : MonoBehaviour {
     public float noiseTolerance = .05f;
     public int id; // Used to assign who controls this player online
-    public int selectedAttribute; // current arrow selected
+    public int selectedAttribute, // current arrow selected
+               criticalShotCount, // count of critical shots landed
+               shotsHit; // count of shots that hit target(s)       
+
     public bool gyroEnabled, // Is there gyroscope feature on this device? 
                 useGyro, // Are we using gyroscope?
                 canPerformActions; // Am I stunned, frozen, or restricted?

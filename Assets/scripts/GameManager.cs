@@ -156,6 +156,7 @@ public class GameManager : MonoBehaviour {
                       buffIconContainer, // holds buff icons
                       interactiveUIContainer, // holds interactive UI
                       itemDropdownList, // holds list of (attribute) items
+                      firework, // particle effect for victory
                       waveNotification; // Notifies player that enemies will spawn
 
     public Text scoreTxt; // Indicates how awesome you are
@@ -492,6 +493,9 @@ public class GameManager : MonoBehaviour {
         mapFingerID = -1;
         quickAccessFingerID = -1;
         selectedAttribute = 0;
+
+        firework = GameObject.Find("Firework");
+        firework.SetActive(false);
 
         intermissionCanvas = GameObject.Find("IntermissionCanvas");
         // If online, make sure everyone is ready to start next wave on intermission
@@ -956,15 +960,23 @@ public class GameManager : MonoBehaviour {
         resultNotification.SetActive(true);
 
         hasWon = won;
+        Transform stats = resultNotification.transform.Find("Statistics");
+        PlayerController pc = player.GetComponent<PlayerController>();
         if (won)
         {
-            resultNotification.transform.Find("ResultTxt").GetComponent<Text>().text = "VICTORY!\nYou have successfully\ndefended the kingdom!";
+            resultNotification.transform.Find("WinOrLoseTxt").GetComponent<Text>().text = "VICTORY";
         }
         else
         {
-            resultNotification.transform.Find("ResultTxt").GetComponent<Text>().text = "Oh No! The enemies broke\nthrough our defenses!";
+            resultNotification.transform.Find("WinOrLoseTxt").GetComponent<Text>().text = "Defeat...";
         }
+        stats.Find("Kills").Find("Stats").GetComponent<Text>().text = "" + (personalKills + totalPersonalKills);
+        stats.Find("CriticalShots").Find("Stats").GetComponent<Text>().text = "" + pc.criticalShotCount;
+        if(pc.shotsHit > 0 && pc.wep.GetComponent<Weapon>().shotCount > 0)
+            stats.Find("Accuracy").Find("Stats").GetComponent<Text>().text = "" + ((float) pc.shotsHit / pc.wep.GetComponent<Weapon>().shotCount * 100).ToString("#.0") + "%";
+        stats.Find("OverallScore").Find("Stats").GetComponent<Text>().text = "" + score;
         personalData.playerCurrency += score / 1000 + inGameCurrency / 20;
+        firework.SetActive(won);
         Save("setupMain");
     }
 
@@ -2319,7 +2331,7 @@ public class GameManager : MonoBehaviour {
                 {
                     difficulty++;
                 }
-                if(wave >= EnemySpawnPattern.patternsBySpawnPointCt[0].Count)
+                if(wave >= 1)// EnemySpawnPattern.patternsBySpawnPointCt[0].Count)
                 {
                     Debug.Log("VICTORY");
                     DisplayEndGameNotifications(true);

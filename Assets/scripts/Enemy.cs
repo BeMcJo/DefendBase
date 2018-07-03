@@ -632,7 +632,12 @@ public class Enemy : MonoBehaviour
         TakeDamage(dmg);
         this.dmgSourceType = dmgSourceType;
         dmgSourceID = sid;
-        
+        PlayerController pc = GameManager.gm.player.GetComponent<PlayerController>();
+        if (dmgSourceType == "Player" && sid == pc.id)
+        {
+            pc.shotsHit++;
+            print("MY PLAYER hit:"+pc.shotsHit + "/" + pc.wep.shotCount);
+        }
         if(health <= 0)
         {
             Die();

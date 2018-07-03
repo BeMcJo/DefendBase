@@ -60,6 +60,7 @@ public abstract class Weapon : MonoBehaviour
     public int chargeBarAlt = 1, // Unused. Originally used to have charge increase and decrease if charging
                   lvl, // Determines stats of weapon
                   id, // Unique ID for this object
+                  shotCount, // counts number of times weapon shot projectile
                   wepID; // Distinguishes what weapon this is
     public PlayerController user; // Who is using this weapon
     protected int shootTouchID, // Finger ID that is used for shooting
