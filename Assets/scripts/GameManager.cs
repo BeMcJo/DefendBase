@@ -546,7 +546,7 @@ public class GameManager : MonoBehaviour {
         playerSpawnPoints = playerRotation.transform.Find("PlayerSpawnPoints").gameObject;
 
         resultNotification = playerStatusCanvas.transform.Find("Result Notification").gameObject;
-        resultNotification.transform.Find("RetryBtn").GetComponent<Button>().onClick.AddListener(FinishGame);//ResetGame);
+        resultNotification.transform.Find("StatisticsMask").GetChild(0).Find("RetryBtn").GetComponent<Button>().onClick.AddListener(FinishGame);//ResetGame);
         resultNotification.SetActive(false);
 
         scoreTxt = playerStatusCanvas.transform.Find("ScoreTxt").GetComponent<Text>();
@@ -960,15 +960,15 @@ public class GameManager : MonoBehaviour {
         resultNotification.SetActive(true);
 
         hasWon = won;
-        Transform stats = resultNotification.transform.Find("Statistics");
+        Transform stats = resultNotification.transform.Find("StatisticsMask").GetChild(0).Find("StatisticsContainer");
         PlayerController pc = player.GetComponent<PlayerController>();
         if (won)
         {
-            resultNotification.transform.Find("WinOrLoseTxt").GetComponent<Text>().text = "VICTORY";
+            stats.parent.Find("WinOrLoseTxt").GetComponent<Text>().text = "VICTORY";
         }
         else
         {
-            resultNotification.transform.Find("WinOrLoseTxt").GetComponent<Text>().text = "Defeat...";
+            stats.parent.Find("WinOrLoseTxt").GetComponent<Text>().text = "Defeat...";
         }
         stats.Find("Kills").Find("Stats").GetComponent<Text>().text = "" + (personalKills + totalPersonalKills);
         stats.Find("CriticalShots").Find("Stats").GetComponent<Text>().text = "" + pc.criticalShotCount;
