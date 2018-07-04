@@ -841,7 +841,7 @@ public class GameManager : MonoBehaviour {
                 NetworkManager.nm.NotifyPlayerChangedArrowAttribute(attributeID);
             }
         }
-        itemDropdownList.GetComponent<Slider>().SlideInDirection(true);
+        itemDropdownList.GetComponent<Slider>().SlideInDirection(0);
         //ToggleArrowQtyList();
         //itemDropdownList.transform.parent.parent.gameObject.SetActive(false);
     }
@@ -943,6 +943,15 @@ public class GameManager : MonoBehaviour {
         print("ENDGAME");
         if (selectedDefense)
             selectedDefense.SetActive(false);
+
+        playerStatusCanvas.transform.Find("OptionsBtn").gameObject.SetActive(false);
+        playerStatusCanvas.transform.Find("HitIndicator").gameObject.SetActive(false);
+        playerStatusCanvas.transform.Find("ShootBtnPlaceholder").gameObject.SetActive(false);
+        playerStatusCanvas.transform.Find("Score").gameObject.SetActive(false);
+        playerStatusCanvas.transform.Find("Kills").gameObject.SetActive(false);
+        playerStatusCanvas.transform.Find("Currency").gameObject.SetActive(false);
+        playerStatusCanvas.transform.Find("Wave").gameObject.SetActive(false);
+        playerStatusCanvas.transform.Find("ObjectiveHitIndicator").gameObject.SetActive(false);
 
         playerOrientationObjects.SetActive(false);
         isSettingPlayerOrientation = false;
