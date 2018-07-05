@@ -36,17 +36,32 @@ public class PlayerData
         wepLvl = 0;
         arrowQuantities = new int[Attribute.names.Length];
     }
+
 }
 
 [Serializable]
 // Saves data outside game session
 public class PersonalData
 {
-    public int playerCurrency;
+    public int playerCurrency,
+               equippedWep;
+    public bool[] isWeaponUnlocked, // If there is a condition to obtain, did we satisfy it to obtain?
+                  isWeaponPurchased; // Is weapon available to purchase and obtain?
 
     public PersonalData()
     {
         playerCurrency = 0;
+        equippedWep = 0;
+        isWeaponUnlocked = new bool[Weapon.weaponStats.Length];
+        for (int i = 0; i < Weapon.weaponStats.Length; i++)
+        {
+            isWeaponUnlocked[i] = Weapon.weaponStats[i].unlockCondition == UnlockCondition.Free; 
+        }
+        isWeaponPurchased = new bool[Weapon.weaponStats.Length];
+        for (int i = 0; i < Weapon.weaponStats.Length; i++)
+        {
+            isWeaponPurchased[i] = Weapon.weaponStats[i].unlockCondition == UnlockCondition.Free;
+        }
     }
 }
 
@@ -111,6 +126,7 @@ public class GameManager : MonoBehaviour {
                       buttonPrefab, // Used for any general purposes as button
                       postedNoteButtonPrefab, // Button that looks like a post
                       itemUIPrefab, // Used to display items in store in game
+                      wepUIPrefab, // Used to display weapon in store out of game
                       descriptionPrefab, // Used to provide details about item
                       enemyArmorPrefab, // ???
                       iconPrefab, // icon of item
@@ -118,6 +134,8 @@ public class GameManager : MonoBehaviour {
                       enemyPrefab; // Enemy object
 
     public GameObject playerStatusCanvas, // Information used for player to see
+                      inventoryCanvas, // Displays shop items and inventory
+                      inventoryItemPanel, // displays different selected item categories
                       playerOrientationObjects, // Holds objects pertaining to setting up player orientation
                       quickAccessCanvas, // Holds touch-interactive UI for quick access purposes
                       effectsCanvas, // Holds special effects in the view of the player
@@ -258,6 +276,7 @@ public class GameManager : MonoBehaviour {
                 PersonalData personalData = new PersonalData();
                 if (gm.personalData != null)
                     personalData = gm.personalData;
+
                     //personalData.playerCurrency = playerCurrency;
                 bf.Serialize(file, personalData);
                 break;
@@ -305,6 +324,7 @@ public class GameManager : MonoBehaviour {
         else
         {
             Debug.Log("File Does Not Exists");
+            Save(type);
         }
     }
 
@@ -317,6 +337,7 @@ public class GameManager : MonoBehaviour {
         enemies = new Dictionary<int, Enemy>();
         gm = this;
         gm.data = new PlayerData();
+        gm.personalData = new PersonalData();
         DontDestroyOnLoad(gm);
         interactiveTouch = false;
         traps = new Dictionary<int, Trap>();
@@ -465,6 +486,71 @@ public class GameManager : MonoBehaviour {
 
         btnContainer.Find("BackBtn").GetComponent<Button>().onClick.AddListener(ToggleMainMenuCanvas);
         btnContainer.Find("BackBtn").GetComponent<Button>().onClick.AddListener(ToggleSettingsCanvas);
+
+
+        // Setup Inventory and Shop
+
+        inventoryCanvas = GameObject.Find("InventoryCanvas");
+        inventoryCanvas.transform.Find("PlayerCurrency").GetChild(0).GetComponent<Text>().text = "" + personalData.playerCurrency;
+        inventoryItemPanel = inventoryCanvas.transform.Find("ItemUIPanel").gameObject;
+        Transform UIContainer = inventoryItemPanel.transform.Find("WeaponUIContainer");
+        for (int i = 0; i < Weapon.weaponStats.Length; i++)
+        {
+            GameObject wepUI = Instantiate(wepUIPrefab);
+            wepUI.transform.SetParent(UIContainer);
+            wepUI.transform.Find("ItemName").GetComponent<Text>().text = Weapon.weaponStats[i].name;
+            wepUI.transform.Find("ItemStats").Find("Damage").Find("Text").GetComponent<Text>().text = "" + Weapon.weaponStats[i].dmg[0];
+            wepUI.transform.Find("ItemStats").Find("Reload").Find("Text").GetComponent<Text>().text = "" + Weapon.weaponStats[i].timeToReload[0];
+            wepUI.transform.Find("ItemStats").Find("ChargeAcceleration").Find("Text").GetComponent<Text>().text = "" + Weapon.weaponStats[i].chargeAccelation[0];
+            wepUI.transform.Find("ItemStats").Find("BowStr").Find("Text").GetComponent<Text>().text = "" + Weapon.weaponStats[i].distance[0];
+            wepUI.transform.Find("ItemDescription").GetComponent<Text>().text = Weapon.weaponStats[i].description;
+            wepUI.name = "wepUI " + i;
+            //wepUI.tag = "wepUI";
+            //wepUI.transform.GetComponent<Button>().onClick.AddListener(PerformInventoryAction);
+            wepUI.transform.Find("LockedItemImage").gameObject.SetActive(
+                (Weapon.weaponStats[i].unlockCondition == UnlockCondition.Quest || Weapon.weaponStats[i].unlockCondition == UnlockCondition.QuestThenPurchase) 
+                && !personalData.isWeaponUnlocked[i]);
+            Transform actionBtn = wepUI.transform.Find("ActionBtn");
+            actionBtn.GetComponent<Button>().interactable = personalData.equippedWep != i;
+            switch (Weapon.weaponStats[i].unlockCondition)
+            {
+                case UnlockCondition.Free:
+                    actionBtn.Find("Text").GetComponent<Text>().text = (personalData.equippedWep == i) ? "Equipped" : "Equip";
+                    actionBtn.Find("Currency").gameObject.SetActive(false);
+                    break;
+                case UnlockCondition.Purchase:
+                    if (personalData.isWeaponPurchased[i])
+                    {
+                        actionBtn.Find("Text").GetComponent<Text>().text = (personalData.equippedWep == i) ? "Equipped" : "Equip";
+                        actionBtn.Find("Currency").gameObject.SetActive(false);
+                    }
+                    else
+                    {
+                        actionBtn.Find("Text").GetComponent<Text>().text = "Unlock\n";
+                        actionBtn.Find("Currency").gameObject.SetActive(true);
+                        actionBtn.Find("Currency").Find("Text").GetComponent<Text>().text = "" + Weapon.weaponStats[i].price;
+                    }
+                    break;
+                case UnlockCondition.Quest:
+                    actionBtn.Find("Text").GetComponent<Text>().text = (personalData.equippedWep == i) ? "Equipped" : "Equip";
+                    actionBtn.Find("Currency").gameObject.SetActive(false);
+                    break;
+                case UnlockCondition.QuestThenPurchase:
+                    if (personalData.isWeaponPurchased[i])
+                    {
+                        actionBtn.Find("Text").GetComponent<Text>().text = (personalData.equippedWep == i) ? "Equipped" : "Equip";
+                        actionBtn.Find("Currency").gameObject.SetActive(false);
+                    }
+                    else
+                    {
+                        actionBtn.Find("Text").GetComponent<Text>().text = "Unlock\n";
+                        actionBtn.Find("Currency").gameObject.SetActive(true);
+                        actionBtn.Find("Currency").Find("Text").GetComponent<Text>().text = "" + Weapon.weaponStats[i].price;
+                    }
+                    break;
+            }
+        }
+
     }
 
     // Load game scene. If there was any saved game progress, remove it
@@ -869,6 +955,31 @@ public class GameManager : MonoBehaviour {
             selectedDescription.transform.parent.parent.gameObject.SetActive(false);
         }
         selectedDescription = null;
+    }
+
+    public void HandleWeaponItemAction(int wepID)
+    {
+        print("HANDLING " + wepID);
+        switch (Weapon.weaponStats[wepID].unlockCondition)
+        {
+            case UnlockCondition.Free:
+                if (wepID != personalData.equippedWep)
+                {
+                    EquipWeapon(wepID);
+                }
+                break;
+        }
+    }
+
+    public void EquipWeapon(int wepID)
+    {
+        print("EQUOP");
+        Transform wepUIContainer = inventoryItemPanel.transform.Find("WeaponUIContainer");
+        wepUIContainer.GetChild(personalData.equippedWep).Find("ActionBtn").Find("Text").GetComponent<Text>().text = "Equip";
+        wepUIContainer.GetChild(personalData.equippedWep).Find("ActionBtn").GetComponent<Button>().interactable = true;
+        wepUIContainer.GetChild(wepID).Find("ActionBtn").Find("Text").GetComponent<Text>().text = "Equipped";
+        personalData.equippedWep = wepID;
+        wepUIContainer.GetChild(personalData.equippedWep).Find("ActionBtn").GetComponent<Button>().interactable = false;
     }
 
     public void Purchase()

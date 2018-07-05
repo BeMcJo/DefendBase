@@ -284,10 +284,10 @@ public class Bow : Weapon
             arrow.SetParent(GameManager.gm.projectilesContainer.transform);
             Rigidbody rb = arrow.transform.GetComponent<Rigidbody>();
             rb.constraints = RigidbodyConstraints.None; // Remove the fixed position of arrow
-            rb.AddForce(user.playerCam.transform.forward * chargePower * statsByLevel[wepID].distance[lvl] * 100); // Launch arrow
+            rb.AddForce(user.playerCam.transform.forward * chargePower * weaponStats[wepID].distance[lvl] * 100); // Launch arrow
             rb.useGravity = true;
             Arrow arrw = arrow.GetComponent<Arrow>();
-            arrw.Shoot(null, user.tag, user.id, statsByLevel[wepID].dmg[lvl]);
+            arrw.Shoot(null, user.tag, user.id, weaponStats[wepID].dmg[lvl]);
             //arrw.isShot = true;
             //arrw.id = user.id;
             //arrw.dmg = statsByLevel[wepID].dmg[lvl];
@@ -295,7 +295,7 @@ public class Bow : Weapon
             //arrw.attributeID = GameManager.gm.selectedAttribute;
             arrow = null;
             reloading = true;
-            reloadTime = statsByLevel[wepID].timeToReload[lvl];
+            reloadTime = weaponStats[wepID].timeToReload[lvl];
             
 
             // Reset bowstring vertices

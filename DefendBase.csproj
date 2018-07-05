@@ -109,6 +109,7 @@
     <Compile Include="Assets\scripts\HoldButton.cs" />
     <Compile Include="Assets\scripts\Infurie.cs" />
     <Compile Include="Assets\scripts\InteractiveUI.cs" />
+    <Compile Include="Assets\scripts\InventoryActionButton.cs" />
     <Compile Include="Assets\scripts\MapLibrary.cs" />
     <Compile Include="Assets\scripts\MapManager.cs" />
     <Compile Include="Assets\scripts\MapView.cs" />
