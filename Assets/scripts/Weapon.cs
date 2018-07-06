@@ -74,7 +74,7 @@ public abstract class Weapon : MonoBehaviour
         (
             "Sniper Bow",
             1500,
-            UnlockCondition.Quest,
+            UnlockCondition.Free,
             new int[] {1,1,1,1,2},
             new int[] {50,100,200,500},
             new float[] {20, 23,26,29,32},

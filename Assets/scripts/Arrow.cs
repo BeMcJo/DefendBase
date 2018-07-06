@@ -32,12 +32,17 @@ public class Arrow : Projectile {
     {
         base.Shoot(t, ownerType, ownerID,dmg);
         transform.Find("Tail").GetComponent<BoxCollider>().enabled = false;
+        if(attributeID == 3)
+        {
+            transform.Find("Arrow Tip").GetComponent<Collider>().enabled = false;
+            
+        }
     }
 
     // Update is called once per frame
     protected virtual void FixedUpdate () {
         // Orient Arrow in the direction of its trajectory
-        if (transform.GetComponent<Rigidbody>().velocity != Vector3.zero)
+        if (transform.GetComponent<Rigidbody>().velocity != Vector3.zero && attributeID != 3)
             transform.rotation = Quaternion.LookRotation(transform.GetComponent<Rigidbody>().velocity);
 	}
 }

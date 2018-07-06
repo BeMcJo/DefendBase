@@ -513,10 +513,12 @@ public class GameManager : MonoBehaviour {
 
         // Set up weapon section
         Transform UIContainer = inventoryItemPanel.transform.Find("WeaponsUIContainer");
+        ContentSizeFitter csf = UIContainer.GetComponent<ContentSizeFitter>();
         for (int i = 0; i < Weapon.weaponStats.Length; i++)
         {
             GameObject itemUI = Instantiate(wepUIPrefab);
-            itemUI.transform.SetParent(UIContainer);
+            //itemUI.transform.SetParent(UIContainer);
+            csf.AddItem(itemUI);
             itemUI.transform.Find("ItemName").GetComponent<Text>().text = Weapon.weaponStats[i].name;
             itemUI.transform.Find("ItemStats").Find("Damage").Find("Text").GetComponent<Text>().text = "" + Weapon.weaponStats[i].dmg[0];
             itemUI.transform.Find("ItemStats").Find("Reload").Find("Text").GetComponent<Text>().text = "" + Weapon.weaponStats[i].timeToReload[0];
@@ -573,10 +575,12 @@ public class GameManager : MonoBehaviour {
 
         // Set up arrow section
         UIContainer = inventoryItemPanel.transform.Find("ArrowsUIContainer");
+        csf = UIContainer.GetComponent<ContentSizeFitter>();
         for (int i = 0; i < Projectile.projectileStats.Length; i++)
         {
             GameObject itemUI = Instantiate(wepUIPrefab);
-            itemUI.transform.SetParent(UIContainer);
+            csf.AddItem(itemUI);
+            //itemUI.transform.SetParent(UIContainer);
             itemUI.transform.Find("ItemName").GetComponent<Text>().text = Projectile.projectileStats[i].name;
             itemUI.transform.Find("ItemStats").gameObject.SetActive(false);//Find("Damage").Find("Text").GetComponent<Text>().text = "" + Weapon.weaponStats[i].dmg[0];
             //itemUI.transform.Find("ItemStats").Find("Reload").Find("Text").GetComponent<Text>().text = "" + Weapon.weaponStats[i].timeToReload[0];
@@ -895,7 +899,7 @@ public class GameManager : MonoBehaviour {
     {
         if(itemType == "Attribute")
         {
-            data.arrowQuantities[itemID] += qty;
+            //data.arrowQuantities[itemID] += qty;
             print(itemID);
             print(personalData.arrowQuantities.Length);
             print(Projectile.projectileStats.Length);

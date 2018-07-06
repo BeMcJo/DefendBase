@@ -49,7 +49,7 @@ public class Bow : Weapon
             Transform crosshair = (Instantiate(transform.Find("Crosshair"))) as Transform;
             crosshair.SetParent(GameManager.gm.playerStatusCanvas.transform);
             crosshair.localScale = new Vector3(1, 1, 1);
-            crosshair.localPosition = new Vector3(20,-20,0);
+            crosshair.localPosition = new Vector3(5,0,0);
         }
     }
 	
@@ -120,6 +120,7 @@ public class Bow : Weapon
         if (reloadTime > 0)
             return;
         reloading = false;
+        // twin fang bow
         if(wepID == 1)
         {
 
@@ -129,6 +130,7 @@ public class Bow : Weapon
                 arrows[i].transform.rotation = bulletSpawns[i].transform.rotation;
                 arrows[i].transform.SetParent(transform);
                 arrows[i].transform.localPosition = bulletSpawns[i].transform.localPosition;
+                arrows[i].transform.localRotation = bulletSpawns[i].transform.localRotation;
                 arrows[i].GetComponent<Arrow>().attributeID = user.selectedAttribute;
             }
         }
@@ -141,6 +143,7 @@ public class Bow : Weapon
                 arrows[i].transform.rotation = bulletSpawns[0].transform.rotation;
                 arrows[i].transform.SetParent(transform);
                 arrows[i].transform.localPosition = bulletSpawns[0].transform.localPosition;
+                arrows[i].transform.localRotation = bulletSpawns[i].transform.localRotation;
                 arrows[i].GetComponent<Arrow>().attributeID = user.selectedAttribute;
             }
         }
@@ -309,7 +312,7 @@ public class Bow : Weapon
         
 
         this.chargePower = chargePower;
-        print(chargePower / chargeLimit);
+        //print(chargePower / chargeLimit);
         // if machine bow
         if (wepID == 3)
         {
@@ -337,8 +340,8 @@ public class Bow : Weapon
                 arrows[i].SetParent(GameManager.gm.projectilesContainer.transform);
                 Rigidbody rb = arrows[i].transform.GetComponent<Rigidbody>();
                 rb.constraints = RigidbodyConstraints.None; // Remove the fixed position of arrow
-                rb.AddForce(user.playerCam.transform.forward * chargePower * weaponStats[wepID].distance[lvl] * 100); // Launch arrow
-                rb.useGravity = true;
+                rb.AddForce(user.playerCam.transform.forward * chargePower * weaponStats[wepID].distance[lvl] * 100);// ((user.selectedAttribute == 3)?500:100)); // Launch arrow
+                rb.useGravity = user.selectedAttribute != 3;
                 Arrow arrw = arrows[i].GetComponent<Arrow>();
                 arrw.Shoot(null, user.tag, user.id, weaponStats[wepID].dmg[lvl]);
                 //arrw.isShot = true;

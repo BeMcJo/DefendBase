@@ -35,6 +35,18 @@ public class Projectile : MonoBehaviour {
             UnlockCondition.Purchase,
             "Explode your targets!"
             ),
+        new ProjectileStats(
+            "Piercing Arrow",
+            0,
+            UnlockCondition.Purchase,
+            "Shoots through the enemies!"
+            ),
+        new ProjectileStats(
+            "Bullet Arrow",
+            0,
+            UnlockCondition.Purchase,
+            "Shoots straight to the target!"
+            ),
 
     };
     public static string[] names = new string[] {
@@ -76,6 +88,10 @@ public class Projectile : MonoBehaviour {
         if (tr)
             tr.enabled = true;
         target = t;
+        if(attributeID == 3)
+        {
+            GetComponent<Rigidbody>().AddForce(transform.forward * 5000);
+        }
     }
 	
 	// Update is called once per frame
@@ -88,6 +104,39 @@ public class Projectile : MonoBehaviour {
                 transform.LookAt(target.transform);
                 transform.position += transform.forward * Time.deltaTime * moveSpd;
             }
+            else
+            {
+                // bullet type
+                if (attributeID == 3 && !deflected)
+                {
+                    //Debug.DrawLine(transform.position, transform.);
+                    //Debug.DrawRay(transform.position, transform.forward);
+                    //print("shoot forward" + Time.time);
+                    //GetComponent<Rigidbody>().useGravity = false;
+                    RaycastHit hit;
+                    /*
+                    hits = Physics.RaycastAll(transform.position, transform.forward);
+                    for (int i = 0; i < hits.Length; i++)
+                    {
+                        print(hits[i].collider.name + " " + hits[i].collider.tag);
+                    }
+                    */
+                    if(Physics.Raycast(transform.position, transform.forward, out hit))
+                    {
+                        print("HIT " + hit.distance);
+                        print(hit.point.ToString());
+                        print(hit.collider.gameObject.name + " " + hit.collider.tag);
+                        if (hit.distance <= 30)
+                        {
+                            GameObject mark = Instantiate(gameObject, hit.point, Quaternion.LookRotation(hit.normal)) as GameObject;
+                            //mark.transform.Rotate(Vector)
+                            mark.GetComponent<Projectile>().enabled = false;
+                            OnHit(hit.collider.gameObject);
+                        }
+                    }
+                }
+            }
+
         }
         if(activeDuration <= 0)
         {
@@ -113,25 +162,23 @@ public class Projectile : MonoBehaviour {
         attributeID = aID;
     }
 
-    protected virtual void OnTriggerEnter(Collider collision)
+    public void OnHit(GameObject collision)
     {
-        //print("ATTRIBUTE::>>>>>>>>>>>>>>" + attributeID);
-        //print(collision.gameObject.name + " " + collision.gameObject.tag + " " + ownerType);
-        //print((id != GameManager.gm.player.transform.GetComponent<PlayerController>().id));
-        //print(deflected);
-        //print(!isShot);
         if (deflected || !isShot)
             return;
         //print("HIT");
 
         // If projectile is an enemy's hitting me as the player?
-        if(collision.tag == "Player" && ownerType == "Enemy" )
+        if (collision.tag == "Player" && ownerType == "Enemy")
         {
             print("SPLAT");
             //GameManager.gm.Blackout();&& 
             //if(collision.GetComponent<PlayerController>().IsMyPlayer())
             collision.GetComponent<PlayerController>().AddBuff(1, 1);
-            Destroy(gameObject);
+            if (attributeID == 3)
+                Destroy(gameObject, 3f);
+            else
+                Destroy(gameObject);
         }
         if (ownerType != "Player")
             return;
@@ -183,7 +230,7 @@ public class Projectile : MonoBehaviour {
                         tr.enabled = false;
                         transform.SetParent(collision.transform);
                     }
-                   
+
                 }
             }
             else if (collision.transform.tag == "Ground" || collision.transform.tag == "Impenetrable" || collision.transform.tag == "Path")
@@ -198,7 +245,12 @@ public class Projectile : MonoBehaviour {
                 }
                 hitGround = true;
                 deflected = true;
-                Destroy(gameObject);
+                if (attributeID == 3)
+                {
+                    Destroy(gameObject, 3f);
+                }
+                else
+                    Destroy(gameObject);
             }
             return;
         }
@@ -211,7 +263,7 @@ public class Projectile : MonoBehaviour {
             collision.GetComponent<Floater>().OnHit();
         }
 
-        else if(collision.tag == "SweetSpot")
+        else if (collision.tag == "SweetSpot")
         {
             print("SWEET");
             collision.GetComponent<SweetSpot>().TakeDamage(gameObject);
@@ -276,11 +328,11 @@ public class Projectile : MonoBehaviour {
                 e.TakeDamageFrom(dmg, ownerType, ownerID);
                 //if (e.TakeDamage(dmg))
                 //{
-                    // If enemy is still alive, leave arrow stuck in enemy
-                    //if (e.health > 0 )
-                    //{
-                        
-                    //}
+                // If enemy is still alive, leave arrow stuck in enemy
+                //if (e.health > 0 )
+                //{
+
+                //}
                 //}
             }
         }
@@ -296,9 +348,15 @@ public class Projectile : MonoBehaviour {
             }
             hitGround = true;
             deflected = true;
-            Destroy(gameObject);
+            if (attributeID == 3)
+            {
+                deflected = true;
+                Destroy(gameObject, 3f);
+            }
+            else
+                Destroy(gameObject);
         }
-        else if(collision.tag == "Trap")
+        else if (collision.tag == "Trap")
         {
             Debug.Log("???");
             if (NetworkManager.nm.isStarted)
@@ -308,6 +366,16 @@ public class Projectile : MonoBehaviour {
             }
             collision.GetComponent<Trap>().TakeDamage(dmg);
         }
+    }
+
+    protected virtual void OnTriggerEnter(Collider collision)
+    {
+        //print("ATTRIBUTE::>>>>>>>>>>>>>>" + attributeID);
+        //print(collision.gameObject.name + " " + collision.gameObject.tag + " " + ownerType);
+        //print((id != GameManager.gm.player.transform.GetComponent<PlayerController>().id));
+        //print(deflected);
+        //print(!isShot);
+        OnHit(collision.gameObject);
     }
     //unused
     /*

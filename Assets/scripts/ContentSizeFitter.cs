@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class ContentSizeFitter : MonoBehaviour {
     public Vector2 dimension;
-    public int childCount;
+    public int childCount, columnsPerRow=1;
     RectTransform rt;
 	// Use this for initialization
 	void Awake () {
@@ -21,7 +21,7 @@ public class ContentSizeFitter : MonoBehaviour {
 	
     public void Resize()
     {
-        rt.sizeDelta = new Vector3(rt.rect.width, dimension.y * childCount);
+        rt.sizeDelta = new Vector3(rt.rect.width, dimension.y * (1 + childCount / columnsPerRow));
     }
 
     public void SetItemActive(int i, bool b)

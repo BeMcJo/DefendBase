@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Attribute : MonoBehaviour {
-    public static string[] names = new string[] {
+    /*public static string[] names = new string[] {
         "Arrow",
         "Bomb Arrow",
         //"Piercing",
         //"Piercing",
         //"Piercing"
     };
+    */
 
     public static int[] prices = new int[]
     {
