@@ -1836,7 +1836,7 @@ public class GameManager : MonoBehaviour {
         {
             for (int i = 0; i < 1; i++)
             {
-                GameObject wep = Instantiate(weaponPrefabs[0]);
+                GameObject wep = Instantiate(weaponPrefabs[personalData.equippedWep]);
                 pc.EquipWeapon(wep.transform.GetComponent<Weapon>());
             }
         }

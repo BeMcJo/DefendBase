@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 public class Bow : Weapon
 {
-    public Transform arrow; // The type of projectile shot by this weapon
+    public Transform[] arrows; // The type of projectile shot by this weapon
     public Transform bow; // The actual game object
     private LineRenderer lr; // Used for the bowstring
     private Vector2 originalTouchPos; // Used for Touch Interactive shooting. Determines bow draw distance
@@ -17,14 +17,20 @@ public class Bow : Weapon
     private float maxScreenDrawRange; // Distance from middle of screen to corner
     public float drawElasticity = 15; // Determines how much string can stretch upon pulling
     public GameObject[] bowstringPositionPlaceHolders;
+
     protected Vector3[] bowstringPositions;
 	// Use this for initialization
 	protected override void Start ()
     {
-        wepID = 0;
+        //wepID = 0;
         base.Start();
         //distance = 2000;
-        arrow = transform.Find("Arrow");
+        //arrows = transform.Find("Arrow");
+        //arrows = new List<Transform>();
+        if (wepID == 1)
+            arrows = new Transform[3];
+        else
+            arrows = new Transform[1];
         bow = transform.Find("Bow");
         lr = bow.GetComponent<LineRenderer>();
         drawOffset = -3.65f;
@@ -38,6 +44,13 @@ public class Bow : Weapon
         for (int i = 0; i < bowstringPositionPlaceHolders.Length; i++)
             bowstringPositions[i] = bowstringPositionPlaceHolders[i].transform.position;
         lr.SetPositions(bowstringPositions);
+        if(wepID == 2)
+        {
+            Transform crosshair = (Instantiate(transform.Find("Crosshair"))) as Transform;
+            crosshair.SetParent(GameManager.gm.playerStatusCanvas.transform);
+            crosshair.localScale = new Vector3(1, 1, 1);
+            crosshair.localPosition = new Vector3(20,-20,0);
+        }
     }
 	
     // Key information to have NetworkManager send to other players
@@ -65,21 +78,22 @@ public class Bow : Weapon
         //bowstringPositions[1] = bowstringPositionPlaceHolders[1].transform.position;
 
         bowstringPositions[1] = bowstringPositionPlaceHolders[1].transform.position;
-        if (!reloading && arrow != null)
+        if (!reloading && arrows[0] != null )
             //    bowstringPositions[1] += (new Vector3(0, 0, 0));// drawRange)); // Default position of middle vertex
             //else
             //{
-            bowstringPositions[1] = arrow.transform.Find("Tail").position;// (new Vector3(0,0,-chargePower*2.35f));//arrow.position.z - 2.35f)); // Position of arrow tail
+            bowstringPositions[1] = arrows[0].transform.Find("Tail").position;// (new Vector3(0,0,-chargePower*2.35f));//arrow.position.z - 2.35f)); // Position of arrow tail
         //}
         bowstringPositions[2] = bowstringPositionPlaceHolders[2].transform.position;
         lr.SetPositions(bowstringPositions);//positions.ToArray()); // Assign vertices positions
-        if (reloading || arrow == null)
+
+        base.Update();
+        if (reloading || arrows[0] == null)
         {
             Reload();
             return true;
         }
 
-        base.Update();
 
         if (charging)
         {
@@ -106,11 +120,30 @@ public class Bow : Weapon
         if (reloadTime > 0)
             return;
         reloading = false;
-        arrow = Instantiate(bulletPrefab).transform;
-        arrow.transform.rotation = bulletSpawn.transform.rotation;
-        arrow.transform.SetParent(transform);
-        arrow.transform.localPosition = bulletSpawn.transform.localPosition;
-        arrow.GetComponent<Arrow>().attributeID = user.selectedAttribute;
+        if(wepID == 1)
+        {
+
+            for (int i = 0; i < 3; i++)
+            {
+                arrows[i] = Instantiate(bulletPrefab).transform;
+                arrows[i].transform.rotation = bulletSpawns[i].transform.rotation;
+                arrows[i].transform.SetParent(transform);
+                arrows[i].transform.localPosition = bulletSpawns[i].transform.localPosition;
+                arrows[i].GetComponent<Arrow>().attributeID = user.selectedAttribute;
+            }
+        }
+        else
+        {
+
+            for (int i = 0; i < 1; i++)
+            {
+                arrows[i] = Instantiate(bulletPrefab).transform;
+                arrows[i].transform.rotation = bulletSpawns[0].transform.rotation;
+                arrows[i].transform.SetParent(transform);
+                arrows[i].transform.localPosition = bulletSpawns[0].transform.localPosition;
+                arrows[i].GetComponent<Arrow>().attributeID = user.selectedAttribute;
+            }
+        }
         //arrow.GetComponent<Projectile>().SetAttribute(GameManager.gm.selectedAttribute);//.attributeID = GameManager.gm.selectedAttribute;
     }
 
@@ -162,10 +195,13 @@ public class Bow : Weapon
     public override void SetAttribute(int attributeID)
     {
         base.SetAttribute(attributeID);
-        if (arrow)
+        for (int i = 0; i < arrows.Length; i++)
         {
-            //print("change arrow attribute");
-            arrow.GetComponent<Projectile>().SetAttribute(attributeID);//.attributeID = GameManager.gm.selectedAttribute;
+            if (arrows[i])
+            {
+                //print("change arrow attribute");
+                arrows[i].GetComponent<Projectile>().SetAttribute(attributeID);//.attributeID = GameManager.gm.selectedAttribute;
+            }
         }
     }
 
@@ -173,8 +209,8 @@ public class Bow : Weapon
     public override void EndUse()
     {
         shootTouchID = -1;
-        if(arrow)
-            arrow.localPosition = bulletSpawn.localPosition;
+        if(arrows[0])
+            arrows[0].localPosition = bulletSpawns[0].transform.localPosition;
         drawRange = drawOffset;
         inUse = false;
         anim.speed = 1;
@@ -191,8 +227,8 @@ public class Bow : Weapon
         {
             this.chargePower = chargePower;
             drawRange = drawOffset + chargePower * drawLimit * drawElasticity;
-            if (arrow)
-                arrow.localPosition = bulletSpawn.localPosition + new Vector3(0, 0, chargePower * drawLimit);
+            if (arrows[0])
+                arrows[0].localPosition = bulletSpawns[0].transform.localPosition + new Vector3(0, 0, chargePower * drawLimit);
             return;
         }
 
@@ -202,11 +238,13 @@ public class Bow : Weapon
         // If not using Touch Interactive mode, progressively increase the chargePower as long as user holds shoot button
         if (!GameManager.gm.interactiveTouch)
         {
-            chargePower = chargePower + .03f / (float)DebugManager.dbm.fps * 60.0f; // increment charge power
+            
+
+            chargePower = chargePower + (.03f * weaponStats[wepID].chargeAccelation[0]) / (float)DebugManager.dbm.fps * 60.0f; // increment charge power
             if (chargePower >= chargeLimit)
                 chargePower = chargeLimit;
             chargeBar.transform.localScale = new Vector3(1, chargePower / chargeLimit, 1); // Visual indicator of charge percentage
-
+            
             /*
             float chargeDif = chargePower - this.chargePower;
             print(chargeDif);
@@ -266,10 +304,19 @@ public class Bow : Weapon
         }
 
         drawRange = drawOffset + chargePower * drawLimit * drawElasticity; // Calculate how far arrow and bowstring is drawn
-        arrow.localPosition = bulletSpawn.localPosition + new Vector3(0, 0, chargePower * drawLimit); // Move arrow backwards based on charge power 
+        for(int i = 0; i < ((wepID == 1)? 3:1);i++)
+            arrows[i].localPosition = bulletSpawns[i].transform.localPosition + new Vector3(0, 0, chargePower * drawLimit); // Move arrow backwards based on charge power 
         
 
         this.chargePower = chargePower;
+        print(chargePower / chargeLimit);
+        // if machine bow
+        if (wepID == 3)
+        {
+            if (chargePower / chargeLimit >= 1)
+                Shoot(chargePower);
+            return;
+        }
         anim.Play("charge", -1, chargePower);
         
        // print(audioSrc.time);
@@ -279,46 +326,54 @@ public class Bow : Weapon
     // Launch arrow if charge exceeds minimum
     public override void Shoot(float chargePower)
     {
-        if (chargePower > .05f && arrow)
+        if (chargePower > .05f && arrows[0])
         {
-            arrow.SetParent(GameManager.gm.projectilesContainer.transform);
-            Rigidbody rb = arrow.transform.GetComponent<Rigidbody>();
-            rb.constraints = RigidbodyConstraints.None; // Remove the fixed position of arrow
-            rb.AddForce(user.playerCam.transform.forward * chargePower * weaponStats[wepID].distance[lvl] * 100); // Launch arrow
-            rb.useGravity = true;
-            Arrow arrw = arrow.GetComponent<Arrow>();
-            arrw.Shoot(null, user.tag, user.id, weaponStats[wepID].dmg[lvl]);
-            //arrw.isShot = true;
-            //arrw.id = user.id;
-            //arrw.dmg = statsByLevel[wepID].dmg[lvl];
-            //arrw.transform.Find("Tail").GetComponent<BoxCollider>().enabled = false;
-            //arrw.attributeID = GameManager.gm.selectedAttribute;
-            arrow = null;
-            reloading = true;
-            reloadTime = weaponStats[wepID].timeToReload[lvl];
-            
+            if (wepID == 3 && chargePower / chargeLimit < 1)
+            {
+                return;
+            }
+            for (int i = 0; i < ((wepID == 1) ? 3 : 1); i++)
+            {
+                arrows[i].SetParent(GameManager.gm.projectilesContainer.transform);
+                Rigidbody rb = arrows[i].transform.GetComponent<Rigidbody>();
+                rb.constraints = RigidbodyConstraints.None; // Remove the fixed position of arrow
+                rb.AddForce(user.playerCam.transform.forward * chargePower * weaponStats[wepID].distance[lvl] * 100); // Launch arrow
+                rb.useGravity = true;
+                Arrow arrw = arrows[i].GetComponent<Arrow>();
+                arrw.Shoot(null, user.tag, user.id, weaponStats[wepID].dmg[lvl]);
+                //arrw.isShot = true;
+                //arrw.id = user.id;
+                //arrw.dmg = statsByLevel[wepID].dmg[lvl];
+                //arrw.transform.Find("Tail").GetComponent<BoxCollider>().enabled = false;
+                //arrw.attributeID = GameManager.gm.selectedAttribute;
 
-            // Reset bowstring vertices
+                arrows[i] = null;
+                reloading = true;
+                reloadTime = weaponStats[wepID].timeToReload[lvl];
 
-            //for (int i = 0; i < bowstringPositionPlaceHolders.Length; i++)
-            //    bowstringPositions[i] = bowstringPositionPlaceHolders[i].transform.position;
-            //lr.SetPositions(bowstringPositions);
-            if (!anim.GetCurrentAnimatorStateInfo(0).IsName("release"))
-                anim.Play("release", -1, 1 - chargePower);
-            base.Shoot(chargePower);
-            audioSrc.clip = soundClips[1];
-            audioSrc.time = .1f;
-            audioSrc.volume = 1f;
-            //print(audioSrc.clip.length);
-            audioSrc.Play();
 
-            // if wave started, count shots 
-            if (GameManager.gm.startWaves)
-                shotCount++;
-            
-            // decrement arrow being used if user is my player
-            if (user.IsMyPlayer())
-                GameManager.gm.UseItem("Attribute", user.selectedAttribute);//GameManager.gm.selectedArrowAttribute);
+                // Reset bowstring vertices
+
+                //for (int i = 0; i < bowstringPositionPlaceHolders.Length; i++)
+                //    bowstringPositions[i] = bowstringPositionPlaceHolders[i].transform.position;
+                //lr.SetPositions(bowstringPositions);
+                if (!anim.GetCurrentAnimatorStateInfo(0).IsName("release"))
+                    anim.Play("release", -1, 1 - chargePower);
+                base.Shoot(chargePower);
+                audioSrc.clip = soundClips[1];
+                audioSrc.time = .1f;
+                audioSrc.volume = 1f;
+                //print(audioSrc.clip.length);
+                audioSrc.Play();
+
+                // if wave started, count shots 
+                if (GameManager.gm.startWaves)
+                    shotCount++;
+
+                // decrement arrow being used if user is my player
+                if (user.IsMyPlayer())
+                    GameManager.gm.UseItem("Attribute", user.selectedAttribute);//GameManager.gm.selectedArrowAttribute);
+            }
         }
         else
         {

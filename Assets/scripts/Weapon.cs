@@ -59,15 +59,15 @@ public abstract class Weapon : MonoBehaviour
         // Dual-Shot Bow
         new WeaponStats
         (
-            "Dual-Shot Bow",
+            "Twin-Fang Bow",
             0,
-            UnlockCondition.Purchase,
+            UnlockCondition.Quest,
             new int[] {1,1,1,1,2},
             new int[] {50,100,200,500},
             new float[] {16, 17,19,23,29},
             new float[] {2f,1.75f,1.5f,1.25f,1f},
             new float[] {.75f,.70f,.65f,.55f,.5f},
-            "Double the shots, double the fun!"
+            "Bites the enemy like a viper. HISSSS "
         ),
         // Sniper Bow
         new WeaponStats
@@ -77,8 +77,8 @@ public abstract class Weapon : MonoBehaviour
             UnlockCondition.Quest,
             new int[] {1,1,1,1,2},
             new int[] {50,100,200,500},
-            new float[] {16, 17,19,23,29},
-            new float[] {2f,1.75f,1.5f,1.25f,1f},
+            new float[] {20, 23,26,29,32},
+            new float[] {2.3f,2.0f,1.7f,1.4f,1.15f},
             new float[] {.75f,.70f,.65f,.55f,.5f},
             "Steady focused aim wins the game"
         ),
@@ -91,14 +91,14 @@ public abstract class Weapon : MonoBehaviour
             new int[] {1,1,1,1,2},
             new int[] {50,100,200,500},
             new float[] {16, 17,19,23,29},
-            new float[] {2f,1.75f,1.5f,1.25f,1f},
-            new float[] {.75f,.70f,.65f,.55f,.5f},
+            new float[] {.1f,1.75f,1.5f,1.25f,1f},
+            new float[] {.5f,.70f,.65f,.55f,.5f},
             "Spraying arrows!? For the love of God..."
         )
     };
 
     public static int WeaponCount = 0; // Counts number of weapons created
-    protected Transform bulletSpawn; // Spawn point for bullets
+    public GameObject[] bulletSpawns; // Spawn point(s) for bullets
     public GameObject bulletPrefab; // Projectile to spawn
     public GameObject chargeBarGuage, // Visual indicator of max charge
                       chargeBar, // Visual indicator of charge percentage
@@ -152,7 +152,8 @@ public abstract class Weapon : MonoBehaviour
         WeaponCount++;
         name = "Wep " + id;
         */
-        bulletSpawn = transform.Find("BulletSpawn");
+       
+        //bulletSpawn[0] = transform.Find("BulletSpawn");
         chargeBarGuage = Instantiate(chargeBarGuage);
         chargeBar = chargeBarGuage.transform.GetChild(0).gameObject;
         shootBtn = Instantiate(shootBtn);
@@ -200,6 +201,11 @@ public abstract class Weapon : MonoBehaviour
                 itemUI.transform.SetParent(GameManager.gm.shopCanvas.transform.Find("Displays").Find("StoreWeaponsDisplay").GetChild(0));
         }
         itemUI.transform.localScale = new Vector3(1, 1, 1);
+
+        if(wepID == 1)
+        {
+
+        }
     }
 	
     public void SetItemDescription()
