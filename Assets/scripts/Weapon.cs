@@ -60,8 +60,8 @@ public abstract class Weapon : MonoBehaviour
         new WeaponStats
         (
             "Dual-Shot Bow",
-            1000,
-            UnlockCondition.Free,
+            0,
+            UnlockCondition.Purchase,
             new int[] {1,1,1,1,2},
             new int[] {50,100,200,500},
             new float[] {16, 17,19,23,29},

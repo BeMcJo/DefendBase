@@ -2,7 +2,41 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+// Keeps track of projectile details
+public class ProjectileStats
+{
+    public string name,
+                  description;
+    //unlockCondition;
+    public UnlockCondition unlockCondition;
+    public int price = 0; // How much to initially buy from store
+   
+    public ProjectileStats(string nm, int price, UnlockCondition unlockCond, string description)
+    {
+        name = nm;
+        this.price = price;
+        unlockCondition = unlockCond;
+        this.description = description;
+    }
+}
+
 public class Projectile : MonoBehaviour {
+    public static ProjectileStats[] projectileStats = new ProjectileStats[]
+    {
+        new ProjectileStats(
+            "Arrow",
+            0,
+            UnlockCondition.Free,
+            "Your standard arrow"
+            ),
+        new ProjectileStats(
+            "Bomb Arrow",
+            0,
+            UnlockCondition.Purchase,
+            "Explode your targets!"
+            ),
+
+    };
     public static string[] names = new string[] {
         "Projectile",
         "Arrow"

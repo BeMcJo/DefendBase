@@ -367,7 +367,7 @@ public class Rotator : MonoBehaviour, IPointerDownHandler, IPointerUpHandler,IDr
                 icon.Find("QtyTxt").GetComponent<Text>().text += GameManager.gm.myAttributes[itemOrder[i]];
         }
         //print("INSIDE EDIT CUR :" + curItem);
-        currentItemTxt.text = Attribute.names[curItem] + '\n' + Projectile.names[1];
+        currentItemTxt.text = Projectile.names[curItem] + '\n' + Projectile.names[1];
     }
 	
     // clockwise = -1, counter = 1
@@ -375,7 +375,7 @@ public class Rotator : MonoBehaviour, IPointerDownHandler, IPointerUpHandler,IDr
     {
         //itemSwapIndex = 2;
         //int tmp = itemOrder[itemSwapIndex];
-        int attributeCt = Attribute.names.Length;
+        int attributeCt = Projectile.names.Length;
         //int nextCurrentItem;
         //int nextItemSwapIndex;
 

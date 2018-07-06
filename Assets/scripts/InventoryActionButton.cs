@@ -7,6 +7,11 @@ public class InventoryActionButton : MonoBehaviour {
 
     public void PerformInventoryAction()
     {
+        if(tag == "ChangeInventoryTab")
+        {
+            GameManager.gm.ChangeSelectedTab(transform.Find("Text").GetComponent<Text>().text);
+            return;
+        }
         print("inventory "+ name);
         string[] details = name.Split(' ');
         print(details[0]);
@@ -16,6 +21,9 @@ public class InventoryActionButton : MonoBehaviour {
         {
             case "wepUI":
                 GameManager.gm.HandleWeaponItemAction(int.Parse(details[1]));
+                break;
+            case "arrowUI":
+                GameManager.gm.HandleArrowItemAction(int.Parse(details[1]));
                 break;
         }
     }
