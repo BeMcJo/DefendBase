@@ -188,7 +188,7 @@ public class MapManager : MonoBehaviour {
 
             if (!hasNeighbors)
             {
-                print("NODE " + i + " has no nebrs");
+                //print("NODE " + i + " has no nebrs");
             }
             
         }

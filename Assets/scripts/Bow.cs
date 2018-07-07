@@ -212,12 +212,14 @@ public class Bow : Weapon
     public override void EndUse()
     {
         shootTouchID = -1;
-        if(arrows[0])
-            arrows[0].localPosition = bulletSpawns[0].transform.localPosition;
         drawRange = drawOffset;
         inUse = false;
         anim.speed = 1;
-        Shoot(chargePower);
+        if (arrows[0])
+        {
+            arrows[0].localPosition = bulletSpawns[0].transform.localPosition;
+            Shoot(chargePower);
+        }
         //charging = false;
         //chargePower = 0;
         base.EndUse();
@@ -331,6 +333,7 @@ public class Bow : Weapon
     {
         if (chargePower > .05f && arrows[0])
         {
+            // if machine bow
             if (wepID == 3 && chargePower / chargeLimit < 1)
             {
                 return;
@@ -368,7 +371,6 @@ public class Bow : Weapon
                 audioSrc.volume = 1f;
                 //print(audioSrc.clip.length);
                 audioSrc.Play();
-
                 // if wave started, count shots 
                 if (GameManager.gm.startWaves)
                     shotCount++;

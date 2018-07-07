@@ -128,6 +128,8 @@ public class GameManager : MonoBehaviour {
                         VFXPrefabs, // list of particle effects
                         weaponPrefabs; // List of weapon objects
 
+    public GameObject[] arrowUIItems; // List of arrow UI interactables in game session
+
     public GameObject statusIndicatorPrefab, // Shows health and other status for object
                       playerPrefab, // Your player in game
                       playerUIPrefab, // Your object in lobby
@@ -358,6 +360,7 @@ public class GameManager : MonoBehaviour {
         playerOrientation = Vector3.zero;
         realTimeAction = true;
         selectedTab = "Weapons";
+        arrowUIItems = new GameObject[Projectile.projectileStats.Length];
         Screen.orientation = ScreenOrientation.Landscape; // Landscape mode for mobile phones
         LoadMainScene(); // Default start game in main scene
         EnemySpawnPattern.InstantiatePatterns();
@@ -513,12 +516,13 @@ public class GameManager : MonoBehaviour {
 
         // Set up weapon section
         Transform UIContainer = inventoryItemPanel.transform.Find("WeaponsUIContainer");
+        //UIContainer.transform.localPosition = new Vector3(0, -1000, 0);
         ContentSizeFitter csf = UIContainer.GetComponent<ContentSizeFitter>();
         for (int i = 0; i < Weapon.weaponStats.Length; i++)
         {
             GameObject itemUI = Instantiate(wepUIPrefab);
-            //itemUI.transform.SetParent(UIContainer);
-            csf.AddItem(itemUI);
+            itemUI.transform.SetParent(UIContainer);
+            //csf.AddItem(itemUI);
             itemUI.transform.Find("ItemName").GetComponent<Text>().text = Weapon.weaponStats[i].name;
             itemUI.transform.Find("ItemStats").Find("Damage").Find("Text").GetComponent<Text>().text = "" + Weapon.weaponStats[i].dmg[0];
             itemUI.transform.Find("ItemStats").Find("Reload").Find("Text").GetComponent<Text>().text = "" + Weapon.weaponStats[i].timeToReload[0];
@@ -575,12 +579,13 @@ public class GameManager : MonoBehaviour {
 
         // Set up arrow section
         UIContainer = inventoryItemPanel.transform.Find("ArrowsUIContainer");
-        csf = UIContainer.GetComponent<ContentSizeFitter>();
+        //UIContainer.transform.localPosition = new Vector3(0, -1000, 0);
+        //csf = UIContainer.GetComponent<ContentSizeFitter>();
         for (int i = 0; i < Projectile.projectileStats.Length; i++)
         {
             GameObject itemUI = Instantiate(wepUIPrefab);
-            csf.AddItem(itemUI);
-            //itemUI.transform.SetParent(UIContainer);
+            //csf.AddItem(itemUI);
+            itemUI.transform.SetParent(UIContainer);
             itemUI.transform.Find("ItemName").GetComponent<Text>().text = Projectile.projectileStats[i].name;
             itemUI.transform.Find("ItemStats").gameObject.SetActive(false);//Find("Damage").Find("Text").GetComponent<Text>().text = "" + Weapon.weaponStats[i].dmg[0];
             //itemUI.transform.Find("ItemStats").Find("Reload").Find("Text").GetComponent<Text>().text = "" + Weapon.weaponStats[i].timeToReload[0];
@@ -765,13 +770,14 @@ public class GameManager : MonoBehaviour {
         itemWheel = quickAccessCanvas.transform.Find("ItemWheel").gameObject;
         itemWheel.SetActive(false);
 
-        itemDropdownList = quickAccessCanvas.transform.Find("ItemDropdownList").GetChild(0).GetChild(0).gameObject;
+        itemDropdownList = quickAccessCanvas.transform.Find("ItemDropdownList").Find("ItemContainer").gameObject;//GetChild(0).gameObject;
         ContentSizeFitter csf = itemDropdownList.GetComponent<ContentSizeFitter>();
         //quickAccessCanvas.SetActive(false);
         effectsCanvas = GameObject.Find("EffectsCanvas");
 
         myProjectiles.Clear();
         myAttributes.Clear();
+
         //Attribute.names = new string[attributePrefabs.Length];
 
         // Add all attributes to inventory and instantiate them
@@ -781,12 +787,14 @@ public class GameManager : MonoBehaviour {
             myAttributes[i] = 1;
             GameObject icon = Instantiate(iconPrefab);
             icon.GetComponent<Selector>().id = i;
-            csf.AddItem(icon);
-            //icon.transform.SetParent(itemDropdownList.transform);
+            //csf.AddItem(icon);
+            arrowUIItems[i] = icon;
+            icon.transform.SetParent(itemDropdownList.transform);
             icon.name = "Attribute " + i;
             icon.tag = "QuickAccess";
             icon.transform.localScale = new Vector3(1, 1, 1);
             icon.transform.Find("ItemIcon").GetComponent<Image>().sprite = itemIcons[i];
+            //csf.SetItemActive(i, i == 0);
             icon.transform.Find("Selected BG").gameObject.SetActive(i == 0);
         }
         //itemDropdownList.transform.parent.parent.gameObject.SetActive(false);
@@ -920,7 +928,7 @@ public class GameManager : MonoBehaviour {
             myAttributes[itemID]--;
             personalData.arrowQuantities[itemID]--;
             //print(itemID + ":" + myAttributes[itemID]);
-            if(myAttributes[itemID] == 0)
+            if(myAttributes[itemID] <= 0)
             {
                 print("OUT OF ITEM");
                 ChangeSelectedAttribute(0);
@@ -985,9 +993,10 @@ public class GameManager : MonoBehaviour {
         }
         itemDropdownList.transform.GetChild(itemID).Find("QtyTxt").GetComponent<Text>().text = "x" + ((itemID == 0) ? "---" : ""+myAttributes[itemID]);
         bool isEmpty = myAttributes[itemID] == 0 && itemID != 0;
-        
-        itemDropdownList.transform.GetChild(itemID).gameObject.SetActive(!isEmpty);
-        itemDropdownList.GetComponent<ContentSizeFitter>().SetItemActive(itemID, !isEmpty);
+        print(isEmpty+" "+itemID) ;
+        arrowUIItems[itemID].SetActive(!isEmpty);
+        //itemDropdownList.transform.GetChild(itemID).gameObject.SetActive(!isEmpty);
+        //itemDropdownList.GetComponent<ContentSizeFitter>().SetItemActive(itemID, !isEmpty);
         
     }
 
@@ -1008,6 +1017,7 @@ public class GameManager : MonoBehaviour {
         }
         itemDropdownList.GetComponent<Slider>().SlideInDirection(0);
         //ToggleArrowQtyList();
+
         //itemDropdownList.transform.parent.parent.gameObject.SetActive(false);
     }
 
