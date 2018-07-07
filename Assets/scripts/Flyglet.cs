@@ -184,7 +184,7 @@ public class Flyglet : Enemy
     {
         float len = anim.GetCurrentAnimatorClipInfo(0)[0].clip.length * anim.GetCurrentAnimatorStateInfo(0).normalizedTime;
 
-        if (anim.GetCurrentAnimatorStateInfo(0).IsName("pre-flap") && len > 0)
+        if (canPerformAction && anim.GetCurrentAnimatorStateInfo(0).IsName("pre-flap") && len > 0)
         {
             //print(len + "...@@@@@@");
             height -= .05f;
@@ -208,7 +208,7 @@ public class Flyglet : Enemy
         //print(anim.GetCurrentAnimatorClipInfo(0)[0].clip.length);
         //print("##########");
         float len = anim.GetCurrentAnimatorClipInfo(0)[0].clip.length * anim.GetCurrentAnimatorStateInfo(0).normalizedTime;
-        if (anim.GetCurrentAnimatorStateInfo(0).IsName("flap") && len > 0)
+        if (canPerformAction && anim.GetCurrentAnimatorStateInfo(0).IsName("flap") && len > 0)
         {
             height += .2f;
             transform.position = Vector3.MoveTowards(transform.position, new Vector3(transform.position.x, height + originalPos.y, transform.position.z), .2f * 60f / (float)DebugManager.dbm.fps);
@@ -230,7 +230,7 @@ public class Flyglet : Enemy
         //transform.position += new Vector3(0, -0.01f, 0);
         float len = anim.GetCurrentAnimatorClipInfo(0)[0].clip.length * anim.GetCurrentAnimatorStateInfo(0).normalizedTime;
 
-        if (anim.GetCurrentAnimatorStateInfo(0).IsName("post-flap") && len > 0)
+        if (canPerformAction && anim.GetCurrentAnimatorStateInfo(0).IsName("post-flap") && len > 0)
         {
             //print(len + "...%%%%%%%%%%%%%d");
             height -= .1f;

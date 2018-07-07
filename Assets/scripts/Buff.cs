@@ -3,6 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+public enum Effect
+{
+    freeze
+};
+
 public class Buff : MonoBehaviour {
     public int buffID, // uniquely identifies the buff (ex: different cosmetics or name)
                buffType; // categorizes the buffs (ex: boosters, stuns, ...)

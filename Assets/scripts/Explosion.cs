@@ -2,12 +2,19 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum ExplosionType
+{
+    damage,
+    freeze
+}
+
 public class Explosion : MonoBehaviour {
     public float growthRate = 1f;
     public float growthLimit = 20f;
     public int dmg = 10,
                ownerID;
     public string ownerType;
+    public ExplosionType explosionType;
     public List<GameObject> alreadyHit;
 
     private void Awake()
@@ -17,8 +24,12 @@ public class Explosion : MonoBehaviour {
 
     // Use this for initialization
     void Start () {
-        GameObject vfx = Instantiate(GameManager.gm.VFXPrefabs[1]);
+        print((int)explosionType);
+        print(GameManager.gm.VFXPrefabs.Length);
+        GameObject vfx = Instantiate(GameManager.gm.VFXPrefabs[(int)explosionType+1]);
+        GetComponent<MeshRenderer>().enabled = explosionType == ExplosionType.freeze;
         vfx.transform.position = gameObject.transform.position;
+
 	}
     
 
@@ -49,7 +60,13 @@ public class Explosion : MonoBehaviour {
             if (alreadyHit.Contains(e.gameObject))
                 return;
             alreadyHit.Add(e.gameObject);
-            e.OnHit();
+            if(explosionType == ExplosionType.damage)
+                e.OnHit();
+            else if(explosionType == ExplosionType.freeze)
+            {
+                print("FREEze");
+                e.ApplyEffect(Effect.freeze);
+            }
             if (NetworkManager.nm.isStarted)
             {
                 NetworkManager.nm.NotifyObjectDamagedBy(e.gameObject, gameObject);

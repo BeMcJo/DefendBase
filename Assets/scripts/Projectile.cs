@@ -47,6 +47,12 @@ public class Projectile : MonoBehaviour {
             UnlockCondition.Purchase,
             "Shoots straight to the target!"
             ),
+        new ProjectileStats(
+            "Ice Arrow",
+            0,
+            UnlockCondition.Purchase,
+            "Creates a chilly explosion, freezing nearby enemies"
+            ),
 
     };
     public static string[] names = new string[] {
@@ -146,12 +152,14 @@ public class Projectile : MonoBehaviour {
 
 	}
 
-    public void CreateExplosion()
+    // 0 = damage explosion, 1 = freezing wave
+    public void CreateExplosion(ExplosionType explosionType)
     {
         GameObject explosion = Instantiate(GameManager.gm.attributePrefabs[attributeID]);
         explosion.transform.position = transform.position;
-        explosion.transform.GetComponent<Explosion>().dmg = 1;
-        explosion.transform.GetComponent<Explosion>().growthLimit = 14;
+        explosion.transform.GetComponent<Explosion>().dmg = (explosionType == ExplosionType.damage)? 1:0;
+        explosion.transform.GetComponent<Explosion>().explosionType = explosionType;
+        explosion.transform.GetComponent<Explosion>().growthLimit = (explosionType == ExplosionType.damage) ? 14 : 20;
         explosion.transform.GetComponent<Explosion>().ownerID = ownerID;
         explosion.transform.GetComponent<Explosion>().ownerType = ownerType;
     }
@@ -171,7 +179,7 @@ public class Projectile : MonoBehaviour {
         // If projectile is an enemy's hitting me as the player?
         if (collision.tag == "Player" && ownerType == "Enemy")
         {
-            print("SPLAT");
+           // print("SPLAT");
             //GameManager.gm.Blackout();&& 
             //if(collision.GetComponent<PlayerController>().IsMyPlayer())
             collision.GetComponent<PlayerController>().AddBuff(1, 1);
@@ -194,7 +202,7 @@ public class Projectile : MonoBehaviour {
 
                 if (attributeID == 1)
                 {
-                    CreateExplosion();
+                    CreateExplosion(ExplosionType.damage);
                 }
                 //e.OnHit();
                 // If piercing attribute, don't stop arrow
@@ -219,10 +227,15 @@ public class Projectile : MonoBehaviour {
                 {
                     if (attributeID == 1)
                     {
-                        CreateExplosion();
+                        CreateExplosion(ExplosionType.damage);
+                    }
+                    // ice arrow
+                    else if (attributeID == 4)
+                    {
+                        print(UnlockCondition.Free);
                     }
                     // If piercing attribute, don't stop arrow
-                    if (attributeID != 2)
+                    else if (attributeID != 2)
                     {
                         deflected = true;
                         transform.GetComponent<Rigidbody>().velocity = Vector3.zero;
@@ -241,7 +254,13 @@ public class Projectile : MonoBehaviour {
 
                 if (attributeID == 1)
                 {
-                    CreateExplosion();
+                    CreateExplosion(ExplosionType.damage);
+                }
+                // ice arrow
+                else if (attributeID == 4)
+                {
+                    CreateExplosion(ExplosionType.freeze);
+                    //e.ApplyEffect(Effect.freeze);
                 }
                 hitGround = true;
                 deflected = true;
@@ -270,7 +289,7 @@ public class Projectile : MonoBehaviour {
 
             if (attributeID == 1)
             {
-                CreateExplosion();
+                CreateExplosion(ExplosionType.damage);
             }
             //e.OnHit();
             // If piercing attribute, don't stop arrow
@@ -302,11 +321,6 @@ public class Projectile : MonoBehaviour {
                     e = t.parent.GetComponent<Enemy>();
                 }
 
-                if (attributeID == 1)
-                {
-                    CreateExplosion();
-                }
-                e.OnHit();
                 // If piercing attribute, don't stop arrow
                 if (attributeID != 2)
                 {
@@ -316,6 +330,19 @@ public class Projectile : MonoBehaviour {
                     tr.enabled = false;
                     transform.SetParent(collision.transform);
                 }
+                if (attributeID == 1)
+                {
+                    CreateExplosion(ExplosionType.damage);
+                }
+                // ice arrow
+                else if (attributeID == 4)
+                {
+                    CreateExplosion(ExplosionType.freeze);
+                    //e.ApplyEffect(Effect.freeze);
+                    return;
+                }
+
+                e.OnHit();
                 //e.transform.GetComponent<Rigidbody>().velocity = Vector3.zero; // Disable physics force applied when colliding
                 // If using online feature, let Network Manager handle this
                 if (NetworkManager.nm.isStarted)
@@ -344,7 +371,13 @@ public class Projectile : MonoBehaviour {
 
             if (attributeID == 1)
             {
-                CreateExplosion();
+                CreateExplosion(ExplosionType.damage);
+            }
+            // ice arrow
+            else if (attributeID == 4)
+            {
+                CreateExplosion(ExplosionType.freeze);
+                //e.ApplyEffect(Effect.freeze);
             }
             hitGround = true;
             deflected = true;

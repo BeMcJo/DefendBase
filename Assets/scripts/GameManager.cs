@@ -228,6 +228,24 @@ public class GameManager : MonoBehaviour {
     //public List<AudioClip> 
     public AudioSource audioSrc;
 
+    public void CopyPersonalData(PersonalData dest, PersonalData source)
+    {
+        dest.equippedWep = source.equippedWep;
+        dest.playerCurrency = source.playerCurrency;
+        int projectilesLen = (dest.arrowQuantities.Length < source.arrowQuantities.Length) ? dest.arrowQuantities.Length : source.arrowQuantities.Length;
+        int weaponsLen = (dest.isWeaponUnlocked.Length < source.isWeaponUnlocked.Length) ? dest.isWeaponUnlocked.Length : source.isWeaponUnlocked.Length;
+        for(int i = 0; i < projectilesLen; i++)
+        {
+            dest.arrowQuantities[i] = source.arrowQuantities[i];
+            dest.isArrowUnlocked[i] = source.isArrowUnlocked[i];
+        }
+        for(int i =0; i < weaponsLen; i++)
+        {
+            dest.isWeaponPurchased[i] = source.isWeaponPurchased[i];
+            dest.isWeaponUnlocked[i] = source.isWeaponUnlocked[i];
+        }
+    }
+
     // Saves data based on the type
     public void Save(string type)
     {
@@ -255,6 +273,7 @@ public class GameManager : MonoBehaviour {
                 data.inGameCurrency = inGameCurrency;
                 data.score = score;
                 data.difficulty = difficulty;
+                /*
                 if (myAttributes != null)
                 {
                     print(Projectile.projectileStats.Length + " " + myAttributes.Count);
@@ -263,6 +282,7 @@ public class GameManager : MonoBehaviour {
                         data.arrowQuantities[kvp.Key] = kvp.Value;
                     }
                 }
+                */
                 //data.currency = playerCurrency;
                 Debug.Log(inGame + " " + wave);
                 if (objective != null)
@@ -325,7 +345,8 @@ public class GameManager : MonoBehaviour {
                 // Load player stats/achievements
                 case "setupMain":
                     PersonalData personalData = (PersonalData)bf.Deserialize(file);
-                    gm.personalData = personalData;
+                    CopyPersonalData(gm.personalData, personalData);
+                    //gm.personalData = personalData;
                     break;
             }
             //Debug.Log(file.Length);
@@ -1101,8 +1122,11 @@ public class GameManager : MonoBehaviour {
         inventoryCanvas.transform.Find("ButtonsContainer").Find(gm.selectedTab + "TabBtn").GetComponent<Button>().interactable = true;
         inventoryItemPanel.transform.Find(selectedTab + "UIContainer").gameObject.SetActive(true);
         inventoryItemPanel.transform.Find(gm.selectedTab + "UIContainer").gameObject.SetActive(false);
+        inventoryItemPanel.transform.Find(gm.selectedTab + "UIContainer").transform.localPosition = Vector2.zero;
         gm.selectedTab = selectedTab;
         inventoryItemPanel.GetComponent<ScrollRect>().content = inventoryItemPanel.transform.Find(selectedTab + "UIContainer").GetComponent<RectTransform>();
+        inventoryItemPanel.GetComponent<ScrollRect>().velocity = Vector2.zero;
+
     }
 
     public void HandleArrowItemAction(int aID)

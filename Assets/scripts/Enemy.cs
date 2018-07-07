@@ -87,7 +87,7 @@ public class Enemy : MonoBehaviour
                  originalAttackSpd = 1f, // Default Attack Speed
                  attackRange, // Distance before being able to attack
                  effectiveAttackSpd; // Attack speed calculated and used
-    public bool isGrounded = false, isDoneMoving, isAttacking, isPerformingAction, isDead=false;
+    public bool isGrounded = false, isDoneMoving, isAttacking, isPerformingAction, isDead=false, canPerformAction;
     protected string actionPerformed = "idle", ename = "enemy", dmgSourceType;
     protected Color originalColor;
     public GameObject go;
@@ -98,7 +98,9 @@ public class Enemy : MonoBehaviour
     protected List<GameObject> grounds = new List<GameObject>();
 
     protected AudioSource audioSrc;
-    public List<AudioClip> soundClips; 
+    public List<AudioClip> soundClips;
+    public Dictionary<string,Coroutine> coroutines;
+    public Dictionary<string, bool> statusEffects;
 
     // Used to create the enemy and identify it
     /*public static void AssignEnemy(Enemy e)
@@ -158,9 +160,11 @@ public class Enemy : MonoBehaviour
             go = transform.Find("PivotPoint").Find("EnemyObject").gameObject;
         else //if (ename != "slime")
             go = transform.Find("EnemyObject").gameObject;
-
+        canPerformAction = true;
         originalColor = go.GetComponent<Renderer>().material.color;
         originalPos = transform.position;
+        coroutines = new Dictionary<string, Coroutine>();
+        statusEffects = new Dictionary<string, bool>();
     }
 
 
@@ -276,6 +280,42 @@ public class Enemy : MonoBehaviour
         transform.localPosition = pos;
         transform.SetParent(parent);
         curTarget = curTargetIndex;
+    }
+
+    public void ApplyEffect(Effect eff)
+    {
+        switch (eff)
+        {
+            case Effect.freeze:
+                /*
+                if(coroutines.ContainsKey("freeze"))
+                    coroutines["freeze"] = StartCoroutine(Freeze());
+                else
+                    coroutines.Add("freeze",StartCoroutine(Freeze()));
+                    */
+                
+                StartCoroutine(Freeze());
+                break;
+        }
+    }
+
+    public IEnumerator Freeze()
+    {
+        if (!statusEffects.ContainsKey("freeze") || !statusEffects["freeze"])
+        {
+            statusEffects["freeze"] = true;
+            print(1);
+            anim.enabled = false;
+            enabled = false;
+            canPerformAction = false;
+            //if()
+            yield return new WaitForSeconds(5);
+            anim.enabled = true;
+            canPerformAction = true;
+            enabled = true;
+            statusEffects["freeze"] = false;
+            print(2);
+        }
     }
 
     public void MoveForward()

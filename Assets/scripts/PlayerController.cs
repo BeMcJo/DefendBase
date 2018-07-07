@@ -170,25 +170,25 @@ public class PlayerController : MonoBehaviour {
 
         if (buffType > 0 && buffID > 0 && buffs.ContainsKey(-buffType) && buffs[-buffType].ContainsKey(-buffID))
         {
-            print("IMMUNE TO THIS BUFF");
+            //print("IMMUNE TO THIS BUFF");
             return;
         }
 
         if (!buffs.ContainsKey(buffType))
         {
-            print("instantiating buff type list " + buffType);
+            //print("instantiating buff type list " + buffType);
             buffs.Add(buffType, new Dictionary<int, Buff>());
         }
 
         if (buffs[buffType].ContainsKey(buffID))
         {
-            print("Restarting BUFF" + buffType + "," + buffID);
+            //print("Restarting BUFF" + buffType + "," + buffID);
             buffs[buffType][buffID].ReActivate();
             //buffs[buffType].Remove(buffID);
         }
         else
         {
-            print("CREATING BUFF " + buffID + "," + buffType);
+            //print("CREATING BUFF " + buffID + "," + buffType);
             Buff b;
             // if negative ID, instantiate an immunity buff
             if(buffID < 0)
