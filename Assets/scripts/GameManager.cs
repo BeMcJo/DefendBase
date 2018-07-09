@@ -2631,7 +2631,7 @@ public class GameManager : MonoBehaviour {
                 {
                     difficulty++;
                 }
-                if(wave >= 1)// EnemySpawnPattern.patternsBySpawnPointCt[0].Count)
+                if(wave >= EnemySpawnPattern.patternsBySpawnPointCt[0].Count)
                 {
                     Debug.Log("VICTORY");
                     DisplayEndGameNotifications(true);

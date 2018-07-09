@@ -131,7 +131,7 @@ public class Bow : Weapon
                 arrows[i].transform.SetParent(transform);
                 arrows[i].transform.localPosition = bulletSpawns[i].transform.localPosition;
                 arrows[i].transform.localRotation = bulletSpawns[i].transform.localRotation;
-                arrows[i].GetComponent<Arrow>().attributeID = user.selectedAttribute;
+                arrows[i].GetComponent<Arrow>().SetAttribute(user.selectedAttribute);// .attributeID = user.selectedAttribute;
             }
         }
         else
@@ -144,7 +144,7 @@ public class Bow : Weapon
                 arrows[i].transform.SetParent(transform);
                 arrows[i].transform.localPosition = bulletSpawns[0].transform.localPosition;
                 arrows[i].transform.localRotation = bulletSpawns[i].transform.localRotation;
-                arrows[i].GetComponent<Arrow>().attributeID = user.selectedAttribute;
+                arrows[i].GetComponent<Arrow>().SetAttribute(user.selectedAttribute);// arrows[i].GetComponent<Arrow>().attributeID = user.selectedAttribute;
             }
         }
         //arrow.GetComponent<Projectile>().SetAttribute(GameManager.gm.selectedAttribute);//.attributeID = GameManager.gm.selectedAttribute;
@@ -198,6 +198,7 @@ public class Bow : Weapon
     public override void SetAttribute(int attributeID)
     {
         base.SetAttribute(attributeID);
+        // change attribute for each arrow active
         for (int i = 0; i < arrows.Length; i++)
         {
             if (arrows[i])

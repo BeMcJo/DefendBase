@@ -90,6 +90,7 @@ public class Enemy : MonoBehaviour
     public bool isGrounded = false, isDoneMoving, isAttacking, isPerformingAction, isDead=false, canPerformAction;
     protected string actionPerformed = "idle", ename = "enemy", dmgSourceType;
     protected Color originalColor;
+    public GameObject[] statusEffectObjects;
     public GameObject go;
     public GameObject target; // What the enemy prioritizes
     public Vector3 targetPos; // What the enemy faces and moves to
@@ -308,8 +309,10 @@ public class Enemy : MonoBehaviour
             anim.enabled = false;
             enabled = false;
             canPerformAction = false;
+            statusEffectObjects[0].SetActive(true);
             //if()
             yield return new WaitForSeconds(5);
+            statusEffectObjects[0].SetActive(false);
             anim.enabled = true;
             canPerformAction = true;
             enabled = true;

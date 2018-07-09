@@ -68,18 +68,20 @@ public class Projectile : MonoBehaviour {
                 isHoming = false, // Does this object lock on and chase target?
                 isShot; // Did this get launched?
     public GameObject target; // Is there a target locked on to chase?
+    protected Transform attributesContainer; // Holds attribute objects
     protected bool deflected; // Did this not penetrate object? If so, bounce 
     public TrailRenderer tr; // Shows trajectory path tailing this object
     public string ownerType; // What type of object shot me?
     public int ownerID; // Who specifically shot me?
+    public Material[] materials; // List of materials based on attribute
 	// Use this for initialization
-	protected virtual void Start () {
+	protected virtual void Awake () {
         hitGround = false;
         deflected = false;
         tr = transform.GetComponent<TrailRenderer>();
         if (tr)
             tr.enabled = false;
-
+        attributesContainer = transform.Find("Attributes");
         //SetAttribute(GameManager.gm.selectedArrowAttribute);
     }
 
