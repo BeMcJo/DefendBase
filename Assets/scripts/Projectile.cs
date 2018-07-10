@@ -53,6 +53,12 @@ public class Projectile : MonoBehaviour {
             UnlockCondition.Purchase,
             "Creates a chilly explosion, freezing nearby enemies"
             ),
+        new ProjectileStats(
+            "Fire Arrow",
+            0,
+            UnlockCondition.Purchase,
+            "Burn em all!!! AHAHAHA"
+            ),
 
     };
     public static string[] names = new string[] {
@@ -153,6 +159,17 @@ public class Projectile : MonoBehaviour {
         }
 
 	}
+
+    // 0 = fire aoe
+    public void CreateAreaEffect(int effectID)
+    {
+        GameObject areaEffect = Instantiate(GameManager.gm.areaEffectPrefabs[effectID]);
+        areaEffect.transform.position = transform.position;
+        AreaEffect ae = areaEffect.GetComponent<AreaEffect>();
+        ae.ownerID = ownerID;
+        ae.ownerType = ownerType;
+
+    }
 
     // 0 = damage explosion, 1 = freezing wave
     public void CreateExplosion(ExplosionType explosionType)
@@ -380,6 +397,11 @@ public class Projectile : MonoBehaviour {
             {
                 CreateExplosion(ExplosionType.freeze);
                 //e.ApplyEffect(Effect.freeze);
+            }
+            // fire arrow
+            else if (attributeID == 5)
+            {
+                CreateAreaEffect(0);
             }
             hitGround = true;
             deflected = true;

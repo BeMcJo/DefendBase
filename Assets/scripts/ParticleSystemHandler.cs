@@ -9,6 +9,8 @@ public class ParticleSystemHandler : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
         ps = GetComponent<ParticleSystem>();
+        if (ps == null)
+            ps = GetComponentInChildren<ParticleSystem>();
 	}
 	
 	// Update is called once per frame

@@ -125,6 +125,7 @@ public class GameManager : MonoBehaviour {
                         indicatorPrefabs, // List of indicator objects
                         buffs, // List of buffs
                         interactiveUIPrefabs, // list of UIs used for buff conditions
+                        areaEffectPrefabs, // list of area effects
                         VFXPrefabs, // list of particle effects
                         weaponPrefabs; // List of weapon objects
 

@@ -43,6 +43,12 @@ public class Arrow : Projectile {
             transform.Find("Arrow").GetChild(0).GetComponent<MeshRenderer>().material.color = Color.white;
             attributesContainer.GetChild(1).gameObject.SetActive(false);
         }
+        // fire arrow
+        else if (attributeID == 5)
+        {
+            //transform.Find("Arrow").GetChild(0).GetComponent<MeshRenderer>().material.color = Color.white;
+            attributesContainer.GetChild(2).gameObject.SetActive(false);
+        }
 
         //Enable current attribute
         // normal arrow
@@ -73,9 +79,15 @@ public class Arrow : Projectile {
         // ice arrow
         else if (aID == 4)
         {
-            transform.Find("Arrow").GetChild(0).GetComponent<MeshRenderer>().material.color = new Color(111.0f/255,255.0f/255,255.0f/255);
+            transform.Find("Arrow").GetChild(0).GetComponent<MeshRenderer>().material.color = new Color(111.0f / 255, 255.0f / 255, 255.0f / 255);
             attributesContainer.gameObject.SetActive(true);
             attributesContainer.GetChild(1).gameObject.SetActive(true);
+        }
+        // fire arrow
+        else if (aID == 5)
+        {
+            attributesContainer.gameObject.SetActive(true);
+            attributesContainer.GetChild(2).gameObject.SetActive(true);
         }
         base.SetAttribute(aID);
         

@@ -26,7 +26,7 @@ public class Enemy : MonoBehaviour
         // Stats for Slimes ignore -> Normies
         new EnemyStats[]
         {
-            new EnemyStats(1, 1, 1, 1),
+            new EnemyStats(2, 1, 1, 1),
             new EnemyStats(2, 1, 1.2f, 1.2f),
             new EnemyStats(2, 2, 1.25f, 1.25f),
             new EnemyStats(3, 2, 1.5f, 1.3f),
@@ -88,7 +88,8 @@ public class Enemy : MonoBehaviour
                  attackRange, // Distance before being able to attack
                  effectiveAttackSpd; // Attack speed calculated and used
     public bool isGrounded = false, isDoneMoving, isAttacking, isPerformingAction, isDead=false, canPerformAction;
-    protected string actionPerformed = "idle", ename = "enemy", dmgSourceType;
+    protected string actionPerformed = "idle", ename = "enemy", 
+                     dmgSourceType; // who or what dealt damage to me? (Player, trap, etc)
     protected Color originalColor;
     public GameObject[] statusEffectObjects;
     public GameObject go;
@@ -311,7 +312,7 @@ public class Enemy : MonoBehaviour
             canPerformAction = false;
             statusEffectObjects[0].SetActive(true);
             //if()
-            yield return new WaitForSeconds(5);
+            yield return new WaitForSeconds(20);
             statusEffectObjects[0].SetActive(false);
             anim.enabled = true;
             canPerformAction = true;
@@ -670,6 +671,7 @@ public class Enemy : MonoBehaviour
     }
      */
 
+    // take damage dmg from source. upon death we can determine what the source was (player, trap, etc)
     public virtual void TakeDamageFrom(int dmg, string dmgSourceType, int sid)
     {
         TakeDamage(dmg);
