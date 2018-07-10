@@ -21,6 +21,7 @@ public class DamageOverTime : MonoBehaviour {
         timeStamp = Time.time + duration;
         if (type == 0) {
             life = 1;
+            GetComponent<Enemy>().statusEffectObjects[1].gameObject.SetActive(true);
         }
     }
 	
@@ -31,11 +32,16 @@ public class DamageOverTime : MonoBehaviour {
             Enemy e = GetComponent<Enemy>();
             if (e)
             {
+                //e.ApplyEffect(Effect.burn);//,dmg,ownerType,ownerID);
+                
                 e.TakeDamageFrom(dmg, ownerType, ownerID);
                 GameManager.gm.OnHitEnemy();
+                
                 life--;
                 if (life <= 0)
                 {
+                    if (type == 0)
+                        GetComponent<Enemy>().statusEffectObjects[1].gameObject.SetActive(false);
                     Destroy(this);
                 }
                 else

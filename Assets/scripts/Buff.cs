@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 public enum Effect
 {
-    freeze
+    freeze,
 };
 
 public class Buff : MonoBehaviour {

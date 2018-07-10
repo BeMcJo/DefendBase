@@ -61,7 +61,10 @@ public class Explosion : MonoBehaviour {
                 return;
             alreadyHit.Add(e.gameObject);
             if(explosionType == ExplosionType.damage)
-                e.OnHit();
+            //e.OnHit();
+            {
+                GameManager.gm.OnHitEnemy();
+            }
             else if(explosionType == ExplosionType.freeze)
             {
                 print("FREEze");

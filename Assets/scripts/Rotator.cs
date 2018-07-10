@@ -322,7 +322,7 @@ public class Rotator : MonoBehaviour, IPointerDownHandler, IPointerUpHandler,IDr
             if (attributeID == 0)
                 icon.Find("QtyTxt").GetComponent<Text>().text += "---";
             else
-                icon.Find("QtyTxt").GetComponent<Text>().text += GameManager.gm.myAttributes[itemOrder[i]];
+                icon.Find("QtyTxt").GetComponent<Text>().text += GameManager.gm.personalData.arrowQuantities[itemOrder[i]];
             /*
             if (attributeID == 0)
                 icon.GetChild(0).GetComponent<Text>().text += " \nINF";//GameManager.gm.myAttributes[attributeID];// "Attribute " + itemOrder[i];
@@ -364,7 +364,7 @@ public class Rotator : MonoBehaviour, IPointerDownHandler, IPointerUpHandler,IDr
             if (attributeID == 0)
                 icon.Find("QtyTxt").GetComponent<Text>().text += "---";
             else
-                icon.Find("QtyTxt").GetComponent<Text>().text += GameManager.gm.myAttributes[itemOrder[i]];
+                icon.Find("QtyTxt").GetComponent<Text>().text += GameManager.gm.personalData.arrowQuantities[itemOrder[i]];
         }
         //print("INSIDE EDIT CUR :" + curItem);
         currentItemTxt.text = Projectile.names[curItem] + '\n' + Projectile.names[1];

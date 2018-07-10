@@ -207,7 +207,7 @@ public class GameManager : MonoBehaviour {
                       selectedDefense; // Currently selected defense to place onto map
     public Dictionary<int, int> myDefenses, // Counts number of each type of defense in inventory
                                 myProjectiles, // Counts number of each type of projectile in inventory
-                                myAttributes, // Counts number of each type of attribute in inventory
+                                //myAttributes, // Counts number of each type of attribute in inventory
                                 myTraps; // Counts number of each type of trap in inventory 
     public string mapAction,
                   quickAccessDetail,
@@ -375,7 +375,7 @@ public class GameManager : MonoBehaviour {
         interactiveTouch = false;
         traps = new Dictionary<int, Trap>();
         myTraps = new Dictionary<int, int>();
-        myAttributes = new Dictionary<int, int>();
+        //myAttributes = new Dictionary<int, int>();
         myProjectiles = new Dictionary<int, int>();
         myDefenses = new Dictionary<int, int>();
         audioSrc = gameObject.AddComponent<AudioSource>();
@@ -608,6 +608,7 @@ public class GameManager : MonoBehaviour {
             GameObject itemUI = Instantiate(wepUIPrefab);
             //csf.AddItem(itemUI);
             itemUI.transform.SetParent(UIContainer);
+            itemUI.transform.Find("ItemImageBG").GetChild(0).GetComponent<RawImage>().texture = itemIcons[i].texture;
             itemUI.transform.Find("ItemName").GetComponent<Text>().text = Projectile.projectileStats[i].name;
             itemUI.transform.Find("ItemStats").gameObject.SetActive(false);//Find("Damage").Find("Text").GetComponent<Text>().text = "" + Weapon.weaponStats[i].dmg[0];
             //itemUI.transform.Find("ItemStats").Find("Reload").Find("Text").GetComponent<Text>().text = "" + Weapon.weaponStats[i].timeToReload[0];
@@ -798,7 +799,7 @@ public class GameManager : MonoBehaviour {
         effectsCanvas = GameObject.Find("EffectsCanvas");
 
         myProjectiles.Clear();
-        myAttributes.Clear();
+        //myAttributes.Clear();
 
         //Attribute.names = new string[attributePrefabs.Length];
 
@@ -806,7 +807,7 @@ public class GameManager : MonoBehaviour {
         for(int i = 0; i < Projectile.projectileStats.Length; i++)
         {
             //Attribute.names[i] = "Attr " + i;
-            myAttributes[i] = 1;
+            //myAttributes[i] = 1;
             GameObject icon = Instantiate(iconPrefab);
             icon.GetComponent<Selector>().id = i;
             //csf.AddItem(icon);
@@ -947,10 +948,10 @@ public class GameManager : MonoBehaviour {
         {
             if (itemID == 0)
                 return;
-            myAttributes[itemID]--;
+            //myAttributes[itemID]--;
             personalData.arrowQuantities[itemID]--;
             //print(itemID + ":" + myAttributes[itemID]);
-            if(myAttributes[itemID] <= 0)
+            if(personalData.arrowQuantities[itemID] <= 0)//myAttributes[itemID] <= 0)
             {
                 print("OUT OF ITEM");
                 ChangeSelectedAttribute(0);
@@ -967,7 +968,7 @@ public class GameManager : MonoBehaviour {
         for(int i = 1; i < Projectile.projectileStats.Length; i++)
         {
             int nextIndex = (index + i) % Projectile.projectileStats.Length;
-            if(myAttributes[nextIndex] > 0 || nextIndex == 0)
+            if(personalData.arrowQuantities[index] > 0 || nextIndex == 0) //myAttributes[nextIndex] > 0 || nextIndex == 0)
             {
                 index = nextIndex;
                 break;
@@ -981,7 +982,7 @@ public class GameManager : MonoBehaviour {
         for (int i = 1; i < Projectile.projectileStats.Length; i++)
         {
             int prevIndex = (index - i + Projectile.projectileStats.Length) % Projectile.projectileStats.Length;
-            if (myAttributes[prevIndex] > 0 || prevIndex == 0)
+            if (personalData.arrowQuantities[index] > 0 || prevIndex == 0)
             {
                 index = prevIndex;
                 break;
@@ -1010,11 +1011,11 @@ public class GameManager : MonoBehaviour {
             }
             else
             {
-                changeArrowBtn.transform.Find("QtyTxt").GetComponent<Text>().text += myAttributes[itemID];
+                changeArrowBtn.transform.Find("QtyTxt").GetComponent<Text>().text += personalData.arrowQuantities[itemID];//myAttributes[itemID];
             }
         }
-        itemDropdownList.transform.GetChild(itemID).Find("QtyTxt").GetComponent<Text>().text = "x" + ((itemID == 0) ? "---" : ""+myAttributes[itemID]);
-        bool isEmpty = myAttributes[itemID] == 0 && itemID != 0;
+        itemDropdownList.transform.GetChild(itemID).Find("QtyTxt").GetComponent<Text>().text = "x" + ((itemID == 0) ? "---" : "" + personalData.arrowQuantities[itemID]);
+        bool isEmpty = personalData.arrowQuantities[itemID] == 0 && itemID != 0;
         print(isEmpty+" "+itemID) ;
         arrowUIItems[itemID].SetActive(!isEmpty);
         //itemDropdownList.transform.GetChild(itemID).gameObject.SetActive(!isEmpty);
@@ -1836,7 +1837,7 @@ public class GameManager : MonoBehaviour {
             UpdateInGameCurrency(0);
             UpdateKillCount(0);
             UpdateScore(0);
-            for (int i = 0; i < myAttributes.Count; i++)
+            for (int i = 0; i < personalData.arrowQuantities.Length; i++)
                 UpdateArrowQty(i);
             return;
         }
@@ -1849,7 +1850,7 @@ public class GameManager : MonoBehaviour {
         player.transform.SetParent(playerRotation.transform);
         for (int i = 0; i < Projectile.projectileStats.Length; i++)
         {
-            myAttributes[i] = personalData.arrowQuantities[i];
+            personalData.arrowQuantities[i] = personalData.arrowQuantities[i];
         }
         if (continuedGame)
         {
@@ -1889,7 +1890,7 @@ public class GameManager : MonoBehaviour {
         UpdateKillCount(0);
         UpdateScore(0);
         playerStatusCanvas.transform.Find("Wave").Find("Text").GetComponent<Text>().text = (wave) + "";
-        for (int i = 0; i < myAttributes.Count; i++)
+        for (int i = 0; i < personalData.arrowQuantities.Length; i++)
             UpdateArrowQty(i);
 
         if (wave % 5 == 0)

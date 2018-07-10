@@ -284,7 +284,8 @@ public class Enemy : MonoBehaviour
         curTarget = curTargetIndex;
     }
 
-    public void ApplyEffect(Effect eff)
+    // Applies status effects on enemy (freeze, ...)
+    public void ApplyEffect(Effect eff)//, int dmg=0, string ownerType="", int ownerID = -1)
     {
         switch (eff)
         {
@@ -298,8 +299,11 @@ public class Enemy : MonoBehaviour
                 
                 StartCoroutine(Freeze());
                 break;
+
+            
         }
     }
+    
 
     public IEnumerator Freeze()
     {
