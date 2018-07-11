@@ -137,7 +137,7 @@ public class GameManager : MonoBehaviour {
                       buttonPrefab, // Used for any general purposes as button
                       postedNoteButtonPrefab, // Button that looks like a post
                       itemUIPrefab, // Used to display items in store in game
-                      wepUIPrefab, // Used to display weapon in store out of game
+                      inventoryUIPrefab, // Used to display inventory items in out of game
                       descriptionPrefab, // Used to provide details about item
                       enemyArmorPrefab, // ???
                       iconPrefab, // icon of item
@@ -542,9 +542,10 @@ public class GameManager : MonoBehaviour {
         ContentSizeFitter csf = UIContainer.GetComponent<ContentSizeFitter>();
         for (int i = 0; i < Weapon.weaponStats.Length; i++)
         {
-            GameObject itemUI = Instantiate(wepUIPrefab);
+            GameObject itemUI = Instantiate(inventoryUIPrefab);
             itemUI.transform.SetParent(UIContainer);
             //csf.AddItem(itemUI);
+            itemUI.transform.Find("ItemImageBG").GetComponent<RawImage>().color = new Color(249f / 255, 88f/255, 0);// / 255;
             itemUI.transform.Find("ItemName").GetComponent<Text>().text = Weapon.weaponStats[i].name;
             itemUI.transform.Find("ItemStats").Find("Damage").Find("Text").GetComponent<Text>().text = "" + Weapon.weaponStats[i].dmg[0];
             itemUI.transform.Find("ItemStats").Find("Reload").Find("Text").GetComponent<Text>().text = "" + Weapon.weaponStats[i].timeToReload[0];
@@ -605,10 +606,11 @@ public class GameManager : MonoBehaviour {
         //csf = UIContainer.GetComponent<ContentSizeFitter>();
         for (int i = 0; i < Projectile.projectileStats.Length; i++)
         {
-            GameObject itemUI = Instantiate(wepUIPrefab);
+            GameObject itemUI = Instantiate(inventoryUIPrefab);
             //csf.AddItem(itemUI);
             itemUI.transform.SetParent(UIContainer);
             itemUI.transform.Find("ItemImageBG").GetChild(0).GetComponent<RawImage>().texture = itemIcons[i].texture;
+            itemUI.transform.Find("ItemImageBG").GetComponent<RawImage>().color = new Color(149f / 255, 1, 1);// / 255;
             itemUI.transform.Find("ItemName").GetComponent<Text>().text = Projectile.projectileStats[i].name;
             itemUI.transform.Find("ItemStats").gameObject.SetActive(false);//Find("Damage").Find("Text").GetComponent<Text>().text = "" + Weapon.weaponStats[i].dmg[0];
             //itemUI.transform.Find("ItemStats").Find("Reload").Find("Text").GetComponent<Text>().text = "" + Weapon.weaponStats[i].timeToReload[0];
@@ -1117,6 +1119,7 @@ public class GameManager : MonoBehaviour {
 
     public void ChangeSelectedTab(string selectedTab)
     {
+        inventoryItemPanel.transform.Find(gm.selectedTab + "UIContainer").transform.localPosition = Vector2.zero;
         if (gm.selectedTab == selectedTab)
             return;
         print("CHANGE");
@@ -1124,7 +1127,6 @@ public class GameManager : MonoBehaviour {
         inventoryCanvas.transform.Find("ButtonsContainer").Find(gm.selectedTab + "TabBtn").GetComponent<Button>().interactable = true;
         inventoryItemPanel.transform.Find(selectedTab + "UIContainer").gameObject.SetActive(true);
         inventoryItemPanel.transform.Find(gm.selectedTab + "UIContainer").gameObject.SetActive(false);
-        inventoryItemPanel.transform.Find(gm.selectedTab + "UIContainer").transform.localPosition = Vector2.zero;
         gm.selectedTab = selectedTab;
         inventoryItemPanel.GetComponent<ScrollRect>().content = inventoryItemPanel.transform.Find(selectedTab + "UIContainer").GetComponent<RectTransform>();
         inventoryItemPanel.GetComponent<ScrollRect>().velocity = Vector2.zero;
@@ -1411,6 +1413,7 @@ public class GameManager : MonoBehaviour {
     public void ToggleInventoryCanvas()
     {
         inventoryCanvas.SetActive(!inventoryCanvas.activeSelf);
+        ChangeSelectedTab("Weapons");
     }
 
     public void ToggleMapUICanvas()
