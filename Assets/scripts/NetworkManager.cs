@@ -615,11 +615,14 @@ public class NetworkManager : MonoBehaviour {
         Destroy(players[cnnId].playerGO);
         // Remove this player from our client list
         players.Remove(cnnId);
-        
+
+        bool canStart = IsReady();
         // Broadcast again if not in game
-        if (!GameManager.gm.inGame && !isBroadcasting)
+        if (!GameManager.gm.inGame)
         {
-            StartBroadcast();
+            if(!isBroadcasting)
+                StartBroadcast();
+            GameManager.gm.lobbyCanvas.transform.Find("ReadyBtn").GetComponent<Button>().interactable = canStart && players.Count > 1;
         }
         Debug.Log("DCS: " + cnnId);
         // Tell everyone that someone has disconnected
@@ -1749,6 +1752,10 @@ public class NetworkManager : MonoBehaviour {
                 StopBroadcast();
             }
         }
+        else
+        {
+            ClearHostList();
+        }
         if (hostID != -1)
         {
             if (isHost)
@@ -1806,8 +1813,13 @@ public class NetworkManager : MonoBehaviour {
     // Internal workings of ensuring all players are ready for next step in game
     public bool ConfirmReadyStatus(int cnnID)
     {
-        bool readyToStart = true;
         players[cnnID].isReady = !players[cnnID].isReady;
+        return IsReady();
+    }
+
+    public bool IsReady()
+    {
+        bool readyToStart = true;
         foreach (KeyValuePair<int, Player> kvp in players)
         {
             if (kvp.Value.connectionID != 0)
@@ -1818,6 +1830,7 @@ public class NetworkManager : MonoBehaviour {
             }
         }
         return readyToStart;
+
     }
 
     // Handles behaviors for being ready for a player throughout the game

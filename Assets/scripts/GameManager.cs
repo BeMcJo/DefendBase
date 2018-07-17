@@ -1815,7 +1815,7 @@ public class GameManager : MonoBehaviour {
         gameOver = false;
         inGameCurrency = 0;
         startWaves = false;
-        UpdateInGameCurrency(100);
+        UpdateInGameCurrency(0);
         score = 0;
         kills = 0;
         personalKills = 0;
@@ -2203,7 +2203,7 @@ public class GameManager : MonoBehaviour {
                         if (selected.name == "UpgradeWepBtn" && quickAccessDetail == "")
                         {
                             quickAccessDetail = "upgrade";
-                            quickAccessUpgradeDescription.SetActive(true);
+                            //quickAccessUpgradeDescription.SetActive(true);
                             //print("upgrade wep");
                             //mapUICanvas.SetActive(true);
                         }
@@ -2231,6 +2231,7 @@ public class GameManager : MonoBehaviour {
 
                     }
                 }
+                
             }
             else
             {
@@ -2250,7 +2251,7 @@ public class GameManager : MonoBehaviour {
                         if (quickAccessDetail == "upgrade")
                         {
                             //mapUICanvas.SetActive(false);
-                            quickAccessUpgradeDescription.SetActive(false);
+                            quickAccessUpgradeDescription.SetActive(!quickAccessUpgradeDescription.activeSelf);//false);
                         }
                         else if (quickAccessDetail == "change")
                         {
