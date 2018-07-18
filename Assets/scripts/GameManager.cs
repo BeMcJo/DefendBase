@@ -219,7 +219,7 @@ public class GameManager : MonoBehaviour {
     float initialAngle;
     Pattern pattern; // Points to enemy spawn pattern
 
-    public Sprite[] itemIcons;
+    public Sprite[] arrowItemIcons, weaponItemIcons;
     //Button upgradeWepBtn;
     Coroutine blackoutCoroutine,
               waveNotificationCoroutine,
@@ -260,7 +260,7 @@ public class GameManager : MonoBehaviour {
         }
         else
         {
-            print("found");
+            //print("found");
             file = File.Open(path, FileMode.Open);
         }
 
@@ -304,7 +304,7 @@ public class GameManager : MonoBehaviour {
                 break;
 
             case "setupMain":
-                print("seting");
+                //print("seting");
                 PersonalData personalData = new PersonalData();
                 if (gm.personalData != null)
                     personalData = gm.personalData;
@@ -547,6 +547,7 @@ public class GameManager : MonoBehaviour {
             //csf.AddItem(itemUI);
             itemUI.transform.Find("ItemImageBG").GetComponent<RawImage>().color = new Color(249f / 255, 88f/255, 0);// / 255;
             itemUI.transform.Find("ItemName").GetComponent<Text>().text = Weapon.weaponStats[i].name;
+            itemUI.transform.Find("ItemImageBG").GetChild(0).GetComponent<RawImage>().texture = weaponItemIcons[i % weaponItemIcons.Length].texture;
             itemUI.transform.Find("ItemStats").Find("Damage").Find("Text").GetComponent<Text>().text = "" + Weapon.weaponStats[i].dmg[0];
             itemUI.transform.Find("ItemStats").Find("Reload").Find("Text").GetComponent<Text>().text = "" + Weapon.weaponStats[i].timeToReload[0];
             itemUI.transform.Find("ItemStats").Find("ChargeAcceleration").Find("Text").GetComponent<Text>().text = "" + Weapon.weaponStats[i].chargeAccelation[0];
@@ -609,7 +610,7 @@ public class GameManager : MonoBehaviour {
             GameObject itemUI = Instantiate(inventoryUIPrefab);
             //csf.AddItem(itemUI);
             itemUI.transform.SetParent(UIContainer);
-            itemUI.transform.Find("ItemImageBG").GetChild(0).GetComponent<RawImage>().texture = itemIcons[i].texture;
+            itemUI.transform.Find("ItemImageBG").GetChild(0).GetComponent<RawImage>().texture = arrowItemIcons[i].texture;
             itemUI.transform.Find("ItemImageBG").GetComponent<RawImage>().color = new Color(149f / 255, 1, 1);// / 255;
             itemUI.transform.Find("ItemName").GetComponent<Text>().text = Projectile.projectileStats[i].name;
             itemUI.transform.Find("ItemStats").gameObject.SetActive(false);//Find("Damage").Find("Text").GetComponent<Text>().text = "" + Weapon.weaponStats[i].dmg[0];
@@ -818,7 +819,7 @@ public class GameManager : MonoBehaviour {
             icon.name = "Attribute " + i;
             icon.tag = "QuickAccess";
             icon.transform.localScale = new Vector3(1, 1, 1);
-            icon.transform.Find("ItemIcon").GetComponent<Image>().sprite = itemIcons[i];
+            icon.transform.Find("ItemIcon").GetComponent<Image>().sprite = arrowItemIcons[i];
             //csf.SetItemActive(i, i == 0);
             icon.transform.Find("Selected BG").gameObject.SetActive(i == 0);
         }
@@ -1005,7 +1006,7 @@ public class GameManager : MonoBehaviour {
         }
         if (itemID == selectedAttribute)
         {
-            changeArrowBtn.GetComponent<Image>().sprite = itemIcons[itemID];
+            changeArrowBtn.GetComponent<Image>().sprite = arrowItemIcons[itemID];
             changeArrowBtn.transform.Find("QtyTxt").GetComponent<Text>().text = "x";
             if (itemID == 0)
             {

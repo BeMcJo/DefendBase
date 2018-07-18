@@ -351,7 +351,7 @@ public class Rotator : MonoBehaviour, IPointerDownHandler, IPointerUpHandler,IDr
             //string[] splitData = data.Split(' ');
             int attributeID = itemOrder[i];//int.Parse(splitData[1]);
 
-            icon.Find("ItemIcon").GetComponent<Image>().sprite = GameManager.gm.itemIcons[attributeID];
+            icon.Find("ItemIcon").GetComponent<Image>().sprite = GameManager.gm.arrowItemIcons[attributeID];
             icon.Find("Selected BG").gameObject.SetActive(attributeID == GameManager.gm.player.GetComponent<PlayerController>().selectedAttribute); //GameManager.gm.selectedArrowAttribute);
             /*
             icon.GetChild(0).GetComponent<Text>().text = "Attribute " + attributeID + " \n" + GameManager.gm.myAttributes[attributeID];

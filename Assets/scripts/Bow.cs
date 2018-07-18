@@ -31,7 +31,7 @@ public class Bow : Weapon
             arrows = new Transform[3];
         else
             arrows = new Transform[1];
-        bow = transform.Find("Bow");
+        //bow = transform.Find("Bow");
         lr = bow.GetComponent<LineRenderer>();
         drawOffset = -3.65f;
         drawRange = drawOffset;
@@ -153,6 +153,8 @@ public class Bow : Weapon
     // Charges up arrow, drawing it back until drawLimit
     public override bool StartUse(Touch t)
     {
+        if (arrows[0] == null)
+            return false;
         // print(gameObject);
         //print(user);
         //print(user.IsMyPlayer());
