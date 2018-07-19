@@ -12,6 +12,7 @@ public class MapViewCamera : MonoBehaviour {
     public float moveSpd = .01f, zoomSpd = .1f;
     public float maxZoomIn = 4f, maxZoomOut = 75, defaultZoom = 50;
     public float horizExtent, vertExtent, mapX, mapY, minX, minY, maxX, maxY;
+    public bool playerCam, canZoom;
 	// Use this for initialization
 	void Start () {
         mapCam = transform.GetComponent<Camera>();
@@ -36,6 +37,8 @@ public class MapViewCamera : MonoBehaviour {
 
     private void LateUpdate()
     {
+        if (playerCam)
+            return;
         Transform bounds = GameManager.gm.playerRotation.transform.Find("Bounds");
         minX = bounds.GetChild(0).localPosition.x;
         maxX = bounds.GetChild(1).localPosition.x;
@@ -58,6 +61,8 @@ public class MapViewCamera : MonoBehaviour {
     }
     // Update is called once per frame
     void Update() {
+        if (playerCam && !canZoom)
+            return;
         for (int i = 0; i < Input.touchCount; i++)
         {
             //Debug.Log(1);
@@ -105,7 +110,7 @@ public class MapViewCamera : MonoBehaviour {
                 }
             }
         }
-        if (GameManager.gm.selectedDefense && GameManager.gm.mapFingerID != -1)
+        if (!playerCam && GameManager.gm.selectedDefense && GameManager.gm.mapFingerID != -1)
         {
             return;
         }
@@ -116,7 +121,7 @@ public class MapViewCamera : MonoBehaviour {
             if (touchIDs[i] != -1)
                 touches.Add(touchIDs[i]);
         }
-        if(touches.Count == 1)
+        if(!playerCam && touches.Count == 1)
         {
             for (int i = 0; i < Input.touchCount; i++)
             {
@@ -162,11 +167,22 @@ public class MapViewCamera : MonoBehaviour {
             //Debug.Log(dif);
             if (prevDist > 0 || prevDist < 0)
             {
-                mapCam.orthographicSize -= dif * zoomSpd;
-                if (mapCam.orthographicSize <= maxZoomIn)
-                    mapCam.orthographicSize = maxZoomIn;
-                if (mapCam.orthographicSize >= maxZoomOut)
-                    mapCam.orthographicSize = maxZoomOut;
+                if (!playerCam)
+                {
+                    mapCam.orthographicSize -= dif * zoomSpd;
+                    if (mapCam.orthographicSize <= maxZoomIn)
+                        mapCam.orthographicSize = maxZoomIn;
+                    if (mapCam.orthographicSize >= maxZoomOut)
+                        mapCam.orthographicSize = maxZoomOut;
+                }
+                else
+                {
+                    mapCam.fieldOfView -= dif * zoomSpd;
+                    if (mapCam.fieldOfView <= maxZoomIn)
+                        mapCam.fieldOfView = maxZoomIn;
+                    if (mapCam.fieldOfView >= maxZoomOut)
+                        mapCam.fieldOfView = maxZoomOut;
+                }
             }
             prevDist = newDist;
         }

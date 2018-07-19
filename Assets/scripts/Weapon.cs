@@ -77,8 +77,8 @@ public abstract class Weapon : MonoBehaviour
             UnlockCondition.Free,
             new int[] {1,1,1,1,2},
             new int[] {50,100,200,500},
-            new float[] {20, 23,26,29,32},
-            new float[] {2.3f,2.0f,1.7f,1.4f,1.15f},
+            new float[] {24, 30,36,43,50},
+            new float[] {2.5f,2.3f,2.0f,1.7f,1.3f},
             new float[] {.75f,.70f,.65f,.55f,.5f},
             "Steady focused aim wins the game"
         ),
@@ -87,16 +87,20 @@ public abstract class Weapon : MonoBehaviour
         (
             "Machine Bow",
             2500,
-            UnlockCondition.QuestThenPurchase,
+            UnlockCondition.Free,//UnlockCondition.QuestThenPurchase,
             new int[] {1,1,1,1,2},
             new int[] {50,100,200,500},
             new float[] {16, 17,19,23,29},
-            new float[] {.1f,1.75f,1.5f,1.25f,1f},
+            new float[] {.5f,1.75f,1.5f,1.25f,1f},
             new float[] {.5f,.70f,.65f,.55f,.5f},
             "Spraying arrows!? For the love of God..."
         )
     };
-
+    public static bool[] enableWeps = { true, false, true, true };
+    public static int MAX_DMG = 2;
+    public static float MAX_BOW_STR = 50f,
+                        
+                        MIN_BOW_TTR = .5f; 
     public static int WeaponCount = 0; // Counts number of weapons created
     public GameObject[] bulletSpawns; // Spawn point(s) for bullets
     public GameObject bulletPrefab; // Projectile to spawn

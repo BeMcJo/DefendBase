@@ -65,6 +65,7 @@ public class Projectile : MonoBehaviour {
         "Projectile",
         "Arrow"
     };
+    public static bool[] enableArrows = { true, true, false, true, true, true, true };
     public int id; // ID based on which player shot this object
     public float activeDuration = 10f; // How long before destroying object
     public float moveSpd = 6f;

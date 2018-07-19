@@ -599,6 +599,8 @@ public class GameManager : MonoBehaviour {
                     }
                     break;
             }
+
+            itemUI.SetActive(Weapon.enableWeps[i]);
         }
 
         // Set up arrow section
@@ -644,6 +646,7 @@ public class GameManager : MonoBehaviour {
                     actionBtn.Find("Currency").Find("Text").GetComponent<Text>().text = "" + Projectile.projectileStats[i].price;
                     break;
             }
+            itemUI.SetActive(Projectile.enableArrows[i]);
         }
         UIContainer.gameObject.SetActive(false);
 
@@ -793,6 +796,7 @@ public class GameManager : MonoBehaviour {
         quickAccessUpgradeDescription = quickAccessCanvas.transform.Find("DescriptionDisplay").Find("Inventory Descriptions").Find("Upgrade Descriptions").gameObject;
         quickAccessUpgradeDescription.SetActive(false);
         changeArrowBtn = quickAccessCanvas.transform.Find("ChangeArrowsBtn").gameObject;
+        quickAccessCanvas.transform.Find("UpgradeWepBtn").Find("WepIcon").GetComponent<Image>().sprite = weaponItemIcons[personalData.equippedWep];
         itemWheel = quickAccessCanvas.transform.Find("ItemWheel").gameObject;
         itemWheel.SetActive(false);
 

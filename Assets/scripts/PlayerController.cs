@@ -236,7 +236,8 @@ public class PlayerController : MonoBehaviour {
         w.user = this;
         wep.transform.SetParent(transform.Find("Camera Container").Find("Player Camera"));
         wep.transform.position = transform.Find("Camera Container").Find("Player Camera").Find("WeaponPlaceholder").position;
-
+        // Allow zoom feature if using sniper bow
+        playerCam.GetComponent<MapViewCamera>().canZoom = wep.wepID == 2;
     }
 
     // Handle Mobile inputs
