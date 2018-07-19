@@ -221,6 +221,7 @@ public class GameManager : MonoBehaviour {
     Pattern pattern; // Points to enemy spawn pattern
 
     public Sprite[] arrowItemIcons, weaponItemIcons;
+    public Texture[] borderIcons;
     //Button upgradeWepBtn;
     Coroutine blackoutCoroutine,
               waveNotificationCoroutine,
@@ -801,7 +802,7 @@ public class GameManager : MonoBehaviour {
         itemWheel = quickAccessCanvas.transform.Find("ItemWheel").gameObject;
         itemWheel.SetActive(false);
 
-        itemDropdownList = quickAccessCanvas.transform.Find("ItemDropdownList").Find("ItemContainer").gameObject;//GetChild(0).gameObject;
+        itemDropdownList = quickAccessCanvas.transform.Find("ArrowItemList").Find("ItemDropdownList").Find("ItemContainer").gameObject;//GetChild(0).gameObject;
         ContentSizeFitter csf = itemDropdownList.GetComponent<ContentSizeFitter>();
         //quickAccessCanvas.SetActive(false);
         effectsCanvas = GameObject.Find("EffectsCanvas");
@@ -810,6 +811,7 @@ public class GameManager : MonoBehaviour {
         //myAttributes.Clear();
 
         //Attribute.names = new string[attributePrefabs.Length];
+        Color borderColor = new Color(20f/255, 14f/255 , 128f/255);
 
         // Add all attributes to inventory and instantiate them
         for(int i = 0; i < Projectile.projectileStats.Length; i++)
@@ -817,9 +819,19 @@ public class GameManager : MonoBehaviour {
             //Attribute.names[i] = "Attr " + i;
             //myAttributes[i] = 1;
             GameObject icon = Instantiate(iconPrefab);
+            /*
+            GameObject border = new GameObject("Border");
+            border.AddComponent<RawImage>();
+            border.GetComponent<RawImage>().texture = borderIcons[1];
+            border.GetComponent<RawImage>().color = borderColor;
+            border.GetComponent<RectTransform>().sizeDelta = new Vector2(105, 105);// = 105; border.GetComponent<RectTransform>().rect.height = 105;
+            border.transform.SetParent(icon.transform);
+            border.transform.localPosition = Vector2.zero;
+            */
             icon.GetComponent<Selector>().id = i;
             //csf.AddItem(icon);
             arrowUIItems[i] = icon;
+            
             icon.transform.SetParent(itemDropdownList.transform);
             icon.name = "Attribute " + i;
             icon.tag = "QuickAccess";
@@ -828,7 +840,7 @@ public class GameManager : MonoBehaviour {
             //csf.SetItemActive(i, i == 0);
             icon.transform.Find("Selected BG").gameObject.SetActive(i == 0);
         }
-        //itemDropdownList.transform.parent.parent.gameObject.SetActive(false);
+        itemDropdownList.transform.parent.parent.gameObject.SetActive(false);
 
         trapSpawnPrefab = new GameObject[trapPrefabs.Length];
         Transform trapDescriptions = descriptionDisplay.transform.Find("Trap Descriptions");
@@ -1046,10 +1058,10 @@ public class GameManager : MonoBehaviour {
                 NetworkManager.nm.NotifyPlayerChangedArrowAttribute(attributeID);
             }
         }
-        itemDropdownList.GetComponent<Slider>().SlideInDirection(0);
+        //itemDropdownList.GetComponent<Slider>().SlideInDirection(0);
         //ToggleArrowQtyList();
 
-        //itemDropdownList.transform.parent.parent.gameObject.SetActive(false);
+        itemDropdownList.transform.parent.parent.gameObject.SetActive(false);
     }
 
     public void OnHitEnemy()
@@ -1228,9 +1240,9 @@ public class GameManager : MonoBehaviour {
 
     public void ToggleArrowQtyList()
     {
-        itemDropdownList.GetComponent<Slider>().ToggleSlider();
-        //GameObject arrowQtyList = itemDropdownList.transform.parent.parent.gameObject;
-        //arrowQtyList.SetActive(!arrowQtyList.activeSelf);
+        //itemDropdownList.GetComponent<Slider>().ToggleSlider();
+        GameObject arrowQtyList = itemDropdownList.transform.parent.parent.gameObject;
+        arrowQtyList.SetActive(!arrowQtyList.activeSelf);
     }
 
     public void DisplayEndGameNotifications(bool won)
@@ -1640,7 +1652,8 @@ public class GameManager : MonoBehaviour {
 
     public void LeaveGame()
     {
-        StopCoroutine(waveNotificationCoroutine);
+        if(waveNotificationCoroutine != null)
+            StopCoroutine(waveNotificationCoroutine);
         GoToMainScene();
     }
 
