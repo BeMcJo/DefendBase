@@ -19,6 +19,8 @@ public class Bow : Weapon
     public GameObject[] bowstringPositionPlaceHolders;
 
     protected Vector3[] bowstringPositions;
+
+
 	// Use this for initialization
 	protected override void Start ()
     {
@@ -117,6 +119,7 @@ public class Bow : Weapon
     public void Reload()
     {
         reloadTime -= Time.deltaTime;
+        reloadBar.fillAmount = (weaponStats[wepID].timeToReload[lvl] - reloadTime) / weaponStats[wepID].timeToReload[lvl];
         if (reloadTime > 0)
             return;
         reloading = false;
@@ -246,14 +249,15 @@ public class Bow : Weapon
         // If not using Touch Interactive mode, progressively increase the chargePower as long as user holds shoot button
         if (!GameManager.gm.interactiveTouch)
         {
-            
-
+            base.Charge(chargePower);
+            /*
             chargePower = chargePower + (.03f * weaponStats[wepID].chargeAccelation[0]) / (float)DebugManager.dbm.fps * 60.0f; // increment charge power
             if (chargePower >= chargeLimit)
                 chargePower = chargeLimit;
-            chargeBar.transform.localScale = new Vector3(1, chargePower / chargeLimit, 1); // Visual indicator of charge percentage
-            
-            /*
+            //chargeBar.transform.localScale = new Vector3(1, chargePower / chargeLimit, 1); // Visual indicator of charge percentage
+            chargeBar.GetComponent<Image>().fillAmount = (chargePower) / chargeLimit;
+           */ 
+           /*
             float chargeDif = chargePower - this.chargePower;
             print(chargeDif);
             if ((!audioSrc.isPlaying && chargeDif > .03f))// || audioSrc.time > .1f * (1 + percentile) * audioSrc.clip.length)// || audioSrc.time / audioSrc.clip.length > .55f)
@@ -311,21 +315,22 @@ public class Bow : Weapon
                 */
         }
 
-        drawRange = drawOffset + chargePower * drawLimit * drawElasticity; // Calculate how far arrow and bowstring is drawn
+        drawRange = drawOffset + this.chargePower * drawLimit * drawElasticity; // Calculate how far arrow and bowstring is drawn
         for(int i = 0; i < ((wepID == 1)? 3:1);i++)
-            arrows[i].localPosition = bulletSpawns[i].transform.localPosition + new Vector3(0, 0, chargePower * drawLimit); // Move arrow backwards based on charge power 
+            arrows[i].localPosition = bulletSpawns[i].transform.localPosition + new Vector3(0, 0, this.chargePower * drawLimit); // Move arrow backwards based on charge power 
         
 
-        this.chargePower = chargePower;
+        //this.chargePower = chargePower;
+
         //print(chargePower / chargeLimit);
         // if machine bow
         if (wepID == 3)
         {
-            if (chargePower / chargeLimit >= 1)
-                Shoot(chargePower);
+            if (this.chargePower / chargeLimit >= 1)
+                Shoot(this.chargePower);
             return;
         }
-        anim.Play("charge", -1, chargePower);
+        anim.Play("charge", -1, this.chargePower);
         
        // print(audioSrc.time);
         //print(audioSrc.clip.length);

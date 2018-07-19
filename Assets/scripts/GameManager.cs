@@ -798,7 +798,7 @@ public class GameManager : MonoBehaviour {
         quickAccessUpgradeDescription = quickAccessCanvas.transform.Find("DescriptionDisplay").Find("Inventory Descriptions").Find("Upgrade Descriptions").gameObject;
         quickAccessUpgradeDescription.SetActive(false);
         changeArrowBtn = quickAccessCanvas.transform.Find("ChangeArrowsBtn").gameObject;
-        quickAccessCanvas.transform.Find("UpgradeWepBtn").Find("WepIcon").GetComponent<Image>().sprite = weaponItemIcons[personalData.equippedWep];
+        quickAccessCanvas.transform.Find("UpgradeWepBtn").GetComponent<Image>().sprite = weaponItemIcons[personalData.equippedWep];
         itemWheel = quickAccessCanvas.transform.Find("ItemWheel").gameObject;
         itemWheel.SetActive(false);
 

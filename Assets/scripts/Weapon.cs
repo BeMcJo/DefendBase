@@ -131,6 +131,7 @@ public abstract class Weapon : MonoBehaviour
 
     protected AudioSource audioSrc; // controls audio
     public List<AudioClip> soundClips; // List of sounds used for weapon
+    protected Image reloadBar; // Visual indicator for reload timer
 
     // Use this for initialization
     protected virtual void Awake()
@@ -151,6 +152,7 @@ public abstract class Weapon : MonoBehaviour
 
         anim = GetComponent<Animator>();
         audioSrc = GetComponent<AudioSource>();
+        reloadBar = GameManager.gm.playerStatusCanvas.transform.Find("ReloadGauge").Find("ReloadBar").GetComponent<Image>();
         /*
         id = WeaponCount;
         WeaponCount++;
@@ -165,8 +167,8 @@ public abstract class Weapon : MonoBehaviour
         bool canDisplay = !GameManager.gm.interactiveTouch && GameManager.gm.player == user.gameObject;
         //{
         chargeBarGuage.transform.SetParent(GameManager.gm.playerStatusCanvas.transform);
-        chargeBarGuage.transform.localScale = new Vector3(.875f, .5f, 1);
-        chargeBarGuage.transform.localEulerAngles = new Vector3(0, 0, -90);
+        chargeBarGuage.transform.localScale = new Vector3(1, 1, 1);//.875f, .5f, 1);
+        //chargeBarGuage.transform.localEulerAngles = new Vector3(0, 0, -90);
         chargeBarGuage.transform.localPosition = GameManager.gm.playerStatusCanvas.transform.Find("ChargeBarGaugePlaceholder").localPosition;
         shootBtn.transform.SetParent(GameManager.gm.playerStatusCanvas.transform.Find("ShootBtnPlaceholder"));
         shootBtn.transform.localScale = new Vector3(1, 1, 1);
@@ -405,7 +407,7 @@ public abstract class Weapon : MonoBehaviour
         chargePower = 0;
         if (!GameManager.gm.interactiveTouch)
         {
-            chargeBar.transform.localScale = new Vector3(0, 0, 0);
+            //chargeBar.transform.localScale = new Vector3(0, 0, 0);
             chargeBarAlt = 1;
             chargeAccelerator = 0;
         }
@@ -424,7 +426,7 @@ public abstract class Weapon : MonoBehaviour
         if (!GameManager.gm.interactiveTouch)
         {
             chargeBarGuage.SetActive(true);
-            chargeBar.transform.localScale = new Vector3(0, 0, 0);
+            //chargeBar.transform.localScale = new Vector3(0, 0, 0);
             chargeBarAlt = 1;
             chargeAccelerator = 0;
         }
@@ -461,6 +463,14 @@ public abstract class Weapon : MonoBehaviour
     // Handle charging weapon
     public virtual void Charge(float chargePower)
     {
+        chargePower = chargePower + (.03f * weaponStats[wepID].chargeAccelation[0]) / (float)DebugManager.dbm.fps * 60.0f; // increment charge power
+        if (chargePower >= chargeLimit)
+            chargePower = chargeLimit;
+        //chargeBar.transform.localScale = new Vector3(1, chargePower / chargeLimit, 1); // Visual indicator of charge percentage
+        chargeBar.GetComponent<Image>().fillAmount = (chargePower) / chargeLimit;
+
+        this.chargePower = chargePower;
+        /*
         chargePower += .025f * chargeBarAlt;
         chargeAccelerator += .05f * chargeBarAlt;
         chargeBar.transform.localScale = new Vector3(1, chargePower, 1);
@@ -485,5 +495,6 @@ public abstract class Weapon : MonoBehaviour
             chargePower = 0;
             chargeBarAlt = 1;
         }
+        */
     }
 }
