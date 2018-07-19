@@ -141,6 +141,7 @@ public class GameManager : MonoBehaviour {
                       descriptionPrefab, // Used to provide details about item
                       enemyArmorPrefab, // ???
                       iconPrefab, // icon of item
+                      inGameWepItemUIPrefab, // used to display weapon stats in game
                       //enemyDeathVFXPrefab, // used after enemy dies
                       enemyPrefab; // Enemy object
 
@@ -1820,7 +1821,7 @@ public class GameManager : MonoBehaviour {
         gameOver = false;
         inGameCurrency = 0;
         startWaves = false;
-        UpdateInGameCurrency(0);
+        UpdateInGameCurrency(100000);
         score = 0;
         kills = 0;
         personalKills = 0;
@@ -2256,7 +2257,10 @@ public class GameManager : MonoBehaviour {
                         if (quickAccessDetail == "upgrade")
                         {
                             //mapUICanvas.SetActive(false);
-                            quickAccessUpgradeDescription.SetActive(!quickAccessUpgradeDescription.activeSelf);//false);
+
+                            player.GetComponent<PlayerController>().wep.GetComponent<Weapon>().ToggleStatsUI();
+                            //w.itemUI.SetActive(!w.itemUI.activeSelf);
+                            //quickAccessUpgradeDescription.SetActive(!quickAccessUpgradeDescription.activeSelf);//false);
                         }
                         else if (quickAccessDetail == "change")
                         {

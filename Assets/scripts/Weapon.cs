@@ -22,9 +22,9 @@ public class WeaponStats
     public int price = 0; // How much to initially buy from store
     public int[] dmg, // List of damage per level
                  costToUpgrade; // List of cost to upgrade to next level
-    public float[] distance, // How far can shoot projectiles 
-                   timeToReload, // How long before shooting in percentage
-                   chargeAccelation; // How fast to charge (for bows, cannons, etc.) in percentage
+    public float[] distance, // How far can shoot projectiles  (higher = farther)
+                   timeToReload, // How long before shooting in percentage (lower = faster)
+                   chargeAccelation; // How fast to charge (for bows, cannons, etc.) in percentage ([0.0,1.0] for 0%-100%)
     public WeaponStats(string nm,int price, UnlockCondition unlockCond, int[] dmgs,int[] costs, float[] distances, float[] timeToReloads, float[] chargeAccelerations, string description)
     {
         name = nm;
@@ -49,7 +49,7 @@ public abstract class Weapon : MonoBehaviour
             "Bow",
             0,
             UnlockCondition.Free,
-            new int[] {1,1,1,1,2},
+            new int[] {1,1,1,1,1},
             new int[] {50,100,200,500},
             new float[] {16, 17,19,23,29},
             new float[] {2f,1.75f,1.5f,1.25f,1f},
@@ -62,7 +62,7 @@ public abstract class Weapon : MonoBehaviour
             "Twin-Fang Bow",
             0,
             UnlockCondition.Quest,
-            new int[] {1,1,1,1,2},
+            new int[] {1,1,1,1,1},
             new int[] {50,100,200,500},
             new float[] {16, 17,19,23,29},
             new float[] {2f,1.75f,1.5f,1.25f,1f},
@@ -75,7 +75,7 @@ public abstract class Weapon : MonoBehaviour
             "Sniper Bow",
             1500,
             UnlockCondition.Free,
-            new int[] {1,1,1,1,2},
+            new int[] {1,1,1,1,1},
             new int[] {50,100,200,500},
             new float[] {24, 30,36,43,50},
             new float[] {2.5f,2.3f,2.0f,1.7f,1.3f},
@@ -88,11 +88,11 @@ public abstract class Weapon : MonoBehaviour
             "Machine Bow",
             2500,
             UnlockCondition.Free,//UnlockCondition.QuestThenPurchase,
-            new int[] {1,1,1,1,2},
+            new int[] {1,1,1,1,1},
             new int[] {50,100,200,500},
             new float[] {16, 17,19,23,29},
-            new float[] {.5f,1.75f,1.5f,1.25f,1f},
-            new float[] {.5f,.70f,.65f,.55f,.5f},
+            new float[] {.5f,.45f,.4f,.35f,.3f},
+            new float[] {.5f,.55f,.6f,.65f,.7f},
             "Spraying arrows!? For the love of God..."
         )
     };
@@ -178,28 +178,30 @@ public abstract class Weapon : MonoBehaviour
         chargeBarGuage.SetActive(false);
 
         // Add item UI to store with respect to if item was purchased or not
-        itemUI = Instantiate(itemUI);
+        itemUI = Instantiate(GameManager.gm.inGameWepItemUIPrefab);
         //itemUI.transform.Find("ItemDescription").GetComponent<RectTransform>().sizeDelta = new Vector2(1200,150);
         //itemUI.transform.localPosition = new Vector3(-325, 0, 0);
-        itemUI.transform.Find("ItemDescription").transform.localPosition = new Vector3(-400, 0, 0);
+        //itemUI.transform.Find("ItemDescription").transform.localPosition = new Vector3(-400, 0, 0);
         SetItemDescription();
         //itemUI.transform.Find("ItemDescription").GetComponent<Text>().text = statsByLevel[wepID].name + " Lvl " + lvl;
         itemUI.transform.Find("BuyBtn").GetComponent<Button>().onClick.AddListener(Purchase);
+        itemUI.transform.Find("ItemImageBG").Find("ItemImage").GetComponent<RawImage>().texture = GameManager.gm.weaponItemIcons[wepID].texture;
+       
         //itemUI.transform.Find("ItemDescription").GetComponent<Text>().text = statsByLevel[wepID].name + " Lvl." + lvl;
         if (purchased)
         {
-            print(1);
-            itemUI.transform.Find("BuyBtn").GetChild(0).GetComponent<Text>().text = "Upgrade\n" + weaponStats[wepID].costToUpgrade[lvl] + "\nLvl " + (lvl + 1);
+            itemUI.transform.Find("BuyBtn").GetChild(0).GetComponent<Text>().text = "Upgrade\n" + weaponStats[wepID].costToUpgrade[lvl] + "\nLvl " + (lvl + 2);
             if (user && user.gameObject == GameManager.gm.player)
             {
                 //Debug.Log("?");
-                itemUI.transform.SetParent(GameManager.gm.quickAccessUpgradeDescription.transform);//GameManager.gm.quickAccessCanvas.transform.Find("DescriptionDisplay").Find("Inventory Descriptions").Find("Upgrade Descriptions"));
-                itemUI.transform.localPosition = new Vector3(-325, 0, 0);
+                itemUI.transform.SetParent(GameManager.gm.quickAccessCanvas.transform.Find("WepItemUI Placeholder"));//GameManager.gm.quickAccessUpgradeDescription.transform);//GameManager.gm.quickAccessCanvas.transform.Find("DescriptionDisplay").Find("Inventory Descriptions").Find("Upgrade Descriptions"));
+                itemUI.transform.localPosition = Vector2.zero;//new Vector3(-325, 0, 0);
+                itemUI.transform.SetParent(itemUI.transform.parent.parent);
+
             }
         }
         else
         {
-            print(2);
             itemUI.transform.Find("BuyBtn").GetChild(0).GetComponent<Text>().text = "Purchase\n" + weaponStats[wepID].price;
             if (user == null)
                 itemUI.transform.SetParent(GameManager.gm.shopCanvas.transform.Find("Displays").Find("StoreWeaponsDisplay").GetChild(0));
@@ -210,16 +212,49 @@ public abstract class Weapon : MonoBehaviour
         {
 
         }
+        itemUI.SetActive(false);
+    }
+
+    public void ToggleStatsUI()
+    {
+        itemUI.SetActive(!itemUI.activeSelf);
     }
 	
     public void SetItemDescription()
     {
         Transform itemStats = itemUI.transform.Find("ItemStats");
-        itemStats.Find("Damage").Find("Text").GetComponent<Text>().text = weaponStats[wepID].dmg[lvl] + "";
-        itemStats.Find("ChargeAcceleration").Find("Text").GetComponent<Text>().text = weaponStats[wepID].chargeAccelation[lvl] + "";
-        itemStats.Find("Reload").Find("Text").GetComponent<Text>().text = weaponStats[wepID].timeToReload[lvl] + "";
-        itemStats.Find("BowStr").Find("Text").GetComponent<Text>().text = weaponStats[wepID].distance[lvl] + "";
-        itemUI.transform.Find("ItemDescription").GetComponent<Text>().text = weaponStats[wepID].name + " Lvl " + lvl;// + "   DMG:" + statsByLevel[wepID].dmg[lvl] + "   CHRG:" + (1.0f / statsByLevel[wepID].chargeAccelation[lvl]).ToString("F2") + "   RLD:" + statsByLevel[wepID].timeToReload[lvl] + "s   BOWSTR:" + statsByLevel[wepID].distance[lvl];
+        string[] txts = {
+            weaponStats[wepID].dmg[lvl] + "", // dmg
+            weaponStats[wepID].chargeAccelation[lvl] + "", // charge acceleration
+            weaponStats[wepID].timeToReload[lvl] + "", // time to reload
+            weaponStats[wepID].distance[lvl] + "", // distance
+            "Lv " + (lvl + 1) // lvl
+        };
+         //weaponStats[wepID].name + " Lvl " + lvl;// + "   DMG:" + statsByLevel[wepID].dmg[lvl] + "   CHRG:" + (1.0f / statsByLevel[wepID].chargeAccelation[lvl]).ToString("F2") + "   RLD:" + statsByLevel[wepID].timeToReload[lvl] + "s   BOWSTR:" + statsByLevel[wepID].distance[lvl];
+
+        // if reached max level
+        if (lvl == Weapon.weaponStats[wepID].costToUpgrade.Length)
+        {
+            txts[0] += " (-)";
+            txts[1] += " (-)";
+            txts[2] += " (-)";
+            txts[3] += " (-)";
+            txts[4] += " (MAX)";
+        }
+        else
+        {
+            txts[0] += " (" + weaponStats[wepID].dmg[lvl + 1] + ")";
+            txts[1] += " (" + weaponStats[wepID].chargeAccelation[lvl + 1] + ")";
+            txts[2] += " (" + weaponStats[wepID].timeToReload[lvl + 1] + ")";
+            txts[3] += " (" + weaponStats[wepID].distance[lvl + 1] + ")";
+            txts[4] += " (Next)";
+        }
+
+        itemStats.Find("Damage").Find("Text").GetComponent<Text>().text = txts[0];//weaponStats[wepID].dmg[lvl] + "";
+        itemStats.Find("ChargeAcceleration").Find("Text").GetComponent<Text>().text = txts[1];//weaponStats[wepID].chargeAccelation[lvl] + "";
+        itemStats.Find("Reload").Find("Text").GetComponent<Text>().text = txts[2];// weaponStats[wepID].timeToReload[lvl] + "";
+        itemStats.Find("BowStr").Find("Text").GetComponent<Text>().text = txts[3];// weaponStats[wepID].distance[lvl] + "";
+        itemUI.transform.Find("ItemDescription").GetComponent<Text>().text = txts[4];//"Lv " + (lvl + 1);
     }
 
     // Update is called once per frame
@@ -299,7 +334,7 @@ public abstract class Weapon : MonoBehaviour
             if(GameManager.gm.inGameCurrency >= weaponStats[wepID].price)
             {
                 purchased = true;
-                itemUI.transform.Find("BuyBtn").GetChild(0).GetComponent<Text>().text = "Upgrade\n" + weaponStats[wepID].costToUpgrade[lvl] + "\nLvl " + (lvl + 1);
+                itemUI.transform.Find("BuyBtn").GetChild(0).GetComponent<Text>().text = "Upgrade\n" + weaponStats[wepID].costToUpgrade[lvl] + "\nLvl " + (lvl + 2);
                 itemUI.transform.SetParent(GameManager.gm.shopCanvas.transform.Find("Displays").Find("UpgradeWeaponsDisplay").GetChild(0));
                 Debug.Log("PURCHSE");
             }
@@ -322,11 +357,12 @@ public abstract class Weapon : MonoBehaviour
                     Debug.Log("NO MORE UPGRADES");
                     itemUI.transform.Find("BuyBtn").GetComponent<Button>().interactable = false;//.onClick.AddListener(Purchase);
                     itemUI.transform.Find("BuyBtn").GetChild(0).GetComponent<Text>().text = "Upgrade\nMAXED";
+                    itemUI.transform.Find("BuyBtn").Find("Image").gameObject.SetActive(false);
 
                 }
                 else
                 {
-                    itemUI.transform.Find("BuyBtn").GetChild(0).GetComponent<Text>().text = "Upgrade\n" + weaponStats[wepID].costToUpgrade[lvl] + "\nLvl " + (lvl + 1);
+                    itemUI.transform.Find("BuyBtn").GetChild(0).GetComponent<Text>().text = "Upgrade\n" + weaponStats[wepID].costToUpgrade[lvl] + "\nLvl " + (lvl + 2);
                 }
                 SetItemDescription();
                 if (NetworkManager.nm.isStarted)

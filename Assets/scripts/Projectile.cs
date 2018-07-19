@@ -113,6 +113,7 @@ public class Projectile : MonoBehaviour {
 	protected virtual void Update () {
         if (isShot)
         {
+            //print("VALOCITY>>:" + GetComponent<Rigidbody>().velocity + "............" + GetComponent<Rigidbody>().velocity.magnitude);
             activeDuration -= Time.deltaTime;
             if (target)
             {
@@ -122,8 +123,9 @@ public class Projectile : MonoBehaviour {
             else
             {
                 // bullet type
-                if (attributeID == 3 && !deflected)
+                if (transform.GetComponent<Rigidbody>().velocity.magnitude >= 55 || (attributeID == 3 && !deflected))
                 {
+                    print("raycasting");
                     //Debug.DrawLine(transform.position, transform.);
                     //Debug.DrawRay(transform.position, transform.forward);
                     //print("shoot forward" + Time.time);
@@ -143,9 +145,9 @@ public class Projectile : MonoBehaviour {
                         print(hit.collider.gameObject.name + " " + hit.collider.tag);
                         if (hit.distance <= 30)
                         {
-                            GameObject mark = Instantiate(gameObject, hit.point, Quaternion.LookRotation(hit.normal)) as GameObject;
+                            //GameObject mark = Instantiate(gameObject, hit.point, Quaternion.LookRotation(hit.normal)) as GameObject;
                             //mark.transform.Rotate(Vector)
-                            mark.GetComponent<Projectile>().enabled = false;
+                            //mark.GetComponent<Projectile>().enabled = false;
                             OnHit(hit.collider.gameObject);
                         }
                     }
