@@ -29,6 +29,7 @@ public class StatusIndicator : MonoBehaviour {
         // No target? Remove self
         if (target == null)
         {
+            print(1211);
             Destroy(gameObject);
             return;
         }
@@ -53,7 +54,7 @@ public class StatusIndicator : MonoBehaviour {
         }
 
         // Update health bar based on target's health
-
+        /*
         // Follow Target
         if (followTarget)
         {
@@ -65,13 +66,13 @@ public class StatusIndicator : MonoBehaviour {
                     healthBarGauge.transform.GetComponent<RectTransform>().rect.height,
                     0);
         }
-
+        */
         int hp = 0, maxHP = 1;
         // fetch target's current hp
         if(target.tag == "Enemy")
         {
             Enemy e = target.transform.GetComponent<Enemy>();
-            healthBarGauge.position += e.go.transform.localPosition + new Vector3(0, 2, 0) ;
+            //healthBarGauge.position += e.go.transform.localPosition + new Vector3(0, 2, 0) ;
             hp = e.health;
             maxHP = e.maxHP;
         } else if(target.tag == "Objective")
@@ -86,10 +87,12 @@ public class StatusIndicator : MonoBehaviour {
         {
             //Debug.Log("DIFFER");
             int dif = hp - prevHP;
+            /*
             GameObject damageIndicator = Instantiate(damageIndicatorPrefab);
             damageIndicator.transform.position = healthBarGauge.position + new Vector3(0,healthBarGauge.GetComponent<RectTransform>().rect.height,0);
             damageIndicator.transform.LookAt(GameManager.gm.player.transform.GetComponent<PlayerController>().playerCam.transform);
             damageIndicator.transform.GetChild(0).GetComponent<Text>().text = "" + dif;
+            */        
             if (dif > 0)
                 healthBarTrailer.fillAmount = healthPercentage;
         }
@@ -97,11 +100,11 @@ public class StatusIndicator : MonoBehaviour {
         // make sure hp is valid
         if (hp <= 0)
             hp = 0;
-        healthBar.localScale = new Vector3((float)hp / (float)maxHP, 1, 1);
-
+        //healthBar.localScale = new Vector3((float)hp / (float)maxHP, 1, 1);
+        healthBar.GetComponent<Image>().fillAmount = (float)hp / (float)maxHP;
         prevHP = hp;
         healthTxt.text = hp + "/" + maxHP;
-        healthTxt.transform.position = healthBarGauge.position - new Vector3(0, .1f, 0);
+        //healthTxt.transform.position = healthBarGauge.position - new Vector3(0, .1f, 0);
         healthBarTrailer.fillAmount *= animateRate;
         if (healthBarTrailer.fillAmount < healthPercentage)
             healthBarTrailer.fillAmount = healthPercentage;

@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 /*
  * Enables versatility with creating enemies and their stats details
@@ -26,7 +27,7 @@ public class Enemy : MonoBehaviour
         // Stats for Slimes ignore -> Normies
         new EnemyStats[]
         {
-            new EnemyStats(1, 1, 1, 1),
+            new EnemyStats(2, 1, 1, 1),
             new EnemyStats(2, 1, 1.2f, 1.2f),
             new EnemyStats(2, 2, 1.25f, 1.25f),
             new EnemyStats(3, 2, 1.5f, 1.3f),
@@ -167,6 +168,12 @@ public class Enemy : MonoBehaviour
         originalPos = transform.position;
         coroutines = new Dictionary<string, Coroutine>();
         statusEffects = new Dictionary<string, bool>();
+
+        GameObject hpBar = Instantiate(GameManager.gm.statusIndicatorPrefab);
+        hpBar.transform.GetComponent<StatusIndicator>().target = gameObject;
+        hpBar.transform.SetParent(transform.Find("HP Placeholder"));
+        hpBar.transform.localPosition = Vector3.zero;
+
     }
 
 
@@ -679,6 +686,14 @@ public class Enemy : MonoBehaviour
     public virtual void TakeDamageFrom(int dmg, string dmgSourceType, int sid)
     {
         TakeDamage(dmg);
+
+        // Visual indication of damage dealt
+        GameObject damageIndicator = Instantiate(GameManager.gm.indicatorPrefabs[0]);
+        damageIndicator.transform.position = transform.Find("HP Placeholder").position;//healthBarGauge.position + new Vector3(0, healthBarGauge.GetComponent<RectTransform>().rect.height, 0);
+        damageIndicator.transform.LookAt(GameManager.gm.player.transform.GetComponent<PlayerController>().playerCam.transform);
+        damageIndicator.transform.GetChild(0).GetComponent<Text>().text = "" + (-dmg);
+
+        // Keep track of last damage source just in case die and need to reward source
         this.dmgSourceType = dmgSourceType;
         dmgSourceID = sid;
         PlayerController pc = GameManager.gm.player.GetComponent<PlayerController>();
@@ -743,6 +758,7 @@ public class Enemy : MonoBehaviour
         List<GameObject> rewards = new List<GameObject>();
         //GameManager.gm.UpdateItem("Attribute", 1, 1);
         float spawnRewardChance = Random.Range(0.0f, 1.25f);
+        spawnRewardChance = 1;
         //print((int)spawnRewardChance);
         //spawnRewardChance = 1;
         for (int i = 0; i < (int)spawnRewardChance; i++)

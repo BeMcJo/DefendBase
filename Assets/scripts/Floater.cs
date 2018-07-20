@@ -3,6 +3,14 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+public enum Reward
+{
+    arrow,
+    repair,
+    currency,
+    score
+}
+
 public class Floater : MonoBehaviour {
     Rigidbody rb;
     Vector3 biasedDir, biasedTorq;
@@ -27,6 +35,7 @@ public class Floater : MonoBehaviour {
         //GetComponent<Collider>().enabled = true;
         rewardType = Random.Range(0, rewardTypes.Length);
         //rewardType = 1;
+        /*
         Renderer r = GetComponent<Renderer>();
         Color c = r.material.color;
         switch (rewardType)
@@ -41,8 +50,10 @@ public class Floater : MonoBehaviour {
                 c = Color.yellow;
                 break;
         }
+        */
+        //rewardType = 0;
         transform.Find("RewardOptions").GetChild(rewardType).gameObject.SetActive(true);
-        c.a = 135.0f / 255.0f;
+        //c.a = 135.0f / 255.0f;
         //r.material.color = c;
         StartCoroutine(Invincibility());
         ttl = 30f;
@@ -90,42 +101,50 @@ public class Floater : MonoBehaviour {
     public void GenerateReward()
     {
         GameObject itemGainIndicator;
+        itemGainIndicator = Instantiate(GameManager.gm.indicatorPrefabs[0]);
+        itemGainIndicator.transform.GetChild(1).gameObject.SetActive(true);
         //rewardType = 1;
+       
         switch (rewardType)
         {
             // attribute (arrow types)
             case 0:
-                GameManager.gm.UpdateItem("Attribute", 1, 2);
-                itemGainIndicator = Instantiate(GameManager.gm.indicatorPrefabs[0]);
+                int qty = 2;
+                int attributeID = 1;
+                GameManager.gm.UpdateItem("Attribute", attributeID, qty);
                 itemGainIndicator.transform.position = transform.position;
-                itemGainIndicator.transform.GetChild(0).GetComponent<Text>().text = "+2 Bomb Arrow";
+                itemGainIndicator.transform.GetChild(0).GetComponent<Text>().text = "+" + qty;// Bomb Arrow";
+                itemGainIndicator.transform.GetChild(1).GetComponent<Image>().sprite = GameManager.gm.arrowItemIcons[attributeID];
                 itemGainIndicator.transform.LookAt(GameManager.gm.player.GetComponent<PlayerController>().playerCam.transform);
                 break;
 
             // repair
             case 1:
                 GameManager.gm.objective.GetComponent<Objective>().Repair(-2);
-                itemGainIndicator = Instantiate(GameManager.gm.indicatorPrefabs[0]);
+                //itemGainIndicator = Instantiate(GameManager.gm.indicatorPrefabs[0]);
                 itemGainIndicator.transform.position = transform.position;
-                itemGainIndicator.transform.GetChild(0).GetComponent<Text>().text = "+2 Repair";
+                itemGainIndicator.transform.GetChild(0).GetComponent<Text>().text = "+2";
+                itemGainIndicator.transform.GetChild(1).GetComponent<Image>().sprite = GameManager.gm.repairIcon;
                 itemGainIndicator.transform.LookAt(GameManager.gm.player.GetComponent<PlayerController>().playerCam.transform);
                 break;
 
             // money
             case 2:
                 GameManager.gm.UpdateInGameCurrency(10);
-                itemGainIndicator = Instantiate(GameManager.gm.indicatorPrefabs[0]);
+                //itemGainIndicator = Instantiate(GameManager.gm.indicatorPrefabs[0]);
                 itemGainIndicator.transform.position = transform.position;
-                itemGainIndicator.transform.GetChild(0).GetComponent<Text>().text = "+$10";
+                itemGainIndicator.transform.GetChild(0).GetComponent<Text>().text = "+10";
+                itemGainIndicator.transform.GetChild(1).GetComponent<Image>().sprite = GameManager.gm.currencyIcons[0];
                 itemGainIndicator.transform.LookAt(GameManager.gm.player.GetComponent<PlayerController>().playerCam.transform);
                 break;
 
             // score
             case 3:
                 GameManager.gm.UpdateScore(200);
-                itemGainIndicator = Instantiate(GameManager.gm.indicatorPrefabs[0]);
+                //itemGainIndicator = Instantiate(GameManager.gm.indicatorPrefabs[0]);
                 itemGainIndicator.transform.position = transform.position;
                 itemGainIndicator.transform.GetChild(0).GetComponent<Text>().text = "+200 Score";
+                itemGainIndicator.transform.GetChild(1).GetComponent<Image>().sprite = GameManager.gm.scoreIcon;
                 itemGainIndicator.transform.LookAt(GameManager.gm.player.GetComponent<PlayerController>().playerCam.transform);
                 break;
         }

@@ -220,7 +220,9 @@ public class GameManager : MonoBehaviour {
     float initialAngle;
     Pattern pattern; // Points to enemy spawn pattern
 
-    public Sprite[] arrowItemIcons, weaponItemIcons;
+    // list of itcons to represent such items
+    public Sprite[] arrowItemIcons, weaponItemIcons, currencyIcons;
+    public Sprite scoreIcon,repairIcon;
     public Texture[] borderIcons;
     //Button upgradeWepBtn;
     Coroutine blackoutCoroutine,
@@ -1960,8 +1962,8 @@ public class GameManager : MonoBehaviour {
             pathing = MapManager.mapManager.pathsBySpawnPoint[sp][spPath];
         //print("path gen");
         e.pathing = pathing;
-        GameObject enemyUI = Instantiate(statusIndicatorPrefab);
-        enemyUI.transform.GetComponent<StatusIndicator>().target = enemy;
+        //GameObject enemyUI = Instantiate(statusIndicatorPrefab);
+        //enemyUI.transform.GetComponent<StatusIndicator>().target = enemy;
         enemy.transform.SetParent(enemiesContainer.transform);
         difficulty = 0;
         e.level = (pattern.enemyLvls[intervalIndex][spawnIndex] + difficulty) % Enemy.difficulties.Length;

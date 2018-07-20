@@ -81,8 +81,14 @@ public class Objective : MonoBehaviour {
         int curHP = HP;
         HP -= dmg;
 
+        // Visual indication of damage dealt
+        GameObject damageIndicator = Instantiate(GameManager.gm.indicatorPrefabs[0]);
+        damageIndicator.transform.position = transform.Find("ObjectiveStatusIndicator").position;//healthBarGauge.position + new Vector3(0, healthBarGauge.GetComponent<RectTransform>().rect.height, 0);
+        damageIndicator.transform.LookAt(GameManager.gm.player.transform.GetComponent<PlayerController>().playerCam.transform);
+        damageIndicator.transform.GetChild(0).GetComponent<Text>().text = "" + (-dmg);
+
         // Signal that objective has taken damage
-        if(curHP > HP)
+        if (curHP > HP)
         {
             OnHit();
         }
@@ -92,6 +98,7 @@ public class Objective : MonoBehaviour {
         {
             HP = maxHP;
         }
+
         if (HP <= 0)
         {
             HP = 0;
