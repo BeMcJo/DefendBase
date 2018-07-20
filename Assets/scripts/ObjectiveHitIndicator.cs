@@ -24,10 +24,22 @@ public class ObjectiveHitIndicator : MonoBehaviour {
 
             c.a = 1f;
             warning.color = c;
+            foreach(Transform child in warning.transform)
+            {
+                Color col = child.GetComponent<Image>().color;
+                col.a = 1f;
+                child.GetComponent<Image>().color = col;
+            }
             yield return new WaitForSeconds(visibleTime);
 
             c.a = .3f;
             warning.color = c;
+            foreach (Transform child in warning.transform)
+            {
+                Color col = child.GetComponent<Image>().color;
+                col.a = .3f;
+                child.GetComponent<Image>().color = col;
+            }
             yield return new WaitForSeconds(invisibleTime);
             isBlinking = false;
         }

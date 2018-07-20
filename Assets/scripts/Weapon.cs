@@ -152,17 +152,16 @@ public abstract class Weapon : MonoBehaviour
 
         anim = GetComponent<Animator>();
         audioSrc = GetComponent<AudioSource>();
-        reloadBar = GameManager.gm.playerStatusCanvas.transform.Find("ReloadGauge").Find("ReloadBar").GetComponent<Image>();
         /*
         id = WeaponCount;
         WeaponCount++;
         name = "Wep " + id;
         */
-       
+
         //bulletSpawn[0] = transform.Find("BulletSpawn");
+        Transform shootBtnUI = GameManager.gm.playerStatusCanvas.transform.Find("ShootBtnUI");
         chargeBarGuage = Instantiate(chargeBarGuage);
         chargeBar = chargeBarGuage.transform.GetChild(0).gameObject;
-        shootBtn = Instantiate(shootBtn);
         // Display the non-Touch Interactive UIs if not using Touch Interaction and is my player
         bool canDisplay = !GameManager.gm.interactiveTouch && GameManager.gm.player == user.gameObject;
         //{
@@ -170,14 +169,17 @@ public abstract class Weapon : MonoBehaviour
         chargeBarGuage.transform.localScale = new Vector3(1, 1, 1);//.875f, .5f, 1);
         //chargeBarGuage.transform.localEulerAngles = new Vector3(0, 0, -90);
         chargeBarGuage.transform.localPosition = GameManager.gm.playerStatusCanvas.transform.Find("ChargeBarGaugePlaceholder").localPosition;
-        shootBtn.transform.SetParent(GameManager.gm.playerStatusCanvas.transform.Find("ShootBtnPlaceholder"));
-        shootBtn.transform.localScale = new Vector3(1, 1, 1);
-        shootBtn.transform.localPosition = Vector3.zero; //GameManager.gm.playerStatusCanvas.transform.Find("ShootBtnPlaceholder").localPosition;
         //}
         chargeBarGuage.SetActive(canDisplay);
-        shootBtn.SetActive(canDisplay);
-
         chargeBarGuage.SetActive(false);
+
+        shootBtn = shootBtnUI.Find("ShootBtnMask").gameObject;//Instantiate(shootBtn);
+        //shootBtn.transform.SetParent(GameManager.gm.playerStatusCanvas.transform.Find("ShootBtnPlaceholder"));
+        //shootBtn.transform.localScale = new Vector3(1, 1, 1);
+        //shootBtn.transform.localPosition = Vector3.zero; //GameManager.gm.playerStatusCanvas.transform.Find("ShootBtnPlaceholder").localPosition;
+        shootBtn.SetActive(canDisplay);
+        reloadBar = shootBtnUI.Find("ReloadGauge").Find("ReloadBar").GetComponent<Image>();//GameManager.gm.playerStatusCanvas.transform.Find("ReloadGauge").Find("ReloadBar").GetComponent<Image>();
+
 
         // Add item UI to store with respect to if item was purchased or not
         itemUI = Instantiate(GameManager.gm.inGameWepItemUIPrefab);

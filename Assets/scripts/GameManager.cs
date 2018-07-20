@@ -1834,7 +1834,7 @@ public class GameManager : MonoBehaviour {
         gameOver = false;
         inGameCurrency = 0;
         startWaves = false;
-        UpdateInGameCurrency(100000);
+        UpdateInGameCurrency(0);
         score = 0;
         kills = 0;
         personalKills = 0;
@@ -1911,7 +1911,7 @@ public class GameManager : MonoBehaviour {
         UpdateInGameCurrency(0);
         UpdateKillCount(0);
         UpdateScore(0);
-        playerStatusCanvas.transform.Find("Wave").Find("Text").GetComponent<Text>().text = (wave) + "";
+        //playerStatusCanvas.transform.Find("Wave").Find("Text").GetComponent<Text>().text = (wave) + "";
         for (int i = 0; i < personalData.arrowQuantities.Length; i++)
             UpdateArrowQty(i);
 
