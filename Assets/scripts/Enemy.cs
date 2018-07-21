@@ -27,7 +27,7 @@ public class Enemy : MonoBehaviour
         // Stats for Slimes ignore -> Normies
         new EnemyStats[]
         {
-            new EnemyStats(2, 1, 1, 1),
+            new EnemyStats(1, 1, 1, 1),
             new EnemyStats(2, 1, 1.2f, 1.2f),
             new EnemyStats(2, 2, 1.25f, 1.25f),
             new EnemyStats(3, 2, 1.5f, 1.3f),
@@ -50,23 +50,13 @@ public class Enemy : MonoBehaviour
             new EnemyStats(4, 3, 1.25f, 1.25f),
             new EnemyStats(4, 3, 1.5f, 1.3f),
             new EnemyStats(6, 3, 1.5f, 1.5f)
-        },
-        new EnemyStats[]
-        {
-            new EnemyStats(1, 1, 1f, 1),
-            new EnemyStats(2, 2, 1.2f, 1.2f),
-            new EnemyStats(2, 2, 1.25f, 1.25f),
-            new EnemyStats(3, 2, 1.5f, 1.3f),
-            new EnemyStats(3, 2, 1.5f, 1.5f)
-        },
-        new EnemyStats[]
-        {
-            new EnemyStats(1, 1, 1f, 1),
-            new EnemyStats(2, 2, 1.2f, 1.2f),
-            new EnemyStats(2, 2, 1.25f, 1.25f),
-            new EnemyStats(3, 2, 1.5f, 1.3f),
-            new EnemyStats(3, 2, 1.5f, 1.5f)
         }
+    };
+    public static string[] names =
+    {
+        "Slime",
+        "Shroom",
+        "Flyglet"
     };
     public Animator anim;
     public int health = 2, // Current health 
@@ -699,7 +689,6 @@ public class Enemy : MonoBehaviour
         PlayerController pc = GameManager.gm.player.GetComponent<PlayerController>();
         if (dmgSourceType == "Player" && sid == pc.id)
         {
-            pc.shotsHit++;
             print("MY PLAYER hit:"+pc.shotsHit + "/" + pc.wep.shotCount);
         }
         if(health <= 0)
@@ -758,7 +747,7 @@ public class Enemy : MonoBehaviour
         List<GameObject> rewards = new List<GameObject>();
         //GameManager.gm.UpdateItem("Attribute", 1, 1);
         float spawnRewardChance = Random.Range(0.0f, 1.25f);
-        spawnRewardChance = 1;
+        //spawnRewardChance = 1;
         //print((int)spawnRewardChance);
         //spawnRewardChance = 1;
         for (int i = 0; i < (int)spawnRewardChance; i++)

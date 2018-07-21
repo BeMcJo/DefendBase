@@ -387,6 +387,8 @@ public class Projectile : MonoBehaviour {
                     CreateAreaEffect(0);
                 }
 
+                // if projectile hits enemy, icrement counter
+                GameManager.gm.player.GetComponent<PlayerController>().shotsHit++;
                 e.OnHit();
                 //e.transform.GetComponent<Rigidbody>().velocity = Vector3.zero; // Disable physics force applied when colliding
                 // If using online feature, let Network Manager handle this

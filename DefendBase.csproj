@@ -87,6 +87,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\scripts\Achievement.cs" />
     <Compile Include="Assets\scripts\AreaEffect.cs" />
     <Compile Include="Assets\scripts\Arrow.cs" />
     <Compile Include="Assets\scripts\Attribute.cs" />

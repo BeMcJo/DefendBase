@@ -48,8 +48,24 @@ public class PersonalData
     public int[] arrowQuantities;
     public bool[] isWeaponUnlocked, // If there is a condition to obtain, did we satisfy it to obtain?
                   isWeaponPurchased, // Is weapon available to purchase and obtain?
-                  isArrowUnlocked; // Is arrow available to purchase?            
-    
+                  isArrowUnlocked; // Is arrow available to purchase?
+
+    // Best Score Records
+    public int bestScore,
+               mostCurrencySavedInGame,
+               highestWaveSurvived,
+               mostKillsInGame;
+
+    // Cumulative Records
+    public int cumulativeDamageObjectiveTook,
+               cumulative;
+    public int[] killsByEnemy,
+                 killsByArrowAttribute,
+                 arrowsShotByAttribute;
+
+    // Achievement Unlocks
+    public bool[] isAchievementUnlocked;
+
     public PersonalData()
     {
         playerCurrency = 0;
@@ -70,9 +86,28 @@ public class PersonalData
             isArrowUnlocked[i] = Projectile.projectileStats[i].unlockCondition == UnlockCondition.Free;
         }
         arrowQuantities = new int[Projectile.projectileStats.Length];
+
+        bestScore = 0;
+        mostCurrencySavedInGame = 0;
+        highestWaveSurvived = 0;
+        mostKillsInGame = 0;
+        cumulativeDamageObjectiveTook = 0;
+        killsByEnemy = new int[Enemy.difficulties.Length];
+        killsByArrowAttribute = new int[Projectile.projectileStats.Length];
+        arrowsShotByAttribute = new int[Projectile.projectileStats.Length];
     }
 }
 
+/*
+[Serializable]
+// Keeps track of player achievements
+public class PlayerAchievements
+{
+    
+    
+
+}
+*/
 public class GameManager : MonoBehaviour {
     public static GameManager gm; // Single existing game manager
     public static bool Debugging; // Enables in game debugging
@@ -142,6 +177,7 @@ public class GameManager : MonoBehaviour {
                       enemyArmorPrefab, // ???
                       iconPrefab, // icon of item
                       inGameWepItemUIPrefab, // used to display weapon stats in game
+                      achievementUIPrefab, // displays description (and progress if exists) of achievement
                       //enemyDeathVFXPrefab, // used after enemy dies
                       enemyPrefab; // Enemy object
 
@@ -187,6 +223,7 @@ public class GameManager : MonoBehaviour {
                       interactiveUIContainer, // holds interactive UI
                       itemDropdownList, // holds list of (attribute) items
                       firework, // particle effect for victory
+                      achievementsCanvas, // Displays player achievements/records
                       waveNotification; // Notifies player that enemies will spawn
 
     public Text scoreTxt; // Indicates how awesome you are
@@ -233,21 +270,35 @@ public class GameManager : MonoBehaviour {
     //public List<AudioClip> 
     public AudioSource audioSrc;
 
+    public List<int> availableAttributes; // list of attributes able to be used/spawned (based on Unlock Conditions)
+
     public void CopyPersonalData(PersonalData dest, PersonalData source)
     {
         dest.equippedWep = source.equippedWep;
         dest.playerCurrency = source.playerCurrency;
+        dest.bestScore = source.bestScore;
+        dest.mostCurrencySavedInGame = source.mostCurrencySavedInGame;
+        dest.highestWaveSurvived = source.highestWaveSurvived;
+        dest.mostKillsInGame = source.mostKillsInGame;
+        dest.cumulativeDamageObjectiveTook = source.cumulativeDamageObjectiveTook;
         int projectilesLen = (dest.arrowQuantities.Length < source.arrowQuantities.Length) ? dest.arrowQuantities.Length : source.arrowQuantities.Length;
         int weaponsLen = (dest.isWeaponUnlocked.Length < source.isWeaponUnlocked.Length) ? dest.isWeaponUnlocked.Length : source.isWeaponUnlocked.Length;
+        int enemiesLen = (dest.killsByEnemy.Length < source.killsByEnemy.Length) ? dest.killsByEnemy.Length : source.killsByEnemy.Length;
         for(int i = 0; i < projectilesLen; i++)
         {
             dest.arrowQuantities[i] = source.arrowQuantities[i];
             dest.isArrowUnlocked[i] = source.isArrowUnlocked[i];
+            dest.arrowsShotByAttribute[i] = source.arrowsShotByAttribute[i];
+            dest.killsByArrowAttribute[i] = source.killsByArrowAttribute[i];
         }
-        for(int i =0; i < weaponsLen; i++)
+        for (int i = 0; i < weaponsLen; i++)
         {
             dest.isWeaponPurchased[i] = source.isWeaponPurchased[i];
             dest.isWeaponUnlocked[i] = source.isWeaponUnlocked[i];
+        }
+        for (int i = 0; i < enemiesLen; i++)
+        {
+            dest.killsByEnemy[i] = source.killsByEnemy[i];
         }
     }
 
@@ -368,9 +419,12 @@ public class GameManager : MonoBehaviour {
     // Use this for initialization
 
     void Start () {
+
         if (gm)
             return;
+        print("??");
         //Sprite icon = Instantiate(Resources.Load(")
+        Achievement.Instantiate();
         enemies = new Dictionary<int, Enemy>();
         gm = this;
         gm.data = new PlayerData();
@@ -465,6 +519,9 @@ public class GameManager : MonoBehaviour {
 
         btnContainer.Find("InventoryBtn").GetComponent<Button>().onClick.AddListener(ToggleInventoryCanvas);
         btnContainer.Find("InventoryBtn").GetComponent<Button>().onClick.AddListener(ToggleMainMenuCanvas);
+
+        btnContainer.Find("AchievementsBtn").GetComponent<Button>().onClick.AddListener(ToggleMainMenuCanvas);
+        btnContainer.Find("AchievementsBtn").GetComponent<Button>().onClick.AddListener(ToggleAchievementsCanvas);
 
         // Go to continued game if saved game progress exists
         btnContainer.Find("ContinueBtn").GetComponent<Button>().onClick.AddListener(GoToContinuedGameScene);
@@ -606,7 +663,10 @@ public class GameManager : MonoBehaviour {
 
             itemUI.SetActive(Weapon.enableWeps[i]);
         }
-
+        if (availableAttributes != null)
+            availableAttributes.Clear();
+        else
+            availableAttributes = new List<int>();
         // Set up arrow section
         UIContainer = inventoryItemPanel.transform.Find("ArrowsUIContainer");
         //UIContainer.transform.localPosition = new Vector3(0, -1000, 0);
@@ -629,8 +689,19 @@ public class GameManager : MonoBehaviour {
             itemUI.name = "arrowUI " + i;
             //wepUI.tag = "wepUI";
             //wepUI.transform.GetComponent<Button>().onClick.AddListener(PerformInventoryAction);
+            // show if item is unlocked or free
             itemUI.transform.Find("LockedItemImage").gameObject.SetActive(
                 Projectile.projectileStats[i].unlockCondition == UnlockCondition.Quest && !personalData.isArrowUnlocked[i]);
+
+            // add to attribute pool that is spawnable in game as reward under these conditions
+            if (i != 0 && Projectile.enableArrows[i] &&
+              //  (Projectile.projectileStats[i].unlockCondition == UnlockCondition.Free) ||
+                ((Projectile.projectileStats[i].unlockCondition != UnlockCondition.Quest && Projectile.projectileStats[i].unlockCondition != UnlockCondition.QuestThenPurchase) ||
+                personalData.isArrowUnlocked[i])
+               )
+            {
+                availableAttributes.Add(i);
+            }
             Transform actionBtn = itemUI.transform.Find("ActionBtn");
             actionBtn.GetComponent<Button>().interactable = i != 0;
             switch (Projectile.projectileStats[i].unlockCondition)
@@ -652,8 +723,100 @@ public class GameManager : MonoBehaviour {
             }
             itemUI.SetActive(Projectile.enableArrows[i]);
         }
+
+        print(GameManager.gm.availableAttributes.Count);
         UIContainer.gameObject.SetActive(false);
 
+        // set up achievement canvas
+
+        achievementsCanvas = GameObject.Find("AchievementsCanvas");
+        achievementsCanvas.transform.Find("BackBtn").GetComponent<Button>().onClick.AddListener(ToggleAchievementsCanvas);
+        achievementsCanvas.transform.Find("BackBtn").GetComponent<Button>().onClick.AddListener(ToggleMainMenuCanvas);
+        Transform achievementsContainer = achievementsCanvas.transform.Find("ItemUIPanel").Find("AchievementsContainer");
+
+        // fetch all best score achievements
+        for (int i = 0; i < Achievement.bestScoreAchievements.Length; i++)
+        {
+            GameObject itemUI = Instantiate(achievementUIPrefab);
+            itemUI.transform.SetParent(achievementsContainer);
+            itemUI.transform.Find("HideProgress").gameObject.SetActive(!Achievement.CanShowProgress(AchievementType.BestScore, i));
+            itemUI.transform.Find("HeaderTxt").GetComponent<Text>().text = Achievement.bestScoreAchievements[i].header;
+            /*
+            //int achievementTypeIndex = 0; // used for determining to display score text or reward image + progress txt based on type
+            if (Achievement.achievements[i].achievementType == AchievementType.Conditional)
+            {
+                itemUI.transform.Find("AchievementTypes").GetChild(0).gameObject.SetActive(false);
+                GameObject unlockObj = itemUI.transform.Find("AchievementTypes").GetChild(1).gameObject;//.SetActive(false);
+                unlockObj.SetActive(true);
+                unlockObj.transform.Find("ProgressTxt").GetComponent<Text>().text = Achievement.GetAchievementDetails(i);
+            }
+            else
+            {
+            }
+            */
+            itemUI.transform.Find("AchievementTypes").GetChild(1).gameObject.SetActive(false);
+            GameObject scoreObj = itemUI.transform.Find("AchievementTypes").GetChild(0).gameObject;//.SetActive(false);
+            scoreObj.SetActive(true);
+            scoreObj.transform.Find("ScoreTxt").GetComponent<Text>().text = Achievement.GetAchievementDetails(AchievementType.BestScore, i);
+
+            //itemUI.transform.Find("AchievementType").GetChild(achievementTypeIndex).gameObject.SetActive(true);//GetComponent<Text>().text = Achievement.achievements[i].header;
+        }
+
+        // fetch all cumulative score achievements
+        for (int j = 0; j < Achievement.cumulativeScoreAchievements.Length; j++)
+        {
+            for (int i = 0; i < Achievement.cumulativeScoreAchievements[j].Length; i++)
+            {
+                GameObject itemUI = Instantiate(achievementUIPrefab);
+                itemUI.transform.SetParent(achievementsContainer);
+                itemUI.transform.Find("HideProgress").gameObject.SetActive(!Achievement.CanShowProgress(AchievementType.Cumulative, i, j));
+                itemUI.transform.Find("HeaderTxt").GetComponent<Text>().text = Achievement.cumulativeScoreAchievements[j][i].header;
+                /*
+                //int achievementTypeIndex = 0; // used for determining to display score text or reward image + progress txt based on type
+                if (Achievement.achievements[i].achievementType == AchievementType.Conditional)
+                {
+                    itemUI.transform.Find("AchievementTypes").GetChild(0).gameObject.SetActive(false);
+                    GameObject unlockObj = itemUI.transform.Find("AchievementTypes").GetChild(1).gameObject;//.SetActive(false);
+                    unlockObj.SetActive(true);
+                    unlockObj.transform.Find("ProgressTxt").GetComponent<Text>().text = Achievement.GetAchievementDetails(i);
+                }
+                else
+                {
+                }
+                */
+                itemUI.transform.Find("AchievementTypes").GetChild(1).gameObject.SetActive(false);
+                GameObject scoreObj = itemUI.transform.Find("AchievementTypes").GetChild(0).gameObject;//.SetActive(false);
+                scoreObj.SetActive(true);
+                scoreObj.transform.Find("ScoreTxt").GetComponent<Text>().text = Achievement.GetAchievementDetails(AchievementType.Cumulative, i, j);
+            }
+        }
+
+        // fetch all conditional score achievments
+        for (int i = 0; i < Achievement.conditionalAchievements.Length; i++)
+        {
+            GameObject itemUI = Instantiate(achievementUIPrefab);
+            itemUI.transform.SetParent(achievementsContainer);
+            itemUI.transform.Find("HideProgress").gameObject.SetActive(!Achievement.CanShowProgress(AchievementType.Conditional, i));
+            itemUI.transform.Find("HeaderTxt").GetComponent<Text>().text = Achievement.conditionalAchievements[i].header;
+            /*
+            //int achievementTypeIndex = 0; // used for determining to display score text or reward image + progress txt based on type
+            if (Achievement.achievements[i].achievementType == AchievementType.Conditional)
+            {
+                itemUI.transform.Find("AchievementTypes").GetChild(0).gameObject.SetActive(false);
+                GameObject unlockObj = itemUI.transform.Find("AchievementTypes").GetChild(1).gameObject;//.SetActive(false);
+                unlockObj.SetActive(true);
+                unlockObj.transform.Find("ProgressTxt").GetComponent<Text>().text = Achievement.GetAchievementDetails(i);
+            }
+            else
+            {
+            }
+            */
+            itemUI.transform.Find("AchievementTypes").GetChild(0).gameObject.SetActive(false);
+            GameObject unlockObj = itemUI.transform.Find("AchievementTypes").GetChild(1).gameObject;//.SetActive(false);
+            unlockObj.SetActive(true);
+            unlockObj.transform.Find("ProgressTxt").GetComponent<Text>().text = Achievement.GetAchievementDetails(AchievementType.Conditional, i);
+        }
+        achievementsCanvas.SetActive(false);
     }
 
     // Load game scene. If there was any saved game progress, remove it
@@ -1415,6 +1578,11 @@ public class GameManager : MonoBehaviour {
         selectedOption.SetActive(false);
         selectedOption = displayOptions;
         selectedOption.SetActive(true);
+    }
+
+    public void ToggleAchievementsCanvas()
+    {
+        achievementsCanvas.SetActive(!achievementsCanvas.activeSelf);
     }
 
     public void TogglePlayerOrientationSetup()

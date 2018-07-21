@@ -34,6 +34,12 @@ public class Floater : MonoBehaviour {
         rb.AddTorque(biasedTorq* Random.Range(100, 250));
         //GetComponent<Collider>().enabled = true;
         rewardType = Random.Range(0, rewardTypes.Length);
+        // if no arrows to provide as reward, destroy reward
+        if (rewardType == 0 && GameManager.gm.availableAttributes.Count == 0)
+        {
+            Destroy(gameObject);
+            return;
+        }
         //rewardType = 1;
         /*
         Renderer r = GetComponent<Renderer>();
@@ -103,14 +109,14 @@ public class Floater : MonoBehaviour {
         GameObject itemGainIndicator;
         itemGainIndicator = Instantiate(GameManager.gm.indicatorPrefabs[0]);
         itemGainIndicator.transform.GetChild(1).gameObject.SetActive(true);
-        //rewardType = 1;
+        //rewardType = 0;
        
         switch (rewardType)
         {
             // attribute (arrow types)
             case 0:
-                int qty = 2;
-                int attributeID = 1;
+                int qty = Random.Range(1,3);
+                int attributeID = GameManager.gm.availableAttributes[Random.Range(0, GameManager.gm.availableAttributes.Count)]; //1;
                 GameManager.gm.UpdateItem("Attribute", attributeID, qty);
                 itemGainIndicator.transform.position = transform.position;
                 itemGainIndicator.transform.GetChild(0).GetComponent<Text>().text = "+" + qty;// Bomb Arrow";
@@ -143,7 +149,7 @@ public class Floater : MonoBehaviour {
                 GameManager.gm.UpdateScore(200);
                 //itemGainIndicator = Instantiate(GameManager.gm.indicatorPrefabs[0]);
                 itemGainIndicator.transform.position = transform.position;
-                itemGainIndicator.transform.GetChild(0).GetComponent<Text>().text = "+200 Score";
+                itemGainIndicator.transform.GetChild(0).GetComponent<Text>().text = "+200";
                 itemGainIndicator.transform.GetChild(1).GetComponent<Image>().sprite = GameManager.gm.scoreIcon;
                 itemGainIndicator.transform.LookAt(GameManager.gm.player.GetComponent<PlayerController>().playerCam.transform);
                 break;
