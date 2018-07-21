@@ -32,27 +32,34 @@ public class Achievement {
         new Achievement(
                 "Best Score",
                 "",
-                false,
-                null
+                false
             ),
         new Achievement(
                 "Most Kills In A Game",
                 "",
-                false,
-                null
+                false
             ),
         new Achievement(
                 "Most Money Saved In A Game",
                 "",
-                false,
-                null
+                false
             ),
         new Achievement(
                 "Highest Enemy Wave Survived",
                 "",
-                false,
-                null
+                false
             ),
+        new Achievement(
+                "Total Enemies Killed",
+                "",
+                false
+            ),
+        new Achievement(
+                "Most Weak Spots Hit In A Game",
+                "",
+                false
+            ),
+
     };
 
     public static Achievement[][] cumulativeScoreAchievements;
@@ -96,13 +103,17 @@ public class Achievement {
 
     public static void Instantiate()
     {
-        cumulativeScoreAchievements = new Achievement[3][];
+        cumulativeScoreAchievements = new Achievement[6][];
         cumulativeScoreAchievements[0] = new Achievement[Enemy.difficulties.Length]; // index 0 = kills by enemy
         cumulativeScoreAchievements[1] = new Achievement[Projectile.projectileStats.Length]; // index 1 = kills by arrow attribute
         cumulativeScoreAchievements[2] = new Achievement[Projectile.projectileStats.Length]; // index 2 = arrows shot by attribute
+        cumulativeScoreAchievements[3] = new Achievement[Enemy.difficulties.Length]; // index 3 = weak spots hit by enemy
+        cumulativeScoreAchievements[4] = new Achievement[Weapon.weaponStats.Length]; // index 4 = weapons used by game
+        cumulativeScoreAchievements[5] = new Achievement[Weapon.weaponStats.Length]; // index 5 = enemy kill count per weapon
         for (int i = 0; i < cumulativeScoreAchievements[0].Length; i++)
         {
             cumulativeScoreAchievements[0][i] = new Achievement(Enemy.names[i] + " killed", "");
+            cumulativeScoreAchievements[3][i] = new Achievement(Enemy.names[i] + " weak spots hit", "");
         }
         for (int i = 0; i < cumulativeScoreAchievements[1].Length; i++)
         {
@@ -111,6 +122,11 @@ public class Achievement {
         for (int i = 0; i < cumulativeScoreAchievements[2].Length; i++)
         {
             cumulativeScoreAchievements[2][i] = new Achievement(Projectile.projectileStats[i].name + "s shot", "");
+        }
+        for (int i = 0; i < cumulativeScoreAchievements[4].Length; i++)
+        {
+            cumulativeScoreAchievements[4][i] = new Achievement(Weapon.weaponStats[i].name + " used", "");
+            cumulativeScoreAchievements[5][i] = new Achievement(Weapon.weaponStats[i].name + " kill count", "");
         }
 
     }
@@ -141,6 +157,18 @@ public class Achievement {
                     // arrows shot by attribute
                     case 2:
                         madeProgress = GameManager.gm.personalData.arrowsShotByAttribute[achievementID] > 0;
+                        break;
+                    // weak spots hit by enemy
+                    case 3:
+                        madeProgress = GameManager.gm.personalData.weakSpotsHitByEnemy[achievementID] > 0;
+                        break;
+                    // weapons used by game
+                    case 4:
+                        madeProgress = GameManager.gm.personalData.weaponsUsedByGame[achievementID] > 0;
+                        break;
+                    // enemy kill count per weapon
+                    case 5:
+                        madeProgress = GameManager.gm.personalData.enemiesKilledByWeapon[achievementID] > 0;
                         break;
                 }
                 return !cumulativeScoreAchievements[scoreType][achievementID].hideIfNoProgress || madeProgress;
@@ -179,6 +207,17 @@ public class Achievement {
             case 3:
                 details = GameManager.gm.personalData.highestWaveSurvived + "";
                 break;
+            // total enemies killed
+            case 4:
+                int sum = 0;
+                for (int i = 0; i < GameManager.gm.personalData.killsByEnemy.Length; i++)
+                    sum += GameManager.gm.personalData.killsByEnemy[i];
+                details = sum + "";
+                break;
+            // Most Weak Spots Hit In A Game
+            case 5:
+                details = GameManager.gm.personalData.mostWeakSpotsHitInAGame + "";
+                break;
         }
 
         return details;
@@ -203,6 +242,18 @@ public class Achievement {
             case 2:
                 details = GameManager.gm.personalData.arrowsShotByAttribute[achievementID] + "";
                 break;
+            // weak spots hit by enemy
+            case 3:
+                details = GameManager.gm.personalData.weakSpotsHitByEnemy[achievementID] + "";
+                break;
+            // weapons used by game
+            case 4:
+                details = GameManager.gm.personalData.weaponsUsedByGame[achievementID] + "";
+                break;
+            // enemy kill count per weapon
+            case 5:
+                details = GameManager.gm.personalData.enemiesKilledByWeapon[achievementID] + "";
+                break;
         }
 
         return details;
@@ -219,18 +270,7 @@ public class Achievement {
             case 0:
                 details = "" + GameManager.gm.personalData.killsByArrowAttribute[0] + "/" + conditionalAchievements[achievementID].conditions[0];
                 break;
-            // Most Kills In A Game
-            case 1:
-                details = GameManager.gm.personalData.mostKillsInGame + "";
-                break;
-            // Most Money Saved In A Game
-            case 2:
-                details = GameManager.gm.personalData.mostCurrencySavedInGame + "";
-                break;
-            // Highest Wave Survived In A Game
-            case 3:
-                details = GameManager.gm.personalData.highestWaveSurvived + "";
-                break;
+            
         }
 
         return details;

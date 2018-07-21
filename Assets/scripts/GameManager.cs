@@ -9,6 +9,17 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 [Serializable]
+// Used to save data that changes quickly (EX: arrow qty)
+public class DynamicData
+{
+    public int[] arr; // array of integers
+    public DynamicData(int len)
+    {
+        arr = new int[len];
+    }
+}
+
+[Serializable]
 // Used to save in game state
 public class PlayerData
 {
@@ -23,6 +34,13 @@ public class PlayerData
                totalKills;
     public int[] arrowQuantities;
 
+    // Cumulative Records
+    public int cumulativeDamageObjectiveTook;
+    public int[] killsByEnemy,
+                 killsByArrowAttribute,
+                 weakSpotsHitByEnemy,
+                 arrowsShotByAttribute;
+
     public PlayerData()
     {
         savedGame = false;
@@ -35,6 +53,11 @@ public class PlayerData
         wepID = 0;
         wepLvl = 0;
         arrowQuantities = new int[Projectile.projectileStats.Length];
+        
+        weakSpotsHitByEnemy = new int[Enemy.difficulties.Length];
+        killsByEnemy = new int[Enemy.difficulties.Length];
+        killsByArrowAttribute = new int[Projectile.projectileStats.Length];
+        arrowsShotByAttribute = new int[Projectile.projectileStats.Length];
     }
 
 }
@@ -54,14 +77,18 @@ public class PersonalData
     public int bestScore,
                mostCurrencySavedInGame,
                highestWaveSurvived,
+               mostWeakSpotsHitInAGame,
                mostKillsInGame;
 
     // Cumulative Records
     public int cumulativeDamageObjectiveTook,
-               cumulative;
+               totalDefeats,totalVictories;
     public int[] killsByEnemy,
                  killsByArrowAttribute,
-                 arrowsShotByAttribute;
+                 arrowsShotByAttribute,
+                 weakSpotsHitByEnemy,
+                 weaponsUsedByGame,
+                 enemiesKilledByWeapon;
 
     // Achievement Unlocks
     public bool[] isAchievementUnlocked;
@@ -87,11 +114,15 @@ public class PersonalData
         }
         arrowQuantities = new int[Projectile.projectileStats.Length];
 
+        totalDefeats = 0;
+        totalVictories = 0;
         bestScore = 0;
         mostCurrencySavedInGame = 0;
         highestWaveSurvived = 0;
         mostKillsInGame = 0;
         cumulativeDamageObjectiveTook = 0;
+        mostWeakSpotsHitInAGame = 0;
+        weakSpotsHitByEnemy = new int[Enemy.difficulties.Length];
         killsByEnemy = new int[Enemy.difficulties.Length];
         killsByArrowAttribute = new int[Projectile.projectileStats.Length];
         arrowsShotByAttribute = new int[Projectile.projectileStats.Length];
@@ -113,6 +144,7 @@ public class GameManager : MonoBehaviour {
     public static bool Debugging; // Enables in game debugging
     public PlayerData data; // Information about any saved game
     public PersonalData personalData; // Information about player stats and records
+    public DynamicData arrowQty; // Keeps track of each arrow qty. Used to store in file dynamically and for performance
 
     public Dictionary<int, Enemy> enemies; // Keeps track of enemies spawned in game
     public Dictionary<int, Trap> traps; // Keeps track of traps spawned in game
@@ -272,6 +304,33 @@ public class GameManager : MonoBehaviour {
 
     public List<int> availableAttributes; // list of attributes able to be used/spawned (based on Unlock Conditions)
 
+    public void CopyPlayerData(PlayerData dest, PlayerData source)
+    {
+        dest.difficulty = source.difficulty;
+        dest.inGameCurrency = source.inGameCurrency;
+        dest.objectiveHP = source.objectiveHP;
+        dest.savedGame = source.savedGame;
+        dest.totalKills = source.totalKills;
+        dest.wave = source.wave;
+        dest.wepID = source.wepID;
+        dest.wepLvl = source.wepLvl;
+
+        int projectilesLen = (dest.arrowQuantities.Length < source.arrowQuantities.Length) ? dest.arrowQuantities.Length : source.arrowQuantities.Length;
+        int enemiesLen = (dest.killsByEnemy.Length < source.killsByEnemy.Length) ? dest.killsByEnemy.Length : source.killsByEnemy.Length;
+
+        for(int i = 0; i < projectilesLen; i++)
+        {
+            dest.arrowQuantities[i] = source.arrowQuantities[i];
+            dest.killsByArrowAttribute[i] = source.killsByArrowAttribute[i];
+            dest.arrowsShotByAttribute[i] = source.arrowsShotByAttribute[i];
+        }
+
+        for(int i = 0; i < enemiesLen; i++)
+        {
+            dest.weakSpotsHitByEnemy[i] = source.weakSpotsHitByEnemy[i];
+        }
+    }
+
     public void CopyPersonalData(PersonalData dest, PersonalData source)
     {
         dest.equippedWep = source.equippedWep;
@@ -280,6 +339,9 @@ public class GameManager : MonoBehaviour {
         dest.mostCurrencySavedInGame = source.mostCurrencySavedInGame;
         dest.highestWaveSurvived = source.highestWaveSurvived;
         dest.mostKillsInGame = source.mostKillsInGame;
+        dest.totalDefeats = source.totalDefeats;
+        dest.totalVictories = source.totalVictories;
+        dest.mostWeakSpotsHitInAGame = source.mostWeakSpotsHitInAGame;
         dest.cumulativeDamageObjectiveTook = source.cumulativeDamageObjectiveTook;
         int projectilesLen = (dest.arrowQuantities.Length < source.arrowQuantities.Length) ? dest.arrowQuantities.Length : source.arrowQuantities.Length;
         int weaponsLen = (dest.isWeaponUnlocked.Length < source.isWeaponUnlocked.Length) ? dest.isWeaponUnlocked.Length : source.isWeaponUnlocked.Length;
@@ -299,6 +361,7 @@ public class GameManager : MonoBehaviour {
         for (int i = 0; i < enemiesLen; i++)
         {
             dest.killsByEnemy[i] = source.killsByEnemy[i];
+            dest.weakSpotsHitByEnemy[i] = source.weakSpotsHitByEnemy[i];
         }
     }
 
@@ -367,6 +430,10 @@ public class GameManager : MonoBehaviour {
                     //personalData.playerCurrency = playerCurrency;
                 bf.Serialize(file, personalData);
                 break;
+
+            case "arrowQuantity":
+                bf.Serialize(file, arrowQty); 
+                break;
         }
         
         file.Close();
@@ -395,7 +462,8 @@ public class GameManager : MonoBehaviour {
                 // Load in game progress
                 case "continuedGame":
                     PlayerData data = (PlayerData)bf.Deserialize(file);
-                    gm.data = data;
+                    //gm.data = data;
+                    CopyPlayerData(gm.data, data);
                     break;
 
                 // Load player stats/achievements
@@ -403,6 +471,10 @@ public class GameManager : MonoBehaviour {
                     PersonalData personalData = (PersonalData)bf.Deserialize(file);
                     CopyPersonalData(gm.personalData, personalData);
                     //gm.personalData = personalData;
+                    break;
+                // Load array of arrow quantities
+                case "arrowQuantity":
+                    arrowQty = (DynamicData)bf.Deserialize(file);
                     break;
             }
             //Debug.Log(file.Length);
@@ -601,9 +673,10 @@ public class GameManager : MonoBehaviour {
         Transform UIContainer = inventoryItemPanel.transform.Find("WeaponsUIContainer");
         //UIContainer.transform.localPosition = new Vector3(0, -1000, 0);
         ContentSizeFitter csf = UIContainer.GetComponent<ContentSizeFitter>();
+        GameObject itemUI, scoreObj, unlockObj;
         for (int i = 0; i < Weapon.weaponStats.Length; i++)
         {
-            GameObject itemUI = Instantiate(inventoryUIPrefab);
+            itemUI = Instantiate(inventoryUIPrefab);
             itemUI.transform.SetParent(UIContainer);
             //csf.AddItem(itemUI);
             itemUI.transform.Find("ItemImageBG").GetComponent<RawImage>().color = new Color(249f / 255, 88f/255, 0);// / 255;
@@ -673,7 +746,7 @@ public class GameManager : MonoBehaviour {
         //csf = UIContainer.GetComponent<ContentSizeFitter>();
         for (int i = 0; i < Projectile.projectileStats.Length; i++)
         {
-            GameObject itemUI = Instantiate(inventoryUIPrefab);
+            itemUI = Instantiate(inventoryUIPrefab);
             //csf.AddItem(itemUI);
             itemUI.transform.SetParent(UIContainer);
             itemUI.transform.Find("ItemImageBG").GetChild(0).GetComponent<RawImage>().texture = arrowItemIcons[i].texture;
@@ -734,58 +807,57 @@ public class GameManager : MonoBehaviour {
         achievementsCanvas.transform.Find("BackBtn").GetComponent<Button>().onClick.AddListener(ToggleMainMenuCanvas);
         Transform achievementsContainer = achievementsCanvas.transform.Find("ItemUIPanel").Find("AchievementsContainer");
 
+
         // fetch all best score achievements
         for (int i = 0; i < Achievement.bestScoreAchievements.Length; i++)
         {
-            GameObject itemUI = Instantiate(achievementUIPrefab);
+            itemUI = Instantiate(achievementUIPrefab);
             itemUI.transform.SetParent(achievementsContainer);
             itemUI.transform.Find("HideProgress").gameObject.SetActive(!Achievement.CanShowProgress(AchievementType.BestScore, i));
             itemUI.transform.Find("HeaderTxt").GetComponent<Text>().text = Achievement.bestScoreAchievements[i].header;
-            /*
-            //int achievementTypeIndex = 0; // used for determining to display score text or reward image + progress txt based on type
-            if (Achievement.achievements[i].achievementType == AchievementType.Conditional)
-            {
-                itemUI.transform.Find("AchievementTypes").GetChild(0).gameObject.SetActive(false);
-                GameObject unlockObj = itemUI.transform.Find("AchievementTypes").GetChild(1).gameObject;//.SetActive(false);
-                unlockObj.SetActive(true);
-                unlockObj.transform.Find("ProgressTxt").GetComponent<Text>().text = Achievement.GetAchievementDetails(i);
-            }
-            else
-            {
-            }
-            */
+            itemUI.transform.localScale = new Vector3(1, 1, 1);
             itemUI.transform.Find("AchievementTypes").GetChild(1).gameObject.SetActive(false);
-            GameObject scoreObj = itemUI.transform.Find("AchievementTypes").GetChild(0).gameObject;//.SetActive(false);
+            scoreObj = itemUI.transform.Find("AchievementTypes").GetChild(0).gameObject;//.SetActive(false);
             scoreObj.SetActive(true);
             scoreObj.transform.Find("ScoreTxt").GetComponent<Text>().text = Achievement.GetAchievementDetails(AchievementType.BestScore, i);
 
             //itemUI.transform.Find("AchievementType").GetChild(achievementTypeIndex).gameObject.SetActive(true);//GetComponent<Text>().text = Achievement.achievements[i].header;
         }
 
+        // Handle Cumulative Victories
+        itemUI = Instantiate(achievementUIPrefab);
+        itemUI.transform.SetParent(achievementsContainer);
+        itemUI.transform.Find("HideProgress").gameObject.SetActive(false);
+        itemUI.transform.Find("HeaderTxt").GetComponent<Text>().text = "Total Victories";
+        itemUI.transform.localScale = new Vector3(1, 1, 1);
+        itemUI.transform.Find("AchievementTypes").GetChild(1).gameObject.SetActive(false); // disable unlock type
+        scoreObj = itemUI.transform.Find("AchievementTypes").GetChild(0).gameObject; // enable score type
+        scoreObj.SetActive(true);
+        scoreObj.transform.Find("ScoreTxt").GetComponent<Text>().text = "" + personalData.totalVictories;
+
+        // Handle Cumulative Defeats
+        itemUI = Instantiate(achievementUIPrefab);
+        itemUI.transform.SetParent(achievementsContainer);
+        itemUI.transform.Find("HideProgress").gameObject.SetActive(false);
+        itemUI.transform.Find("HeaderTxt").GetComponent<Text>().text = "Total Defeats";
+        itemUI.transform.localScale = new Vector3(1, 1, 1);
+        itemUI.transform.Find("AchievementTypes").GetChild(1).gameObject.SetActive(false); // disable unlock type
+        scoreObj = itemUI.transform.Find("AchievementTypes").GetChild(0).gameObject; // enable score type
+        scoreObj.SetActive(true);
+        scoreObj.transform.Find("ScoreTxt").GetComponent<Text>().text = "" + personalData.totalDefeats;
+
         // fetch all cumulative score achievements
         for (int j = 0; j < Achievement.cumulativeScoreAchievements.Length; j++)
         {
             for (int i = 0; i < Achievement.cumulativeScoreAchievements[j].Length; i++)
             {
-                GameObject itemUI = Instantiate(achievementUIPrefab);
+                itemUI = Instantiate(achievementUIPrefab);
                 itemUI.transform.SetParent(achievementsContainer);
+                itemUI.transform.localScale = new Vector3(1, 1, 1);
                 itemUI.transform.Find("HideProgress").gameObject.SetActive(!Achievement.CanShowProgress(AchievementType.Cumulative, i, j));
                 itemUI.transform.Find("HeaderTxt").GetComponent<Text>().text = Achievement.cumulativeScoreAchievements[j][i].header;
-                /*
-                //int achievementTypeIndex = 0; // used for determining to display score text or reward image + progress txt based on type
-                if (Achievement.achievements[i].achievementType == AchievementType.Conditional)
-                {
-                    itemUI.transform.Find("AchievementTypes").GetChild(0).gameObject.SetActive(false);
-                    GameObject unlockObj = itemUI.transform.Find("AchievementTypes").GetChild(1).gameObject;//.SetActive(false);
-                    unlockObj.SetActive(true);
-                    unlockObj.transform.Find("ProgressTxt").GetComponent<Text>().text = Achievement.GetAchievementDetails(i);
-                }
-                else
-                {
-                }
-                */
                 itemUI.transform.Find("AchievementTypes").GetChild(1).gameObject.SetActive(false);
-                GameObject scoreObj = itemUI.transform.Find("AchievementTypes").GetChild(0).gameObject;//.SetActive(false);
+                scoreObj = itemUI.transform.Find("AchievementTypes").GetChild(0).gameObject;//.SetActive(false);
                 scoreObj.SetActive(true);
                 scoreObj.transform.Find("ScoreTxt").GetComponent<Text>().text = Achievement.GetAchievementDetails(AchievementType.Cumulative, i, j);
             }
@@ -794,25 +866,13 @@ public class GameManager : MonoBehaviour {
         // fetch all conditional score achievments
         for (int i = 0; i < Achievement.conditionalAchievements.Length; i++)
         {
-            GameObject itemUI = Instantiate(achievementUIPrefab);
+            itemUI = Instantiate(achievementUIPrefab);
             itemUI.transform.SetParent(achievementsContainer);
+            itemUI.transform.localScale = new Vector3(1, 1, 1);
             itemUI.transform.Find("HideProgress").gameObject.SetActive(!Achievement.CanShowProgress(AchievementType.Conditional, i));
             itemUI.transform.Find("HeaderTxt").GetComponent<Text>().text = Achievement.conditionalAchievements[i].header;
-            /*
-            //int achievementTypeIndex = 0; // used for determining to display score text or reward image + progress txt based on type
-            if (Achievement.achievements[i].achievementType == AchievementType.Conditional)
-            {
-                itemUI.transform.Find("AchievementTypes").GetChild(0).gameObject.SetActive(false);
-                GameObject unlockObj = itemUI.transform.Find("AchievementTypes").GetChild(1).gameObject;//.SetActive(false);
-                unlockObj.SetActive(true);
-                unlockObj.transform.Find("ProgressTxt").GetComponent<Text>().text = Achievement.GetAchievementDetails(i);
-            }
-            else
-            {
-            }
-            */
             itemUI.transform.Find("AchievementTypes").GetChild(0).gameObject.SetActive(false);
-            GameObject unlockObj = itemUI.transform.Find("AchievementTypes").GetChild(1).gameObject;//.SetActive(false);
+            unlockObj = itemUI.transform.Find("AchievementTypes").GetChild(1).gameObject;//.SetActive(false);
             unlockObj.SetActive(true);
             unlockObj.transform.Find("ProgressTxt").GetComponent<Text>().text = Achievement.GetAchievementDetails(AchievementType.Conditional, i);
         }
@@ -1456,6 +1516,7 @@ public class GameManager : MonoBehaviour {
         if(pc.shotsHit > 0 && pc.wep.GetComponent<Weapon>().shotCount > 0)
             stats.Find("Accuracy").Find("Stats").GetComponent<Text>().text = "" + ((float) pc.shotsHit / pc.wep.GetComponent<Weapon>().shotCount * 100).ToString("#.0") + "%";
         stats.Find("OverallScore").Find("Stats").GetComponent<Text>().text = "" + score;
+       
         personalData.playerCurrency += score / 1000 + inGameCurrency / 20;
         firework.SetActive(won);
         Save("setupMain");
