@@ -23,7 +23,9 @@ public class DynamicData
 // Used to save in game state
 public class PlayerData
 {
-    public bool savedGame; // Determines if game is being loaded or saved
+    public bool savedGame, // Determines if game is being loaded or saved
+                hasWon, // game ended by winning, else lost
+                gameOver; // has game session ended
     public int wave,
                inGameCurrency,
                objectiveHP,
@@ -44,6 +46,8 @@ public class PlayerData
     public PlayerData()
     {
         savedGame = false;
+        hasWon = false;
+        gameOver = false;
         wave = 0;
         inGameCurrency = 0;
         difficulty = 0;
@@ -100,18 +104,21 @@ public class PersonalData
         isWeaponUnlocked = new bool[Weapon.weaponStats.Length];
         for (int i = 0; i < Weapon.weaponStats.Length; i++)
         {
-            isWeaponUnlocked[i] = Weapon.weaponStats[i].unlockCondition == UnlockCondition.Free; 
+            isWeaponUnlocked[i] = Weapon.weaponStats[i].unlockCondition == UnlockCondition.Free;
+            //Debug.Log("aa>" + isWeaponUnlocked[i]);
         }
         isWeaponPurchased = new bool[Weapon.weaponStats.Length];
         for (int i = 0; i < Weapon.weaponStats.Length; i++)
         {
             isWeaponPurchased[i] = Weapon.weaponStats[i].unlockCondition == UnlockCondition.Free;
+            //Debug.Log(">" + isWeaponPurchased[i]);
         }
         isArrowUnlocked = new bool[Projectile.projectileStats.Length];
         for (int i = 0; i < Projectile.projectileStats.Length; i++)
         {
             isArrowUnlocked[i] = Projectile.projectileStats[i].unlockCondition == UnlockCondition.Free;
         }
+        isAchievementUnlocked = new bool[Achievement.conditionalAchievements.Length];
         arrowQuantities = new int[Projectile.projectileStats.Length];
 
         totalDefeats = 0;
@@ -123,6 +130,8 @@ public class PersonalData
         cumulativeDamageObjectiveTook = 0;
         mostWeakSpotsHitInAGame = 0;
         weakSpotsHitByEnemy = new int[Enemy.difficulties.Length];
+        enemiesKilledByWeapon = new int[Weapon.weaponStats.Length];
+        weaponsUsedByGame = new int[Projectile.projectileStats.Length];
         killsByEnemy = new int[Enemy.difficulties.Length];
         killsByArrowAttribute = new int[Projectile.projectileStats.Length];
         arrowsShotByAttribute = new int[Projectile.projectileStats.Length];
@@ -150,7 +159,7 @@ public class GameManager : MonoBehaviour {
     public Dictionary<int, Trap> traps; // Keeps track of traps spawned in game
 
     public bool inGame, // In game scene?
-                gameOver, // Game session end?
+                //gameOver, // Game session end?
                 startWaves, // Wave spawning?
                 continuedGame, // Was this game saved then loaded? If so load game from data
                 spawning, // Determines if in process of spawning an enemy
@@ -158,7 +167,7 @@ public class GameManager : MonoBehaviour {
                 isSettingPlayerOrientation, // Are you done setting up the orientation of your forward?
                 //gyroEnabled, // Used????
                 isBlackingOut, // Used for blackout effect for player view
-                hasWon,
+                //hasWon,
                 interactiveTouch, // Using touch interactions that isn't just shoot button?
                 onIntermission, // Are we on break from defending waves of enemies?
                 playingOnline, // Are we playing with players online?
@@ -166,7 +175,7 @@ public class GameManager : MonoBehaviour {
                 realTimeAction, // Trade off between live player movement and in game activities
                 paused; // Game paused?
 
-    public int wave, // Determines current wave to spawn
+    public int //wave, // Determines current wave to spawn
                playerID, // Unique identifier for player
                kills, // Total enemies killed in one wave
                personalKills, // Total enemies you killed in one wave (multiplayer purpose)
@@ -178,8 +187,8 @@ public class GameManager : MonoBehaviour {
                enemiesSpawned, // Total number of enemies spawned
                playerCurrency, // Currency used outside game session
                inGameCurrency, // Currency used inside game session
-               difficulty, // How hard enemies will be (Used to offset enemy level)
-               score; // Keeps track of how awesome you are
+               difficulty; // How hard enemies will be (Used to offset enemy level)
+               //score; // Keeps track of how awesome you are
 
     public Vector3 playerOrientation; // Keeps track of where your forward is
 
@@ -210,10 +219,12 @@ public class GameManager : MonoBehaviour {
                       iconPrefab, // icon of item
                       inGameWepItemUIPrefab, // used to display weapon stats in game
                       achievementUIPrefab, // displays description (and progress if exists) of achievement
+                      notificationUIPrefab, // used to display notification (EX: quest rewards)
                       //enemyDeathVFXPrefab, // used after enemy dies
                       enemyPrefab; // Enemy object
 
     public GameObject playerStatusCanvas, // Information used for player to see
+                      notificationCanvas, // Displays any notifications (EX: finish quest and receive reward)
                       inventoryCanvas, // Displays shop items and inventory
                       inventoryItemPanel, // displays different selected item categories
                       playerOrientationObjects, // Holds objects pertaining to setting up player orientation
@@ -302,10 +313,14 @@ public class GameManager : MonoBehaviour {
     //public List<AudioClip> 
     public AudioSource audioSrc;
 
+    Transform notificationContainer; // holds list of notifications
+
     public List<int> availableAttributes; // list of attributes able to be used/spawned (based on Unlock Conditions)
 
     public void CopyPlayerData(PlayerData dest, PlayerData source)
     {
+        dest.gameOver = source.gameOver;
+        dest.hasWon = source.hasWon;
         dest.difficulty = source.difficulty;
         dest.inGameCurrency = source.inGameCurrency;
         dest.objectiveHP = source.objectiveHP;
@@ -314,7 +329,8 @@ public class GameManager : MonoBehaviour {
         dest.wave = source.wave;
         dest.wepID = source.wepID;
         dest.wepLvl = source.wepLvl;
-
+        print(dest.killsByEnemy == null);
+        print(source.killsByEnemy == null);
         int projectilesLen = (dest.arrowQuantities.Length < source.arrowQuantities.Length) ? dest.arrowQuantities.Length : source.arrowQuantities.Length;
         int enemiesLen = (dest.killsByEnemy.Length < source.killsByEnemy.Length) ? dest.killsByEnemy.Length : source.killsByEnemy.Length;
 
@@ -346,6 +362,7 @@ public class GameManager : MonoBehaviour {
         int projectilesLen = (dest.arrowQuantities.Length < source.arrowQuantities.Length) ? dest.arrowQuantities.Length : source.arrowQuantities.Length;
         int weaponsLen = (dest.isWeaponUnlocked.Length < source.isWeaponUnlocked.Length) ? dest.isWeaponUnlocked.Length : source.isWeaponUnlocked.Length;
         int enemiesLen = (dest.killsByEnemy.Length < source.killsByEnemy.Length) ? dest.killsByEnemy.Length : source.killsByEnemy.Length;
+        int questsLen = (dest.isAchievementUnlocked.Length < source.isAchievementUnlocked.Length) ? dest.isAchievementUnlocked.Length : source.isAchievementUnlocked.Length;
         for(int i = 0; i < projectilesLen; i++)
         {
             dest.arrowQuantities[i] = source.arrowQuantities[i];
@@ -357,11 +374,16 @@ public class GameManager : MonoBehaviour {
         {
             dest.isWeaponPurchased[i] = source.isWeaponPurchased[i];
             dest.isWeaponUnlocked[i] = source.isWeaponUnlocked[i];
+            dest.enemiesKilledByWeapon[i] = source.enemiesKilledByWeapon[i];
         }
         for (int i = 0; i < enemiesLen; i++)
         {
             dest.killsByEnemy[i] = source.killsByEnemy[i];
             dest.weakSpotsHitByEnemy[i] = source.weakSpotsHitByEnemy[i];
+        }
+        for(int i = 0; i < questsLen; i++)
+        {
+            dest.isAchievementUnlocked[i] = source.isAchievementUnlocked[i];
         }
     }
 
@@ -386,12 +408,16 @@ public class GameManager : MonoBehaviour {
         {
             // Save in game progress
             case "continuedGame":
-                PlayerData data = new PlayerData();
+                PlayerData data = gm.data;//new PlayerData();
                 data.savedGame = inGame;
+                /*
                 data.totalKills = totalKills;
                 data.inGameCurrency = inGameCurrency;
                 data.score = score;
                 data.difficulty = difficulty;
+                data.wave = wave;
+                
+                 */
                 /*
                 if (myAttributes != null)
                 {
@@ -403,7 +429,7 @@ public class GameManager : MonoBehaviour {
                 }
                 */
                 //data.currency = playerCurrency;
-                Debug.Log(inGame + " " + wave);
+                Debug.Log(inGame + " " + data.wave);
                 if (objective != null)
                 {
                     data.objectiveHP = objective.transform.GetComponent<Objective>().HP;
@@ -417,7 +443,6 @@ public class GameManager : MonoBehaviour {
                         data.wepID = pc.wep.wepID;
                     }
                 }
-                data.wave = wave;
                 bf.Serialize(file, data);
                 break;
 
@@ -500,6 +525,7 @@ public class GameManager : MonoBehaviour {
         enemies = new Dictionary<int, Enemy>();
         gm = this;
         gm.data = new PlayerData();
+        gm.arrowQty = new DynamicData(Projectile.projectileStats.Length);
         gm.personalData = new PersonalData();
         DontDestroyOnLoad(gm);
         interactiveTouch = false;
@@ -570,6 +596,7 @@ public class GameManager : MonoBehaviour {
     {
         Load("continuedGame");
         Load("setupMain");
+        Load("arrowQuantity");
         scene = "main";
         selectedTab = "Weapons";
         inGame = false;
@@ -659,7 +686,12 @@ public class GameManager : MonoBehaviour {
         btnContainer.Find("BackBtn").GetComponent<Button>().onClick.AddListener(ToggleMainMenuCanvas);
         btnContainer.Find("BackBtn").GetComponent<Button>().onClick.AddListener(ToggleSettingsCanvas);
 
-
+        // setup notification canvas
+        notificationCanvas = GameObject.Find("NotificationCanvas");
+        notificationCanvas.transform.Find("NotificationUI").Find("ConfirmBtn").GetComponent<Button>().onClick.AddListener(ToggleNotificationCanvas);
+        notificationCanvas.SetActive(false);
+        StartCoroutine(CheckForQuestCompletions());
+        print("asd");
         // Setup Inventory and Shop
 
         inventoryCanvas = GameObject.Find("InventoryCanvas");
@@ -691,6 +723,10 @@ public class GameManager : MonoBehaviour {
             itemUI.name = "wepUI " + i;
             //wepUI.tag = "wepUI";
             //wepUI.transform.GetComponent<Button>().onClick.AddListener(PerformInventoryAction);
+            print("ASD" + personalData.isWeaponUnlocked[i]);
+            print(Weapon.weaponStats[i].unlockCondition);
+            print((Weapon.weaponStats[i].unlockCondition == UnlockCondition.Quest || Weapon.weaponStats[i].unlockCondition == UnlockCondition.QuestThenPurchase));
+            print( !personalData.isWeaponUnlocked[i]);
             itemUI.transform.Find("LockedItemImage").gameObject.SetActive(
                 (Weapon.weaponStats[i].unlockCondition == UnlockCondition.Quest || Weapon.weaponStats[i].unlockCondition == UnlockCondition.QuestThenPurchase) 
                 && !personalData.isWeaponUnlocked[i]);
@@ -758,13 +794,13 @@ public class GameManager : MonoBehaviour {
             //itemUI.transform.Find("ItemStats").Find("BowStr").Find("Text").GetComponent<Text>().text = "" + Weapon.weaponStats[i].distance[0];
             itemUI.transform.Find("ItemDescription").GetComponent<Text>().text = Projectile.projectileStats[i].description;
             itemUI.transform.Find("QtyTxt").gameObject.SetActive(true);
-            itemUI.transform.Find("QtyTxt").GetComponent<Text>().text = "Quantity: " + ((i == 0)? "---": "" + personalData.arrowQuantities[i]);
+            itemUI.transform.Find("QtyTxt").GetComponent<Text>().text = "Quantity: " + ((i == 0)? "---": "" + arrowQty.arr[i]);
             itemUI.name = "arrowUI " + i;
             //wepUI.tag = "wepUI";
             //wepUI.transform.GetComponent<Button>().onClick.AddListener(PerformInventoryAction);
             // show if item is unlocked or free
             itemUI.transform.Find("LockedItemImage").gameObject.SetActive(
-                Projectile.projectileStats[i].unlockCondition == UnlockCondition.Quest && !personalData.isArrowUnlocked[i]);
+                Projectile.projectileStats[i].unlockCondition == UnlockCondition.QuestThenPurchase && !personalData.isArrowUnlocked[i]);
 
             // add to attribute pool that is spawnable in game as reward under these conditions
             if (i != 0 && Projectile.enableArrows[i] &&
@@ -874,9 +910,14 @@ public class GameManager : MonoBehaviour {
             itemUI.transform.Find("AchievementTypes").GetChild(0).gameObject.SetActive(false);
             unlockObj = itemUI.transform.Find("AchievementTypes").GetChild(1).gameObject;//.SetActive(false);
             unlockObj.SetActive(true);
+            unlockObj.transform.Find("RewardImage").GetChild(0).gameObject.SetActive(!personalData.isAchievementUnlocked[i]);
+            unlockObj.transform.Find("RewardImage").GetComponent<Image>().sprite = Achievement.GetRewardIcon(i);
             unlockObj.transform.Find("ProgressTxt").GetComponent<Text>().text = Achievement.GetAchievementDetails(AchievementType.Conditional, i);
         }
         achievementsCanvas.SetActive(false);
+
+
+        print("done main");
     }
 
     // Load game scene. If there was any saved game progress, remove it
@@ -1171,17 +1212,61 @@ public class GameManager : MonoBehaviour {
         
     }
 
+    public void ToggleNotificationCanvas()
+    {
+        notificationCanvas.SetActive(!notificationCanvas.activeSelf);
+    }
+
+    public bool NotificationIsActive()
+    {
+        return notificationCanvas.activeSelf;
+    }
+
+    // Looks for any quests that are recently compeleted and notifies player of rewards
+    public IEnumerator CheckForQuestCompletions()
+    {
+        List<int> questsCompleted = new List<int>(); // list of quests recently completed by achievementID
+        Transform notification = notificationCanvas.transform.Find("NotificationUI");
+
+        // get list of quests completed for first time
+        for (int i = 0; i < Achievement.conditionalAchievements.Length; i++)
+        {
+            // if just completed, keep track of it to not notify another time and add to list to notify player
+            if (!personalData.isAchievementUnlocked[i] && Achievement.CompletedQuest(i))
+            {
+                personalData.isAchievementUnlocked[i] = true;
+                questsCompleted.Add(i);
+            }
+        }
+
+        // notify player of each quest completed one at a time
+        for(int i = 0; i < questsCompleted.Count; i++)
+        {
+            print("come");
+            notificationCanvas.SetActive(true);
+            notification.Find("HeaderTxt").GetComponent<Text>().text = Achievement.conditionalAchievements[questsCompleted[i]].header;
+            notification.Find("ProgressTxt").GetComponent<Text>().text = Achievement.GetAchievementDetails(AchievementType.Conditional, questsCompleted[i]);
+            notification.Find("RewardImage").GetComponent<Image>().sprite = Achievement.GetRewardIcon(questsCompleted[i]);
+            yield return new WaitWhile(NotificationIsActive);
+        }
+
+        // save state if any quests were completed
+        if(questsCompleted.Count> 0)
+            Save("setupMain");
+    }
+
     public void UpdateItem(string itemType, int itemID, int qty)
     {
         if(itemType == "Attribute")
         {
             //data.arrowQuantities[itemID] += qty;
-            print(itemID);
-            print(personalData.arrowQuantities.Length);
-            print(Projectile.projectileStats.Length);
-            personalData.arrowQuantities[itemID] += qty;
+            //print(itemID);
+            //print(personalData.arrowQuantities.Length);
+            //print(Projectile.projectileStats.Length);
+            //personalData.arrowQuantities[itemID] += qty;
+            arrowQty.arr[itemID] += qty;
             //myAttributes[itemID] += qty;
-            print("CT " + personalData.arrowQuantities[itemID]);
+            //print("CT " + personalData.arrowQuantities[itemID]);
             UpdateArrowQty(itemID);
             //itemWheel.GetComponent<Rotator>().ResetItemWheel(selectedAttribute);
         }
@@ -1191,12 +1276,14 @@ public class GameManager : MonoBehaviour {
     {
         if(itemType == "Attribute")
         {
+            data.arrowsShotByAttribute[itemID]++;
             if (itemID == 0)
                 return;
             //myAttributes[itemID]--;
-            personalData.arrowQuantities[itemID]--;
+            arrowQty.arr[itemID]--;
+            //personalData.arrowQuantities[itemID]--;
             //print(itemID + ":" + myAttributes[itemID]);
-            if(personalData.arrowQuantities[itemID] <= 0)//myAttributes[itemID] <= 0)
+            if(arrowQty.arr[itemID] <= 0)//personalData.arrowQuantities[itemID] <= 0)//myAttributes[itemID] <= 0)
             {
                 print("OUT OF ITEM");
                 ChangeSelectedAttribute(0);
@@ -1213,7 +1300,7 @@ public class GameManager : MonoBehaviour {
         for(int i = 1; i < Projectile.projectileStats.Length; i++)
         {
             int nextIndex = (index + i) % Projectile.projectileStats.Length;
-            if(personalData.arrowQuantities[index] > 0 || nextIndex == 0) //myAttributes[nextIndex] > 0 || nextIndex == 0)
+            if(arrowQty.arr[index] > 0 || nextIndex == 0) //myAttributes[nextIndex] > 0 || nextIndex == 0)
             {
                 index = nextIndex;
                 break;
@@ -1227,7 +1314,7 @@ public class GameManager : MonoBehaviour {
         for (int i = 1; i < Projectile.projectileStats.Length; i++)
         {
             int prevIndex = (index - i + Projectile.projectileStats.Length) % Projectile.projectileStats.Length;
-            if (personalData.arrowQuantities[index] > 0 || prevIndex == 0)
+            if (arrowQty.arr[index] > 0 || prevIndex == 0)
             {
                 index = prevIndex;
                 break;
@@ -1243,7 +1330,7 @@ public class GameManager : MonoBehaviour {
         if (!inGame)
         {
             print("?");
-            inventoryItemPanel.transform.Find("ArrowsUIContainer").GetChild(itemID).Find("QtyTxt").GetComponent<Text>().text = "Quantity: " + personalData.arrowQuantities[itemID];
+            inventoryItemPanel.transform.Find("ArrowsUIContainer").GetChild(itemID).Find("QtyTxt").GetComponent<Text>().text = "Quantity: " + arrowQty.arr[itemID];// personalData.arrowQuantities[itemID];
             return;
         }
         if (itemID == selectedAttribute)
@@ -1256,11 +1343,11 @@ public class GameManager : MonoBehaviour {
             }
             else
             {
-                changeArrowBtn.transform.Find("QtyTxt").GetComponent<Text>().text += personalData.arrowQuantities[itemID];//myAttributes[itemID];
+                changeArrowBtn.transform.Find("QtyTxt").GetComponent<Text>().text += arrowQty.arr[itemID];// personalData.arrowQuantities[itemID];//myAttributes[itemID];
             }
         }
-        itemDropdownList.transform.GetChild(itemID).Find("QtyTxt").GetComponent<Text>().text = "x" + ((itemID == 0) ? "---" : "" + personalData.arrowQuantities[itemID]);
-        bool isEmpty = personalData.arrowQuantities[itemID] == 0 && itemID != 0;
+        itemDropdownList.transform.GetChild(itemID).Find("QtyTxt").GetComponent<Text>().text = "x" + ((itemID == 0) ? "---" : "" + arrowQty.arr[itemID]);// personalData.arrowQuantities[itemID]);
+        bool isEmpty = arrowQty.arr[itemID] == 0 && itemID != 0;
         print(isEmpty+" "+itemID) ;
         arrowUIItems[itemID].SetActive(!isEmpty);
         //itemDropdownList.transform.GetChild(itemID).gameObject.SetActive(!isEmpty);
@@ -1362,7 +1449,9 @@ public class GameManager : MonoBehaviour {
 
     public void ChangeSelectedTab(string selectedTab)
     {
-        inventoryItemPanel.transform.Find(gm.selectedTab + "UIContainer").transform.localPosition = Vector2.zero;
+
+        inventoryItemPanel.GetComponent<ScrollRect>().verticalNormalizedPosition = 1;
+        //inventoryItemPanel.transform.Find(gm.selectedTab + "UIContainer").transform.localPosition = Vector2.zero;
         if (gm.selectedTab == selectedTab)
             return;
         print("CHANGE");
@@ -1470,6 +1559,7 @@ public class GameManager : MonoBehaviour {
         arrowQtyList.SetActive(!arrowQtyList.activeSelf);
     }
 
+
     public void DisplayEndGameNotifications(bool won)
     {
         print("ENDGAME");
@@ -1497,10 +1587,10 @@ public class GameManager : MonoBehaviour {
         mapFingerID = -1;
         selectedDefense = null;
 
-        gameOver = true;
+        data.gameOver = true;
         resultNotification.SetActive(true);
 
-        hasWon = won;
+        data.hasWon = won;
         Transform stats = resultNotification.transform.Find("StatisticsMask").GetChild(0).Find("StatisticsContainer");
         PlayerController pc = player.GetComponent<PlayerController>();
         if (won)
@@ -1515,9 +1605,11 @@ public class GameManager : MonoBehaviour {
         stats.Find("CriticalShots").Find("Stats").GetComponent<Text>().text = "" + pc.criticalShotCount;
         if(pc.shotsHit > 0 && pc.wep.GetComponent<Weapon>().shotCount > 0)
             stats.Find("Accuracy").Find("Stats").GetComponent<Text>().text = "" + ((float) pc.shotsHit / pc.wep.GetComponent<Weapon>().shotCount * 100).ToString("#.0") + "%";
-        stats.Find("OverallScore").Find("Stats").GetComponent<Text>().text = "" + score;
-       
-        personalData.playerCurrency += score / 1000 + inGameCurrency / 20;
+        stats.Find("OverallScore").Find("Stats").GetComponent<Text>().text = "" + data.score;
+
+        Achievement.CheckForAchievementProgress();
+
+        personalData.playerCurrency += data.score / 1000 + inGameCurrency / 20;
         firework.SetActive(won);
         Save("setupMain");
     }
@@ -1581,8 +1673,8 @@ public class GameManager : MonoBehaviour {
         mapFingerID = -1;
         selectedDefense = null;
 
-        gameOver = true;
-        hasWon = true;
+        data.gameOver = true;
+        data.hasWon = true;
         resultNotification.SetActive(true);
         resultNotification.transform.Find("ResultTxt").GetComponent<Text>().text = "VICTORY!\nYou have successfully\ndefended the kingdom!";
     }
@@ -1601,8 +1693,8 @@ public class GameManager : MonoBehaviour {
         mapFingerID = -1;
         selectedDefense = null;
 
-        gameOver = true;
-        hasWon = false;
+        data.gameOver = true;
+        data.hasWon = false;
         resultNotification.SetActive(true);
         resultNotification.transform.Find("ResultTxt").GetComponent<Text>().text = "Oh No! The enemies broke\nthrough our defenses!";
     }
@@ -1811,12 +1903,12 @@ public class GameManager : MonoBehaviour {
 
     public void UpdateScore(int s)
     {
-        score += s;
+        data.score += s;
         Transform scoreObj = playerStatusCanvas.transform.Find("Score");
         string scoreTxt = "";
         for(int i = 0; i < 9; i++)
         {
-            scoreTxt = (score / (int)Mathf.Pow(10, i)) % 10 + scoreTxt;
+            scoreTxt = (data.score / (int)Mathf.Pow(10, i)) % 10 + scoreTxt;
         }
         scoreObj.Find("Text").GetComponent<Text>().text = scoreTxt;
     }
@@ -1831,7 +1923,7 @@ public class GameManager : MonoBehaviour {
     {
         intermissionCanvas.GetComponent<Canvas>().sortingOrder = playerStatusCanvas.GetComponent<Canvas>().sortingOrder - 1;
         intermissionCanvas.SetActive(false);
-        StartWave(wave);
+        StartWave(data.wave);
     }
 
     public void DisplayIntermission()
@@ -1917,7 +2009,7 @@ public class GameManager : MonoBehaviour {
 
     public void AddScore(int s)
     {
-        score += s;
+        data.score += s;
     }
 
     // Updates in game currency and displays the information in shop
@@ -2004,7 +2096,7 @@ public class GameManager : MonoBehaviour {
     // Set player in game information to initial values
     public void ResetPlayerStats()
     {
-        score = 0;
+        data.score = 0;
         totalKills = 0;
         objective.transform.GetComponent<Objective>().Reset();
     }
@@ -2016,7 +2108,7 @@ public class GameManager : MonoBehaviour {
         spawnIndex = 0;
         startWaves = false;
         intervalIndex = 0;
-        wave = w;
+        data.wave = w;
         kills = 0;
         personalKills = 0;
         enemiesSpawned = 0;
@@ -2026,7 +2118,7 @@ public class GameManager : MonoBehaviour {
     public void FinishGame()
     {
         print("done game");
-        print(hasWon);
+        print(data.hasWon);
         
         LeaveGame();
     }
@@ -2041,7 +2133,7 @@ public class GameManager : MonoBehaviour {
         resultNotification.SetActive(false);
         objective.transform.GetComponent<Objective>().Reset();
         inGame = true;
-        gameOver = false;
+        data.gameOver = false;
         paused = false;
         StartWave(0);
     }
@@ -2055,23 +2147,22 @@ public class GameManager : MonoBehaviour {
         Weapon.WeaponCount = 0;
         Trap.TrapCount = 0;
         */
-        
         enemies.Clear();
         traps.Clear();
         edittingMap = false;
         inGame = true;
         onIntermission = false;
         paused = false;
-        gameOver = false;
+        data.gameOver = false;
         inGameCurrency = 0;
         startWaves = false;
         UpdateInGameCurrency(0);
-        score = 0;
+        data.score = 0;
         kills = 0;
         personalKills = 0;
         totalPersonalKills = 0;
         difficulty = 0;
-        wave = 0;
+        data.wave = 0;
         totalKills = 0;
         MapManager.mapManager.LoadMap(0);
         Weapon w = null;
@@ -2087,10 +2178,11 @@ public class GameManager : MonoBehaviour {
         //DisplayIntermission();
         if (NetworkManager.nm.isStarted)
         {
+            data = new PlayerData();
             UpdateInGameCurrency(0);
             UpdateKillCount(0);
             UpdateScore(0);
-            for (int i = 0; i < personalData.arrowQuantities.Length; i++)
+            for (int i = 0; i < arrowQty.arr.Length; i++)
                 UpdateArrowQty(i);
             return;
         }
@@ -2101,22 +2193,24 @@ public class GameManager : MonoBehaviour {
         //pc.SetOrientation(playerOrientation);
         player.transform.position = playerSpawnPoints.transform.GetChild(0).position;
         player.transform.SetParent(playerRotation.transform);
+        /*
         for (int i = 0; i < Projectile.projectileStats.Length; i++)
         {
             personalData.arrowQuantities[i] = personalData.arrowQuantities[i];
         }
+        */
         if (continuedGame)
         {
             Debug.Log("Continued Game");
             if (data != null && data.savedGame)
             {
                 Debug.Log("fetching saved data");
-                score = data.score;
+                data.score = data.score;
                 totalKills = data.totalKills;
                 personalKills = totalKills;
-                wave = data.wave;
+                data.wave = data.wave;
                 inGameCurrency = data.inGameCurrency;
-                print(score + " " + totalKills + " " + wave + " " + inGameCurrency);
+                print(data.score + " " + totalKills + " " + data.wave + " " + inGameCurrency);
                 objective.transform.GetComponent<Objective>().HP = data.objectiveHP;
                 w = Instantiate(weaponPrefabs[data.wepID]).transform.GetComponent<Weapon>();
                 w.lvl = data.wepLvl;
@@ -2124,6 +2218,10 @@ public class GameManager : MonoBehaviour {
                 //w.purchased = true;
                 
             }
+        }
+        else
+        {
+            data = new PlayerData();
         }
         if (w == null)
         {
@@ -2143,15 +2241,15 @@ public class GameManager : MonoBehaviour {
         UpdateKillCount(0);
         UpdateScore(0);
         //playerStatusCanvas.transform.Find("Wave").Find("Text").GetComponent<Text>().text = (wave) + "";
-        for (int i = 0; i < personalData.arrowQuantities.Length; i++)
+        for (int i = 0; i < arrowQty.arr.Length; i++)
             UpdateArrowQty(i);
 
-        if (wave % 5 == 0)
+        if (data.wave % 5 == 0)
         {
             DisplayIntermission();
             return;
         }
-        StartWave(wave);
+        StartWave(data.wave);
     }
 
     public void StartWave(int w)
@@ -2163,7 +2261,7 @@ public class GameManager : MonoBehaviour {
         patternIterations = pattern.iterations;
         timeToSpawn = pattern.spawnTimes[intervalIndex] / pattern.spawnCts[intervalIndex].Count;
 
-        playerStatusCanvas.transform.Find("Wave").Find("Text").GetComponent<Text>().text = (wave + 1) + "";
+        playerStatusCanvas.transform.Find("Wave").Find("Text").GetComponent<Text>().text = (data.wave + 1) + "";
         
         waveNotificationCoroutine = StartCoroutine(NotifyIncomingWave(w));
     }
@@ -2822,7 +2920,7 @@ public class GameManager : MonoBehaviour {
         }
 
         // Don't do anything if not in game or didn't start the waves
-        if (!inGame || gameOver)
+        if (!inGame || data.gameOver)
         {
             return;
         }
@@ -2850,7 +2948,7 @@ public class GameManager : MonoBehaviour {
             HandleMapEditActivities();
         }
 
-        scoreTxt.text = "Score: " + score + ", Kills: " + kills + "/" + enemiesSpawned + ", My Kills: " + personalKills + ", $" + inGameCurrency + ", Wave: " + (wave+1);
+        scoreTxt.text = "Score: " + data.score + ", Kills: " + kills + "/" + enemiesSpawned + ", My Kills: " + personalKills + ", $" + inGameCurrency + ", Wave: " + (data.wave+1);
         if (!startWaves)
             return;
         // if there are enemies to spawn
@@ -2878,19 +2976,19 @@ public class GameManager : MonoBehaviour {
             if(kills == enemiesSpawned && !onIntermission)
             {
                 startWaves = false; // indicate end of wave
-                wave++; // increment to next wave
+                data.wave++; // increment to next wave
                 totalKills += kills; // add to cumulative kills
                 totalPersonalKills += personalKills;
                 personalKills = 0;
                 UpdateKillCount(0);
                 kills = 0; // reset kill count
-                UpdateInGameCurrency(3 * wave);
+                UpdateInGameCurrency(3 * data.wave);
                 // increment difficulty after every 10th wave
-                if (wave % 10 == 0) 
+                if (data.wave % 10 == 0) 
                 {
                     difficulty++;
                 }
-                if(wave >= EnemySpawnPattern.patternsBySpawnPointCt[0].Count)
+                if(data.wave >= 1)//EnemySpawnPattern.patternsBySpawnPointCt[0].Count)
                 {
                     Debug.Log("VICTORY");
                     DisplayEndGameNotifications(true);
@@ -2898,7 +2996,7 @@ public class GameManager : MonoBehaviour {
                     return;
                 }
                 // go on intermission after every 5th wave
-                if(wave % 5 == 0)
+                if(data.wave % 5 == 0)
                 {
                     DisplayIntermission();
                 }
@@ -2907,7 +3005,7 @@ public class GameManager : MonoBehaviour {
                 { 
                     // If online, sync everyone to start wave
                     if(!NetworkManager.nm.isStarted)
-                        StartWave(wave);
+                        StartWave(data.wave);
                     else
                     {
                         NetworkManager.nm.RequestReady();

@@ -31,8 +31,8 @@ public class Projectile : MonoBehaviour {
             ),
         new ProjectileStats(
             "Bomb Arrow",
-            0,
-            UnlockCondition.Purchase,
+            20,
+            UnlockCondition.QuestThenPurchase,
             "Explode your targets!"
             ),
         new ProjectileStats(
@@ -44,19 +44,19 @@ public class Projectile : MonoBehaviour {
         new ProjectileStats(
             "Bullet Arrow",
             0,
-            UnlockCondition.Purchase,
+            UnlockCondition.QuestThenPurchase,
             "Shoots straight to the target!"
             ),
         new ProjectileStats(
             "Ice Arrow",
             0,
-            UnlockCondition.Purchase,
+            UnlockCondition.QuestThenPurchase,
             "Creates a chilly explosion, freezing nearby enemies"
             ),
         new ProjectileStats(
             "Fire Arrow",
             0,
-            UnlockCondition.Purchase,
+            UnlockCondition.QuestThenPurchase,
             "Burn em all!!! AHAHAHA"
             ),
 
@@ -341,6 +341,19 @@ public class Projectile : MonoBehaviour {
                 tr.enabled = false;
                 transform.SetParent(collision.transform);
             }
+            Transform t = collision.transform;
+            Enemy e = collision.transform.parent.GetComponent<Enemy>();
+            while (e == null)
+            {
+                t = t.parent;
+                e = t.parent.GetComponent<Enemy>();
+            }
+            // if enemy dies, update record statistics
+            if (e.health <= 0)
+            {
+                // increment kill count for attribute
+                GameManager.gm.data.killsByArrowAttribute[attributeID]++;
+            }
         }
 
         // If non-enemy projectile hits enemy
@@ -400,6 +413,12 @@ public class Projectile : MonoBehaviour {
                 }
                 // If not using online feature, inflict damage to enemy
                 e.TakeDamageFrom(dmg, ownerType, ownerID);
+                // if enemy dies, update record statistics
+                if (e.health <= 0)
+                {
+                    // increment kill count for attribute
+                    GameManager.gm.data.killsByArrowAttribute[attributeID]++;
+                }
                 //if (e.TakeDamage(dmg))
                 //{
                 // If enemy is still alive, leave arrow stuck in enemy

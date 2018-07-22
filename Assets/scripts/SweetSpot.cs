@@ -26,11 +26,14 @@ public class SweetSpot : MonoBehaviour {
             if(owner.tag == "Enemy")
             {
                 PlayerController pc = GameManager.gm.player.GetComponent<PlayerController>();
-                if(p.ownerID == pc.id)
-                { print("MY PLAYER");
-                    pc.criticalShotCount++;
-                }
+                
                 Enemy e = owner.GetComponent<Enemy>();
+                if (p.ownerID == pc.id)
+                {
+                    print("MY PLAYER");
+                    pc.criticalShotCount++;
+                    GameManager.gm.data.weakSpotsHitByEnemy[e.enemyID]++;
+                }
                 GameManager.gm.OnHitEnemy();
                 e.OnHit();
                 // If using online feature, let Network Manager handle this

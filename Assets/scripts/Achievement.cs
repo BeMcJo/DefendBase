@@ -19,10 +19,14 @@ public enum ConditionType
 
 public class Condition
 {
-    int count; // requirement to be satisfied
-    public Condition(int count)
+    public int count; // requirement to be satisfied
+    public int itemID; // ID of reward 
+    public string rewardType; // weapon, attribute, ...
+    public Condition(int count, int itemID, string rewardType)
     {
         this.count = count;
+        this.itemID = itemID;
+        this.rewardType = rewardType;
     }
 }
 
@@ -80,7 +84,23 @@ public class Achievement {
                 "",
                 true,
                 new Condition[] {
-                    new Condition(10)
+                    new Condition(3,1,"attribute")
+                }
+            ),
+        new Achievement(
+                "Kill 10 enemies uasdasdsing " + Projectile.projectileStats[0].name,
+                "",
+                true,
+                new Condition[] {
+                    new Condition(3,1,"attribute")
+                }
+            ),
+        new Achievement(
+                "Kill 10 enemies usisssssssng " + Projectile.projectileStats[0].name,
+                "",
+                true,
+                new Condition[] {
+                    new Condition(3,1,"attribute")
                 }
             ),
 
@@ -101,6 +121,7 @@ public class Achievement {
         hideIfNoProgress = hide;
     }
 
+    // instantiate cumulative score achievements
     public static void Instantiate()
     {
         cumulativeScoreAchievements = new Achievement[6][];
@@ -140,9 +161,11 @@ public class Achievement {
                 return !bestScoreAchievements[achievementID].hideIfNoProgress;
                 break;
             case AchievementType.Conditional:
+                return true;
                 return !conditionalAchievements[achievementID].hideIfNoProgress;
                 break;
             case AchievementType.Cumulative:
+                return true;
                 bool madeProgress = false;
                 switch (scoreType)
                 {
@@ -268,13 +291,15 @@ public class Achievement {
         {
             // Kill 10 enemies using standard arrow - REWARD: Get Bomb Arrow
             case 0:
-                details = "" + GameManager.gm.personalData.killsByArrowAttribute[0] + "/" + conditionalAchievements[achievementID].conditions[0];
+                details = "" + Mathf.Min(GameManager.gm.personalData.killsByArrowAttribute[0], conditionalAchievements[achievementID].conditions[0].count) + "/" + conditionalAchievements[achievementID].conditions[0].count;
                 break;
             
         }
 
         return details;
     }
+
+    // Get the details/progress of achievement based on ID and scoreType if cumulative
     public static string GetAchievementDetails(AchievementType type, int achievementID, int scoreType=-1)
     {
         string details = "";
@@ -295,8 +320,118 @@ public class Achievement {
         return details;
     }
 
-	// Use this for initialization
-	void Start () {
+    public static void CheckForAchievementProgress()
+    {
+        Debug.Log("Checking for achievements");
+        PersonalData records = GameManager.gm.personalData;
+        PlayerData gameSession = GameManager.gm.data;
+
+        // Best Score
+        records.bestScore = Mathf.Max(records.bestScore, gameSession.score);
+
+        int kills = 0, weakSpotsHit = 0;
+        for(int i = 0; i < Enemy.names.Length; i++)
+        {
+            // cumulative kill count per enemy
+            records.killsByEnemy[i] += gameSession.killsByEnemy[i];
+
+            kills += gameSession.killsByEnemy[i];
+
+            // cumulative weak spot hit per enemy
+            records.weakSpotsHitByEnemy[i] += gameSession.weakSpotsHitByEnemy[i];
+
+            weakSpotsHit += gameSession.weakSpotsHitByEnemy[i];
+        }
+        // Most Kills in Game
+        records.mostKillsInGame = Mathf.Max(records.mostKillsInGame, kills);
+
+        // Most Weak Spots Hit in Game
+        records.mostWeakSpotsHitInAGame = Mathf.Max(records.mostWeakSpotsHitInAGame, weakSpotsHit);
+
+        // Highest Wave Survived
+        records.highestWaveSurvived = Mathf.Max(records.highestWaveSurvived, gameSession.wave);
+
+        // If game session ended, increment win or lost
+        if (gameSession.gameOver)
+        {
+            if (gameSession.hasWon)
+            {
+                records.totalVictories++;
+            }
+            else
+            {
+                records.totalDefeats++;
+            }
+        }
+
+        // increment usage of equipped weapon
+        records.weaponsUsedByGame[gameSession.wepID]++;
+
+        // number of kills used by equipped weapon
+        records.enemiesKilledByWeapon[gameSession.wepID] += kills;
+
+        for(int i = 0; i < Projectile.projectileStats.Length; i++)
+        {
+            // cumulative count of kills per arrow
+            records.killsByArrowAttribute[i] += gameSession.killsByArrowAttribute[i];
+            // cumulative arrows shot
+            records.arrowsShotByAttribute[i] += gameSession.arrowsShotByAttribute[i];
+        }
+    }
+
+    // Checks the conditional achievement to see if condition(s) are satisfied
+    public static bool CompletedQuest(int achievementID)
+    {
+        bool satisfied = false;
+        switch (achievementID)
+        {
+            // Kill 10 enemies using standard arrow - REWARD: Get Bomb Arrow
+            case 0:
+                satisfied = GameManager.gm.personalData.killsByArrowAttribute[0] >= conditionalAchievements[achievementID].conditions[0].count;
+                GameManager.gm.personalData.isArrowUnlocked[conditionalAchievements[achievementID].conditions[0].itemID] = satisfied;
+                break;
+            // Kill 10 enemies using standard arrow - REWARD: Get Bomb Arrow
+            case 1:
+                satisfied = GameManager.gm.personalData.killsByArrowAttribute[0] >= conditionalAchievements[achievementID].conditions[0].count;
+                GameManager.gm.personalData.isArrowUnlocked[conditionalAchievements[achievementID].conditions[0].itemID] = satisfied;
+                break;
+            // Kill 10 enemies using standard arrow - REWARD: Get Bomb Arrow
+            case 2:
+                satisfied = GameManager.gm.personalData.killsByArrowAttribute[0] >= conditionalAchievements[achievementID].conditions[0].count;
+                GameManager.gm.personalData.isArrowUnlocked[conditionalAchievements[achievementID].conditions[0].itemID] = satisfied;
+                break;
+
+        }
+        return satisfied;
+    }
+
+    // fetches image for the specific reward
+    public static Sprite GetRewardIcon(int achievementID)
+    {
+        Sprite icon = null;
+
+        switch (conditionalAchievements[achievementID].conditions[0].rewardType)
+        {
+            case "attribute":
+                icon = GameManager.gm.arrowItemIcons[conditionalAchievements[achievementID].conditions[0].itemID];
+                break;
+            case "weapon":
+                icon = GameManager.gm.weaponItemIcons[conditionalAchievements[achievementID].conditions[0].itemID];
+                break;
+
+        }
+        return icon;
+
+    }
+
+    // Checks the reward and unlocks it for player
+    public static void UnlockQuestReward(int achievementID)
+    {
+
+    }
+
+    // Use this for initialization
+    void Start () {
 		
 	}
 	

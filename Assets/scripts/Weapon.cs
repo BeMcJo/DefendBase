@@ -74,7 +74,7 @@ public abstract class Weapon : MonoBehaviour
         (
             "Sniper Bow",
             1500,
-            UnlockCondition.Free,
+            UnlockCondition.QuestThenPurchase,
             new int[] {1,1,1,1,1},
             new int[] {50,100,200,500},
             new float[] {24, 30,36,43,50},
@@ -87,7 +87,7 @@ public abstract class Weapon : MonoBehaviour
         (
             "Machine Bow",
             2500,
-            UnlockCondition.Free,//UnlockCondition.QuestThenPurchase,
+            UnlockCondition.QuestThenPurchase,//UnlockCondition.QuestThenPurchase,
             new int[] {1,1,1,1,1},
             new int[] {50,100,200,500},
             new float[] {16, 17,19,23,29},
@@ -264,7 +264,7 @@ public abstract class Weapon : MonoBehaviour
     // Update is called once per frame
     protected virtual bool Update () {
         // Don't do anything if no user exists or game is over
-        if (!user || GameManager.gm.gameOver)
+        if (!user || GameManager.gm.data.gameOver)
             return false;
         // If using online feature and disconnected, cancel using weapon, to prevent further complications
         // OR if can't perform action and was in process of charging

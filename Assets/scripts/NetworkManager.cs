@@ -1874,14 +1874,14 @@ public class NetworkManager : MonoBehaviour {
                 {
                     if(GameManager.gm.onIntermission)
                     {
-                        StartWave(GameManager.gm.wave);
+                        StartWave(GameManager.gm.data.wave);
                         return;
                     }
                 }
             }
             // If in game and not on intermission as host, start the next wave when everyone is done with the current wave
             if (GameManager.gm.inGame && readyToStart && !GameManager.gm.onIntermission)
-                StartWave(GameManager.gm.wave);
+                StartWave(GameManager.gm.data.wave);
         }
         // As client, re-enable action buttons when host confirms you are ready or not
         else if(cnnID == ourClientID)

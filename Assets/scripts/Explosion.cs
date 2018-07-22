@@ -77,8 +77,15 @@ public class Explosion : MonoBehaviour {
             }
             // If not using online feature, inflict damage to enemy
             e.TakeDamageFrom(dmg, ownerType, ownerID);
+            // if enemy dies, update record statistics
+            if (e.health <= 0)
+            {
+                // increment kill count for attribute
+                GameManager.gm.data.killsByArrowAttribute[1]++;
+            }
             //Debug.Log("BOOM");
-        }else if (other.tag == "Trap")
+        }
+        else if (other.tag == "Trap")
         {
             //if (!other.transform.GetComponent<ObjectPlacement>().isSet)
             //    return;

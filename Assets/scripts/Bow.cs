@@ -379,13 +379,18 @@ public class Bow : Weapon
                 audioSrc.volume = 1f;
                 //print(audioSrc.clip.length);
                 audioSrc.Play();
+                /*
                 // if wave started, count shots 
-                if (GameManager.gm.startWaves)
+                if (GameManager.gm.startWaves && user.IsMyPlayer())
+                {
                     shotCount++;
-
+                }
+                */
                 // decrement arrow being used if user is my player
                 if (user.IsMyPlayer())
+                {
                     GameManager.gm.UseItem("Attribute", user.selectedAttribute);//GameManager.gm.selectedArrowAttribute);
+                }
             }
         }
         else

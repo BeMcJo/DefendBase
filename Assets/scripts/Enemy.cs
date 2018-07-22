@@ -173,7 +173,7 @@ public class Enemy : MonoBehaviour
         //print(isGrounded);
         //PerformAction();
         //AttemptAttackAction();
-        if (!GameManager.gm.inGame || GameManager.gm.gameOver)
+        if (!GameManager.gm.inGame || GameManager.gm.data.gameOver)
         {
             if (!anim.GetCurrentAnimatorStateInfo(0).IsName("idle"))
                 anim.Play("idle", -1, 0);
@@ -730,10 +730,12 @@ public class Enemy : MonoBehaviour
 
         if (dmgSourceType == "Player")
         {
+            // if I killed the enemy
             if(dmgSourceID == GameManager.gm.player.GetComponent<PlayerController>().id)
             {
                 GameManager.gm.UpdateKillCount(1);
                 GameManager.gm.UpdateScore(50);
+                GameManager.gm.data.killsByEnemy[enemyID]++;
             }
         }
         
