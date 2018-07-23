@@ -9,6 +9,7 @@ using UnityEngine.UI;
 public class Player
 {
     public int connectionID; // Unique ID per connection
+    public int wepID; // Weapon player equipped
     public string playerName; // Name of player
     public bool isReady; // Used to determine if game can proceed at each break point
     public GameObject playerGO; // Who/what the player is
@@ -269,7 +270,7 @@ public class NetworkManager : MonoBehaviour {
 
         hostID = NetworkTransport.AddHost(topo, 0);
         ourClientID = hostID;
-        SpawnPlayerUI("Player " + (ourClientID+1), ourClientID); // Spawn my player in the lobby
+        SpawnPlayerUI(new string[] {"", "Player " + (ourClientID + 1), "" + ourClientID, "" + GameManager.gm.personalData.equippedWep }); // Spawn my player in the lobby
         players[ourClientID].isReady = false; // Always ready to start game
         StartBroadcast(); // Announce my Network Manager is hosting
     }
@@ -575,21 +576,25 @@ public class NetworkManager : MonoBehaviour {
         // When player joins server, tell him his ID
         // Request his name and send name of all other players
         string msg = "ASKNAME|" + cnnId + "|";// + myPlayer.playerName + "%0|";
+        msg = msg.Trim('|');
+        Send(msg, reliableChannel, cnnId);
+        // Send info of other players in room
         foreach (KeyValuePair<int, Player> kvp in players)
         {
             if (kvp.Key != cnnId)
             {
                 Player sc = kvp.Value;
-                msg += sc.playerName + "%" + sc.connectionID + "|";
+                //msg += sc.playerName + "|" + sc.connectionID + "|" + sc.wepID+"|";
+                Send("CNN|" + sc.playerName + '|' + sc.connectionID + '|' + sc.wepID, reliableChannel, cnnId);
             }
         }
-        msg = msg.Trim('|');
-        Send(msg, reliableChannel, cnnId);
     }
 
     // As host, approve client officially when name is given and announce to other players in lobby
-    private void OnNameIs(int cnnId, string playerName)
+    private void OnNameIs(int cnnId, string[] data)
     {
+        string playerName = data[1];
+        int wepID = int.Parse(data[2]);
         // Make sure not self and client exists from OnConnection
         if (players.Count == 1 && !players.ContainsKey(cnnId))
         {
@@ -597,12 +602,13 @@ public class NetworkManager : MonoBehaviour {
         }
         Player sc = players[cnnId];
         sc.playerName = playerName;
+        sc.wepID = wepID;
         sc.playerGO.transform.Find("NameText").GetComponent<Text>().text = playerName;
         sc.playerGO.transform.SetParent(GameManager.gm.lobbyCanvas.transform.Find("PlayerList"));
         sc.playerGO.SetActive(true);
         sc.playerGO.transform.localScale = new Vector3(1, 1, 1);
         // Tell everybody that new player has connected
-        Send("CNN|" + playerName + '|' + cnnId, reliableChannel, players);
+        Send("CNN|" + playerName + '|' + cnnId + '|' + data[2], reliableChannel, players);
     }
 
     // Handle when someone disconnects in lobby
@@ -702,7 +708,7 @@ public class NetworkManager : MonoBehaviour {
                         break;
                     // Client states his name, officially approve client to lobby
                     case "NAMEIS":
-                        OnNameIs(connectionId, splitData[1]);
+                        OnNameIs(connectionId, splitData);
                         break;
                     // Client requests to join lobby
                     case "NEWCNN":
@@ -823,7 +829,7 @@ public class NetworkManager : MonoBehaviour {
                     // Host states someone has connected to lobby, create player object for him/her
                     case "CNN":
                         debugLog.Add(msg);
-                        SpawnPlayerUI(splitData[1], int.Parse(splitData[2]));
+                        SpawnPlayerUI(splitData);//splitData[1], int.Parse(splitData[2]));
                         break;
                     // Host states enemy has been damaged, make sure log is synced with the sequence of actions in game
                     case "ENEMYDMG":
@@ -1710,22 +1716,26 @@ public class NetworkManager : MonoBehaviour {
         // Create all the other players
         for (int i = 2; i < data.Length; i++)
         {
-            string[] d = data[i].Split('%');
-            SpawnPlayerUI(d[0], int.Parse(d[1]));
+            string[] d = data[i].Split('|');
+            SpawnPlayerUI(d);// d[0], int.Parse(d[1]));
         }
 
-        // Send our name to server
-        Send("NAMEIS|" + "Player " + (ourClientID+1), reliableChannel);
+        // Send our name and other player info to server
+        Send("NAMEIS|" + "Player " + (ourClientID+1)+"|"+GameManager.gm.personalData.equippedWep, reliableChannel);
 
     }
 
     // Create lobby objects for player
-    private void SpawnPlayerUI(string playerName, int cnnId)
+    private void SpawnPlayerUI(string[] data)//string playerName, int cnnId)
     {
+        string playerName = data[1];
+        int cnnId = int.Parse(data[2]);
+        int wepID = int.Parse(data[3]);
         GameObject go = Instantiate(GameManager.gm.playerUIPrefab);
         
         //playerName += " " + (cnnId+1);
         Player p = new Player();
+        p.wepID = wepID;
         p.playerGO = go;
         p.playerName = playerName;
         p.connectionID = cnnId;
@@ -1989,7 +1999,7 @@ public class NetworkManager : MonoBehaviour {
         foreach (KeyValuePair<int, Player> kvp in players)
         {
             GameObject playerGO = Instantiate(GameManager.gm.playerPrefab);
-            GameObject wep = Instantiate(GameManager.gm.weaponPrefabs[0]);
+            GameObject wep = Instantiate(GameManager.gm.weaponPrefabs[kvp.Value.wepID]);
             PlayerController pc = playerGO.transform.GetComponent<PlayerController>();
             Weapon w = wep.transform.GetComponent<Weapon>();
             pc.EquipWeapon(w);

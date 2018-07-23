@@ -1024,7 +1024,8 @@ public class GameManager : MonoBehaviour {
         optionsCanvas = GameObject.Find("OptionsCanvas");
         optionsPanel = optionsCanvas.transform.Find("OptionsPanel").gameObject;
         optionsPanel.transform.Find("ResumeBtn").GetComponent<Button>().onClick.AddListener(ResumeGame);
-        optionsPanel.transform.Find("ExitBtn").GetComponent<Button>().onClick.AddListener(LeaveGame);
+        optionsPanel.transform.Find("ExitBtn").GetComponent<Button>().onClick.AddListener(ToggleNotificationCanvas);
+        optionsPanel.transform.Find("ExitBtn").GetComponent<Button>().onClick.AddListener(ToggleOptionsCanvas);
         optionsPanel.transform.Find("SettingsBtn").GetComponent<Button>().onClick.AddListener(ToggleInGameSettings);
         //Transform leaveGameNotif = optionsPanel.transform.Find("LeaveGameNotification");//.GetComponent<Button>().onClick.AddListener(ToggleInGameSettings);
         //leaveGameNotif.Find("CancelBtn").GetComponent<Button>().onClick.AddListener(ToggleLeaveGameNotification);
@@ -1089,6 +1090,12 @@ public class GameManager : MonoBehaviour {
         ContentSizeFitter csf = itemDropdownList.GetComponent<ContentSizeFitter>();
         //quickAccessCanvas.SetActive(false);
         effectsCanvas = GameObject.Find("EffectsCanvas");
+
+        notificationCanvas = GameObject.Find("NotificationCanvas");
+        notificationCanvas.transform.Find("WindowBG").Find("LeaveGameBtn").GetComponent<Button>().onClick.AddListener(LeaveGame);
+        notificationCanvas.transform.Find("WindowBG").Find("ResumeBtn").GetComponent<Button>().onClick.AddListener(ToggleNotificationCanvas);
+        notificationCanvas.transform.Find("WindowBG").Find("ResumeBtn").GetComponent<Button>().onClick.AddListener(ToggleOptionsCanvas);
+        notificationCanvas.SetActive(false);
 
         myProjectiles.Clear();
         //myAttributes.Clear();
@@ -2065,9 +2072,14 @@ public class GameManager : MonoBehaviour {
         c.a += .01f;
         waveNotification.transform.GetComponent<Image>().color = c;
 
-        c = waveNotification.transform.GetChild(0).GetComponent<Text>().color;
+
+        c = waveNotification.transform.Find("WaveTxt").GetComponent<Text>().color;
         c.a += .01f;
-        waveNotification.transform.GetChild(0).GetComponent<Text>().color = c;
+        waveNotification.transform.Find("WaveTxt").GetComponent<Text>().color = c;
+        c = waveNotification.transform.Find("MonsterIcon").GetComponent<Image>().color;
+        c.a += .01f;
+        waveNotification.transform.Find("MonsterIcon").GetComponent<Image>().color = c;
+
         return c.a >= 1;
     }
 
@@ -2082,9 +2094,12 @@ public class GameManager : MonoBehaviour {
         c.a -= .01f;
         waveNotification.transform.GetComponent<Image>().color = c;
 
-        c = waveNotification.transform.GetChild(0).GetComponent<Text>().color;
+        c = waveNotification.transform.Find("WaveTxt").GetComponent<Text>().color;
         c.a -= .01f;
-        waveNotification.transform.GetChild(0).GetComponent<Text>().color = c;
+        waveNotification.transform.Find("WaveTxt").GetComponent<Text>().color = c;
+        c = waveNotification.transform.Find("MonsterIcon").GetComponent<Image>().color;
+        c.a -= .01f;
+        waveNotification.transform.Find("MonsterIcon").GetComponent<Image>().color = c;
         return c.a <= 0;
     }
 
@@ -2093,7 +2108,7 @@ public class GameManager : MonoBehaviour {
     {
         
         waveNotification.SetActive(true);
-        waveNotification.transform.GetChild(0).GetComponent<Text>().text = "Wave " + (w+1);
+        waveNotification.transform.Find("WaveTxt").GetComponent<Text>().text = "Wave " + (w+1);
         yield return new WaitUntil(DisplayWaveNotification);
         yield return new WaitForSeconds(3f);
         yield return new WaitUntil(HideWaveNotification);

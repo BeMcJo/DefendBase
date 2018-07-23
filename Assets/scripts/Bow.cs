@@ -119,7 +119,8 @@ public class Bow : Weapon
     public void Reload()
     {
         reloadTime -= Time.deltaTime;
-        reloadBar.fillAmount = (weaponStats[wepID].timeToReload[lvl] - reloadTime) / weaponStats[wepID].timeToReload[lvl];
+        if(user.IsMyPlayer())
+            reloadBar.fillAmount = (weaponStats[wepID].timeToReload[lvl] - reloadTime) / weaponStats[wepID].timeToReload[lvl];
         if (reloadTime > 0)
             return;
         reloading = false;
@@ -248,7 +249,7 @@ public class Bow : Weapon
 
         // If not using Touch Interactive mode, progressively increase the chargePower as long as user holds shoot button
         if (!GameManager.gm.interactiveTouch)
-        {
+        { print(1);
             base.Charge(chargePower);
             /*
             chargePower = chargePower + (.03f * weaponStats[wepID].chargeAccelation[0]) / (float)DebugManager.dbm.fps * 60.0f; // increment charge power

@@ -177,7 +177,8 @@ public abstract class Weapon : MonoBehaviour
         //shootBtn.transform.SetParent(GameManager.gm.playerStatusCanvas.transform.Find("ShootBtnPlaceholder"));
         //shootBtn.transform.localScale = new Vector3(1, 1, 1);
         //shootBtn.transform.localPosition = Vector3.zero; //GameManager.gm.playerStatusCanvas.transform.Find("ShootBtnPlaceholder").localPosition;
-        shootBtn.SetActive(canDisplay);
+        if(user.IsMyPlayer())
+            shootBtn.SetActive(canDisplay);
         reloadBar = shootBtnUI.Find("ReloadGauge").Find("ReloadBar").GetComponent<Image>();//GameManager.gm.playerStatusCanvas.transform.Find("ReloadGauge").Find("ReloadBar").GetComponent<Image>();
 
 
@@ -469,7 +470,8 @@ public abstract class Weapon : MonoBehaviour
         if (chargePower >= chargeLimit)
             chargePower = chargeLimit;
         //chargeBar.transform.localScale = new Vector3(1, chargePower / chargeLimit, 1); // Visual indicator of charge percentage
-        chargeBar.GetComponent<Image>().fillAmount = (chargePower) / chargeLimit;
+        if(user.IsMyPlayer())
+            chargeBar.GetComponent<Image>().fillAmount = (chargePower) / chargeLimit;
 
         this.chargePower = chargePower;
         /*
