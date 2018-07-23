@@ -221,6 +221,7 @@ public class GameManager : MonoBehaviour {
                       iconPrefab, // icon of item
                       inGameWepItemUIPrefab, // used to display weapon stats in game
                       achievementUIPrefab, // displays description (and progress if exists) of achievement
+                      questAchievementUIPrefab, // displays quest achievement description
                       notificationUIPrefab, // used to display notification (EX: quest rewards)
                       //enemyDeathVFXPrefab, // used after enemy dies
                       enemyPrefab; // Enemy object
@@ -668,6 +669,7 @@ public class GameManager : MonoBehaviour {
         if (!interactiveTouch)
             isOn = "OFF";
         settingsCanvas.transform.Find("ButtonsContainer").Find("InteractiveTouchBtn").GetChild(0).GetComponent<Text>().text = "Interactive Touch: " + isOn;
+        settingsCanvas.transform.Find("ButtonsContainer").Find("InteractiveTouchBtn").gameObject.SetActive(false);
         if (Debugging)
             isOn = "ON";
         else
@@ -847,7 +849,7 @@ public class GameManager : MonoBehaviour {
         achievementsCanvas.transform.Find("BackBtn").GetComponent<Button>().onClick.AddListener(ToggleAchievementsCanvas);
         achievementsCanvas.transform.Find("BackBtn").GetComponent<Button>().onClick.AddListener(ToggleMainMenuCanvas);
         btnContainer = achievementsCanvas.transform.Find("ButtonsContainer");
-        Transform achievementsContainer = achievementsCanvas.transform.Find("ItemUIPanel").Find("ScoresUIContainer");//"AchievementsContainer");
+        Transform achievementsContainer = achievementsCanvas.transform.Find("ItemUIPanel").Find("RecordsUIContainer");//"AchievementsContainer");
 
 
         // fetch all best score achievements
@@ -911,7 +913,7 @@ public class GameManager : MonoBehaviour {
         // fetch all quests
         for (int i = 0; i < Achievement.conditionalAchievements.Length; i++)
         {
-            itemUI = Instantiate(achievementUIPrefab);
+            itemUI = Instantiate(questAchievementUIPrefab);
             itemUI.transform.SetParent(achievementsContainer);
             itemUI.transform.localScale = new Vector3(1, 1, 1);
             itemUI.transform.Find("HideProgress").gameObject.SetActive(!Achievement.CanShowProgress(AchievementType.Conditional, i));
@@ -919,9 +921,12 @@ public class GameManager : MonoBehaviour {
             itemUI.transform.Find("AchievementTypes").GetChild(0).gameObject.SetActive(false);
             unlockObj = itemUI.transform.Find("AchievementTypes").GetChild(1).gameObject;//.SetActive(false);
             unlockObj.SetActive(true);
-            unlockObj.transform.Find("RewardImage").GetChild(0).gameObject.SetActive(!personalData.isAchievementUnlocked[i]);
+            unlockObj.transform.Find("RewardImage").GetChild(0).gameObject.SetActive(false);// !personalData.isAchievementUnlocked[i]);
             unlockObj.transform.Find("RewardImage").GetComponent<Image>().sprite = Achievement.GetRewardIcon(i);
-            unlockObj.transform.Find("ProgressTxt").GetComponent<Text>().text = Achievement.GetAchievementDetails(AchievementType.Conditional, i);
+            Transform progress = unlockObj.transform.Find("Progress");
+            progress.Find("ProgressTxt").GetComponent<Text>().text = Achievement.GetAchievementDetails(AchievementType.Conditional, i);
+            progress.Find("ProgressGauge").Find("ProgressBar").GetComponent<Image>().fillAmount = Achievement.GetQuestProgressPercentage(i);
+            unlockObj.transform.Find("Completed").gameObject.SetActive(personalData.isAchievementUnlocked[i]);
         }
         achievementsContainer.gameObject.SetActive(false);
         achievementsCanvas.SetActive(false);
@@ -1033,6 +1038,8 @@ public class GameManager : MonoBehaviour {
             isOn = "OFF";
         settingsPanel.transform.Find("InteractiveTouchBtn").GetChild(0).GetComponent<Text>().text = "Interactive Touch: " + isOn;
         settingsPanel.transform.Find("InteractiveTouchBtn").GetComponent<Button>().onClick.AddListener(ToggleInteractiveTouch);
+        settingsPanel.transform.Find("InteractiveTouchBtn").gameObject.SetActive(false);
+
 
         settingsPanel.SetActive(false);
         optionsCanvas.SetActive(false);
@@ -1460,14 +1467,14 @@ public class GameManager : MonoBehaviour {
     public void ChangeSelectedTab(string selectedTab)
     {
         GameObject canvas = inventoryCanvas;
-        if (gm.selectedTab == "Scores" || gm.selectedTab == "Quests")
+        if (gm.selectedTab == "Records" || gm.selectedTab == "Quests")
         {
             canvas = achievementsCanvas;
         }
         inventoryItemPanel = canvas.transform.Find("ItemUIPanel").gameObject;
         canvas.transform.Find("ButtonsContainer").Find(gm.selectedTab + "TabBtn").GetComponent<Button>().interactable = true;
         inventoryItemPanel.transform.Find(gm.selectedTab + "UIContainer").gameObject.SetActive(false);
-        if (selectedTab == "Scores" || selectedTab == "Quests")
+        if (selectedTab == "Records" || selectedTab == "Quests")
         {
             canvas = achievementsCanvas;
         }
@@ -1585,10 +1592,11 @@ public class GameManager : MonoBehaviour {
         print("ENDGAME");
         if (selectedDefense)
             selectedDefense.SetActive(false);
-
+        // Hide in game UI
         playerStatusCanvas.transform.Find("OptionsBtn").gameObject.SetActive(false);
         playerStatusCanvas.transform.Find("HitIndicator").gameObject.SetActive(false);
-        playerStatusCanvas.transform.Find("ShootBtnPlaceholder").gameObject.SetActive(false);
+        playerStatusCanvas.transform.Find("ShootBtnUI").gameObject.SetActive(false);
+        playerStatusCanvas.transform.Find("StatisticsBG").gameObject.SetActive(false);
         playerStatusCanvas.transform.Find("Score").gameObject.SetActive(false);
         playerStatusCanvas.transform.Find("Kills").gameObject.SetActive(false);
         playerStatusCanvas.transform.Find("Currency").gameObject.SetActive(false);
@@ -1611,6 +1619,8 @@ public class GameManager : MonoBehaviour {
         resultNotification.SetActive(true);
 
         data.hasWon = won;
+
+        // Show Eng Game Results Notification
         Transform stats = resultNotification.transform.Find("StatisticsMask").GetChild(0).Find("StatisticsContainer");
         PlayerController pc = player.GetComponent<PlayerController>();
         if (won)
@@ -1757,7 +1767,7 @@ public class GameManager : MonoBehaviour {
     {
         achievementsCanvas.SetActive(!achievementsCanvas.activeSelf);
         //selectedTab = "Scores";
-        ChangeSelectedTab("Scores");
+        ChangeSelectedTab("Records");
     }
 
     public void TogglePlayerOrientationSetup()

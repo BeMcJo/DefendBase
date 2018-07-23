@@ -44,7 +44,7 @@ public class Achievement {
                 false
             ),
         new Achievement(
-                "Most Money Saved In A Game",
+                "What shall this score be?",
                 "",
                 false
             ),
@@ -137,11 +137,12 @@ public class Achievement {
                 return !bestScoreAchievements[achievementID].hideIfNoProgress;
                 break;
             case AchievementType.Conditional:
-                return true;
-                return !conditionalAchievements[achievementID].hideIfNoProgress;
+                //return true;
+                // show progress if we don't need to hide at all OR if we have made progress
+                return !conditionalAchievements[achievementID].hideIfNoProgress || GetQuestProgressPercentage(achievementID) > 0;
                 break;
             case AchievementType.Cumulative:
-                return true;
+                //return true;
                 bool madeProgress = false;
                 switch (scoreType)
                 {
@@ -315,6 +316,44 @@ public class Achievement {
             ),
 
     };
+
+    // Fetches the percentage of quest completion
+    public static float GetQuestProgressPercentage(int achievementID)
+    {
+        float details = 0;
+
+        switch (achievementID)
+        {
+            // Kill 1000 enemies using standard arrow - REWARD: Unlock Bomb Arrow
+            case 0:
+                details = (float)GameManager.gm.personalData.killsByArrowAttribute[0] / conditionalAchievements[achievementID].conditions[0].count;
+                break;
+            // Kill 2,500 enemies using bomb arrow - REWARD: Unlock Fire Arrow
+            case 1:
+                details = (float)GameManager.gm.personalData.killsByArrowAttribute[1] / conditionalAchievements[achievementID].conditions[0].count;
+                break;
+            // Hit 7,500 enemy weak spots - REWARD: Unlock Sniper Bow
+            case 2:
+                int totalWeakSpotsHit = 0;
+                for (int i = 0; i < GameManager.gm.personalData.weakSpotsHitByEnemy.Length; i++)
+                {
+                    totalWeakSpotsHit += GameManager.gm.personalData.weakSpotsHitByEnemy[i];
+                }
+                details = (float)totalWeakSpotsHit / conditionalAchievements[achievementID].conditions[0].count;
+                break;
+            // Hit 2,500 enemy weak spots using Sniper Bow - REWARD: Unlock Bullet Arrow
+            case 3:
+                details = (float)GameManager.gm.personalData.weakSpotsHitByWeapon[2] / conditionalAchievements[achievementID].conditions[0].count;
+                break;
+            // Kill 1,500 Ice Flyglets - REWARD: Unlock Ice Arrow
+            case 4:
+                details = (float)GameManager.gm.personalData.killsByEnemy[2] / conditionalAchievements[achievementID].conditions[0].count;
+                break;
+
+        }
+
+        return details;
+    }
 
     // Handles fetching the returned detail for conditional achievements
     static string GetConditionalAchievementDetails(int achievementID)
