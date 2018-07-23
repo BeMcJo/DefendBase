@@ -73,7 +73,7 @@ public abstract class Weapon : MonoBehaviour
         new WeaponStats
         (
             "Sniper Bow",
-            1500,
+            3500,
             UnlockCondition.QuestThenPurchase,
             new int[] {1,1,1,1,1},
             new int[] {50,100,200,500},

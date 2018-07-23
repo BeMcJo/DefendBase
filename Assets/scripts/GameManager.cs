@@ -92,7 +92,8 @@ public class PersonalData
                  arrowsShotByAttribute,
                  weakSpotsHitByEnemy,
                  weaponsUsedByGame,
-                 enemiesKilledByWeapon;
+                 enemiesKilledByWeapon,
+                 weakSpotsHitByWeapon;
 
     // Achievement Unlocks
     public bool[] isAchievementUnlocked;
@@ -135,6 +136,7 @@ public class PersonalData
         killsByEnemy = new int[Enemy.difficulties.Length];
         killsByArrowAttribute = new int[Projectile.projectileStats.Length];
         arrowsShotByAttribute = new int[Projectile.projectileStats.Length];
+        weakSpotsHitByWeapon = new int[Weapon.weaponStats.Length];
     }
 }
 
@@ -329,12 +331,10 @@ public class GameManager : MonoBehaviour {
         dest.wave = source.wave;
         dest.wepID = source.wepID;
         dest.wepLvl = source.wepLvl;
-        print(dest.killsByEnemy == null);
-        print(source.killsByEnemy == null);
         int projectilesLen = (dest.arrowQuantities.Length < source.arrowQuantities.Length) ? dest.arrowQuantities.Length : source.arrowQuantities.Length;
         int enemiesLen = (dest.killsByEnemy.Length < source.killsByEnemy.Length) ? dest.killsByEnemy.Length : source.killsByEnemy.Length;
-
-        for(int i = 0; i < projectilesLen; i++)
+        //int weaponsLen = (dest.weakSpotsHitByWeapon.Length < source.weakSpotsHitByWeapon.Length) ? dest.weakSpotsHitByWeapon.Length : source.weakSpotsHitByWeapon.Length;
+        for (int i = 0; i < projectilesLen; i++)
         {
             dest.arrowQuantities[i] = source.arrowQuantities[i];
             dest.killsByArrowAttribute[i] = source.killsByArrowAttribute[i];
@@ -345,6 +345,12 @@ public class GameManager : MonoBehaviour {
         {
             dest.weakSpotsHitByEnemy[i] = source.weakSpotsHitByEnemy[i];
         }
+        /*
+        for(int i = 0; i < weaponsLen; i++)
+        {
+            dest.weakSpotsHitByWeapon[i] = source.weakSpotsHitByWeapon[i];
+        }
+        */
     }
 
     public void CopyPersonalData(PersonalData dest, PersonalData source)
@@ -375,6 +381,7 @@ public class GameManager : MonoBehaviour {
             dest.isWeaponPurchased[i] = source.isWeaponPurchased[i];
             dest.isWeaponUnlocked[i] = source.isWeaponUnlocked[i];
             dest.enemiesKilledByWeapon[i] = source.enemiesKilledByWeapon[i];
+            dest.weakSpotsHitByWeapon[i] = source.weakSpotsHitByWeapon[i];
         }
         for (int i = 0; i < enemiesLen; i++)
         {
@@ -468,7 +475,7 @@ public class GameManager : MonoBehaviour {
     // Load data based on the type
     public void Load(string type)
     {
-        print(Application.persistentDataPath);
+        //print(Application.persistentDataPath);
         string path = Application.persistentDataPath + "/" + type + ".dat";
         if (File.Exists(path))
         {
@@ -519,7 +526,6 @@ public class GameManager : MonoBehaviour {
 
         if (gm)
             return;
-        print("??");
         //Sprite icon = Instantiate(Resources.Load(")
         Achievement.Instantiate();
         enemies = new Dictionary<int, Enemy>();
@@ -691,7 +697,6 @@ public class GameManager : MonoBehaviour {
         notificationCanvas.transform.Find("NotificationUI").Find("ConfirmBtn").GetComponent<Button>().onClick.AddListener(ToggleNotificationCanvas);
         notificationCanvas.SetActive(false);
         StartCoroutine(CheckForQuestCompletions());
-        print("asd");
         // Setup Inventory and Shop
 
         inventoryCanvas = GameObject.Find("InventoryCanvas");
@@ -723,10 +728,10 @@ public class GameManager : MonoBehaviour {
             itemUI.name = "wepUI " + i;
             //wepUI.tag = "wepUI";
             //wepUI.transform.GetComponent<Button>().onClick.AddListener(PerformInventoryAction);
-            print("ASD" + personalData.isWeaponUnlocked[i]);
-            print(Weapon.weaponStats[i].unlockCondition);
-            print((Weapon.weaponStats[i].unlockCondition == UnlockCondition.Quest || Weapon.weaponStats[i].unlockCondition == UnlockCondition.QuestThenPurchase));
-            print( !personalData.isWeaponUnlocked[i]);
+            //print("ASD" + personalData.isWeaponUnlocked[i]);
+            //print(Weapon.weaponStats[i].unlockCondition);
+            //print((Weapon.weaponStats[i].unlockCondition == UnlockCondition.Quest || Weapon.weaponStats[i].unlockCondition == UnlockCondition.QuestThenPurchase));
+            //print( !personalData.isWeaponUnlocked[i]);
             itemUI.transform.Find("LockedItemImage").gameObject.SetActive(
                 (Weapon.weaponStats[i].unlockCondition == UnlockCondition.Quest || Weapon.weaponStats[i].unlockCondition == UnlockCondition.QuestThenPurchase) 
                 && !personalData.isWeaponUnlocked[i]);
@@ -833,7 +838,7 @@ public class GameManager : MonoBehaviour {
             itemUI.SetActive(Projectile.enableArrows[i]);
         }
 
-        print(GameManager.gm.availableAttributes.Count);
+        //print(GameManager.gm.availableAttributes.Count);
         UIContainer.gameObject.SetActive(false);
 
         // set up achievement canvas
@@ -841,7 +846,8 @@ public class GameManager : MonoBehaviour {
         achievementsCanvas = GameObject.Find("AchievementsCanvas");
         achievementsCanvas.transform.Find("BackBtn").GetComponent<Button>().onClick.AddListener(ToggleAchievementsCanvas);
         achievementsCanvas.transform.Find("BackBtn").GetComponent<Button>().onClick.AddListener(ToggleMainMenuCanvas);
-        Transform achievementsContainer = achievementsCanvas.transform.Find("ItemUIPanel").Find("AchievementsContainer");
+        btnContainer = achievementsCanvas.transform.Find("ButtonsContainer");
+        Transform achievementsContainer = achievementsCanvas.transform.Find("ItemUIPanel").Find("ScoresUIContainer");//"AchievementsContainer");
 
 
         // fetch all best score achievements
@@ -899,7 +905,10 @@ public class GameManager : MonoBehaviour {
             }
         }
 
-        // fetch all conditional score achievments
+
+        achievementsContainer = achievementsCanvas.transform.Find("ItemUIPanel").Find("QuestsUIContainer");//"AchievementsContainer");
+
+        // fetch all quests
         for (int i = 0; i < Achievement.conditionalAchievements.Length; i++)
         {
             itemUI = Instantiate(achievementUIPrefab);
@@ -914,6 +923,7 @@ public class GameManager : MonoBehaviour {
             unlockObj.transform.Find("RewardImage").GetComponent<Image>().sprite = Achievement.GetRewardIcon(i);
             unlockObj.transform.Find("ProgressTxt").GetComponent<Text>().text = Achievement.GetAchievementDetails(AchievementType.Conditional, i);
         }
+        achievementsContainer.gameObject.SetActive(false);
         achievementsCanvas.SetActive(false);
 
 
@@ -1449,19 +1459,29 @@ public class GameManager : MonoBehaviour {
 
     public void ChangeSelectedTab(string selectedTab)
     {
-
-        inventoryItemPanel.GetComponent<ScrollRect>().verticalNormalizedPosition = 1;
-        //inventoryItemPanel.transform.Find(gm.selectedTab + "UIContainer").transform.localPosition = Vector2.zero;
-        if (gm.selectedTab == selectedTab)
-            return;
-        print("CHANGE");
-        inventoryCanvas.transform.Find("ButtonsContainer").Find(selectedTab + "TabBtn").GetComponent<Button>().interactable = false;
-        inventoryCanvas.transform.Find("ButtonsContainer").Find(gm.selectedTab + "TabBtn").GetComponent<Button>().interactable = true;
-        inventoryItemPanel.transform.Find(selectedTab + "UIContainer").gameObject.SetActive(true);
+        GameObject canvas = inventoryCanvas;
+        if (gm.selectedTab == "Scores" || gm.selectedTab == "Quests")
+        {
+            canvas = achievementsCanvas;
+        }
+        inventoryItemPanel = canvas.transform.Find("ItemUIPanel").gameObject;
+        canvas.transform.Find("ButtonsContainer").Find(gm.selectedTab + "TabBtn").GetComponent<Button>().interactable = true;
         inventoryItemPanel.transform.Find(gm.selectedTab + "UIContainer").gameObject.SetActive(false);
+        if (selectedTab == "Scores" || selectedTab == "Quests")
+        {
+            canvas = achievementsCanvas;
+        }
+        else
+        {
+            canvas = inventoryCanvas;
+        }
+        inventoryItemPanel = canvas.transform.Find("ItemUIPanel").gameObject;
+        inventoryItemPanel.transform.Find(selectedTab + "UIContainer").gameObject.SetActive(true);
+        canvas.transform.Find("ButtonsContainer").Find(selectedTab + "TabBtn").GetComponent<Button>().interactable = false;
         gm.selectedTab = selectedTab;
         inventoryItemPanel.GetComponent<ScrollRect>().content = inventoryItemPanel.transform.Find(selectedTab + "UIContainer").GetComponent<RectTransform>();
         inventoryItemPanel.GetComponent<ScrollRect>().velocity = Vector2.zero;
+        inventoryItemPanel.GetComponent<ScrollRect>().verticalNormalizedPosition = 1;
 
     }
 
@@ -1736,6 +1756,8 @@ public class GameManager : MonoBehaviour {
     public void ToggleAchievementsCanvas()
     {
         achievementsCanvas.SetActive(!achievementsCanvas.activeSelf);
+        //selectedTab = "Scores";
+        ChangeSelectedTab("Scores");
     }
 
     public void TogglePlayerOrientationSetup()
@@ -1754,6 +1776,7 @@ public class GameManager : MonoBehaviour {
     public void ToggleInventoryCanvas()
     {
         inventoryCanvas.SetActive(!inventoryCanvas.activeSelf);
+        //selectedTab = "Weapons";
         ChangeSelectedTab("Weapons");
     }
 
@@ -2988,7 +3011,7 @@ public class GameManager : MonoBehaviour {
                 {
                     difficulty++;
                 }
-                if(data.wave >= 1)//EnemySpawnPattern.patternsBySpawnPointCt[0].Count)
+                if(data.wave >= EnemySpawnPattern.patternsBySpawnPointCt[0].Count)
                 {
                     Debug.Log("VICTORY");
                     DisplayEndGameNotifications(true);

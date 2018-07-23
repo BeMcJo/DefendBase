@@ -9,9 +9,9 @@ public class ProjectileStats
                   description;
     //unlockCondition;
     public UnlockCondition unlockCondition;
-    public int price = 0; // How much to initially buy from store
-   
-    public ProjectileStats(string nm, int price, UnlockCondition unlockCond, string description)
+    public int price = 0, // How much to initially buy from store
+               purchaseQty; // How many you get when purchasing
+    public ProjectileStats(string nm, int price, int purchaseQty, UnlockCondition unlockCond, string description)
     {
         name = nm;
         this.price = price;
@@ -26,36 +26,42 @@ public class Projectile : MonoBehaviour {
         new ProjectileStats(
             "Arrow",
             0,
+            0,
             UnlockCondition.Free,
             "Your standard arrow"
             ),
         new ProjectileStats(
             "Bomb Arrow",
-            20,
+            50,
+            15,
             UnlockCondition.QuestThenPurchase,
             "Explode your targets!"
             ),
         new ProjectileStats(
             "Piercing Arrow",
             0,
+            0,
             UnlockCondition.Purchase,
             "Shoots through the enemies!"
             ),
         new ProjectileStats(
             "Bullet Arrow",
-            0,
+            50,
+            10,
             UnlockCondition.QuestThenPurchase,
             "Shoots straight to the target!"
             ),
         new ProjectileStats(
             "Ice Arrow",
-            0,
+            50,
+            15,
             UnlockCondition.QuestThenPurchase,
             "Creates a chilly explosion, freezing nearby enemies"
             ),
         new ProjectileStats(
             "Fire Arrow",
-            0,
+            50,
+            7,
             UnlockCondition.QuestThenPurchase,
             "Burn em all!!! AHAHAHA"
             ),

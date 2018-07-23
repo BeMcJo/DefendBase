@@ -77,35 +77,6 @@ public class Achievement {
 
     };*/
 
-    public static Achievement[] conditionalAchievements =
-    {
-        new Achievement(
-                "Kill 10 enemies using " + Projectile.projectileStats[0].name,
-                "",
-                true,
-                new Condition[] {
-                    new Condition(3,1,"attribute")
-                }
-            ),
-        new Achievement(
-                "Kill 10 enemies uasdasdsing " + Projectile.projectileStats[0].name,
-                "",
-                true,
-                new Condition[] {
-                    new Condition(3,1,"attribute")
-                }
-            ),
-        new Achievement(
-                "Kill 10 enemies usisssssssng " + Projectile.projectileStats[0].name,
-                "",
-                true,
-                new Condition[] {
-                    new Condition(3,1,"attribute")
-                }
-            ),
-
-    };
-
     public AchievementType achievementType;
     public string header, description;
     public Condition[] conditions;
@@ -124,13 +95,17 @@ public class Achievement {
     // instantiate cumulative score achievements
     public static void Instantiate()
     {
-        cumulativeScoreAchievements = new Achievement[6][];
-        cumulativeScoreAchievements[0] = new Achievement[Enemy.difficulties.Length]; // index 0 = kills by enemy
-        cumulativeScoreAchievements[1] = new Achievement[Projectile.projectileStats.Length]; // index 1 = kills by arrow attribute
-        cumulativeScoreAchievements[2] = new Achievement[Projectile.projectileStats.Length]; // index 2 = arrows shot by attribute
-        cumulativeScoreAchievements[3] = new Achievement[Enemy.difficulties.Length]; // index 3 = weak spots hit by enemy
-        cumulativeScoreAchievements[4] = new Achievement[Weapon.weaponStats.Length]; // index 4 = weapons used by game
-        cumulativeScoreAchievements[5] = new Achievement[Weapon.weaponStats.Length]; // index 5 = enemy kill count per weapon
+        cumulativeScoreAchievements = new Achievement[][]
+        {
+            new Achievement[Enemy.difficulties.Length], // index 0 = kills by enemy
+            new Achievement[Projectile.projectileStats.Length], // index 1 = kills by arrow attribute
+            new Achievement[Projectile.projectileStats.Length], // index 2 = arrows shot by attribute
+            new Achievement[Enemy.difficulties.Length], // index 3 = weak spots hit by enemy
+            new Achievement[Weapon.weaponStats.Length], // index 4 = weapons used by game
+            new Achievement[Weapon.weaponStats.Length], // index 5 = enemy kill count per weapon
+            new Achievement[Weapon.weaponStats.Length] // index 6 = weak spots hit per weapon
+        };
+
         for (int i = 0; i < cumulativeScoreAchievements[0].Length; i++)
         {
             cumulativeScoreAchievements[0][i] = new Achievement(Enemy.names[i] + " killed", "");
@@ -148,6 +123,7 @@ public class Achievement {
         {
             cumulativeScoreAchievements[4][i] = new Achievement(Weapon.weaponStats[i].name + " used", "");
             cumulativeScoreAchievements[5][i] = new Achievement(Weapon.weaponStats[i].name + " kill count", "");
+            cumulativeScoreAchievements[6][i] = new Achievement(Weapon.weaponStats[i].name + " weak spots hit", "");
         }
 
     }
@@ -192,6 +168,10 @@ public class Achievement {
                     // enemy kill count per weapon
                     case 5:
                         madeProgress = GameManager.gm.personalData.enemiesKilledByWeapon[achievementID] > 0;
+                        break;
+                    // weak spots hit per weapon
+                    case 6:
+                        madeProgress = GameManager.gm.personalData.weakSpotsHitByWeapon[achievementID] > 0;
                         break;
                 }
                 return !cumulativeScoreAchievements[scoreType][achievementID].hideIfNoProgress || madeProgress;
@@ -277,10 +257,64 @@ public class Achievement {
             case 5:
                 details = GameManager.gm.personalData.enemiesKilledByWeapon[achievementID] + "";
                 break;
+            // weak spots hit per weapon
+            case 6:
+                details = GameManager.gm.personalData.weakSpotsHitByWeapon[achievementID] + "";
+                break;
         }
 
         return details;
     }
+
+    public static Achievement[] conditionalAchievements =
+{
+        // unlock bomb arrow
+        new Achievement(
+                "Kill 1000 enemies using " + Projectile.projectileStats[0].name,
+                "",
+                true,
+                new Condition[] {
+                    new Condition(1000,1,"attribute")
+                }
+            ),
+        // unlock fire arrow
+        new Achievement(
+                "Kill 2,500 enemies using " + Projectile.projectileStats[1].name,
+                "",
+                true,
+                new Condition[] {
+                    new Condition(2500,5,"attribute")
+                }
+            ),
+        // unlock sniper bow
+        new Achievement(
+                "Hit 7,500 enemy weak spots",
+                "",
+                true,
+                new Condition[] {
+                    new Condition(7500,2,"weapon")
+                }
+            ),
+        // unlock bullet arrow
+        new Achievement(
+                "Hit 2,500 enemy weak spots using " + Weapon.weaponStats[2].name,
+                "",
+                true,
+                new Condition[] {
+                    new Condition(2500,3,"attribute")
+                }
+            ),
+        // unlock ice arrow
+        new Achievement(
+                "Kill 1,500 Ice " + Enemy.names[2] +"s",
+                "",
+                true,
+                new Condition[] {
+                    new Condition(1500,4,"attribute")
+                }
+            ),
+
+    };
 
     // Handles fetching the returned detail for conditional achievements
     static string GetConditionalAchievementDetails(int achievementID)
@@ -289,11 +323,32 @@ public class Achievement {
 
         switch (achievementID)
         {
-            // Kill 10 enemies using standard arrow - REWARD: Get Bomb Arrow
+            // Kill 1000 enemies using standard arrow - REWARD: Unlock Bomb Arrow
             case 0:
                 details = "" + Mathf.Min(GameManager.gm.personalData.killsByArrowAttribute[0], conditionalAchievements[achievementID].conditions[0].count) + "/" + conditionalAchievements[achievementID].conditions[0].count;
                 break;
-            
+            // Kill 2,500 enemies using bomb arrow - REWARD: Unlock Fire Arrow
+            case 1:
+                details = "" + Mathf.Min(GameManager.gm.personalData.killsByArrowAttribute[1], conditionalAchievements[achievementID].conditions[0].count) + "/" + conditionalAchievements[achievementID].conditions[0].count;
+                break;
+            // Hit 7,500 enemy weak spots - REWARD: Unlock Sniper Bow
+            case 2:
+                int totalWeakSpotsHit = 0;
+                for(int i = 0; i < GameManager.gm.personalData.weakSpotsHitByEnemy.Length; i++)
+                {
+                    totalWeakSpotsHit += GameManager.gm.personalData.weakSpotsHitByEnemy[i];
+                }
+                details = "" + Mathf.Min(totalWeakSpotsHit, conditionalAchievements[achievementID].conditions[0].count) + "/" + conditionalAchievements[achievementID].conditions[0].count;
+                break;
+            // Hit 2,500 enemy weak spots using Sniper Bow - REWARD: Unlock Bullet Arrow
+            case 3:
+                details = "" + Mathf.Min(GameManager.gm.personalData.weakSpotsHitByWeapon[2], conditionalAchievements[achievementID].conditions[0].count) + "/" + conditionalAchievements[achievementID].conditions[0].count;
+                break;
+            // Kill 1,500 Ice Flyglets - REWARD: Unlock Ice Arrow
+            case 4:
+                details = "" + Mathf.Min(GameManager.gm.personalData.killsByEnemy[2], conditionalAchievements[achievementID].conditions[0].count) + "/" + conditionalAchievements[achievementID].conditions[0].count;
+                break;
+
         }
 
         return details;
@@ -385,19 +440,34 @@ public class Achievement {
         bool satisfied = false;
         switch (achievementID)
         {
-            // Kill 10 enemies using standard arrow - REWARD: Get Bomb Arrow
+            // Kill 1000 enemies using standard arrow - REWARD: Get Bomb Arrow
             case 0:
                 satisfied = GameManager.gm.personalData.killsByArrowAttribute[0] >= conditionalAchievements[achievementID].conditions[0].count;
                 GameManager.gm.personalData.isArrowUnlocked[conditionalAchievements[achievementID].conditions[0].itemID] = satisfied;
                 break;
-            // Kill 10 enemies using standard arrow - REWARD: Get Bomb Arrow
+            // Kill 25,000 enemies using bomb arrow - REWARD: Get Fire Arrow
             case 1:
-                satisfied = GameManager.gm.personalData.killsByArrowAttribute[0] >= conditionalAchievements[achievementID].conditions[0].count;
+                satisfied = GameManager.gm.personalData.killsByArrowAttribute[1] >= conditionalAchievements[achievementID].conditions[0].count;
                 GameManager.gm.personalData.isArrowUnlocked[conditionalAchievements[achievementID].conditions[0].itemID] = satisfied;
                 break;
-            // Kill 10 enemies using standard arrow - REWARD: Get Bomb Arrow
+            // Hit 30,000 enemy weak spots - REWARD: Get Sniper Bow
             case 2:
-                satisfied = GameManager.gm.personalData.killsByArrowAttribute[0] >= conditionalAchievements[achievementID].conditions[0].count;
+                int totalWeakSpotsHit = 0;
+                for (int i = 0; i < GameManager.gm.personalData.weakSpotsHitByEnemy.Length; i++)
+                {
+                    totalWeakSpotsHit += GameManager.gm.personalData.weakSpotsHitByEnemy[i];
+                }
+                satisfied = totalWeakSpotsHit >= conditionalAchievements[achievementID].conditions[0].count;
+                GameManager.gm.personalData.isWeaponUnlocked[conditionalAchievements[achievementID].conditions[0].itemID] = satisfied;
+                break;
+            // Hit 2,500 enemy weak spots using Sniper Bow - REWARD: Unlock Bullet Arrow
+            case 3:
+                satisfied = GameManager.gm.personalData.weakSpotsHitByWeapon[2] >= conditionalAchievements[achievementID].conditions[0].count;
+                GameManager.gm.personalData.isArrowUnlocked[conditionalAchievements[achievementID].conditions[0].itemID] = satisfied;
+                break; 
+            // Kill 1,500 Ice Flyglets - REWARD: Unlock Ice Arrow
+            case 4:
+                satisfied = GameManager.gm.personalData.killsByEnemy[2] >= conditionalAchievements[achievementID].conditions[0].count;
                 GameManager.gm.personalData.isArrowUnlocked[conditionalAchievements[achievementID].conditions[0].itemID] = satisfied;
                 break;
 
