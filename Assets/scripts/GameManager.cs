@@ -1773,6 +1773,8 @@ public class GameManager : MonoBehaviour {
     public void ToggleAchievementsCanvas()
     {
         achievementsCanvas.SetActive(!achievementsCanvas.activeSelf);
+        if (achievementsCanvas.activeSelf)
+            GameObject.Find("BackgroundCanvas").transform.Find("Header").Find("Text").GetComponent<Text>().text = "Achievements";
         //selectedTab = "Scores";
         ChangeSelectedTab("Records");
     }
@@ -1793,6 +1795,8 @@ public class GameManager : MonoBehaviour {
     public void ToggleInventoryCanvas()
     {
         inventoryCanvas.SetActive(!inventoryCanvas.activeSelf);
+        if (inventoryCanvas.activeSelf)
+            GameObject.Find("BackgroundCanvas").transform.Find("Header").Find("Text").GetComponent<Text>().text = "Inventory";
         //selectedTab = "Weapons";
         ChangeSelectedTab("Weapons");
     }
@@ -1821,6 +1825,8 @@ public class GameManager : MonoBehaviour {
     public void ToggleSettingsCanvas()
     {
         settingsCanvas.SetActive(!settingsCanvas.activeSelf);
+        if (settingsCanvas.activeSelf)
+            GameObject.Find("BackgroundCanvas").transform.Find("Header").Find("Text").GetComponent<Text>().text = "Settings";
     }
 
     public void ToggleDebugging()
@@ -1913,21 +1919,29 @@ public class GameManager : MonoBehaviour {
     public void ToggleMainMenuCanvas()
     {
         mainMenuCanvas.SetActive(!mainMenuCanvas.activeSelf);
+        if (mainMenuCanvas.activeSelf)
+            GameObject.Find("BackgroundCanvas").transform.Find("Header").Find("Text").GetComponent<Text>().text = "Main Menu";
     }
 
     public void ToggleLobbyCanvas()
     {
         lobbyCanvas.SetActive(!lobbyCanvas.activeSelf);
+        if (lobbyCanvas.activeSelf)
+            GameObject.Find("BackgroundCanvas").transform.Find("Header").Find("Text").GetComponent<Text>().text = "Lobby";
     }
 
     public void ToggleHostListCanvas()
     {
         hostListCanvas.SetActive(!hostListCanvas.activeSelf);
+        if (hostListCanvas.activeSelf)
+            GameObject.Find("BackgroundCanvas").transform.Find("Header").Find("Text").GetComponent<Text>().text = "Finding a Host";
     }
 
     public void ToggleMultiplayerCanvas()
     {
         multiplayerCanvas.SetActive(!multiplayerCanvas.activeSelf);
+        if (multiplayerCanvas.activeSelf)
+            GameObject.Find("BackgroundCanvas").transform.Find("Header").Find("Text").GetComponent<Text>().text = "Multiplayer";
     }
 
     public void ToggleIntermissionCanvas()
