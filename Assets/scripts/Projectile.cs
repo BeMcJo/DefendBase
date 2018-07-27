@@ -32,9 +32,9 @@ public class Projectile : MonoBehaviour {
             ),
         new ProjectileStats(
             "Bomb Arrow",
-            50,
+            0,//50,
             15,
-            UnlockCondition.QuestThenPurchase,
+            UnlockCondition.Purchase,
             "Explode your targets!"
             ),
         new ProjectileStats(
@@ -53,9 +53,9 @@ public class Projectile : MonoBehaviour {
             ),
         new ProjectileStats(
             "Ice Arrow",
-            50,
+            0,//50,
             15,
-            UnlockCondition.QuestThenPurchase,
+            UnlockCondition.Purchase,
             "Creates a chilly explosion, freezing nearby enemies"
             ),
         new ProjectileStats(

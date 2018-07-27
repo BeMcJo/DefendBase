@@ -376,7 +376,7 @@ public class Bow : Weapon
                     anim.Play("release", -1, 1 - chargePower);
                 base.Shoot(chargePower);
                 audioSrc.clip = soundClips[1];
-                audioSrc.time = .1f;
+                //audioSrc.time = .1f;
                 audioSrc.volume = 1f;
                 //print(audioSrc.clip.length);
                 audioSrc.Play();

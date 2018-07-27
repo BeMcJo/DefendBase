@@ -1350,7 +1350,7 @@ public class GameManager : MonoBehaviour {
     // Updates the visual indication of arrow amount
     public void UpdateArrowQty(int itemID)
     {
-        Save("setupMain");
+        Save("arrowQuantity");
         if (!inGame)
         {
             print("?");
