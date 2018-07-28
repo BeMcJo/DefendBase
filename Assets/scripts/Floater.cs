@@ -24,10 +24,12 @@ public class Floater : MonoBehaviour {
         "score"
     };
 
-    int rewardType;
+    int rewardType; // determines which reward to provide
+    AudioSource audio; // plays sound effect based on reward
 	// Use this for initialization
 	void Start () {
         rb = GetComponent<Rigidbody>();
+        audio = GetComponent<AudioSource>();
         biasedDir = new Vector3(Random.Range(-.5f, 0.5f) / 5, Random.Range(0, 0.5f), Random.Range(-.5f, 0.5f)/5);
         biasedTorq = new Vector3(Random.Range(-.5f, 0.5f), Random.Range(-.5f, 0.5f), Random.Range(-.5f, 0.5f));
         rb.AddForce(biasedDir* Random.Range(20,250));
@@ -108,9 +110,13 @@ public class Floater : MonoBehaviour {
     {
         GameObject itemGainIndicator;
         itemGainIndicator = Instantiate(GameManager.gm.indicatorPrefabs[0]);
+        AudioSource audiosrc = itemGainIndicator.AddComponent<AudioSource>();
+        //audiosrc.playOnAwake = true;
+        audiosrc.volume = .75f;
         itemGainIndicator.transform.GetChild(1).gameObject.SetActive(true);
-        //rewardType = 0;
-       
+        //rewardType = 1;
+
+        StartCoroutine(GameManager.gm.PlaySFX(GameManager.gm.bubblePopSFX));
         switch (rewardType)
         {
             // attribute (arrow types)
@@ -136,6 +142,10 @@ public class Floater : MonoBehaviour {
 
             // money
             case 2:
+                //audio.clip = GameManager.gm.obtainCoinSFX;
+                //audio.Play();
+                //audiosrc.clip = GameManager.gm.obtainCoinSFX;
+                //audiosrc.Play();
                 GameManager.gm.UpdateInGameCurrency(10);
                 //itemGainIndicator = Instantiate(GameManager.gm.indicatorPrefabs[0]);
                 itemGainIndicator.transform.position = transform.position;

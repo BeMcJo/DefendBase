@@ -49,6 +49,7 @@ public class ObjectiveHitIndicator : MonoBehaviour {
     {
         //print(blinker == null);
         timeToLive = 5f + Time.time;
+        StartCoroutine(GameManager.gm.PlaySFX(GameManager.gm.objectiveHitSFX));
 
     }
 

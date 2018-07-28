@@ -166,6 +166,7 @@ public class Bow : Weapon
         if (NetworkManager.nm.isStarted && !user.IsMyPlayer())
         {
             base.StartUse(t);
+            
             return true;
         }
         anim.speed = 0;
@@ -181,6 +182,12 @@ public class Bow : Weapon
                     //print("??");
                     base.StartUse(t);
                     shootTouchID = t.fingerId;
+                    
+                    //audioSrc.clip = soundClips[0];
+                    //audioSrc.volume = .6f;
+                    //audioSrc.loop = true;
+
+                    //audioSrc.Play();
                 }
             }
             return charging;
@@ -222,11 +229,14 @@ public class Bow : Weapon
         drawRange = drawOffset;
         inUse = false;
         anim.speed = 1;
+        audioSrc.volume = 1;
+        audioSrc.pitch = 1;
         if (arrows[0])
         {
             arrows[0].localPosition = bulletSpawns[0].transform.localPosition;
             Shoot(chargePower);
         }
+        audioSrc.loop = false;
         //charging = false;
         //chargePower = 0;
         base.EndUse();
@@ -245,11 +255,9 @@ public class Bow : Weapon
         }
 
 
-        audioSrc.clip = soundClips[0];
-
         // If not using Touch Interactive mode, progressively increase the chargePower as long as user holds shoot button
         if (!GameManager.gm.interactiveTouch)
-        { print(1);
+        { //print(1);
             base.Charge(chargePower);
             /*
             chargePower = chargePower + (.03f * weaponStats[wepID].chargeAccelation[0]) / (float)DebugManager.dbm.fps * 60.0f; // increment charge power
@@ -315,7 +323,8 @@ public class Bow : Weapon
                 audioSrc.Stop();
                 */
         }
-
+        //audioSrc.pitch = .5f + chargePower;
+        //audioSrc.loop = chargePower >= 1;
         drawRange = drawOffset + this.chargePower * drawLimit * drawElasticity; // Calculate how far arrow and bowstring is drawn
         for(int i = 0; i < ((wepID == 1)? 3:1);i++)
             arrows[i].localPosition = bulletSpawns[i].transform.localPosition + new Vector3(0, 0, this.chargePower * drawLimit); // Move arrow backwards based on charge power 

@@ -51,6 +51,7 @@ public class Objective : MonoBehaviour {
 
     public void Repair(int hp)
     {
+        //StartCoroutine(GameManager.gm.PlaySFX(GameManager.gm.repairSFX));
         if (NetworkManager.nm.isStarted)
         {
             NetworkManager.nm.ConfirmObjectiveRepair(id, hp, false);
@@ -78,6 +79,8 @@ public class Objective : MonoBehaviour {
     // Inflict damage and update uis related to health
     public void TakeDamage(int dmg)
     {
+        if (GameManager.gm.data.gameOver)
+            return;
         int curHP = HP;
         HP -= dmg;
 
@@ -102,6 +105,7 @@ public class Objective : MonoBehaviour {
         if (HP <= 0)
         {
             HP = 0;
+
             GameManager.gm.DisplayEndGameNotifications(false);
             //GameManager.gm.DisplayDefeatNotification();
         }

@@ -222,6 +222,7 @@ public abstract class Weapon : MonoBehaviour
 
     public void ToggleStatsUI()
     {
+        GameManager.gm.NotifyButtonPressed();
         itemUI.SetActive(!itemUI.activeSelf);
     }
 	
@@ -341,11 +342,14 @@ public abstract class Weapon : MonoBehaviour
                 purchased = true;
                 itemUI.transform.Find("BuyBtn").GetChild(0).GetComponent<Text>().text = "Upgrade\n" + weaponStats[wepID].costToUpgrade[lvl] + "\nLvl " + (lvl + 2);
                 itemUI.transform.SetParent(GameManager.gm.shopCanvas.transform.Find("Displays").Find("UpgradeWeaponsDisplay").GetChild(0));
+                GameManager.gm.NotifyTransactionSuccess();
                 Debug.Log("PURCHSE");
             }
             else
             {
                 Debug.Log("CANT BUYT");
+                GameManager.gm.NotifyInvalid();
+                //StartCoroutine(GameManager.gm.PlaySFX(GameManager.gm.invalidSFX));
             }
         }
         // If upgrading weapon
@@ -355,6 +359,7 @@ public abstract class Weapon : MonoBehaviour
             {
                 Debug.Log("CAN UPGRADE");
                 GameManager.gm.UpdateInGameCurrency(-weaponStats[wepID].costToUpgrade[lvl]);
+                GameManager.gm.NotifyTransactionSuccess();
                 //GameManager.gm.inGameCurrency -= ;
                 lvl++;
                 if (lvl == weaponStats[wepID].costToUpgrade.Length)
@@ -379,6 +384,8 @@ public abstract class Weapon : MonoBehaviour
             else
             {
                 Debug.Log("CANTS UPGRADE");
+                GameManager.gm.NotifyInvalid();
+                //StartCoroutine(GameManager.gm.PlaySFX(GameManager.gm.invalidSFX));
             }
         }
     }
@@ -405,6 +412,7 @@ public abstract class Weapon : MonoBehaviour
     // Handles the beginning of weapon usage for online feature
     public virtual bool StartUse()
     {
+        print(1123);
         inUse = true;
         charging = true;
         chargePower = 0;

@@ -312,7 +312,17 @@ public class GameManager : MonoBehaviour {
               waveNotificationCoroutine,
               frostBorderCoroutine;
 
-    public AudioClip onEnemyHitSFX;
+    public AudioClip onEnemyHitSFX,
+                     obtainCoinSFX,
+                     purchaseSFX,
+                     invalidSFX,
+                     equipSFX,
+                     btnClickSFX,
+                     victorySFX,
+                     defeatSFX,
+                     objectiveHitSFX,
+                     repairSFX,
+                     bubblePopSFX;
     //public List<AudioClip> 
     public AudioSource audioSrc;
 
@@ -614,6 +624,10 @@ public class GameManager : MonoBehaviour {
         mainMenuCanvas.transform.Find("PlayerCurrency").GetChild(0).GetComponent<Text>().text = "" + personalData.playerCurrency;
 
         Transform btnContainer = mainMenuCanvas.transform.Find("ButtonsContainer");
+        foreach(Transform child in btnContainer)
+        {
+            child.GetComponent<Button>().onClick.AddListener(NotifyButtonPressed);
+        }
         btnContainer.Find("PlayBtn").GetComponent<Button>().onClick.AddListener(GoToGameScene);
 
         btnContainer.Find("OnlineBtn").GetComponent<Button>().onClick.AddListener(ToggleMultiplayerCanvas);
@@ -637,6 +651,10 @@ public class GameManager : MonoBehaviour {
         multiplayerCanvas = GameObject.Find("MultiplayerCanvas");
         multiplayerCanvas.SetActive(false);
         btnContainer = multiplayerCanvas.transform.Find("ButtonsContainer");
+        foreach (Transform child in btnContainer)
+        {
+            child.GetComponent<Button>().onClick.AddListener(NotifyButtonPressed);
+        }
 
         btnContainer.Find("HostBtn").GetComponent<Button>().onClick.AddListener(ToggleLobbyCanvas);
         btnContainer.Find("HostBtn").GetComponent<Button>().onClick.AddListener(ToggleMultiplayerCanvas);
@@ -656,10 +674,12 @@ public class GameManager : MonoBehaviour {
         hostListCanvas.transform.Find("BackBtn").GetComponent<Button>().onClick.AddListener(ToggleMultiplayerCanvas);
         hostListCanvas.transform.Find("BackBtn").GetComponent<Button>().onClick.AddListener(ToggleHostListCanvas);
         hostListCanvas.transform.Find("BackBtn").GetComponent<Button>().onClick.AddListener(NetworkManager.nm.Disconnect);
+        hostListCanvas.transform.Find("BackBtn").GetComponent<Button>().onClick.AddListener(NotifyButtonPressed);
 
         lobbyCanvas = GameObject.Find("LobbyCanvas");
         lobbyCanvas.SetActive(false);
         lobbyCanvas.transform.Find("BackBtn").GetComponent<Button>().onClick.AddListener(NetworkManager.nm.RequestLeaveLobby);
+        lobbyCanvas.transform.Find("BackBtn").GetComponent<Button>().onClick.AddListener(NotifyButtonPressed);
 
         lobbyCanvas.transform.Find("ReadyBtn").GetComponent<Button>().onClick.AddListener(NetworkManager.nm.RequestReady);
 
@@ -705,6 +725,7 @@ public class GameManager : MonoBehaviour {
         inventoryCanvas.SetActive(false);
         inventoryCanvas.transform.Find("BackBtn").GetComponent<Button>().onClick.AddListener(ToggleInventoryCanvas);
         inventoryCanvas.transform.Find("BackBtn").GetComponent<Button>().onClick.AddListener(ToggleMainMenuCanvas);
+        inventoryCanvas.transform.Find("BackBtn").GetComponent<Button>().onClick.AddListener(NotifyButtonPressed);
         inventoryCanvas.transform.Find("PlayerCurrency").GetChild(0).GetComponent<Text>().text = "" + personalData.playerCurrency;
         inventoryItemPanel = inventoryCanvas.transform.Find("ItemUIPanel").gameObject;
 
@@ -848,6 +869,7 @@ public class GameManager : MonoBehaviour {
         achievementsCanvas = GameObject.Find("AchievementsCanvas");
         achievementsCanvas.transform.Find("BackBtn").GetComponent<Button>().onClick.AddListener(ToggleAchievementsCanvas);
         achievementsCanvas.transform.Find("BackBtn").GetComponent<Button>().onClick.AddListener(ToggleMainMenuCanvas);
+        achievementsCanvas.transform.Find("BackBtn").GetComponent<Button>().onClick.AddListener(NotifyButtonPressed);
         btnContainer = achievementsCanvas.transform.Find("ButtonsContainer");
         Transform achievementsContainer = achievementsCanvas.transform.Find("ItemUIPanel").Find("RecordsUIContainer");//"AchievementsContainer");
 
@@ -978,8 +1000,10 @@ public class GameManager : MonoBehaviour {
             intermissionCanvas.transform.Find("ResumeBtn").GetComponent<Button>().onClick.AddListener(NextWave);
             intermissionCanvas.transform.Find("SaveAndQuitBtn").GetComponent<Button>().onClick.AddListener(SaveAndQuit);
         }
+        intermissionCanvas.transform.Find("ResumeBtn").GetComponent<Button>().onClick.AddListener(NotifyButtonPressed);
+        intermissionCanvas.transform.Find("SaveAndQuitBtn").GetComponent<Button>().onClick.AddListener(NotifyButtonPressed);
 
-        
+
         //intermissionCanvas.transform.Find("ShopBtn").GetComponent<Button>().onClick.AddListener(ToggleShopCanvas);
         //intermissionCanvas.transform.Find("ShopBtn").GetComponent<Button>().onClick.AddListener(ToggleIntermissionCanvas);
         intermissionCanvas.SetActive(false);
@@ -993,6 +1017,7 @@ public class GameManager : MonoBehaviour {
 
         playerStatusCanvas = GameObject.Find("PlayerStatusCanvas").gameObject;
         playerStatusCanvas.transform.Find("OptionsBtn").GetComponent<Button>().onClick.AddListener(ToggleOptionsCanvas);//DisplayOptions);
+        playerStatusCanvas.transform.Find("OptionsBtn").GetComponent<Button>().onClick.AddListener(NotifyButtonPressed);
         playerStatusCanvas.transform.Find("MapBtn").GetComponent<Button>().onClick.AddListener(ToggleMapUICanvas);
         playerStatusCanvas.transform.Find("MapBtn").gameObject.SetActive(false);
         hitObjectiveIndicator = playerStatusCanvas.transform.Find("ObjectiveHitIndicator").gameObject;
@@ -1001,7 +1026,9 @@ public class GameManager : MonoBehaviour {
 
         playerOrientationObjects = playerStatusCanvas.transform.Find("PlayerOrientationObjects").gameObject;
         playerOrientationObjects.transform.Find("SetOrientationBtn").GetComponent<Button>().onClick.AddListener(SetPlayerOrientation);
+        playerOrientationObjects.transform.Find("SetOrientationBtn").GetComponent<Button>().onClick.AddListener(NotifyButtonPressed);
         playerOrientationObjects.transform.Find("DoneSetupBtn").GetComponent<Button>().onClick.AddListener(TogglePlayerOrientationSetup);
+        playerOrientationObjects.transform.Find("DoneSetupBtn").GetComponent<Button>().onClick.AddListener(NotifyButtonPressed);
         playerOrientationObjects.SetActive(false);
         //upgradeWepBtn = playerStatusCanvas.transform.Find("UpgradeWepBtn").GetComponent<Button>();
         //upgradeWepBtn.OnPointerDown()
@@ -1015,6 +1042,7 @@ public class GameManager : MonoBehaviour {
 
         resultNotification = playerStatusCanvas.transform.Find("Result Notification").gameObject;
         resultNotification.transform.Find("StatisticsMask").GetChild(0).Find("RetryBtn").GetComponent<Button>().onClick.AddListener(FinishGame);//ResetGame);
+        resultNotification.transform.Find("StatisticsMask").GetChild(0).Find("RetryBtn").GetComponent<Button>().onClick.AddListener(NotifyButtonPressed);
         resultNotification.SetActive(false);
 
         scoreTxt = playerStatusCanvas.transform.Find("ScoreTxt").GetComponent<Text>();
@@ -1024,16 +1052,21 @@ public class GameManager : MonoBehaviour {
         optionsCanvas = GameObject.Find("OptionsCanvas");
         optionsPanel = optionsCanvas.transform.Find("OptionsPanel").gameObject;
         optionsPanel.transform.Find("ResumeBtn").GetComponent<Button>().onClick.AddListener(ResumeGame);
+        optionsPanel.transform.Find("ResumeBtn").GetComponent<Button>().onClick.AddListener(NotifyButtonPressed);
         optionsPanel.transform.Find("ExitBtn").GetComponent<Button>().onClick.AddListener(ToggleNotificationCanvas);
+        optionsPanel.transform.Find("ExitBtn").GetComponent<Button>().onClick.AddListener(NotifyButtonPressed);
         optionsPanel.transform.Find("ExitBtn").GetComponent<Button>().onClick.AddListener(ToggleOptionsCanvas);
         optionsPanel.transform.Find("SettingsBtn").GetComponent<Button>().onClick.AddListener(ToggleInGameSettings);
+        optionsPanel.transform.Find("SettingsBtn").GetComponent<Button>().onClick.AddListener(NotifyButtonPressed);
         //Transform leaveGameNotif = optionsPanel.transform.Find("LeaveGameNotification");//.GetComponent<Button>().onClick.AddListener(ToggleInGameSettings);
         //leaveGameNotif.Find("CancelBtn").GetComponent<Button>().onClick.AddListener(ToggleLeaveGameNotification);
         //leaveGameNotif.Find("LeaveBtn").GetComponent<Button>().onClick.AddListener(LeaveGame);
 
         settingsPanel = optionsCanvas.transform.Find("SettingsPanel").gameObject;
         settingsPanel.transform.Find("BackBtn").GetComponent<Button>().onClick.AddListener(ToggleInGameSettings);
+        settingsPanel.transform.Find("BackBtn").GetComponent<Button>().onClick.AddListener(NotifyButtonPressed);
         settingsPanel.transform.Find("SetOrientationBtn").GetComponent<Button>().onClick.AddListener(TogglePlayerOrientationSetup);
+        settingsPanel.transform.Find("SetOrientationBtn").GetComponent<Button>().onClick.AddListener(NotifyButtonPressed);
         string isOn = "ON";
         if (!interactiveTouch)
             isOn = "OFF";
@@ -1093,8 +1126,10 @@ public class GameManager : MonoBehaviour {
 
         notificationCanvas = GameObject.Find("NotificationCanvas");
         notificationCanvas.transform.Find("WindowBG").Find("LeaveGameBtn").GetComponent<Button>().onClick.AddListener(LeaveGame);
+        notificationCanvas.transform.Find("WindowBG").Find("LeaveGameBtn").GetComponent<Button>().onClick.AddListener(NotifyButtonPressed);
         notificationCanvas.transform.Find("WindowBG").Find("ResumeBtn").GetComponent<Button>().onClick.AddListener(ToggleNotificationCanvas);
         notificationCanvas.transform.Find("WindowBG").Find("ResumeBtn").GetComponent<Button>().onClick.AddListener(ToggleOptionsCanvas);
+        notificationCanvas.transform.Find("WindowBG").Find("ResumeBtn").GetComponent<Button>().onClick.AddListener(NotifyButtonPressed);
         notificationCanvas.SetActive(false);
 
         myProjectiles.Clear();
@@ -1219,6 +1254,11 @@ public class GameManager : MonoBehaviour {
         b.SetActive(true);
     }
 
+    public void NotifyButtonPressed()
+    {
+        StartCoroutine(PlaySFX(btnClickSFX));
+    }
+
     public void ToggleLeaveGameNotification()
     {
         Transform leaveGameNotif = optionsPanel.transform.Find("LeaveGameNotification");//.GetComponent<Button>().onClick.AddListener(ToggleInGameSettings);
@@ -1239,6 +1279,7 @@ public class GameManager : MonoBehaviour {
     public void ToggleNotificationCanvas()
     {
         notificationCanvas.SetActive(!notificationCanvas.activeSelf);
+        NotifyButtonPressed();
     }
 
     public bool NotificationIsActive()
@@ -1384,6 +1425,7 @@ public class GameManager : MonoBehaviour {
         if (attributeID != selectedAttribute)
         {
             //return;
+            NotifyButtonPressed();
             itemDropdownList.transform.GetChild(selectedAttribute).GetComponent<Selector>().SetSelected(false);
             itemDropdownList.transform.GetChild(attributeID).GetComponent<Selector>().SetSelected(true);
             selectedAttribute = attributeID;
@@ -1437,9 +1479,29 @@ public class GameManager : MonoBehaviour {
                 }
                 break;
             case UnlockCondition.Purchase:
-                BuyWeapon(wepID);
+                if (personalData.isWeaponPurchased[wepID])
+                {
+                    EquipWeapon(wepID);
+                }
+                else
+                {
+                    BuyWeapon(wepID);
+                }
+
                 break;
         }
+    }
+
+    // Notify player action is invalid
+    public void NotifyInvalid()
+    {
+        StartCoroutine(PlaySFX(invalidSFX));
+    }
+
+    // Notfiy player transaction is successful
+    public void NotifyTransactionSuccess()
+    {
+        StartCoroutine(PlaySFX(purchaseSFX));
     }
 
     public void EquipWeapon(int wepID)
@@ -1453,6 +1515,10 @@ public class GameManager : MonoBehaviour {
         wepUIContainer.GetChild(wepID).Find("ActionBtn").Find("Text").GetComponent<Text>().text = "Equipped";
         personalData.equippedWep = wepID;
         wepUIContainer.GetChild(personalData.equippedWep).Find("ActionBtn").GetComponent<Button>().interactable = false;
+
+        StartCoroutine(PlaySFX(equipSFX));
+        //audioSrc.clip = equipSFX;
+        //audioSrc.Play();
         Save("setupMain");
     }
 
@@ -1461,6 +1527,9 @@ public class GameManager : MonoBehaviour {
         if(Weapon.weaponStats[wepID].price > personalData.playerCurrency)
         {
             print("cant buy wep");
+            StartCoroutine(PlaySFX(invalidSFX));
+            //audioSrc.clip = invalidSFX;
+            //audioSrc.Play();
             return;
         }
         personalData.playerCurrency -= Weapon.weaponStats[wepID].price;
@@ -1468,11 +1537,15 @@ public class GameManager : MonoBehaviour {
         personalData.isWeaponPurchased[wepID] = true;
         print("BOUGHT");
         EquipWeapon(wepID);
+        StartCoroutine(PlaySFX(purchaseSFX));
+        //audioSrc.clip = purchaseSFX;
+        //audioSrc.Play();
         //personalData.equippedWep = wepID;
     }
 
     public void ChangeSelectedTab(string selectedTab)
     {
+        NotifyButtonPressed();
         GameObject canvas = inventoryCanvas;
         if (gm.selectedTab == "Records" || gm.selectedTab == "Quests")
         {
@@ -1513,16 +1586,39 @@ public class GameManager : MonoBehaviour {
         }
     }
 
+    public bool IsClipFinished(AudioSource audio)
+    {
+        return audio.time >= audio.clip.length;
+    }
+
+    public IEnumerator PlaySFX(AudioClip clip)
+    {
+        AudioSource audio = gameObject.AddComponent<AudioSource>();
+        audio.clip = clip;
+        //if (clip == btnClickSFX)
+        //    audio.volume = .5f;
+        audio.Play();
+        yield return new WaitWhile(() => audio.isPlaying);//2);//IsClipFinished(audio));
+        Destroy(audio);
+        //yield return new WaitForSeconds(0);
+        //Destroy(audio,audio.clip.length);
+    }
+
     public void BuyArrow(int aID)
     {
         if(Projectile.projectileStats[aID].price > personalData.playerCurrency)
         {
             print("CANT BUY");
+            audioSrc.clip = invalidSFX;
+            audioSrc.Play();
             return;
         }
         print("BOUGHT");
         personalData.playerCurrency -= Projectile.projectileStats[aID].price;
         UpdateItem("Attribute", aID, 1);
+        //audioSrc.clip = purchaseSFX;
+        //audioSrc.Play();
+        StartCoroutine(PlaySFX(purchaseSFX));
         //UpdateArrowQty(aID);
     }
 
@@ -1590,6 +1686,7 @@ public class GameManager : MonoBehaviour {
     {
         //itemDropdownList.GetComponent<Slider>().ToggleSlider();
         GameObject arrowQtyList = itemDropdownList.transform.parent.parent.gameObject;
+        NotifyButtonPressed();
         arrowQtyList.SetActive(!arrowQtyList.activeSelf);
     }
 
@@ -1627,15 +1724,18 @@ public class GameManager : MonoBehaviour {
 
         data.hasWon = won;
 
+
         // Show Eng Game Results Notification
         Transform stats = resultNotification.transform.Find("StatisticsMask").GetChild(0).Find("StatisticsContainer");
         PlayerController pc = player.GetComponent<PlayerController>();
         if (won)
         {
+            StartCoroutine(PlaySFX(victorySFX));
             stats.parent.Find("WinOrLoseTxt").GetComponent<Text>().text = "VICTORY";
         }
         else
         {
+            StartCoroutine(PlaySFX(defeatSFX));
             stats.parent.Find("WinOrLoseTxt").GetComponent<Text>().text = "Defeat...";
         }
         stats.Find("Kills").Find("Stats").GetComponent<Text>().text = "" + (personalKills + totalPersonalKills);
@@ -2120,12 +2220,13 @@ public class GameManager : MonoBehaviour {
     // Displays wave notification text and then hides it, the end indicates wave starts
     IEnumerator NotifyIncomingWave(int w)
     {
-        
         waveNotification.SetActive(true);
+        //waveNotification.GetComponent<AudioSource>().enabled = true;
         waveNotification.transform.Find("WaveTxt").GetComponent<Text>().text = "Wave " + (w+1);
         yield return new WaitUntil(DisplayWaveNotification);
         yield return new WaitForSeconds(3f);
         yield return new WaitUntil(HideWaveNotification);
+        //waveNotification.GetComponent<AudioSource>().enabled = false;
         startWaves = true;
         Debug.Log("Wave started");
     }

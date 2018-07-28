@@ -20,7 +20,6 @@ public class GroundChecker : MonoBehaviour {
         {
             GetComponent<Rigidbody>().velocity = Vector3.zero;
             GetComponent<Rigidbody>().useGravity = false;
-            print("?ASD");
         }
     }
 }

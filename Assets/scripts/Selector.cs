@@ -11,8 +11,10 @@ public class Selector : MonoBehaviour, IPointerClickHandler,IPointerUpHandler {
     {
         print("CLICKED");
         print(id);
-        if(selectionType == "attribute")
+        if (selectionType == "attribute")
+        {
             GameManager.gm.ChangeSelectedAttribute(id);
+        }
         //Select();
     }
 
