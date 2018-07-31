@@ -36,28 +36,36 @@ public class DamageOverTime : MonoBehaviour {
                 if (NetworkManager.nm.isStarted)
                 {
                     print("hit4");
-                    NetworkManager.nm.NotifyObjectDamagedBy("ENEMY", "Enemy", e.id, ownerID, dmg, ownerType);//e.gameObject, gameObject);
-                    return;
-                }
-                e.TakeDamageFrom(dmg, ownerType, ownerID);
-                GameManager.gm.OnHitEnemy();
-                // if enemy dies, update record statistics
-                if (e.health <= 0)
-                {
-                    // increment kill count for fire attribute
-                    GameManager.gm.data.killsByArrowAttribute[5]++;
-                }
-                life--;
-                if (life <= 0)
-                {
-                    if (type == 0)
-                        GetComponent<Enemy>().statusEffectObjects[1].gameObject.SetActive(false);
-                    Destroy(this);
+                    if (ownerID == GameManager.gm.player.GetComponent<PlayerController>().id)
+                    {
+                        GameManager.gm.OnHitEnemy();
+                        NetworkManager.nm.NotifyObjectDamagedBy("ENEMY", "Enemy", e.id, ownerID, dmg, ownerType);//e.gameObject, gameObject);
+                                                                                                                 //return;
+                    }
                 }
                 else
                 {
-                    timeStamp = duration + Time.time;
+                    e.TakeDamageFrom(dmg, ownerType, ownerID);
+                    GameManager.gm.OnHitEnemy();
+                    // if enemy dies, update record statistics
+                    if (e.health <= 0)
+                    {
+                        // increment kill count for fire attribute
+                        GameManager.gm.data.killsByArrowAttribute[5]++;
+                    }
                 }
+            }
+
+            life--;
+            if (life <= 0)
+            {
+                if (type == 0)
+                    GetComponent<Enemy>().statusEffectObjects[1].gameObject.SetActive(false);
+                Destroy(this);
+            }
+            else
+            {
+                timeStamp = duration + Time.time;
             }
         }
 	}

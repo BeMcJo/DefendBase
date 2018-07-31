@@ -205,10 +205,22 @@ public class Projectile : MonoBehaviour {
         {
             //print("SWEET");
             //collision.GetComponent<SweetSpot>().TakeDamage(gameObject);
-
+            // bomb arrow
             if (attributeID == 1)
             {
                 CreateExplosion(ExplosionType.damage);
+            }
+            // ice arrow
+            else if (attributeID == 4)
+            {
+                CreateExplosion(ExplosionType.freeze);
+                //e.ApplyEffect(Effect.freeze);
+                //return;
+            }
+            // fire arrow
+            else if (attributeID == 5)
+            {
+                CreateAreaEffect(0);
             }
             //e.OnHit();
             // If piercing attribute, don't stop arrow
@@ -231,6 +243,7 @@ public class Projectile : MonoBehaviour {
             // If can damage enemy and this is shot by my player
             if (!hitGround && !deflected)
             {
+                // bomb arrow
                 if (attributeID == 1)
                 {
                     CreateExplosion(ExplosionType.damage);
@@ -238,7 +251,14 @@ public class Projectile : MonoBehaviour {
                 // ice arrow
                 else if (attributeID == 4)
                 {
-                    print(UnlockCondition.Free);
+                    CreateExplosion(ExplosionType.freeze);
+                    //e.ApplyEffect(Effect.freeze);
+                    //return;
+                }
+                // fire arrow
+                else if (attributeID == 5)
+                {
+                    CreateAreaEffect(0);
                 }
                 // If piercing attribute, don't stop arrow
                 else if (attributeID != 2)
@@ -267,6 +287,11 @@ public class Projectile : MonoBehaviour {
             {
                 CreateExplosion(ExplosionType.freeze);
                 //e.ApplyEffect(Effect.freeze);
+            }
+            // fire arrow
+            else if (attributeID == 5)
+            {
+                CreateAreaEffect(0);
             }
             hitGround = true;
             deflected = true;

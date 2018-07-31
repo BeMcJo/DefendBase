@@ -301,6 +301,13 @@ public class Enemy : MonoBehaviour
         }
     }
     
+    // slowly unfreeze enemy
+    public bool HasThawed()
+    {
+        print(statusEffectObjects[0].transform.localScale.magnitude);
+        statusEffectObjects[0].transform.localScale /= 1.0015f;
+        return statusEffectObjects[0].transform.localScale.magnitude < .5f;
+    }
 
     public IEnumerator Freeze()
     {
@@ -312,8 +319,11 @@ public class Enemy : MonoBehaviour
             enabled = false;
             canPerformAction = false;
             statusEffectObjects[0].SetActive(true);
-            //if()
-            yield return new WaitForSeconds(20);
+            statusEffectObjects[0].transform.localScale = new Vector3(1, 1, 1);
+            
+            yield return new WaitUntil(HasThawed);
+          
+            //yield return new WaitForSeconds(20);
             statusEffectObjects[0].SetActive(false);
             anim.enabled = true;
             canPerformAction = true;
@@ -677,12 +687,14 @@ public class Enemy : MonoBehaviour
     {
         TakeDamage(dmg);
 
-        // Visual indication of damage dealt
-        GameObject damageIndicator = Instantiate(GameManager.gm.indicatorPrefabs[0]);
-        damageIndicator.transform.position = transform.Find("HP Placeholder").position;//healthBarGauge.position + new Vector3(0, healthBarGauge.GetComponent<RectTransform>().rect.height, 0);
-        damageIndicator.transform.LookAt(GameManager.gm.player.transform.GetComponent<PlayerController>().playerCam.transform);
-        damageIndicator.transform.GetChild(0).GetComponent<Text>().text = "" + (-dmg);
-
+        if (dmg != 0)
+        {
+            // Visual indication of damage dealt
+            GameObject damageIndicator = Instantiate(GameManager.gm.indicatorPrefabs[0]);
+            damageIndicator.transform.position = transform.Find("HP Placeholder").position;//healthBarGauge.position + new Vector3(0, healthBarGauge.GetComponent<RectTransform>().rect.height, 0);
+            damageIndicator.transform.LookAt(GameManager.gm.player.transform.GetComponent<PlayerController>().playerCam.transform);
+            damageIndicator.transform.GetChild(0).GetComponent<Text>().text = "" + (dmg);
+        }
         // Keep track of last damage source just in case die and need to reward source
         this.dmgSourceType = dmgSourceType;
         dmgSourceID = sid;

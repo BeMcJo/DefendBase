@@ -43,8 +43,7 @@ public class Explosion : MonoBehaviour {
     private void OnTriggerEnter(Collider other)
     {
         //Debug.Log(other.tag);
-        if (ownerID != GameManager.gm.player.transform.GetComponent<PlayerController>().id)
-            return;
+        
         //Debug.Log("aa");
         if(other.tag == "Enemy")
         {
@@ -60,7 +59,17 @@ public class Explosion : MonoBehaviour {
             if (alreadyHit.Contains(e.gameObject))
                 return;
             alreadyHit.Add(e.gameObject);
-            if(explosionType == ExplosionType.damage)
+            // if not my player object
+            if (ownerID != GameManager.gm.player.transform.GetComponent<PlayerController>().id)
+            {
+                if (explosionType == ExplosionType.freeze)
+                {
+                    print("FREEze");
+                    e.ApplyEffect(Effect.freeze);
+                }
+                return;
+            }
+            if (explosionType == ExplosionType.damage)
             //e.OnHit();
             {
                 GameManager.gm.OnHitEnemy();

@@ -41,7 +41,7 @@ public class Objective : MonoBehaviour {
     // Used to synchronize repairing objective using online feature
     public void RequestRepairIfValid()
     {
-        if (GameManager.gm.inGameCurrency < 50)
+        if (GameManager.gm.data.inGameCurrency < 50)
             return;
         if (HP >= maxHP)
             return;
@@ -63,7 +63,7 @@ public class Objective : MonoBehaviour {
     // Add health to objective and make player pay the price
     public void Repair()
     {
-        if (GameManager.gm.inGameCurrency >= 50)
+        if (GameManager.gm.data.inGameCurrency >= 50)
         {
             Debug.Log("Repair gate");
             GameManager.gm.UpdateInGameCurrency(-50);

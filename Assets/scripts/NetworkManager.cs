@@ -1807,6 +1807,8 @@ public class NetworkManager : MonoBehaviour {
             {
                 GameManager.gm.intermissionCanvas.transform.Find("ResumeBtn").GetComponent<Button>().interactable = false;
                 GameManager.gm.intermissionCanvas.transform.Find("SaveAndQuitBtn").GetComponent<Button>().interactable = false;
+                GameObject readyMarker = GameManager.gm.intermissionCanvas.transform.Find("ReadyMarker").gameObject;
+                readyMarker.SetActive(!readyMarker.activeSelf);
             }
         }
     }

@@ -157,8 +157,10 @@ public abstract class Weapon : MonoBehaviour
         WeaponCount++;
         name = "Wep " + id;
         */
-
-        //bulletSpawn[0] = transform.Find("BulletSpawn");
+        if (!user.IsMyPlayer()) {
+            return;
+        }
+            //bulletSpawn[0] = transform.Find("BulletSpawn");
         Transform shootBtnUI = GameManager.gm.playerStatusCanvas.transform.Find("ShootBtnUI");
         chargeBarGuage = Instantiate(chargeBarGuage);
         chargeBar = chargeBarGuage.transform.GetChild(0).gameObject;
@@ -177,13 +179,14 @@ public abstract class Weapon : MonoBehaviour
         //shootBtn.transform.SetParent(GameManager.gm.playerStatusCanvas.transform.Find("ShootBtnPlaceholder"));
         //shootBtn.transform.localScale = new Vector3(1, 1, 1);
         //shootBtn.transform.localPosition = Vector3.zero; //GameManager.gm.playerStatusCanvas.transform.Find("ShootBtnPlaceholder").localPosition;
-        if(user.IsMyPlayer())
-            shootBtn.SetActive(canDisplay);
+        
+        shootBtn.SetActive(canDisplay);
         reloadBar = shootBtnUI.Find("ReloadGauge").Find("ReloadBar").GetComponent<Image>();//GameManager.gm.playerStatusCanvas.transform.Find("ReloadGauge").Find("ReloadBar").GetComponent<Image>();
 
 
         // Add item UI to store with respect to if item was purchased or not
-        itemUI = Instantiate(GameManager.gm.inGameWepItemUIPrefab);
+        //itemUI = Instantiate(GameManager.gm.inGameWepItemUIPrefab);
+        itemUI = GameManager.gm.inGameWepItemUI;
         //itemUI.transform.Find("ItemDescription").GetComponent<RectTransform>().sizeDelta = new Vector2(1200,150);
         //itemUI.transform.localPosition = new Vector3(-325, 0, 0);
         //itemUI.transform.Find("ItemDescription").transform.localPosition = new Vector3(-400, 0, 0);
@@ -195,13 +198,13 @@ public abstract class Weapon : MonoBehaviour
         //itemUI.transform.Find("ItemDescription").GetComponent<Text>().text = statsByLevel[wepID].name + " Lvl." + lvl;
         if (purchased)
         {
-            itemUI.transform.Find("BuyBtn").GetChild(0).GetComponent<Text>().text = "Upgrade\n" + weaponStats[wepID].costToUpgrade[lvl] + "\nLvl " + (lvl + 2);
+            itemUI.transform.Find("BuyBtn").GetChild(0).GetComponent<Text>().text = "Upgrade\n" + weaponStats[wepID].costToUpgrade[lvl];// + "\nLvl " + (lvl + 2);
             if (user && user.gameObject == GameManager.gm.player)
             {
                 //Debug.Log("?");
-                itemUI.transform.SetParent(GameManager.gm.quickAccessCanvas.transform.Find("WepItemUI Placeholder"));//GameManager.gm.quickAccessUpgradeDescription.transform);//GameManager.gm.quickAccessCanvas.transform.Find("DescriptionDisplay").Find("Inventory Descriptions").Find("Upgrade Descriptions"));
-                itemUI.transform.localPosition = Vector2.zero;//new Vector3(-325, 0, 0);
-                itemUI.transform.SetParent(itemUI.transform.parent.parent);
+                //itemUI.transform.SetParent(GameManager.gm.quickAccessCanvas.transform.Find("WepItemUI Placeholder"));//GameManager.gm.quickAccessUpgradeDescription.transform);//GameManager.gm.quickAccessCanvas.transform.Find("DescriptionDisplay").Find("Inventory Descriptions").Find("Upgrade Descriptions"));
+                //itemUI.transform.localPosition = Vector2.zero;//new Vector3(-325, 0, 0);
+                //itemUI.transform.SetParent(itemUI.transform.parent.parent);
 
             }
         }
@@ -211,7 +214,7 @@ public abstract class Weapon : MonoBehaviour
             if (user == null)
                 itemUI.transform.SetParent(GameManager.gm.shopCanvas.transform.Find("Displays").Find("StoreWeaponsDisplay").GetChild(0));
         }
-        itemUI.transform.localScale = new Vector3(1, 1, 1);
+        //itemUI.transform.localScale = new Vector3(1, 1, 1);
 
         if(wepID == 1)
         {
@@ -337,10 +340,10 @@ public abstract class Weapon : MonoBehaviour
         // If buying from store
         if (!purchased)
         {
-            if(GameManager.gm.inGameCurrency >= weaponStats[wepID].price)
+            if(GameManager.gm.data.inGameCurrency >= weaponStats[wepID].price)
             {
                 purchased = true;
-                itemUI.transform.Find("BuyBtn").GetChild(0).GetComponent<Text>().text = "Upgrade\n" + weaponStats[wepID].costToUpgrade[lvl] + "\nLvl " + (lvl + 2);
+                itemUI.transform.Find("BuyBtn").GetChild(0).GetComponent<Text>().text = "Upgrade\n" + weaponStats[wepID].costToUpgrade[lvl];// + "\nLvl " + (lvl + 2);
                 itemUI.transform.SetParent(GameManager.gm.shopCanvas.transform.Find("Displays").Find("UpgradeWeaponsDisplay").GetChild(0));
                 GameManager.gm.NotifyTransactionSuccess();
                 Debug.Log("PURCHSE");
@@ -355,13 +358,13 @@ public abstract class Weapon : MonoBehaviour
         // If upgrading weapon
         else
         {
-            if(GameManager.gm.inGameCurrency >= weaponStats[wepID].costToUpgrade[lvl])
+            if(GameManager.gm.data.inGameCurrency >= weaponStats[wepID].costToUpgrade[lvl])
             {
                 Debug.Log("CAN UPGRADE");
-                GameManager.gm.UpdateInGameCurrency(-weaponStats[wepID].costToUpgrade[lvl]);
-                GameManager.gm.NotifyTransactionSuccess();
                 //GameManager.gm.inGameCurrency -= ;
                 lvl++;
+                GameManager.gm.data.wepLvl++;
+                // MAX level?
                 if (lvl == weaponStats[wepID].costToUpgrade.Length)
                 {
                     Debug.Log("NO MORE UPGRADES");
@@ -372,13 +375,15 @@ public abstract class Weapon : MonoBehaviour
                 }
                 else
                 {
-                    itemUI.transform.Find("BuyBtn").GetChild(0).GetComponent<Text>().text = "Upgrade\n" + weaponStats[wepID].costToUpgrade[lvl] + "\nLvl " + (lvl + 2);
+                    itemUI.transform.Find("BuyBtn").GetChild(0).GetComponent<Text>().text = "Upgrade\n" + weaponStats[wepID].costToUpgrade[lvl];// + "\nLvl " + (lvl + 2);
                 }
                 SetItemDescription();
                 if (NetworkManager.nm.isStarted)
                 {
                     NetworkManager.nm.NotifyWeaponUpgraded(wepID, lvl);
                 }
+                GameManager.gm.UpdateInGameCurrency(-weaponStats[wepID].costToUpgrade[lvl - 1]);
+                GameManager.gm.NotifyTransactionSuccess();
                 //itemUI.transform.Find("ItemDescription").GetComponent<Text>().text = statsByLevel[wepID].name + " Lvl." + lvl;
             }
             else
@@ -387,6 +392,7 @@ public abstract class Weapon : MonoBehaviour
                 GameManager.gm.NotifyInvalid();
                 //StartCoroutine(GameManager.gm.PlaySFX(GameManager.gm.invalidSFX));
             }
+            
         }
     }
     

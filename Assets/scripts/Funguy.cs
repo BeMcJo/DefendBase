@@ -18,6 +18,13 @@ public class Funguy : Enemy {
         attackTypes = 2;
     }
 
+    protected override void Update()
+    {
+        base.Update();
+        if (GetComponent<Rigidbody>().velocity.y > 0)
+            GetComponent<Rigidbody>().velocity = Vector3.zero;
+    }
+
     public override void Move()
     {
         if (!anim.GetCurrentAnimatorStateInfo(0).IsName("walk"))
