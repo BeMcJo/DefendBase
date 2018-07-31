@@ -323,7 +323,10 @@ public class GameManager : MonoBehaviour {
                      defeatSFX,
                      objectiveHitSFX,
                      repairSFX,
-                     bubblePopSFX;
+                     bubblePopSFX,
+                     playerUnfreezeSFX,
+                     breakIceSFX,
+                     playerFreezeSFX;
     //public List<AudioClip> 
     public AudioSource audioSrc;
 
@@ -1819,6 +1822,8 @@ public class GameManager : MonoBehaviour {
     {
         if (frostBorderCoroutine != null)
             StopCoroutine(frostBorderCoroutine);
+        StartCoroutine(PlaySFX(playerFreezeSFX));
+        playerStatusCanvas.transform.Find("Tap Action").gameObject.SetActive(true);
         frostBorderCoroutine = StartCoroutine(ShowFrostBorder());
     }
 
@@ -1826,6 +1831,8 @@ public class GameManager : MonoBehaviour {
     {
         if (frostBorderCoroutine != null)
             StopCoroutine(frostBorderCoroutine);
+        StartCoroutine(PlaySFX(playerUnfreezeSFX));
+        playerStatusCanvas.transform.Find("Tap Action").gameObject.SetActive(false);
         frostBorderCoroutine = StartCoroutine(HideFrostBorder());
     }
 

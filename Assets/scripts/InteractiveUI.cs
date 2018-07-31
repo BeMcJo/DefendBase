@@ -64,6 +64,10 @@ public class InteractiveUI : MonoBehaviour, IPointerDownHandler  {
                     print("DESTROYED");
                     owner.RemoveCondition(gameObject);
                 }
+                else
+                {
+                    StartCoroutine(GameManager.gm.PlaySFX(GameManager.gm.breakIceSFX));
+                }
                 break;
         }
     }
