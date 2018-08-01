@@ -66,10 +66,10 @@ public class Host
  */
 public class NetworkManager : MonoBehaviour {
     public static NetworkManager nm; // Singleton
-    int maxreq = 5;
+    int maxreq = 5; // used for disconnections
     // Max number of host connections
     private const int MAX_CONNECTION = 100;
-    private const int MAX_PLAYERS = 4;
+    private const int MAX_PLAYERS = 2; // for performance only 2 players // 4;
     // Keep as is
     private int SERVER_PORT = 5920,
                 CLIENT_PORT = 5919;
@@ -602,6 +602,7 @@ public class NetworkManager : MonoBehaviour {
         c.playerGO.SetActive(false);
         //Debug.Log(cnnId);
         players.Add(cnnId, c);
+        print(players.Count);
         // Stop broadcasting if full room
         if (players.Count == MAX_PLAYERS)
         {

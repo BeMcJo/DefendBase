@@ -128,6 +128,7 @@ public class Enemy : MonoBehaviour
         }
         name = "Enemy " + id;
         Physics.IgnoreLayerCollision(8, 8, true);
+
     }
 
     // Use this for initialization

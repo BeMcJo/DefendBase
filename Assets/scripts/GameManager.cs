@@ -1623,6 +1623,7 @@ public class GameManager : MonoBehaviour {
         }
     }
 
+    // Checks if clip is still playing
     public bool IsClipFinished(AudioSource audio)
     {
         return audio.time >= audio.clip.length;

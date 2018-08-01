@@ -73,8 +73,8 @@ public abstract class Weapon : MonoBehaviour
         new WeaponStats
         (
             "Sniper Bow",
-            3500,
-            UnlockCondition.QuestThenPurchase,
+            0,
+            UnlockCondition.Quest,
             new int[] {1,1,1,1,1},
             new int[] {50,100,200,500},
             new float[] {24, 30,36,43,50},
@@ -96,7 +96,7 @@ public abstract class Weapon : MonoBehaviour
             "Spraying arrows!? For the love of God..."
         )
     };
-    public static bool[] enableWeps = { true, false, true, true };
+    public static bool[] enableWeps = { true, false, true, false };
     public static int MAX_DMG = 2;
     public static float MAX_BOW_STR = 50f,
                         

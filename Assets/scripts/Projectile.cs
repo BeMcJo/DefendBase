@@ -95,6 +95,7 @@ public class Projectile : MonoBehaviour {
         if (tr)
             tr.enabled = false;
         attributesContainer = transform.Find("Attributes");
+
         //SetAttribute(GameManager.gm.selectedArrowAttribute);
     }
 

@@ -473,7 +473,7 @@ public class Achievement {
         }
     }
 
-    // Checks the conditional achievement to see if condition(s) are satisfied
+    // Checks the conditional achievement to see if condition(s) are satisfied. If so, reward player
     public static bool CompletedQuest(int achievementID)
     {
         bool satisfied = false;
@@ -510,6 +510,18 @@ public class Achievement {
                 GameManager.gm.personalData.isArrowUnlocked[conditionalAchievements[achievementID].conditions[0].itemID] = satisfied;
                 break;
 
+        }
+        if (satisfied)
+        {
+            switch (conditionalAchievements[achievementID].conditions[0].rewardType)
+            {
+                case "attribute":
+                    int itemID = conditionalAchievements[achievementID].conditions[0].itemID;
+                    GameManager.gm.arrowQty.arr[itemID] += Projectile.projectileStats[itemID].purchaseQty;
+                    break;
+                case "weapon":
+                    break;
+            }
         }
         return satisfied;
     }
