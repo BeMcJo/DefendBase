@@ -976,7 +976,9 @@ public class GameManager : MonoBehaviour {
     // Load game scene. If there was any saved game progress, remove it
     public void LoadGameScene()
     {
-        Save("continuedGame"); // Removes saved game progress
+        // don't remove saved state if playing multiplayer
+        if(!NetworkManager.nm.isStarted)
+            Save("continuedGame"); // Removes saved game progress
         scene = "game";
         //Needed here???////////
         //inGame = true;
@@ -1774,7 +1776,12 @@ public class GameManager : MonoBehaviour {
             stats.parent.Find("WinOrLoseTxt").GetComponent<Text>().text = "Defeat...";
         }
         stats.Find("Kills").Find("Stats").GetComponent<Text>().text = "" + data.totalKills;// (personalKills + totalPersonalKills);
-        stats.Find("CriticalShots").Find("Stats").GetComponent<Text>().text = "" + pc.criticalShotCount;
+        int weakspotCt = 0;
+        for(int i = 0; i < data.weakSpotsHitByEnemy.Length; i++)
+        {
+            weakspotCt += data.weakSpotsHitByEnemy[i];
+        }
+        stats.Find("WeakSpotsHit").Find("Stats").GetComponent<Text>().text = "" + weakspotCt;
         //if(pc.shotsHit > 0 && pc.wep.GetComponent<Weapon>().shotCount > 0)
         //    stats.Find("Accuracy").Find("Stats").GetComponent<Text>().text = "" + ((float) pc.shotsHit / pc.wep.GetComponent<Weapon>().shotCount * 100).ToString("#.0") + "%";
         stats.Find("WavesSurvived").Find("Stats").GetComponent<Text>().text = "" + (data.wave);
@@ -2421,6 +2428,7 @@ public class GameManager : MonoBehaviour {
         {
             data = new PlayerData();
         }
+        //personalData.equippedWep = 2;
 
         //data.wave = 4;
 

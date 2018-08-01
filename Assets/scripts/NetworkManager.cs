@@ -199,15 +199,16 @@ public class NetworkManager : MonoBehaviour {
 
         // While in game, send information about my player
         ///*
-        if (!GameManager.gm.realTimeAction && GameManager.gm.inGame && !isDisconnected)
+        if (GameManager.gm.realTimeAction && GameManager.gm.inGame && !isDisconnected)
         {
             // Don't send anything when wave ended for you to prevent overloading other players
-            if (GameManager.gm.onIntermission || !GameManager.gm.startWaves)
-                return;
+            //if (GameManager.gm.onIntermission || !GameManager.gm.startWaves)
+            //    return;
             sendTimer -= Time.deltaTime;
             if (sendTimer <= 0)
             {
-                SendPlayerInformation();
+                SendPlayerRotation();
+                //SendPlayerInformation();
                 sendTimer = sendRate;
             }
         }
@@ -226,6 +227,26 @@ public class NetworkManager : MonoBehaviour {
     public int PLayerDCCount()
     {
         return playerDC.Count;
+    }
+
+    // Network Information about player rptation
+    // Format: 
+    // PLAYERSTATS|Unique client ID|Camera orientation without the orientation offset|Weapon Network Information|
+    public void SendPlayerRotation()
+    {
+        string info = "PLAYERROT|" + ourClientID + "|";
+        PlayerController p = GameManager.gm.player.transform.GetComponent<PlayerController>();
+        Camera cam = p.playerCam;
+        Vector3 dir = cam.transform.eulerAngles;// - GameManager.gm.playerOrientation;
+        info += dir.x + "," + dir.y + "," + dir.z + "|";// + p.wep.NetworkInformation();
+        if (isHost)
+        {
+            Send(info, unreliableChannel, players);
+        }
+        else
+        {
+            Send(info, unreliableChannel);
+        }
     }
 
     // Network Information about player
@@ -406,7 +427,7 @@ public class NetworkManager : MonoBehaviour {
 
     // Extract Network Information about the other players
     public void OnPlayerInformation(string[] data)
-    {        
+    {
         int cnnID = int.Parse(data[1]);
         if (cnnID == ourClientID)
             return;
@@ -437,9 +458,22 @@ public class NetworkManager : MonoBehaviour {
                 p.wep.EndUse();
             }
         }
+
+    }
+
+    // Extract Network Information about the other players rotation
+    public void OnPlayerRotation(string[] data)
+    {
+        int cnnID = int.Parse(data[1]);
+        if (cnnID == ourClientID)
+            return;
+        string[] orientation = data[2].Split(',');
+
+        PlayerController p = players[cnnID].playerGO.transform.GetComponent<PlayerController>();
+        p.playerCam.transform.eulerAngles = new Vector3(float.Parse(orientation[0]), float.Parse(orientation[01]), float.Parse(orientation[2]));// + GameManager.gm.playerOrientation;
         
     }
-    
+
     // Tell other players that I have upgraded my weapon
     public void NotifyWeaponUpgraded(int wepID, int lvl)
     {
@@ -723,6 +757,11 @@ public class NetworkManager : MonoBehaviour {
                         OnPlayerInformation(splitData);
                         Send(msg, reliableChannel, players);
                         break;
+                    // Client provides player rotation
+                    case "PLAYERROT":
+                        OnPlayerRotation(splitData);
+                        Send(msg, reliableChannel, players);
+                        break;
                     // Client requests to approve being ready for the next step in the game
                     case "READY?":
                         OnReady(connectionId);
@@ -900,6 +939,10 @@ public class NetworkManager : MonoBehaviour {
                     // Received information about player
                     case "PLAYERSTATS":
                         OnPlayerInformation(splitData);
+                        break;
+                    // Received player rotation
+                    case "PLAYERROT":
+                        OnPlayerRotation(splitData);
                         break;
                     // Host asks why you connecting
                     case "PURPOSE":
@@ -2056,7 +2099,7 @@ public class NetworkManager : MonoBehaviour {
         //GameManager.gm.playerRotation.transform.eulerAngles = GameManager.gm.playerOrientation;
     }
 
-    // Send message to host
+    // Send message to host6
     private void Send(string message, int channelId)
     {
         byte[] msg = Encoding.Unicode.GetBytes(message);

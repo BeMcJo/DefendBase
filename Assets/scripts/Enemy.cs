@@ -812,10 +812,10 @@ public class Enemy : MonoBehaviour
         {
 
             Collider c = collision.collider;
+            print(c.name);
             if (collision.gameObject.name != "EnemyObject")
             {
                 c = collision.gameObject.GetComponent<Enemy>().go.GetComponent<Collider>();
-                
             }
             Physics.IgnoreCollision(c, go.GetComponent<Collider>());
             return;

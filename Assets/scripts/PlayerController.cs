@@ -17,7 +17,7 @@ public class PlayerController : MonoBehaviour {
     private Gyroscope gyro; // Point to gyroscope object
     private GameObject cameraContainer; // Holds the camera that represents your view
     public Camera playerCam; // Your perspective in game
-    private Quaternion rot; // Used for orienting your perspective
+    private Quaternion rot,startRot; // Used for orienting your perspective
     public float prevXAngle, // Used for limiting how far you can look down
                  maxLookDownLimit; // Limit on how far your look down
     // PC purpose?
@@ -29,6 +29,7 @@ public class PlayerController : MonoBehaviour {
     private int chargeBarAlt = 1;
 
     public Weapon wep; // Weapon player is currently holding and using
+    //Vector3 rotation;
 
     //Quaternion origin; unused?
 
@@ -50,7 +51,7 @@ public class PlayerController : MonoBehaviour {
         buffs = new Dictionary<int, Dictionary<int, Buff>>();
         immunityTimers = new Dictionary<int, float>();
         canPerformActions = true;
-
+        //transform.rot
         //origin = Input.gyro.attitude;
     }
     
@@ -247,6 +248,7 @@ public class PlayerController : MonoBehaviour {
         if (gyroEnabled && useGyro)
         {
             RotatePlayer();
+            
         }
     }
 
@@ -293,7 +295,8 @@ public class PlayerController : MonoBehaviour {
     // Orient player perspective
     private void RotatePlayer()
     {
-
+       
+        //playerCam.transform.rotation = Quaternion.Lerp(playerCam.transform.rotation)
         float dist = Vector3.Distance(gyro.rotationRateUnbiased, Vector3.zero);
         //playerCam.transform.Rotate(Input.gyro.rotationRate);
         //Debug.Log(gyro.attitude + " ...." + gyro.rotationRateUnbiased + "...a>>" +dist );
