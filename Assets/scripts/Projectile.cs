@@ -129,8 +129,8 @@ public class Projectile : MonoBehaviour {
             }
             else
             {
-                // bullet type
-                if (transform.GetComponent<Rigidbody>().velocity.magnitude >= 55 || (attributeID == 3 && !deflected))
+                // bullet type (currently just testing to allow raycast at all times)
+                if (true || transform.GetComponent<Rigidbody>().velocity.magnitude >= 55 || (attributeID == 3 && !deflected))
                 {
                     print("raycasting");
                     //Debug.DrawLine(transform.position, transform.);
@@ -150,8 +150,9 @@ public class Projectile : MonoBehaviour {
                         print("HIT " + hit.distance);
                         print(hit.point.ToString());
                         print(hit.collider.gameObject.name + " " + hit.collider.tag);
-                        if (hit.distance <= 30)
+                        if (hit.distance <= transform.GetComponent<Rigidbody>().velocity.magnitude)//30)
                         {
+                            print("CLOSE");
                             //GameObject mark = Instantiate(gameObject, hit.point, Quaternion.LookRotation(hit.normal)) as GameObject;
                             //mark.transform.Rotate(Vector)
                             //mark.GetComponent<Projectile>().enabled = false;
@@ -344,8 +345,8 @@ public class Projectile : MonoBehaviour {
         else if (collision.tag == "SweetSpot")
         {
             print("SWEET");
-            collision.GetComponent<SweetSpot>().TakeDamage(gameObject);
-
+            SweetSpot ss = collision.GetComponent<SweetSpot>();//.TakeDamage(gameObject);
+            ss.TakeDamage(gameObject);
             // bomb arrow
             if (attributeID == 1)
             {
@@ -373,6 +374,8 @@ public class Projectile : MonoBehaviour {
                 tr.enabled = false;
                 transform.SetParent(collision.transform);
             }
+            if (ss.owner.tag == "Dummy")
+                return;
             Transform t = collision.transform;
             Enemy e = collision.transform.parent.GetComponent<Enemy>();
             while (e == null)
@@ -501,6 +504,11 @@ public class Projectile : MonoBehaviour {
                 return;
             }
             collision.GetComponent<Trap>().TakeDamage(dmg);
+        }else if(collision.tag == "Dummy")
+        {
+            print("BAKA");
+            GameManager.gm.OnHitEnemy();
+            Destroy(gameObject);
         }
     }
 

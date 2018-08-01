@@ -5,7 +5,7 @@ using UnityEngine;
 public class SweetSpot : MonoBehaviour {
     public GameObject owner;
     public GameObject onHitParticleEffectPrefab;
-    public int ssid; // sweet spot id (for determining placement of particle effect)
+    //public int ssid; // sweet spot id (for determining placement of particle effect)
 	// Use this for initialization
 	void Start () {
 		
@@ -18,14 +18,14 @@ public class SweetSpot : MonoBehaviour {
 
     public void TakeDamage(GameObject source)
     {
-        if(source.tag == "Projectile")
+        GameObject particleEffect = Instantiate(onHitParticleEffectPrefab);
+        particleEffect.transform.position = transform.position;//owner.transform.Find("ParticleEffectPlaceHolders").GetChild(ssid).position;
+        if (source.tag == "Projectile")
         {
             Projectile p = source.GetComponent<Projectile>();
-            GameObject particleEffect = Instantiate(onHitParticleEffectPrefab);
-            particleEffect.transform.position = transform.position;//owner.transform.Find("ParticleEffectPlaceHolders").GetChild(ssid).position;
-            if(owner.tag == "Enemy")
+            PlayerController pc = GameManager.gm.player.GetComponent<PlayerController>();
+            if (owner.tag == "Enemy")
             {
-                PlayerController pc = GameManager.gm.player.GetComponent<PlayerController>();
                 
                 Enemy e = owner.GetComponent<Enemy>();
                 if (p.ownerID == pc.id)
@@ -46,6 +46,10 @@ public class SweetSpot : MonoBehaviour {
                 // If not using online feature, inflict damage to enemy
                 //e.TakeDamageFrom(dmg, ownerType, ownerID);
                 e.TakeDamageFrom(2*p.dmg,p.ownerType, p.ownerID);
+            }else if(owner.tag == "Dummy")
+            {
+                if(p.ownerID == pc.id)
+                    GameManager.gm.OnHitEnemy();
             }
             print("SWEETSPOT HAS BEEN HIT");
         }

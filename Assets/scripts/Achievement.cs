@@ -129,7 +129,7 @@ public class Achievement {
     }
 
     // Returns true if conditions are met to show progress details of achievement, false otherwise
-    public static bool CanShowProgress(AchievementType type, int achievementID, int scoreType=-1)
+    public static bool CanShowProgress(AchievementType type, int achievementID, int scoreType = -1)
     {
         switch (type)
         {
@@ -181,12 +181,53 @@ public class Achievement {
         return true;
         //return (type == AchievementType.Cumulative) ? cumulativeScoreAchievements[scoreType][achievementID].hideIfNoProgress && : conditionalAchievements[achievementID].hideIfNoProgress;
     }
-    
-    bool CanShowProgressByAchievementType(int achievementID)
+
+    // Returns whether or not item used for record is enabled or not
+    public static bool IsItemActive(AchievementType type, int achievementID, int scoreType = -1)
     {
-        
-        return false;
+        switch (type)
+        {
+            //case AchievementType.BestScore:
+            //    return !bestScoreAchievements[achievementID].hideIfNoProgress;
+            //    break;
+            //case AchievementType.Conditional:
+                //return true;
+                // show progress if we don't need to hide at all OR if we have made progress
+            //    return !conditionalAchievements[achievementID].hideIfNoProgress || GetQuestProgressPercentage(achievementID) > 0;
+            //    break;
+            case AchievementType.Cumulative:
+                //return true;
+                bool madeProgress = false;
+                switch (scoreType)
+                {
+                    // kills by enemy
+                    case 0:
+                        break;
+                    //  kills by arrow attribute
+                    case 1:
+                        return Projectile.enableArrows[achievementID];
+                    // arrows shot by attribute
+                    case 2:
+                        return Projectile.enableArrows[achievementID];
+                    // weak spots hit by enemy
+                    case 3:
+                        break;
+                    // weapons used by game
+                    case 4:
+                        return Weapon.enableWeps[achievementID];
+                    // enemy kill count per weapon
+                    case 5:
+                        return Weapon.enableWeps[achievementID];
+                    // weak spots hit per weapon
+                    case 6:
+                        return Weapon.enableWeps[achievementID];
+                }
+                break;
+        }
+        return true;
+        //return (type == AchievementType.Cumulative) ? cumulativeScoreAchievements[scoreType][achievementID].hideIfNoProgress && : conditionalAchievements[achievementID].hideIfNoProgress;
     }
+
 
     // Handles fetching the returned detail for best score achievements
     static string GetBestScoreAchievementDetails(int achievementID)

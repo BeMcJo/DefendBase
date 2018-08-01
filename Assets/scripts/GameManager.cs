@@ -271,6 +271,7 @@ public class GameManager : MonoBehaviour {
                       firework, // particle effect for victory
                       achievementsCanvas, // Displays player achievements/records
                       inGameWepItemUI, // Details of player's weapon stats in game
+                      targetContainer, // contains targets available during intermission
                       waveNotification; // Notifies player that enemies will spawn
 
     public Text scoreTxt; // Indicates how awesome you are
@@ -934,6 +935,7 @@ public class GameManager : MonoBehaviour {
             for (int i = 0; i < Achievement.cumulativeScoreAchievements[j].Length; i++)
             {
                 itemUI = Instantiate(achievementUIPrefab);
+                itemUI.SetActive(Achievement.IsItemActive(AchievementType.Cumulative, i,j));
                 itemUI.transform.SetParent(achievementsContainer);
                 itemUI.transform.localScale = new Vector3(1, 1, 1);
                 itemUI.transform.Find("HideProgress").gameObject.SetActive(!Achievement.CanShowProgress(AchievementType.Cumulative, i, j));
@@ -1004,7 +1006,7 @@ public class GameManager : MonoBehaviour {
 
         firework = GameObject.Find("Firework");
         firework.SetActive(false);
-
+        targetContainer = GameObject.Find("TargetContainer");
         intermissionCanvas = GameObject.Find("IntermissionCanvas");
         // If online, make sure everyone is ready to start next wave on intermission
         if (NetworkManager.nm.isStarted)
@@ -1099,7 +1101,7 @@ public class GameManager : MonoBehaviour {
 
         shopCanvas = GameObject.Find("ShopCanvas");
         shopCanvas.transform.Find("CloseBtn").GetComponent<Button>().onClick.AddListener(ToggleShopCanvas);
-        shopCanvas.transform.Find("CloseBtn").GetComponent<Button>().onClick.AddListener(ToggleIntermissionCanvas);
+        //shopCanvas.transform.Find("CloseBtn").GetComponent<Button>().onClick.AddListener(ToggleIntermissionCanvas);
         Transform btns1 = shopCanvas.transform.Find("ButtonContainer1");
         btns1.Find("StoreBtn").GetComponent<Button>().onClick.AddListener(DisplayStoreSelection);
         btns1.Find("UpgradeBtn").GetComponent<Button>().onClick.AddListener(DisplayUpgradeSelection);
@@ -2092,12 +2094,14 @@ public class GameManager : MonoBehaviour {
         if (multiplayerCanvas.activeSelf)
             GameObject.Find("BackgroundCanvas").transform.Find("Header").Find("Text").GetComponent<Text>().text = "Multiplayer";
     }
-
+    /*
     public void ToggleIntermissionCanvas()
     {
         intermissionCanvas.SetActive(!intermissionCanvas.activeSelf);
+        print(intermissionCanvas.activeSelf);
+        targetContainer.SetActive(intermissionCanvas.activeSelf);
     }
-
+    */
     public void UpdateKillCount(int kills)
     {
         data.totalKills += kills;
@@ -2127,6 +2131,7 @@ public class GameManager : MonoBehaviour {
     {
         intermissionCanvas.GetComponent<Canvas>().sortingOrder = playerStatusCanvas.GetComponent<Canvas>().sortingOrder - 1;
         intermissionCanvas.SetActive(false);
+        targetContainer.SetActive(false);
         StartWave(data.wave);
     }
 
@@ -2137,6 +2142,7 @@ public class GameManager : MonoBehaviour {
         onIntermission = true;
         startWaves = false;
         intermissionCanvas.SetActive(true);
+        targetContainer.SetActive(true);
         //intermissionCanvas.transform.Find("StatsTxt").GetComponent<Text>().text = "Score: " + score + "\tKills: " + totalKills + "\nNext Wave: " + (wave + 1);
         //intermissionCanvas.transform.Find("ShopBtn").GetComponent<Button>().interactable = false;// wave % 10 == 0;
         if (NetworkManager.nm.isStarted && NetworkManager.nm.isHost)
