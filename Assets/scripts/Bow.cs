@@ -193,7 +193,6 @@ public class Bow : Weapon
             return charging;
         }
         // Using Touch Interactive. Check if object we touch is arrow tail
-        RaycastHit2D hitInfo = Physics2D.Raycast(t.position, user.playerCam.transform.forward);
         RaycastHit hit;
         Ray ray = user.playerCam.ScreenPointToRay(t.position);
         // If we are touching arrow tail

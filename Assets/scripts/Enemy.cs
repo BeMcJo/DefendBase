@@ -454,7 +454,7 @@ public class Enemy : MonoBehaviour
             if (dist <= .3f)
             {
                 //print("CHANGE PATH");
-                PlatformPath p = target.transform.GetComponent<PlatformPath>();
+                //PlatformPath p = target.transform.GetComponent<PlatformPath>();
                 target = null;
 
                 curTarget++;
@@ -822,7 +822,7 @@ public class Enemy : MonoBehaviour
             return;
         }
         // Check if touching ground
-        if (collision.gameObject.tag == "Ground" || collision.gameObject.tag == "Path");
+        if (collision.gameObject.tag == "Ground" || collision.gameObject.tag == "Path")
         {
             //print("GRND");
             grounds.Add(collision.gameObject);

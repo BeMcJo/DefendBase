@@ -13,7 +13,8 @@ public class MapManager : MonoBehaviour {
     public Dictionary<int, List<List<GameObject>>> pathsBySpawnPoint; // List of paths given a map and based on the starting points
     public Dictionary<int, GameObject> platforms; // Keeps track of Platforms by their ID
     private bool createdMap; // Used to denote if map is done creating
-	// Use this for initialization
+	
+    // Use this for initialization
 	void Start () {
         if(mapManager != null)
         {

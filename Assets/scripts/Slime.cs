@@ -31,7 +31,7 @@ public class Slime : Enemy {
             return;
         }
         // Check if touching ground
-        if (collision.gameObject.tag == "Ground" || collision.gameObject.tag == "Path") ;
+        if (collision.gameObject.tag == "Ground" || collision.gameObject.tag == "Path") 
         {
             //print("GRND");
             grounds.Add(collision.gameObject);

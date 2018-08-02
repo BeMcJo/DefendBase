@@ -42,16 +42,6 @@ public class StatusIndicator : MonoBehaviour {
             healthBarGauge.transform.localEulerAngles += new Vector3(0, 180, 0);
             healthTxt.transform.localEulerAngles += new Vector3(0, 180, 0);
         }
-        float objHeight = 1;
-
-        if(target.tag == "Enemy")// && target.name.Contains("slime"))
-        {
-            objHeight = 1;// target.transform.Find("EnemyObject").localScale.y;
-        }
-        else
-        {
-            objHeight = target.transform.localScale.y;
-        }
 
         // Update health bar based on target's health
         /*

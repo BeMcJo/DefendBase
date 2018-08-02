@@ -70,9 +70,7 @@ public class NetworkManager : MonoBehaviour {
     // Max number of host connections
     private const int MAX_CONNECTION = 100;
     private const int MAX_PLAYERS = 2; // for performance only 2 players // 4;
-    // Keep as is
-    private int SERVER_PORT = 5920,
-                CLIENT_PORT = 5919;
+   
     // Keep these as is
     public int broadcastPort = 47777;
     public int broadcastKey = 1000;
@@ -82,7 +80,6 @@ public class NetworkManager : MonoBehaviour {
     private int hostID; // Keeps track of the hostID
     // Unused?
     private int recHostID;
-    private int webHostID;
     
     private Host connectedHost; // Keep track of our host
 
@@ -106,10 +103,6 @@ public class NetworkManager : MonoBehaviour {
     public bool isSpawningObject;
 
     public Dictionary<int, Player> players = new Dictionary<int, Player>(); // cnnID -> Player
-    //Unused
-    private Dictionary<int, int> client2player = new Dictionary<int, int>(); // cnnID -> Player Order Pos
-    //Unused
-    private Dictionary<int, int> player2client = new Dictionary<int, int>(); // Player Order Pos -> cnnID
 
     // Ideally remove player if timeout too long
     private Dictionary<int, float> playerDC = new Dictionary<int, float>(); // Player Order Pos -> DC timer
@@ -855,7 +848,6 @@ public class NetworkManager : MonoBehaviour {
                 string msg = Encoding.Unicode.GetString(recBuffer, 0, dataSize);
                 string[] splitData = msg.Split('|');
                 int logID;
-                int cnnID;
                 switch (splitData[0])
                 {
                     // Someone changed their arrow attribute

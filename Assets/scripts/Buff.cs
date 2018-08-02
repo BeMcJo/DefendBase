@@ -53,12 +53,6 @@ public class Buff : MonoBehaviour {
             Destroy(cond);
         }
         Destroy(buffDurationUI);
-        switch (buffName)
-        {
-            case "frozen":
-                GameManager.gm.UnfreezePlayer();
-                break;
-        }
     }
 
     // Update is called once per frame
@@ -76,8 +70,10 @@ public class Buff : MonoBehaviour {
     // Adds condition needed to satisfy in order to remove buff (an InteractiveUI)
     public void AddCondition(GameObject cond)
     {
-        cond.transform.SetParent(GameManager.gm.interactiveUIContainer.transform);
-        cond.transform.localPosition = new Vector2(0, 0);
+        //cond.transform.SetParent(GameManager.gm.interactiveUIContainer.transform);
+        //cond.transform.localPosition = new Vector2(0, 0);
+        //cond.transform.localScale = new Vector3(1, 1, 1);
+        cond.SetActive(true);
         cond.GetComponent<InteractiveUI>().owner = this;
         conditions.Add(cond);
     }
@@ -85,12 +81,19 @@ public class Buff : MonoBehaviour {
     public void RemoveCondition(GameObject cond)
     {
         print("removeing condition");
+        cond.SetActive(false);
         conditions.Remove(cond);
-        Destroy(cond);
+        //Destroy(cond);
         if (conditions.Count == 0)
         {
             print("CONDITIONS ALL MET REMOVE BUFF " + buffID + " ," + buffType);
             player.RemoveBuff(this);
+            switch (buffName)
+            {
+                case "frozen":
+                    GameManager.gm.UnfreezePlayer();
+                    break;
+            }
         }
     }
 
@@ -113,9 +116,11 @@ public class Buff : MonoBehaviour {
         {
             // can't perform actions
             case 1:
-                GameObject interactiveUI = Instantiate(GameManager.gm.interactiveUIPrefabs[0]);
+                GameObject interactiveUI = GameManager.gm.interactiveUIContainer.transform.Find("Ice Shard (UI)").gameObject;// Instantiate(GameManager.gm.interactiveUIPrefabs[0]);
+                
                 AddCondition(interactiveUI);
-                interactiveUI.transform.localScale = new Vector3(1, 1, 1);
+                //interactiveUI.transform.GetComponent<RectTransform>().offsetMin = new Vector2(0, 0);
+                //interactiveUI.transform.GetComponent<RectTransform>().offsetMax = new Vector2(1, 1);
                 break;
         }
     }

@@ -20,13 +20,6 @@ public class PlayerController : MonoBehaviour {
     private Quaternion rot,startRot; // Used for orienting your perspective
     public float prevXAngle, // Used for limiting how far you can look down
                  maxLookDownLimit; // Limit on how far your look down
-    // PC purpose?
-    private Transform bulletSpawn;
-    public GameObject bulletPrefab;
-    public GameObject chargeBarGuage, chargeBar;
-    private bool charging;
-    private float chargePower, chargeAccelerator;
-    private int chargeBarAlt = 1;
 
     public Weapon wep; // Weapon player is currently holding and using
     //Vector3 rotation;
@@ -38,8 +31,6 @@ public class PlayerController : MonoBehaviour {
 
     // Use this for initialization
 	void Start () {
-        charging = false;
-        bulletSpawn = playerCam.transform.Find("BulletSpawn");
         prevXAngle = 0;
         maxLookDownLimit = 60f;
         Screen.orientation = ScreenOrientation.Landscape;
@@ -272,22 +263,10 @@ public class PlayerController : MonoBehaviour {
         }
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            charging = true;
-            chargePower = 0;
-            chargeBarGuage.SetActive(true);
-            chargeBar.transform.localScale = new Vector3(0, 0, 0);
-            chargeBarAlt = 1;
-            chargeAccelerator = 0;
+            
         }
         if (Input.GetKeyUp(KeyCode.Space))
         {
-            charging = false;
-            chargeBarGuage.SetActive(false);
-
-            GameObject bullet = Instantiate(bulletPrefab);
-
-            bullet.transform.position = bulletSpawn.transform.position;
-            bullet.transform.GetComponent<Rigidbody>().AddForce(transform.GetChild(0).forward * chargePower * 1000);
         }
 
     }

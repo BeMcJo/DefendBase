@@ -135,12 +135,10 @@ public class Achievement {
         {
             case AchievementType.BestScore:
                 return !bestScoreAchievements[achievementID].hideIfNoProgress;
-                break;
             case AchievementType.Conditional:
                 //return true;
                 // show progress if we don't need to hide at all OR if we have made progress
                 return !conditionalAchievements[achievementID].hideIfNoProgress || GetQuestProgressPercentage(achievementID) > 0;
-                break;
             case AchievementType.Cumulative:
                 //return true;
                 bool madeProgress = false;
@@ -176,7 +174,6 @@ public class Achievement {
                         break;
                 }
                 return !cumulativeScoreAchievements[scoreType][achievementID].hideIfNoProgress || madeProgress;
-                break;
         }
         return true;
         //return (type == AchievementType.Cumulative) ? cumulativeScoreAchievements[scoreType][achievementID].hideIfNoProgress && : conditionalAchievements[achievementID].hideIfNoProgress;
@@ -197,7 +194,6 @@ public class Achievement {
             //    break;
             case AchievementType.Cumulative:
                 //return true;
-                bool madeProgress = false;
                 switch (scoreType)
                 {
                     // kills by enemy

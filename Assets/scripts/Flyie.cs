@@ -202,8 +202,6 @@ public class Flyie : Enemy {
         //    if (actionPerformed == "move")
         //    {
                 Turn();
-                Vector2 targetPos2d = new Vector2(targetPos.x, targetPos.z);
-                Vector2 pos2d = new Vector2(transform.position.x, transform.position.z);
         //print("moving" + id + ",..." + Vector2.Distance(targetPos2d, pos2d));
        
                 transform.position = Vector3.MoveTowards(transform.position, targetPos, effectiveMoveSpd);

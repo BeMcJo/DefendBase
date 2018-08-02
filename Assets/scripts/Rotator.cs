@@ -14,7 +14,6 @@ public class Rotator : MonoBehaviour, IPointerDownHandler, IPointerUpHandler,IDr
           rotateVelocity,
           rotateSpd = 1,
           rotateFriction = .8f;
-    bool reached45deg =false;
     public bool isTouched = false,
                 isDragging;
     public bool isInteractable;
@@ -127,8 +126,7 @@ public class Rotator : MonoBehaviour, IPointerDownHandler, IPointerUpHandler,IDr
             }
 
         }
-
-        float dist = Vector2.Distance(initialPos, touchPos);
+        
         float offset = dir * angle * dragSpd;
         wheel.localEulerAngles = new Vector3(0, 0, offset + initialAngle);
 

@@ -330,6 +330,7 @@ public class GameManager : MonoBehaviour {
                      playerFreezeSFX;
     //public List<AudioClip> 
     public AudioSource audioSrc;
+    public List<AudioSource> inGameAudio, outOfGameAudio;
 
     Transform notificationContainer; // holds list of notifications
 
@@ -555,6 +556,8 @@ public class GameManager : MonoBehaviour {
         interactiveTouch = false;
         traps = new Dictionary<int, Trap>();
         myTraps = new Dictionary<int, int>();
+        inGameAudio = new List<AudioSource>();
+        outOfGameAudio = new List<AudioSource>();
         //myAttributes = new Dictionary<int, int>();
         myProjectiles = new Dictionary<int, int>();
         myDefenses = new Dictionary<int, int>();
@@ -618,6 +621,14 @@ public class GameManager : MonoBehaviour {
 
     public void LoadMainScene()
     {
+        for(int i = 0; i < inGameAudio.Count; i++)
+        {
+            if(inGameAudio[i] != null)
+            {
+                Destroy(inGameAudio[i]);
+            }
+        }
+        inGameAudio.Clear();
         Load("continuedGame");
         Load("setupMain");
         Load("arrowQuantity");
@@ -749,7 +760,6 @@ public class GameManager : MonoBehaviour {
         // Set up weapon section
         Transform UIContainer = inventoryItemPanel.transform.Find("WeaponsUIContainer");
         //UIContainer.transform.localPosition = new Vector3(0, -1000, 0);
-        ContentSizeFitter csf = UIContainer.GetComponent<ContentSizeFitter>();
         GameObject itemUI, scoreObj, unlockObj;
         for (int i = 0; i < Weapon.weaponStats.Length; i++)
         {
@@ -978,6 +988,14 @@ public class GameManager : MonoBehaviour {
     // Load game scene. If there was any saved game progress, remove it
     public void LoadGameScene()
     {
+        for(int i = 0; i < outOfGameAudio.Count; i++)
+        {
+            if(outOfGameAudio[i] != null)
+            {
+                Destroy(outOfGameAudio[i]);
+            }
+        }
+
         // don't remove saved state if playing multiplayer
         if(!NetworkManager.nm.isStarted)
             Save("continuedGame"); // Removes saved game progress
@@ -994,7 +1012,7 @@ public class GameManager : MonoBehaviour {
         //totalKills = 0;
         //////////////////////////
         //print("player orient:" + playerOrientation);
-
+        outOfGameAudio.Clear();
         Enemy.EnemyCount = 0;
         Objective.ObjectiveCount = 0;
         Weapon.WeaponCount = 0;
@@ -1142,8 +1160,7 @@ public class GameManager : MonoBehaviour {
         itemWheel.SetActive(false);
 
         itemDropdownList = quickAccessCanvas.transform.Find("ArrowItemList").Find("ItemDropdownList").Find("ItemContainer").gameObject;//GetChild(0).gameObject;
-        ContentSizeFitter csf = itemDropdownList.GetComponent<ContentSizeFitter>();
-        //quickAccessCanvas.SetActive(false);
+
         effectsCanvas = GameObject.Find("EffectsCanvas");
 
         notificationCanvas = GameObject.Find("NotificationCanvas");
@@ -1158,7 +1175,6 @@ public class GameManager : MonoBehaviour {
         //myAttributes.Clear();
 
         //Attribute.names = new string[attributePrefabs.Length];
-        Color borderColor = new Color(20f/255, 14f/255 , 128f/255);
 
         // Add all attributes to inventory and instantiate them
         for(int i = 0; i < Projectile.projectileStats.Length; i++)
@@ -1625,21 +1641,24 @@ public class GameManager : MonoBehaviour {
         }
     }
 
-    // Checks if clip is still playing
-    public bool IsClipFinished(AudioSource audio)
-    {
-        return audio.time >= audio.clip.length;
-    }
-
     public IEnumerator PlaySFX(AudioClip clip)
     {
         AudioSource audio = gameObject.AddComponent<AudioSource>();
+        if (inGame)
+        {
+            inGameAudio.Add(audio);
+        }
+        else
+        {
+            outOfGameAudio.Add(audio);
+        }
         audio.clip = clip;
         //if (clip == btnClickSFX)
         //    audio.volume = .5f;
         audio.Play();
-        yield return new WaitWhile(() => audio.isPlaying);//2);//IsClipFinished(audio));
-        Destroy(audio);
+        yield return new WaitWhile(() => audio != null && audio.isPlaying);//2);//IsClipFinished(audio));
+        if(audio)
+            Destroy(audio);
         //yield return new WaitForSeconds(0);
         //Destroy(audio,audio.clip.length);
     }
@@ -1767,7 +1786,6 @@ public class GameManager : MonoBehaviour {
 
         // Show Eng Game Results Notification
         Transform stats = resultNotification.transform.Find("StatisticsMask").GetChild(0).Find("StatisticsContainer");
-        PlayerController pc = player.GetComponent<PlayerController>();
         if (won)
         {
             StartCoroutine(PlaySFX(victorySFX));
@@ -2185,8 +2203,9 @@ public class GameManager : MonoBehaviour {
 
     public void LeaveGame()
     {
-        if(waveNotificationCoroutine != null)
-            StopCoroutine(waveNotificationCoroutine);
+        StopAllCoroutines();
+        //if(waveNotificationCoroutine != null)
+        //    StopCoroutine(waveNotificationCoroutine);
         GoToMainScene();
     }
 
@@ -2846,7 +2865,6 @@ public class GameManager : MonoBehaviour {
     {
         //mapUICanvas.SetActive(selectedDefense == null);
         //playerStatusCanvas.SetActive(selectedDefense == null);
-        bool selectedUI = false;
         // Check to see if any finger touch ID is valid for selecting defense
         for (int i = 0; i < Input.touchCount; i++)
         {

@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class DamageIndicator : MonoBehaviour {
     public float timeToLive = .7f;
-    AudioSource audio;
+    //AudioSource audio;
 	// Use this for initialization
 	void Start () {
     }

@@ -114,7 +114,6 @@ public class MapViewCamera : MonoBehaviour {
         {
             return;
         }
-        int touchCt = 0;
         List<int> touches = new List<int>();
         for (int i = 0; i < touchIDs.Length; i++)
         {

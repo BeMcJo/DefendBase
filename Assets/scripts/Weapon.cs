@@ -411,8 +411,8 @@ public abstract class Weapon : MonoBehaviour
     // Extract network information
     public virtual void SetNetworkInformation(string[] data)
     {
-        bool inUse = bool.Parse(data[1]);
-        float chargePower = float.Parse(data[2]);
+        //bool inUse = bool.Parse(data[1]);
+        //float chargePower = float.Parse(data[2]);
     }
 
     // Handles the beginning of weapon usage for online feature

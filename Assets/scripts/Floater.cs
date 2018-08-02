@@ -25,11 +25,11 @@ public class Floater : MonoBehaviour {
     };
 
     int rewardType; // determines which reward to provide
-    AudioSource audio; // plays sound effect based on reward
+    //AudioSource audio; // plays sound effect based on reward
 	// Use this for initialization
 	void Start () {
         rb = GetComponent<Rigidbody>();
-        audio = GetComponent<AudioSource>();
+        //audio = GetComponent<AudioSource>();
         biasedDir = new Vector3(Random.Range(-.5f, 0.5f) / 5, Random.Range(0, 0.5f), Random.Range(-.5f, 0.5f)/5);
         biasedTorq = new Vector3(Random.Range(-.5f, 0.5f), Random.Range(-.5f, 0.5f), Random.Range(-.5f, 0.5f));
         rb.AddForce(biasedDir* Random.Range(20,250));
