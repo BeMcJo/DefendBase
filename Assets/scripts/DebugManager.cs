@@ -32,7 +32,7 @@ public class DebugManager : MonoBehaviour {
             fps = frameCount / dt;
             frameCount = 0;
             dt -= 1.0 / updateRate;
-            transform.Find("Canvas").Find("Text").GetComponent<Text>().text = "FPS:" + fps;
+            transform.Find("Canvas").Find("Text").GetComponent<Text>().text = "FPS:" + fps.ToString("F1");
         }
     }
 

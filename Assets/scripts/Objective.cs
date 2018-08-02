@@ -99,6 +99,7 @@ public class Objective : MonoBehaviour {
         
         if (HP > maxHP)
         {
+            GameManager.gm.UpdateScore(50 * (HP % maxHP)); // bonus points for each hp more than max
             HP = maxHP;
         }
 

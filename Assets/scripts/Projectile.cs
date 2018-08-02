@@ -229,10 +229,13 @@ public class Projectile : MonoBehaviour {
             if (attributeID != 2)
             {
                 deflected = true;
+                Destroy(gameObject);
+                /*
                 transform.GetComponent<Rigidbody>().velocity = Vector3.zero;
                 transform.GetComponent<Rigidbody>().useGravity = false;
                 tr.enabled = false;
                 transform.SetParent(collision.transform);
+                */
             }
         }
 
@@ -266,10 +269,14 @@ public class Projectile : MonoBehaviour {
                 else if (attributeID != 2)
                 {
                     deflected = true;
+
+                    Destroy(gameObject);
+                    /*
                     transform.GetComponent<Rigidbody>().velocity = Vector3.zero;
                     transform.GetComponent<Rigidbody>().useGravity = false;
                     tr.enabled = false;
                     transform.SetParent(collision.transform);
+                    */
                 }
 
             }
@@ -369,10 +376,13 @@ public class Projectile : MonoBehaviour {
             if (attributeID != 2)
             {
                 deflected = true;
+                Destroy(gameObject);
+                /*
                 transform.GetComponent<Rigidbody>().velocity = Vector3.zero;
                 transform.GetComponent<Rigidbody>().useGravity = false;
                 tr.enabled = false;
                 transform.SetParent(collision.transform);
+                */
             }
             if (ss.owner.tag == "Dummy")
                 return;
@@ -413,10 +423,13 @@ public class Projectile : MonoBehaviour {
                 if (attributeID != 2)
                 {
                     deflected = true;
+                    Destroy(gameObject);
+                    /*
                     transform.GetComponent<Rigidbody>().velocity = Vector3.zero;
                     transform.GetComponent<Rigidbody>().useGravity = false;
                     tr.enabled = false;
                     transform.SetParent(collision.transform);
+                    */
                 }
                 if (attributeID == 1)
                 {

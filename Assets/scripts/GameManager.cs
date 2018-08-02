@@ -1109,10 +1109,13 @@ public class GameManager : MonoBehaviour {
         string isOn = "ON";
         if (!interactiveTouch)
             isOn = "OFF";
-        settingsPanel.transform.Find("InteractiveTouchBtn").GetChild(0).GetComponent<Text>().text = "Interactive Touch: " + isOn;
-        settingsPanel.transform.Find("InteractiveTouchBtn").GetComponent<Button>().onClick.AddListener(ToggleInteractiveTouch);
-        settingsPanel.transform.Find("InteractiveTouchBtn").gameObject.SetActive(false);
+        //settingsPanel.transform.Find("InteractiveTouchBtn").GetChild(0).GetComponent<Text>().text = "Interactive Touch: " + isOn;
+        //settingsPanel.transform.Find("InteractiveTouchBtn").GetComponent<Button>().onClick.AddListener(ToggleInteractiveTouch);
+        //settingsPanel.transform.Find("InteractiveTouchBtn").gameObject.SetActive(false);
 
+        settingsPanel.transform.Find("ShowFPSBtn").GetComponent<Button>().onClick.AddListener(ToggleDebugging);
+        settingsPanel.transform.Find("ShowFPSBtn").GetChild(0).GetComponent<Text>().text = "Show FPS: " + ((Debugging) ? "ON":"OFF");//GetComponent<Button>().onClick.AddListener(ToggleDebugging);
+        //settingsPanel.transform.Find("ShowFPSBtn").GetComponent<Button>().onClick.AddListener(NotifyButtonPressed);
 
         settingsPanel.SetActive(false);
         optionsCanvas.SetActive(false);
@@ -1657,8 +1660,18 @@ public class GameManager : MonoBehaviour {
         //    audio.volume = .5f;
         audio.Play();
         yield return new WaitWhile(() => audio != null && audio.isPlaying);//2);//IsClipFinished(audio));
-        if(audio)
+        if (audio)
+        {
+            if (inGame)
+            {
+                inGameAudio.Remove(audio);
+            }
+            else
+            {
+                outOfGameAudio.Remove(audio);
+            }
             Destroy(audio);
+        }
         //yield return new WaitForSeconds(0);
         //Destroy(audio,audio.clip.length);
     }
@@ -2005,7 +2018,7 @@ public class GameManager : MonoBehaviour {
         if (!Debugging)
             isOn = "OFF";
         DebugManager.dbm.SetDebugMode(Debugging);
-        settingsCanvas.transform.Find("ButtonsContainer").Find("DebugBtn").GetChild(0).GetComponent<Text>().text = "Debug Mode: " + isOn;
+        optionsCanvas.transform.Find("SettingsPanel").Find("ShowFPSBtn").GetChild(0).GetComponent<Text>().text = "Show FPS: " + isOn;
     }
 
     public void ToggleInteractiveTouch()
