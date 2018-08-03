@@ -12,7 +12,7 @@ public class MapViewCamera : MonoBehaviour {
     public float moveSpd = .01f, zoomSpd = .1f;
     public float maxZoomIn = 4f, maxZoomOut = 75, defaultZoom = 50;
     public float horizExtent, vertExtent, mapX, mapY, minX, minY, maxX, maxY;
-    public bool playerCam, canZoom;
+    public bool playerCam, canZoom,zoomIn;
 	// Use this for initialization
 	void Start () {
         mapCam = transform.GetComponent<Camera>();
@@ -27,12 +27,19 @@ public class MapViewCamera : MonoBehaviour {
         maxX = -mapX / 2 + horizExtent;
         minY = -vertExtent + mapY / 2;
         maxY = -mapY / 2 + vertExtent;
+        zoomIn = false;
     }
 
     public void Reset()
     {
         if(touchIDs != null)
             touchIDs[0] = touchIDs[1] = -1;
+    }
+
+    public bool ToggleZoom()
+    {
+        zoomIn = !zoomIn;
+        return zoomIn;
     }
 
     private void LateUpdate()
@@ -59,10 +66,10 @@ public class MapViewCamera : MonoBehaviour {
         //pos.z = Mathf.Clamp(pos.z, minY, maxY);
         transform.localPosition = pos;
     }
-    // Update is called once per frame
-    void Update() {
-        if (playerCam && !canZoom)
-            return;
+
+    // use touchscreen to zoom in or out
+    void ManualZoom()
+    {
         for (int i = 0; i < Input.touchCount; i++)
         {
             //Debug.Log(1);
@@ -84,7 +91,7 @@ public class MapViewCamera : MonoBehaviour {
                 }
                 else
                 {
-                   // Debug.Log(1);
+                    // Debug.Log(1);
                 }
                 for (int j = 0; j < touchIDs.Length; j++)
                 {
@@ -102,7 +109,7 @@ public class MapViewCamera : MonoBehaviour {
                 {
                     if (touchIDs[j] == t.fingerId)
                     {
-                        if(touchIDs[j] == moveID)
+                        if (touchIDs[j] == moveID)
                             moveID = -1;
                         touchIDs[j] = -1;
                         break;
@@ -120,7 +127,7 @@ public class MapViewCamera : MonoBehaviour {
             if (touchIDs[i] != -1)
                 touches.Add(touchIDs[i]);
         }
-        if(!playerCam && touches.Count == 1)
+        if (!playerCam && touches.Count == 1)
         {
             for (int i = 0; i < Input.touchCount; i++)
             {
@@ -149,12 +156,12 @@ public class MapViewCamera : MonoBehaviour {
         else if (touches.Count == 2)
         {
             List<Vector2> positions = new List<Vector2>();
-            for(int i = 0;i <Input.touchCount; i++)
+            for (int i = 0; i < Input.touchCount; i++)
             {
                 Touch t = Input.GetTouch(i);
-                for(int j = 0; j < touches.Count; j++)
+                for (int j = 0; j < touches.Count; j++)
                 {
-                    if(touches[j] == t.fingerId)
+                    if (touches[j] == t.fingerId)
                     {
                         positions.Add(t.position);
                         break;
@@ -189,5 +196,22 @@ public class MapViewCamera : MonoBehaviour {
         {
             prevDist = 0;
         }
-	}
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        if (playerCam && !canZoom)
+            return;
+        //ManualZoom();
+        
+        // zoom in or out based on toggle option
+        int alt = (zoomIn) ? -1 : 1;
+        mapCam.fieldOfView += alt * zoomSpd;
+        if (mapCam.fieldOfView <= maxZoomIn)
+            mapCam.fieldOfView = maxZoomIn;
+        if (mapCam.fieldOfView >= maxZoomOut)
+            mapCam.fieldOfView = maxZoomOut;
+
+    }
 }

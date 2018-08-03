@@ -35,7 +35,7 @@ public class Projectile : MonoBehaviour {
             50,
             15,
             UnlockCondition.QuestThenPurchase,
-            "Explode your targets!"
+            "Explode the enemies!"
             ),
         new ProjectileStats(
             "Piercing Arrow",
@@ -47,7 +47,7 @@ public class Projectile : MonoBehaviour {
         new ProjectileStats(
             "Bullet Arrow",
             50,
-            10,
+            15,
             UnlockCondition.QuestThenPurchase,
             "Shoots straight to the target!"
             ),
@@ -56,14 +56,14 @@ public class Projectile : MonoBehaviour {
             50,
             15,
             UnlockCondition.QuestThenPurchase,
-            "Creates a chilly explosion, freezing nearby enemies"
+            "Freeze the enemies!"
             ),
         new ProjectileStats(
             "Fire Arrow",
             50,
             7,
             UnlockCondition.QuestThenPurchase,
-            "Burn em all!!! AHAHAHA"
+            "Burn the enemies!"
             ),
 
     };
@@ -71,7 +71,7 @@ public class Projectile : MonoBehaviour {
         "Projectile",
         "Arrow"
     };
-    public static bool[] enableArrows = { true, true, false, true, true, true, true };
+    public static bool[] enableArrows = { true, true, false, false, true, true, true };
     public int id; // ID based on which player shot this object
     public float activeDuration = 10f; // How long before destroying object
     public float moveSpd = 6f;
@@ -376,7 +376,14 @@ public class Projectile : MonoBehaviour {
             if (attributeID != 2)
             {
                 deflected = true;
-                Destroy(gameObject);
+
+                if (attributeID == 3)
+                {
+                    deflected = true;
+                    Destroy(gameObject, 1f);
+                }
+                else
+                    Destroy(gameObject);
                 /*
                 transform.GetComponent<Rigidbody>().velocity = Vector3.zero;
                 transform.GetComponent<Rigidbody>().useGravity = false;
@@ -423,7 +430,13 @@ public class Projectile : MonoBehaviour {
                 if (attributeID != 2)
                 {
                     deflected = true;
-                    Destroy(gameObject);
+                    if (attributeID == 3)
+                    {
+                        deflected = true;
+                        Destroy(gameObject, 1f);
+                    }
+                    else
+                        Destroy(gameObject);
                     /*
                     transform.GetComponent<Rigidbody>().velocity = Vector3.zero;
                     transform.GetComponent<Rigidbody>().useGravity = false;
@@ -503,7 +516,7 @@ public class Projectile : MonoBehaviour {
             if (attributeID == 3)
             {
                 deflected = true;
-                Destroy(gameObject, 3f);
+                Destroy(gameObject, 1f);
             }
             else
                 Destroy(gameObject);
@@ -521,7 +534,12 @@ public class Projectile : MonoBehaviour {
         {
             print("BAKA");
             GameManager.gm.OnHitEnemy();
-            Destroy(gameObject);
+            if (attributeID == 3)
+            {
+                deflected = true;
+                Destroy(gameObject, 1f);
+            }else
+                Destroy(gameObject);
         }
     }
 

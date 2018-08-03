@@ -52,6 +52,7 @@ public class Bow : Weapon
             crosshair.SetParent(GameManager.gm.playerStatusCanvas.transform);
             crosshair.localScale = new Vector3(1, 1, 1);
             crosshair.localPosition = new Vector3(5,0,0);
+            crosshair.gameObject.SetActive(false);
         }
     }
 	

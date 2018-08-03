@@ -21,12 +21,14 @@ public class Condition
 {
     public int count; // requirement to be satisfied
     public int itemID; // ID of reward 
+    public int rewardQty; // amount of reward (for arrows)
     public string rewardType; // weapon, attribute, ...
-    public Condition(int count, int itemID, string rewardType)
+    public Condition(int count, int itemID, string rewardType, int rewardQty=0)
     {
         this.count = count;
         this.itemID = itemID;
         this.rewardType = rewardType;
+        this.rewardQty = rewardQty;
     }
 }
 
@@ -312,7 +314,7 @@ public class Achievement {
                 "",
                 true,
                 new Condition[] {
-                    new Condition(1000,1,"attribute")
+                    new Condition(1000,1,"attribute",20)
                 }
             ),
         // unlock fire arrow
@@ -321,7 +323,7 @@ public class Achievement {
                 "",
                 true,
                 new Condition[] {
-                    new Condition(2500,5,"attribute")
+                    new Condition(2500,5,"attribute",10)
                 }
             ),
         // unlock sniper bow
@@ -333,22 +335,24 @@ public class Achievement {
                     new Condition(7500,2,"weapon")
                 }
             ),
+        /*
         // unlock bullet arrow
         new Achievement(
                 "Hit 2,500 enemy weak spots using " + Weapon.weaponStats[2].name,
                 "",
                 true,
                 new Condition[] {
-                    new Condition(2500,3,"attribute")
+                    new Condition(2500,3,"attribute", 20)
                 }
             ),
+        */
         // unlock ice arrow
         new Achievement(
                 "Kill 1,500 Ice " + Enemy.names[2] +"s",
                 "",
                 true,
                 new Condition[] {
-                    new Condition(1500,4,"attribute")
+                    new Condition(1500,4,"attribute", 20)
                 }
             ),
 
@@ -554,7 +558,7 @@ public class Achievement {
             {
                 case "attribute":
                     int itemID = conditionalAchievements[achievementID].conditions[0].itemID;
-                    GameManager.gm.arrowQty.arr[itemID] += Projectile.projectileStats[itemID].purchaseQty;
+                    GameManager.gm.arrowQty.arr[itemID] += conditionalAchievements[achievementID].conditions[0].rewardQty;//Projectile.projectileStats[itemID].purchaseQty;
                     break;
                 case "weapon":
                     break;

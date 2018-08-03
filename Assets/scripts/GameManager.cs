@@ -307,7 +307,7 @@ public class GameManager : MonoBehaviour {
 
     // list of itcons to represent such items
     public Sprite[] arrowItemIcons, weaponItemIcons, currencyIcons;
-    public Sprite scoreIcon,repairIcon;
+    public Sprite scoreIcon,repairIcon, zoomInIcon,zoomOutIcon;
     public Texture[] borderIcons;
     //Button upgradeWepBtn;
     Coroutine blackoutCoroutine,
@@ -988,7 +988,10 @@ public class GameManager : MonoBehaviour {
     // Load game scene. If there was any saved game progress, remove it
     public void LoadGameScene()
     {
-        for(int i = 0; i < outOfGameAudio.Count; i++)
+
+        //personalData.equippedWep = 2;
+
+        for (int i = 0; i < outOfGameAudio.Count; i++)
         {
             if(outOfGameAudio[i] != null)
             {
@@ -1159,6 +1162,7 @@ public class GameManager : MonoBehaviour {
         changeArrowBtn = quickAccessCanvas.transform.Find("ChangeArrowsBtn").gameObject;
         quickAccessCanvas.transform.Find("UpgradeWepBtn").Find("WepIcon").GetComponent<Image>().sprite = weaponItemIcons[personalData.equippedWep];
         inGameWepItemUI = quickAccessCanvas.transform.Find("InGameWepItemUI").gameObject;
+        quickAccessCanvas.transform.Find("ZoomBtn").gameObject.SetActive(personalData.equippedWep == 2);//.Find("WepIcon").GetComponent<Image>().sprite = weaponItemIcons[personalData.equippedWep];
         itemWheel = quickAccessCanvas.transform.Find("ItemWheel").gameObject;
         itemWheel.SetActive(false);
 
@@ -1280,8 +1284,8 @@ public class GameManager : MonoBehaviour {
         addToMapBtn.transform.localPosition = new Vector3(200, 0, 0);
 
         StartCoroutine(MapManager.mapManager.LoadGameScene());
-        StartCoroutine(NetworkManager.nm.LoadGameScene()); 
-        
+        StartCoroutine(NetworkManager.nm.LoadGameScene());
+        //arrowQty.arr[3] = 9999;
         StartGame();
         // Create available defense icon for each trap
         GameObject b = Instantiate(buttonPrefab);
@@ -2160,9 +2164,8 @@ public class GameManager : MonoBehaviour {
 
     public void NextWave()
     {
-        intermissionCanvas.GetComponent<Canvas>().sortingOrder = playerStatusCanvas.GetComponent<Canvas>().sortingOrder - 1;
-        intermissionCanvas.SetActive(false);
-        targetContainer.SetActive(false);
+        //intermissionCanvas.SetActive(false);
+        //targetContainer.SetActive(false);
         StartWave(data.wave);
     }
 
@@ -2467,8 +2470,6 @@ public class GameManager : MonoBehaviour {
         {
             data = new PlayerData();
         }
-        //personalData.equippedWep = 2;
-
         //data.wave = 4;
 
         if (w == null)
@@ -2503,7 +2504,9 @@ public class GameManager : MonoBehaviour {
 
     public void StartWave(int w)
     {
+        intermissionCanvas.GetComponent<Canvas>().sortingOrder = playerStatusCanvas.GetComponent<Canvas>().sortingOrder - 1;
         intermissionCanvas.SetActive(false);
+        targetContainer.SetActive(false);
         onIntermission = false;
         ResetSpawnSetup(w);
         pattern = EnemySpawnPattern.patternsBySpawnPointCt[0][w % EnemySpawnPattern.patternsBySpawnPointCt[0].Count]; // Get spawn pattern for the wave
@@ -2768,6 +2771,12 @@ public class GameManager : MonoBehaviour {
         return Mathf.Acos(sumOfSquares / 2 / a / b) * Mathf.Rad2Deg;
     }
 
+    public void ToggleCameraZoom()
+    {
+        bool zoomOption = player.GetComponent<PlayerController>().ToggleCameraZoom();
+        quickAccessCanvas.transform.Find("ZoomBtn").Find("ZoomOptionIcon").GetComponent<Image>().sprite = (!zoomOption) ? zoomInIcon : zoomOutIcon;// Resources.Load<Sprite>("sprite/" + sprite);
+    }
+
     // Handle quick access actions (upgrade weapon or switch arrows) and other tap actions
     public void HandleQuickAccessActivities()
     {
@@ -2813,6 +2822,15 @@ public class GameManager : MonoBehaviour {
 
                             //mapUICanvas.SetActive(true);
                         }
+                        else if (selected.name == "ZoomBtn" && quickAccessDetail == "")
+                        {
+                            quickAccessDetail = "zoom";
+                            //print("change arrow");
+                            //itemWheel.SetActive(true);
+                            //itemWheel.transform.GetComponent<Rotator>().SetInteractable(true);
+
+                            //mapUICanvas.SetActive(true);
+                        }
                         /*else if (selected.name == "ItemWheel" && quickAccessDetail == "change" && mapFingerID == -1)
                         {
                            // print("????");
@@ -2820,7 +2838,7 @@ public class GameManager : MonoBehaviour {
                             initialAngle = quickAccessCanvas.transform.Find("ItemWheel").localEulerAngles.z;
                             initialPos = t.position;
                         }*/
-                        if(quickAccessDetail != "" && quickAccessFingerID == -1)
+                        if (quickAccessDetail != "" && quickAccessFingerID == -1)
                         {
                             quickAccessFingerID = t.fingerId;
                             quickAccessCanvas.GetComponent<Canvas>().sortingOrder = playerStatusCanvas.GetComponent<Canvas>().sortingOrder+1;
@@ -2860,6 +2878,10 @@ public class GameManager : MonoBehaviour {
                             //itemWheel.transform.GetComponent<Rotator>().SetInteractable(false);
                             //itemWheel.SetActive(false);
                             mapFingerID = -1;
+                        }
+                        else if(quickAccessDetail == "zoom")
+                        {
+                            ToggleCameraZoom();
                         }
                         quickAccessDetail = "";
                         quickAccessCanvas.GetComponent<Canvas>().sortingOrder = playerStatusCanvas.GetComponent<Canvas>().sortingOrder - 1;

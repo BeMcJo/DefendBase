@@ -54,7 +54,7 @@ public abstract class Weapon : MonoBehaviour
             new float[] {16, 17,19,23,29},
             new float[] {2f,1.75f,1.5f,1.25f,1f},
             new float[] {.75f,.70f,.65f,.55f,.5f},
-            "Your standard wooden bow"
+            "Your standard bow"
         ),
         // Dual-Shot Bow
         new WeaponStats

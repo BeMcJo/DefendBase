@@ -70,6 +70,11 @@ public class PlayerController : MonoBehaviour {
         return false;
     }
 
+    public bool ToggleCameraZoom()
+    {
+        return playerCam.GetComponent<MapViewCamera>().ToggleZoom();
+    }
+
     // Check if this object is the player I control
     public bool IsMyPlayer()
     {
