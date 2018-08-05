@@ -33,7 +33,6 @@ public class PlayerController : MonoBehaviour {
 	void Start () {
         prevXAngle = 0;
         maxLookDownLimit = 60f;
-        Screen.orientation = ScreenOrientation.Landscape;
         cameraContainer = transform.Find("Camera Container").gameObject;
         gyroEnabled = EnableGyro();
         playerCam.transform.SetParent(cameraContainer.transform);

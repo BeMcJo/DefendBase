@@ -17,6 +17,8 @@ public class ProjectileStats
         this.price = price;
         unlockCondition = unlockCond;
         this.description = description;
+        this.purchaseQty = purchaseQty;
+
     }
 }
 

@@ -99,10 +99,10 @@ public class Achievement {
     {
         cumulativeScoreAchievements = new Achievement[][]
         {
-            new Achievement[Enemy.difficulties.Length], // index 0 = kills by enemy
+            new Achievement[Enemy.enemyStats.Length], // index 0 = kills by enemy
             new Achievement[Projectile.projectileStats.Length], // index 1 = kills by arrow attribute
             new Achievement[Projectile.projectileStats.Length], // index 2 = arrows shot by attribute
-            new Achievement[Enemy.difficulties.Length], // index 3 = weak spots hit by enemy
+            new Achievement[Enemy.enemyStats.Length], // index 3 = weak spots hit by enemy
             new Achievement[Weapon.weaponStats.Length], // index 4 = weapons used by game
             new Achievement[Weapon.weaponStats.Length], // index 5 = enemy kill count per weapon
             new Achievement[Weapon.weaponStats.Length] // index 6 = weak spots hit per weapon

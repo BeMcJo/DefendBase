@@ -9,47 +9,50 @@ using UnityEngine.UI;
  */
 public class EnemyStats
 {
-    public int maxHP, dmg;
-    public float moveSpd, atkSpd;
-    public EnemyStats(int hp, int dmg, float ms, float atkSpd)
+    public int maxHP, dmg, scoreReward, currencyReward;
+    public float moveSpd, atkSpd,atkRange;
+    public EnemyStats(int hp, int dmg, int scoreReward, int currencyReward, float ms, float atkSpd, float atkRange=0)
     {
         maxHP = hp;
         this.dmg = dmg;
         moveSpd = ms;
         this.atkSpd = atkSpd;
+        this.atkRange = atkRange;
+        this.scoreReward = scoreReward;
+        this.currencyReward = currencyReward;
     }
 }
 public class Enemy : MonoBehaviour
 {
     public static int EnemyCount = 0; // Keeps track of enemies created during game session
     // List of stats per level
-    public static EnemyStats[][] difficulties = new EnemyStats[][] {
+    public static EnemyStats[][] enemyStats = new EnemyStats[][] {
         // Stats for Slimes ignore -> Normies
         new EnemyStats[]
         {
-            new EnemyStats(1, 1, 1, 1),
-            new EnemyStats(2, 1, 1.2f, 1.2f),
-            new EnemyStats(2, 2, 1.25f, 1.25f),
-            new EnemyStats(3, 2, 1.5f, 1.3f),
-            new EnemyStats(3, 2, 1.5f, 1.5f)
+            new EnemyStats(1, 1, 50,1,1, 1),
+            new EnemyStats(2, 1, 50,1,1.2f, 1.2f),
+            new EnemyStats(2, 2, 50,1,1.25f, 1.25f),
+            new EnemyStats(3, 2, 50,1,1.5f, 1.3f),
+            new EnemyStats(3, 2, 50,1,1.5f, 1.5f)
         },
         // Stats for Funguys ignore -> Infuries
         new EnemyStats[]
         {
-            new EnemyStats(2, 1, 1, 1),
-            new EnemyStats(2, 2, 1.2f, 1.2f),
-            new EnemyStats(4, 3, 1.25f, 1.25f),
-            new EnemyStats(4, 3, 1.5f, 1.3f),
-            new EnemyStats(6, 3, 1.5f, 1.5f)
+            new EnemyStats(2, 1, 75,1,1, 1),
+            new EnemyStats(2, 2, 75,1,1.2f, 1.2f),
+            new EnemyStats(4, 3, 75,1,1.25f, 1.25f),
+            new EnemyStats(4, 3, 75,1,1.5f, 1.3f),
+            new EnemyStats(6, 3, 75,1,1.5f, 1.5f)
         },
         // Stats for Flyglet ignore -> Flyies
         new EnemyStats[]
         {
-            new EnemyStats(1, 1, 1, 1),
-            new EnemyStats(2, 2, 1.2f, 1.2f),
-            new EnemyStats(4, 3, 1.25f, 1.25f),
-            new EnemyStats(4, 3, 1.5f, 1.3f),
-            new EnemyStats(6, 3, 1.5f, 1.5f)
+            new EnemyStats(1, 1, 70,1,1, 1),
+            new EnemyStats(2, 2, 70,1,1.2f, 1.2f),
+            new EnemyStats(4, 3, 70,1,1.25f, 1.25f),
+            new EnemyStats(4, 3, 70,1,1.5f, 1.3f),
+            new EnemyStats(6, 3, 70,1,1.5f, 1.5f)
         }
     };
     public static string[] names =
@@ -135,13 +138,13 @@ public class Enemy : MonoBehaviour
     protected virtual void Start()
     {
         isPerformingAction = false;
-        maxHP = difficulties[enemyID][level].maxHP;
+        maxHP = enemyStats[enemyID][level].maxHP;
         health = maxHP;
-        dmg = difficulties[enemyID][level].dmg;
-        effectiveMoveSpd = originalMoveSpd * difficulties[enemyID][level].moveSpd;
-        effectiveTimeToAttack = originalTimeToAttack / difficulties[enemyID][level].atkSpd;
+        dmg = enemyStats[enemyID][level].dmg;
+        effectiveMoveSpd = originalMoveSpd * enemyStats[enemyID][level].moveSpd;
+        effectiveTimeToAttack = originalTimeToAttack / enemyStats[enemyID][level].atkSpd;
         atkTimer = effectiveTimeToAttack;
-        effectiveAttackSpd = originalAttackSpd * difficulties[enemyID][level].atkSpd;
+        effectiveAttackSpd = originalAttackSpd * enemyStats[enemyID][level].atkSpd;
         attackCt = 0;
         curTarget = 0;
         anim = GetComponent<Animator>();
@@ -149,7 +152,7 @@ public class Enemy : MonoBehaviour
         gameObject.AddComponent<ConstantForce>().force = new Vector3(0, -9, 0);
         audioSrc = gameObject.AddComponent<AudioSource>();// GetComponent<AudioSource>();
         //print(ename);
-        attackRange = 2.3f;
+        attackRange = 2.7f;
         if (ename == "infurie")
             go = transform.Find("PivotPoint").Find("EnemyObject").gameObject;
         else //if (ename != "slime")
@@ -738,7 +741,7 @@ public class Enemy : MonoBehaviour
     {
         if (isDead)
             return;
-        GameManager.gm.UpdateInGameCurrency(1);
+        GameManager.gm.UpdateInGameCurrency(enemyStats[enemyID][level].currencyReward);
         GameManager.gm.kills++;
 
         if (dmgSourceType == "Player")
@@ -747,7 +750,7 @@ public class Enemy : MonoBehaviour
             if(dmgSourceID == GameManager.gm.player.GetComponent<PlayerController>().id)
             {
                 GameManager.gm.UpdateKillCount(1);
-                GameManager.gm.UpdateScore(50);
+                GameManager.gm.UpdateScore(enemyStats[enemyID][level].scoreReward);
                 GameManager.gm.data.killsByEnemy[enemyID]++;
             }
         }
@@ -826,7 +829,8 @@ public class Enemy : MonoBehaviour
         {
             //print("GRND");
             grounds.Add(collision.gameObject);
-            GetComponent<Rigidbody>().velocity = Vector3.zero;
+            Rigidbody rb = GetComponent<Rigidbody>();
+            rb.velocity = Vector3.zero;
         }
         isGrounded = grounds.Count > 0;
         if(enemyID == 0)

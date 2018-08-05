@@ -65,10 +65,10 @@ public class Infurie : Enemy
             //c = Color.black;
             go.transform.GetComponent<Renderer>().material.color = originalColor;
             //print(go.transform.GetComponent<Renderer>().material.color);
-            effectiveMoveSpd = originalMoveSpd * difficulties[enemyID][level].moveSpd * 2f;
-            effectiveTimeToAttack = originalTimeToAttack / difficulties[enemyID][level].atkSpd / 1.5f;
+            effectiveMoveSpd = originalMoveSpd * enemyStats[enemyID][level].moveSpd * 2f;
+            effectiveTimeToAttack = originalTimeToAttack / enemyStats[enemyID][level].atkSpd / 1.5f;
             atkTimer = effectiveTimeToAttack;
-            effectiveAttackSpd = originalAttackSpd * difficulties[enemyID][level].atkSpd * 2f;
+            effectiveAttackSpd = originalAttackSpd * enemyStats[enemyID][level].atkSpd * 2f;
         }
         anim.SetInteger("hp", dif);
         return true;

@@ -590,7 +590,7 @@ public class NetworkManager : MonoBehaviour {
         // Add client to list
         Player c = new Player();
         c.connectionID = cnnId;
-        c.playerName = "TEMP";
+        c.playerName = "Player " + (1+players.Count);
         c.playerGO = Instantiate(GameManager.gm.playerUIPrefab);
         c.playerGO.SetActive(false);
         //Debug.Log(cnnId);
@@ -629,14 +629,14 @@ public class NetworkManager : MonoBehaviour {
             return;
         }
         Player sc = players[cnnId];
-        sc.playerName = playerName;
+        //sc.playerName = playerName;
         sc.wepID = wepID;
-        sc.playerGO.transform.Find("NameText").GetComponent<Text>().text = playerName;
+        sc.playerGO.transform.Find("NameText").GetComponent<Text>().text = sc.playerName;
         sc.playerGO.transform.SetParent(GameManager.gm.lobbyCanvas.transform.Find("PlayerList"));
         sc.playerGO.SetActive(true);
         sc.playerGO.transform.localScale = new Vector3(1, 1, 1);
         // Tell everybody that new player has connected
-        Send("CNN|" + playerName + '|' + cnnId + '|' + data[2], reliableChannel, players);
+        Send("CNN|" + sc.playerName + '|' + cnnId + '|' + data[2], reliableChannel, players);
     }
 
     // Handle when someone disconnects in lobby
@@ -1757,7 +1757,7 @@ public class NetworkManager : MonoBehaviour {
         }
 
         // Send our name and other player info to server
-        Send("NAMEIS|" + "Player " + (ourClientID+1)+"|"+GameManager.gm.personalData.equippedWep, reliableChannel);
+        Send("NAMEIS|" + "Player " + "|"+GameManager.gm.personalData.equippedWep, reliableChannel);
 
     }
 

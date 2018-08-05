@@ -6,6 +6,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
+using UnityEngine.Advertisements;
 using UnityEngine.UI;
 
 [Serializable]
@@ -58,8 +59,8 @@ public class PlayerData
         wepLvl = 0;
         arrowQuantities = new int[Projectile.projectileStats.Length];
         
-        weakSpotsHitByEnemy = new int[Enemy.difficulties.Length];
-        killsByEnemy = new int[Enemy.difficulties.Length];
+        weakSpotsHitByEnemy = new int[Enemy.enemyStats.Length];
+        killsByEnemy = new int[Enemy.enemyStats.Length];
         killsByArrowAttribute = new int[Projectile.projectileStats.Length];
         arrowsShotByAttribute = new int[Projectile.projectileStats.Length];
     }
@@ -130,10 +131,10 @@ public class PersonalData
         mostKillsInGame = 0;
         cumulativeDamageObjectiveTook = 0;
         mostWeakSpotsHitInAGame = 0;
-        weakSpotsHitByEnemy = new int[Enemy.difficulties.Length];
+        weakSpotsHitByEnemy = new int[Enemy.enemyStats.Length];
         enemiesKilledByWeapon = new int[Weapon.weaponStats.Length];
         weaponsUsedByGame = new int[Projectile.projectileStats.Length];
-        killsByEnemy = new int[Enemy.difficulties.Length];
+        killsByEnemy = new int[Enemy.enemyStats.Length];
         killsByArrowAttribute = new int[Projectile.projectileStats.Length];
         arrowsShotByAttribute = new int[Projectile.projectileStats.Length];
         weakSpotsHitByWeapon = new int[Weapon.weaponStats.Length];
@@ -566,7 +567,7 @@ public class GameManager : MonoBehaviour {
         realTimeAction = true;
         selectedTab = "Weapons";
         arrowUIItems = new GameObject[Projectile.projectileStats.Length];
-        Screen.orientation = ScreenOrientation.Landscape; // Landscape mode for mobile phones
+        Screen.orientation = ScreenOrientation.LandscapeRight; // Landscape mode for mobile phones
         LoadMainScene(); // Default start game in main scene
         EnemySpawnPattern.InstantiatePatterns();
     }
@@ -786,7 +787,7 @@ public class GameManager : MonoBehaviour {
                 (Weapon.weaponStats[i].unlockCondition == UnlockCondition.Quest || Weapon.weaponStats[i].unlockCondition == UnlockCondition.QuestThenPurchase) 
                 && !personalData.isWeaponUnlocked[i]);
             Transform actionBtn = itemUI.transform.Find("ActionBtn");
-            actionBtn.GetComponent<Button>().interactable = personalData.equippedWep != i;
+            actionBtn.GetComponent<Button>().interactable = personalData.equippedWep != i && personalData.playerCurrency >= Weapon.weaponStats[i].price;
             switch (Weapon.weaponStats[i].unlockCondition)
             {
                 case UnlockCondition.Free:
@@ -849,7 +850,9 @@ public class GameManager : MonoBehaviour {
             //itemUI.transform.Find("ItemStats").Find("BowStr").Find("Text").GetComponent<Text>().text = "" + Weapon.weaponStats[i].distance[0];
             itemUI.transform.Find("ItemDescription").GetComponent<Text>().text = Projectile.projectileStats[i].description;
             itemUI.transform.Find("QtyTxt").gameObject.SetActive(true);
-            itemUI.transform.Find("QtyTxt").GetComponent<Text>().text = "Quantity: " + ((i == 0)? "---": "" + arrowQty.arr[i]);
+            itemUI.transform.Find("InfinityIcon").gameObject.SetActive(i==0);
+
+            itemUI.transform.Find("QtyTxt").GetComponent<Text>().text = "Quantity: " + ((i == 0)? "": "" + arrowQty.arr[i]);
             itemUI.name = "arrowUI " + i;
             //wepUI.tag = "wepUI";
             //wepUI.transform.GetComponent<Button>().onClick.AddListener(PerformInventoryAction);
@@ -867,7 +870,7 @@ public class GameManager : MonoBehaviour {
                 availableAttributes.Add(i);
             }
             Transform actionBtn = itemUI.transform.Find("ActionBtn");
-            actionBtn.GetComponent<Button>().interactable = i != 0;
+            actionBtn.GetComponent<Button>().interactable = i != 0 && personalData.playerCurrency >= Projectile.projectileStats[i].price;
             switch (Projectile.projectileStats[i].unlockCondition)
             {
                 case UnlockCondition.Free:
@@ -1207,7 +1210,8 @@ public class GameManager : MonoBehaviour {
             icon.tag = "QuickAccess";
             icon.transform.localScale = new Vector3(1, 1, 1);
             icon.transform.Find("ItemIcon").GetComponent<Image>().sprite = arrowItemIcons[i];
-            //csf.SetItemActive(i, i == 0);
+            icon.transform.Find("InfinityIcon").gameObject.SetActive(i == 0);
+            icon.transform.Find("QtyTxt").gameObject.SetActive(i != 0);
             icon.transform.Find("Selected BG").gameObject.SetActive(i == 0);
         }
         itemDropdownList.transform.parent.parent.gameObject.SetActive(false);
@@ -1396,6 +1400,18 @@ public class GameManager : MonoBehaviour {
             UpdateArrowQty(itemID);
             //itemWheel.GetComponent<Rotator>().ResetItemWheel(selectedAttribute);
         }
+        Transform container = inventoryCanvas.transform.Find("ItemUIPanel").Find("ArrowsUIContainer");
+        for (int i = 1; i < Projectile.projectileStats.Length; i++)
+        {
+            container.GetChild(i).Find("ActionBtn").GetComponent<Button>().interactable = personalData.playerCurrency >= Projectile.projectileStats[i].price;
+        }
+        container = inventoryCanvas.transform.Find("ItemUIPanel").Find("WeaponsUIContainer");
+        for(int i = 1; i < Weapon.weaponStats.Length; i++)
+        {
+            container.GetChild(i).Find("ActionBtn").GetComponent<Button>().interactable = 
+                Weapon.weaponStats[i].unlockCondition != UnlockCondition.QuestThenPurchase ||
+                personalData.playerCurrency >= Weapon.weaponStats[i].price;
+        }
     }
 
     public void UseItem(string itemType, int itemID)
@@ -1463,17 +1479,21 @@ public class GameManager : MonoBehaviour {
         if (itemID == selectedAttribute)
         {
             changeArrowBtn.transform.Find("ArrowIcon").GetComponent<Image>().sprite = arrowItemIcons[itemID];
-            changeArrowBtn.transform.Find("QtyTxt").GetComponent<Text>().text = "x";
+            changeArrowBtn.transform.Find("QtyTxt").GetComponent<Text>().text = "";
             if (itemID == 0)
             {
-                changeArrowBtn.transform.Find("QtyTxt").GetComponent<Text>().text += "---";
+                changeArrowBtn.transform.Find("QtyTxt").gameObject.SetActive(false);
+                changeArrowBtn.transform.Find("InfinityIcon").gameObject.SetActive(true);
             }
             else
             {
+
+                changeArrowBtn.transform.Find("QtyTxt").gameObject.SetActive(true);
+                changeArrowBtn.transform.Find("InfinityIcon").gameObject.SetActive(false);
                 changeArrowBtn.transform.Find("QtyTxt").GetComponent<Text>().text += arrowQty.arr[itemID];// personalData.arrowQuantities[itemID];//myAttributes[itemID];
             }
         }
-        itemDropdownList.transform.GetChild(itemID).Find("QtyTxt").GetComponent<Text>().text = "x" + ((itemID == 0) ? "---" : "" + arrowQty.arr[itemID]);// personalData.arrowQuantities[itemID]);
+        itemDropdownList.transform.GetChild(itemID).Find("QtyTxt").GetComponent<Text>().text = "" + ((itemID == 0) ? "---" : "" + arrowQty.arr[itemID]);// personalData.arrowQuantities[itemID]);
         bool isEmpty = arrowQty.arr[itemID] <= 0 && itemID != 0;
         print(isEmpty+" "+itemID) ;
         arrowUIItems[itemID].SetActive(!isEmpty);
@@ -1549,7 +1569,16 @@ public class GameManager : MonoBehaviour {
                 {
                     BuyWeapon(wepID);
                 }
-
+                break;
+            case UnlockCondition.QuestThenPurchase:
+                if (personalData.isWeaponPurchased[wepID])
+                {
+                    EquipWeapon(wepID);
+                }
+                else
+                {
+                    BuyWeapon(wepID);
+                }
                 break;
         }
     }
@@ -1597,6 +1626,7 @@ public class GameManager : MonoBehaviour {
         personalData.playerCurrency -= Weapon.weaponStats[wepID].price;
         inventoryItemPanel.transform.Find("WeaponsUIContainer").GetChild(wepID).Find("ActionBtn").Find("Currency").gameObject.SetActive(false);
         personalData.isWeaponPurchased[wepID] = true;
+        UpdateItem("", 0,0);
         print("BOUGHT");
         EquipWeapon(wepID);
         StartCoroutine(PlaySFX(purchaseSFX));
@@ -1691,7 +1721,8 @@ public class GameManager : MonoBehaviour {
         }
         print("BOUGHT");
         personalData.playerCurrency -= Projectile.projectileStats[aID].price;
-        UpdateItem("Attribute", aID, 1);
+        UpdateItem("Attribute", aID, Projectile.projectileStats[aID].purchaseQty);
+        
         //audioSrc.clip = purchaseSFX;
         //audioSrc.Play();
         StartCoroutine(PlaySFX(purchaseSFX));
@@ -1827,8 +1858,9 @@ public class GameManager : MonoBehaviour {
         stats.Find("OverallScore").Find("Stats").GetComponent<Text>().text = "" + data.score;
 
         Achievement.CheckForAchievementProgress();
-
-        personalData.playerCurrency += data.score / 1000 + data.inGameCurrency / 20;
+        int earnings = data.score / 1000 + data.inGameCurrency / 20;
+        stats.Find("Earnings").Find("Stats").GetComponent<Text>().text = "" + earnings;
+        personalData.playerCurrency += earnings;
         firework.SetActive(won);
         Save("setupMain");
     }
@@ -2106,7 +2138,7 @@ public class GameManager : MonoBehaviour {
     {
         mainMenuCanvas.SetActive(!mainMenuCanvas.activeSelf);
         if (mainMenuCanvas.activeSelf)
-            GameObject.Find("BackgroundCanvas").transform.Find("Header").Find("Text").GetComponent<Text>().text = "Main Menu";
+            GameObject.Find("BackgroundCanvas").transform.Find("Header").Find("Text").GetComponent<Text>().text = "Archery Castle Defense"; //"Main Menu";
     }
 
     public void ToggleLobbyCanvas()
@@ -2371,11 +2403,36 @@ public class GameManager : MonoBehaviour {
         doneSpawningWave = false;
     }
 
+    void HandleAdResult(ShowResult result)
+    {
+        switch (result)
+        {
+            case ShowResult.Finished:
+                print("watchedfulle");
+                break;
+            case ShowResult.Skipped:
+                print("skipp");
+                break;
+            case ShowResult.Failed:
+                print("no connection or failed");
+                break;
+        }
+    }
+
+    public void ShowAd()
+    {
+
+        if (Advertisement.IsReady())
+            Advertisement.Show("", new ShowOptions() { resultCallback = HandleAdResult });
+        else
+            print("ad not rdy");
+    }
+
     public void FinishGame()
     {
         print("done game");
         print(data.hasWon);
-        
+        //ShowAd();
         LeaveGame();
     }
 
@@ -2545,7 +2602,7 @@ public class GameManager : MonoBehaviour {
         //enemyUI.transform.GetComponent<StatusIndicator>().target = enemy;
         enemy.transform.SetParent(enemiesContainer.transform);
         data.difficulty = 0;
-        e.level = (pattern.enemyLvls[intervalIndex][spawnIndex] + data.difficulty) % Enemy.difficulties.Length;
+        e.level = (pattern.enemyLvls[intervalIndex][spawnIndex] + data.difficulty) % Enemy.enemyStats.Length;
 
     }
 
