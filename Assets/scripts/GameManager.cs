@@ -188,10 +188,12 @@ public class GameManager : MonoBehaviour {
                intervalIndex, // Which group of enemies to spawn in a wave
                patternIterations, // How many times you spawn this spawn pattern
                enemiesSpawned; // Total number of enemies spawned
-               //playerCurrency, // Currency used outside game session
-               //inGameCurrency, // Currency used inside game session
-               //difficulty; // How hard enemies will be (Used to offset enemy level)
-               //score; // Keeps track of how awesome you are
+                               //playerCurrency, // Currency used outside game session
+                               //inGameCurrency, // Currency used inside game session
+                               //difficulty; // How hard enemies will be (Used to offset enemy level)
+                               //score; // Keeps track of how awesome you are
+
+    public float moveSensitivity = .1f;
 
     public Vector3 playerOrientation; // Keeps track of where your forward is
 
@@ -224,7 +226,8 @@ public class GameManager : MonoBehaviour {
                       achievementUIPrefab, // displays description (and progress if exists) of achievement
                       questAchievementUIPrefab, // displays quest achievement description
                       notificationUIPrefab, // used to display notification (EX: quest rewards)
-                      //enemyDeathVFXPrefab, // used after enemy dies
+                                            //enemyDeathVFXPrefab, // used after enemy dies
+                      joystick, // virtual joystick for non gyroscope movement
                       enemyPrefab; // Enemy object
 
     public GameObject playerStatusCanvas, // Information used for player to see
@@ -1065,6 +1068,7 @@ public class GameManager : MonoBehaviour {
         playerStatusCanvas.transform.Find("OptionsBtn").GetComponent<Button>().onClick.AddListener(NotifyButtonPressed);
         playerStatusCanvas.transform.Find("MapBtn").GetComponent<Button>().onClick.AddListener(ToggleMapUICanvas);
         playerStatusCanvas.transform.Find("MapBtn").gameObject.SetActive(false);
+        joystick = playerStatusCanvas.transform.Find("Joystick").gameObject;
         hitObjectiveIndicator = playerStatusCanvas.transform.Find("ObjectiveHitIndicator").gameObject;
         buffIconContainer = playerStatusCanvas.transform.Find("BuffIconContainer").gameObject;
         interactiveUIContainer = playerStatusCanvas.transform.Find("InteractiveUIContainer").gameObject;
@@ -1110,6 +1114,8 @@ public class GameManager : MonoBehaviour {
         settingsPanel = optionsCanvas.transform.Find("SettingsPanel").gameObject;
         settingsPanel.transform.Find("BackBtn").GetComponent<Button>().onClick.AddListener(ToggleInGameSettings);
         settingsPanel.transform.Find("BackBtn").GetComponent<Button>().onClick.AddListener(NotifyButtonPressed);
+        settingsPanel.transform.Find("EnableGyroBtn").GetComponent<Button>().onClick.AddListener(ToggleGyro);
+        settingsPanel.transform.Find("EnableGyroBtn").gameObject.SetActive(false && SystemInfo.supportsGyroscope);
         settingsPanel.transform.Find("SetOrientationBtn").GetComponent<Button>().onClick.AddListener(TogglePlayerOrientationSetup);
         settingsPanel.transform.Find("SetOrientationBtn").GetComponent<Button>().onClick.AddListener(NotifyButtonPressed);
         string isOn = "ON";
@@ -1306,6 +1312,14 @@ public class GameManager : MonoBehaviour {
     public void NotifyButtonPressed()
     {
         //StartCoroutine(PlaySFX(btnClickSFX));
+    }
+
+    public void ToggleGyro()
+    {
+        bool useGyro = player.GetComponent<PlayerController>().ToggleGyro();// = !player.GetComponent<PlayerController>().useGyro;
+
+        optionsCanvas.transform.Find("SettingsPanel").Find("EnableGyroBtn").Find("Text").GetComponent<Text>().text = "Enable Gyro: " + ((useGyro) ? "ON" : "OFF");
+        optionsCanvas.transform.Find("SettingsPanel").Find("SetOrientationBtn").gameObject.SetActive(useGyro);
     }
 
     public void ToggleLeaveGameNotification()
@@ -2306,16 +2320,18 @@ public class GameManager : MonoBehaviour {
         {
             return true;
         }
+        float rate = .01f * 60f / DebugManager.dbm.fps;
         Color c = waveNotification.transform.GetComponent<Image>().color;
-        c.a += .01f;
+
+        c.a += rate;
         waveNotification.transform.GetComponent<Image>().color = c;
 
 
         c = waveNotification.transform.Find("WaveTxt").GetComponent<Text>().color;
-        c.a += .01f;
+        c.a += rate;
         waveNotification.transform.Find("WaveTxt").GetComponent<Text>().color = c;
         c = waveNotification.transform.Find("MonsterIcon").GetComponent<Image>().color;
-        c.a += .01f;
+        c.a += rate;
         waveNotification.transform.Find("MonsterIcon").GetComponent<Image>().color = c;
 
         return c.a >= 1;
@@ -2328,15 +2344,16 @@ public class GameManager : MonoBehaviour {
         {
             return true;
         }
+        float rate = .01f * 60f /DebugManager.dbm.fps;
         Color c = waveNotification.transform.GetComponent<Image>().color;
-        c.a -= .01f;
+        c.a -= rate;
         waveNotification.transform.GetComponent<Image>().color = c;
 
         c = waveNotification.transform.Find("WaveTxt").GetComponent<Text>().color;
-        c.a -= .01f;
+        c.a -= rate;
         waveNotification.transform.Find("WaveTxt").GetComponent<Text>().color = c;
         c = waveNotification.transform.Find("MonsterIcon").GetComponent<Image>().color;
-        c.a -= .01f;
+        c.a -= rate;
         waveNotification.transform.Find("MonsterIcon").GetComponent<Image>().color = c;
         return c.a <= 0;
     }
@@ -2546,7 +2563,7 @@ public class GameManager : MonoBehaviour {
         UpdateInGameCurrency(0);
         UpdateKillCount(0);
         UpdateScore(0);
-        playerStatusCanvas.transform.Find("Wave").Find("Text").GetComponent<Text>().text = (data.wave == 0) ? "": "" + data.wave;
+        playerStatusCanvas.transform.Find("Wave").Find("Text").GetComponent<Text>().text = (data.wave == 0) ? "": "" + data.wave +"/" + EnemySpawnPattern.patternsBySpawnPointCt[0].Count;
         //playerStatusCanvas.transform.Find("Wave").Find("Text").GetComponent<Text>().text = (wave) + "";
         for (int i = 0; i < arrowQty.arr.Length; i++)
             UpdateArrowQty(i);
@@ -2570,7 +2587,7 @@ public class GameManager : MonoBehaviour {
         patternIterations = pattern.iterations;
         timeToSpawn = pattern.spawnTimes[intervalIndex] / pattern.spawnCts[intervalIndex].Count;
 
-        playerStatusCanvas.transform.Find("Wave").Find("Text").GetComponent<Text>().text = (data.wave + 1) + "";
+        playerStatusCanvas.transform.Find("Wave").Find("Text").GetComponent<Text>().text = (data.wave + 1) + "/" + EnemySpawnPattern.patternsBySpawnPointCt[0].Count;
         
         waveNotificationCoroutine = StartCoroutine(NotifyIncomingWave(w));
     }
@@ -2846,11 +2863,13 @@ public class GameManager : MonoBehaviour {
             if (t.phase == TouchPhase.Began)
             {
                 //print("BEING");
+                print(0);
                 if (quickAccessFingerID != -1 && mapFingerID != -1)
                     return;
                 // Is there an object we are touching?
                 if (EventSystem.current.IsPointerOverGameObject(t.fingerId))
                 {
+                    print(1);
                     //if (EventSystem.current.currentSelectedGameObject)
                     //    Debug.Log(EventSystem.current.currentSelectedGameObject.tag);
                     // Is this a UI object?
@@ -2904,6 +2923,23 @@ public class GameManager : MonoBehaviour {
                     }
                 }
                 
+                    print(3);
+                print(quickAccessDetail);
+                print(quickAccessFingerID);
+                print(t.position.x < Screen.width / 2);
+                print(player.GetComponent<PlayerController>().gyroEnabled);
+                if (quickAccessDetail == "" && !player.GetComponent<PlayerController>().useGyro && quickAccessFingerID == -1 && t.position.x < Screen.width / 2)
+                {
+                    print(4);
+                    quickAccessFingerID = t.fingerId;
+                    initialPos = t.position;
+                    joystick.transform.position = initialPos;
+                    joystick.transform.Find("Joystick").position = initialPos;
+                    joystick.SetActive(true);
+                    //player.GetComponent<PlayerController>().
+
+                }
+
             }
             else
             {
@@ -2940,6 +2976,10 @@ public class GameManager : MonoBehaviour {
                         {
                             ToggleCameraZoom();
                         }
+                        else if(quickAccessDetail == "")
+                        {
+                            joystick.SetActive(false);
+                        }
                         quickAccessDetail = "";
                         quickAccessCanvas.GetComponent<Canvas>().sortingOrder = playerStatusCanvas.GetComponent<Canvas>().sortingOrder - 1;
                         quickAccessFingerID = -1;
@@ -2947,6 +2987,21 @@ public class GameManager : MonoBehaviour {
                     else
                     {
                         //itemDropdownList.GetComponent<Slider>().SlideInDirection(true);
+                    }
+                }else if(t.fingerId == quickAccessFingerID)
+                {
+                    if(quickAccessDetail == "")
+                    {
+                        float clampRange = 30 * joystick.transform.localScale.x;
+                        float threshold = 10;
+                        Vector2 offset = Vector2.ClampMagnitude(t.position - initialPos, clampRange);
+                        print(offset.magnitude);
+                        if (offset.magnitude < threshold)
+                            return;
+                        
+                        joystick.transform.Find("Joystick").position = initialPos + offset; //new Vector2(Mathf.Clamp(t.position.x, initialPos.x - clampRange, initialPos.x + clampRange), Mathf.Clamp(t.position.y, initialPos.y - clampRange, initialPos.y + clampRange));
+
+                        player.GetComponent<PlayerController>().SetOrientation(offset / clampRange);
                     }
                 }
             }

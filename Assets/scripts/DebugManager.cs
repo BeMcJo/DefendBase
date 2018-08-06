@@ -7,9 +7,9 @@ public class DebugManager : MonoBehaviour {
     public static DebugManager dbm;
     bool isDebugging;
     public int frameCount = 0;
-    public double dt = 0.0, 
-          fps = 0.0, 
-          updateRate = 4.0;
+    public float dt = 0.0f, 
+          fps = 0.0f, 
+          updateRate = 4.0f;
 	// Use this for initialization
 	void Start () {
         if (dbm)
@@ -27,11 +27,11 @@ public class DebugManager : MonoBehaviour {
 	void Update () {
         frameCount++;
         dt += Time.deltaTime;
-        if(dt > 1.0 / updateRate)
+        if(dt > 1.0f / updateRate)
         {
             fps = frameCount / dt;
             frameCount = 0;
-            dt -= 1.0 / updateRate;
+            dt -= 1.0f / updateRate;
             transform.Find("Canvas").Find("Text").GetComponent<Text>().text = "FPS:" + fps.ToString("F1");
         }
     }

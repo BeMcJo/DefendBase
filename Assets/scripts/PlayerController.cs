@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 public class PlayerController : MonoBehaviour {
-    public float noiseTolerance = .05f;
+    public float driftTolerance = .05f;
     public int id; // Used to assign who controls this player online
     public int selectedAttribute, // current arrow selected
                criticalShotCount, // count of critical shots landed
@@ -22,7 +22,9 @@ public class PlayerController : MonoBehaviour {
                  maxLookDownLimit; // Limit on how far your look down
 
     public Weapon wep; // Weapon player is currently holding and using
-    //Vector3 rotation;
+    Vector3 rotation;
+    int touchID=-1;
+    Vector2 touchPos;
 
     //Quaternion origin; unused?
 
@@ -37,14 +39,31 @@ public class PlayerController : MonoBehaviour {
         gyroEnabled = EnableGyro();
         playerCam.transform.SetParent(cameraContainer.transform);
         SetOrientation(GameManager.gm.playerOrientation);
-        useGyro = true;
+        useGyro = gyroEnabled;
         buffs = new Dictionary<int, Dictionary<int, Buff>>();
         immunityTimers = new Dictionary<int, float>();
         canPerformActions = true;
+        rotation = Vector3.zero;
+        
         //transform.rot
         //origin = Input.gyro.attitude;
     }
     
+    public bool ToggleGyro()
+    {
+        useGyro = !useGyro;
+        if (useGyro)
+        {
+            cameraContainer.transform.rotation = Quaternion.Euler(90f, 90f, 0f);
+        }
+        else
+        {
+            cameraContainer.transform.eulerAngles = Vector3.zero;
+        }
+            playerCam.transform.eulerAngles = Vector3.zero;
+        return useGyro;
+    }
+
     // Disable using gyro if existent
     private void DisableGyro()
     {
@@ -236,6 +255,19 @@ public class PlayerController : MonoBehaviour {
         playerCam.GetComponent<MapViewCamera>().canZoom = wep.wepID == 2;
     }
 
+    // Sets Player Camera orientation based on joystick information
+    public void SetOrientation(Vector2 orientation)
+    {
+        Vector3 prevAngle = playerCam.transform.eulerAngles;
+        float sensitivity = GameManager.gm.moveSensitivity * 60f / DebugManager.dbm.fps;
+        playerCam.transform.eulerAngles += new Vector3(-orientation.y, 0, 0) * sensitivity;// * .01f;
+        playerCam.transform.parent.eulerAngles +=  new Vector3(0, orientation.x , 0) * sensitivity;// * .01f;
+
+        playerCam.transform.localEulerAngles = new Vector3(playerCam.transform.localEulerAngles.x, 0, 0);
+        //playerCam.transform.rotation = Quaternion.Euler(playerCam.transform.rotation.x, playerCam.transform.rotation.y, 0);// = new Vector3(playerCam.transform.eulerAngles.x, playerCam.transform.eulerAngles.y, 0);
+        //playerCam.transform.rotation = Quaternion.Euler(playerCam.transform.eulerAngles.x, playerCam.transform.eulerAngles.y, 0);
+    }
+
     // Handle Mobile inputs
     private void PlayerMobileInput()
     {
@@ -243,7 +275,9 @@ public class PlayerController : MonoBehaviour {
         if (gyroEnabled && useGyro)
         {
             RotatePlayer();
-            
+        }
+        else
+        {
         }
     }
 
@@ -274,20 +308,32 @@ public class PlayerController : MonoBehaviour {
         }
 
     }
-
+    private Quaternion localRotation; // 
+    public float speed = 1.0f; // ajustable speed from Inspector in Unity editor
     // Orient player perspective
     private void RotatePlayer()
     {
-       
-        //playerCam.transform.rotation = Quaternion.Lerp(playerCam.transform.rotation)
-        float dist = Vector3.Distance(gyro.rotationRateUnbiased, Vector3.zero);
+        //attempt to not use gyro
+        /*
+        
+        float zVal = Input.acceleration.z;
+        if (zVal > 1f)
+            zVal = 1;
+        else if (zVal < -1f)
+            zVal = -1;
+        //playerCam.transform.eulerAngles = Vector3.Lerp(Vector3.zero, new Vector3(Mathf.Rad2Deg * -Mathf.Asin(zVal), 0, 0), Time.deltaTime);
+        playerCam.transform.localEulerAngles =  new Vector3(Mathf.Rad2Deg * -Mathf.Asin(zVal), 0, 0);
+        return;
+        */
+
         //playerCam.transform.Rotate(Input.gyro.rotationRate);
         //Debug.Log(gyro.attitude + " ...." + gyro.rotationRateUnbiased + "...a>>" +dist );
         //playerCam.transform.Rotate(-Input.gyro.rotationRateUnbiased.x, -Input.gyro.rotationRateUnbiased.y, Input.gyro.rotationRateUnbiased.z);
         //playerCam.transform.Rotate(-Input.gyro.rotationRateUnbiased.x, 0, 0);
         //  playerCam.transform.localRotation = playerCam.transform.rotation * rot;
         // Temporarily prevents camera from sliding undesireably due to gyroscope errors
-        if (dist < noiseTolerance)
+        float dist = Vector3.Distance(gyro.rotationRateUnbiased, Vector3.zero);
+        if (dist < driftTolerance)
         {
             return;
         }

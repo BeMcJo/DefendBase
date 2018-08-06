@@ -16,7 +16,7 @@ public class Checkmark : MonoBehaviour {
 
     bool CheckmarkIsFilled()
     {
-        transform.Find("CheckmarkFiller").localScale += new Vector3(.1f, 0, 0);
+        transform.Find("CheckmarkFiller").localScale += new Vector3(.1f, 0, 0) * 60f / DebugManager.dbm.fps;
         return transform.Find("CheckmarkFiller").localScale.x >= 1;
     }
 

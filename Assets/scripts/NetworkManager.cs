@@ -12,6 +12,8 @@ public class Player
     public int wepID; // Weapon player equipped
     public string playerName; // Name of player
     public bool isReady; // Used to determine if game can proceed at each break point
+    public float receiveRate; // Rate at which I should send my real time info to players
+    public float sendTimer; // time stamp for when to send info
     public GameObject playerGO; // Who/what the player is
 }
 
@@ -197,12 +199,21 @@ public class NetworkManager : MonoBehaviour {
             // Don't send anything when wave ended for you to prevent overloading other players
             //if (GameManager.gm.onIntermission || !GameManager.gm.startWaves)
             //    return;
+            /*
             sendTimer -= Time.deltaTime;
             if (sendTimer <= 0)
             {
                 SendPlayerRotation();
                 //SendPlayerInformation();
-                sendTimer = sendRate;
+                sendTimer = sendRate;//; * 60.0f / (float)DebugManager.dbm.fps;
+            }
+            */
+            foreach(KeyValuePair<int,Player> kvp in players)
+            {
+                //if(kvp.Value.connectionID != connectionId)
+                //{
+                SendPlayerRotation(kvp.Value.connectionID);
+                //}
             }
         }
         //*/
@@ -225,8 +236,10 @@ public class NetworkManager : MonoBehaviour {
     // Network Information about player rptation
     // Format: 
     // PLAYERSTATS|Unique client ID|Camera orientation without the orientation offset|Weapon Network Information|
-    public void SendPlayerRotation()
+    public void SendPlayerRotation(int cnnID)
     {
+        if (cnnID == ourClientID || players[cnnID].sendTimer > Time.time || playerDC.ContainsKey(cnnID))
+            return;
         string info = "PLAYERROT|" + ourClientID + "|";
         PlayerController p = GameManager.gm.player.transform.GetComponent<PlayerController>();
         Camera cam = p.playerCam;
@@ -234,12 +247,13 @@ public class NetworkManager : MonoBehaviour {
         info += dir.x + "," + dir.y + "," + dir.z + "|";// + p.wep.NetworkInformation();
         if (isHost)
         {
-            Send(info, unreliableChannel, players);
+            Send(info, unreliableChannel, cnnID);// players);
         }
         else
         {
             Send(info, unreliableChannel);
         }
+        players[cnnID].sendTimer = Time.time + (sendTimer * 60.0f / players[cnnID].receiveRate);
     }
 
     // Network Information about player
@@ -284,7 +298,7 @@ public class NetworkManager : MonoBehaviour {
 
         hostID = NetworkTransport.AddHost(topo, 0);
         ourClientID = hostID;
-        SpawnPlayerUI(new string[] {"", "Player " + (ourClientID + 1), "" + ourClientID, "" + GameManager.gm.personalData.equippedWep }); // Spawn my player in the lobby
+        SpawnPlayerUI(new string[] {"", "Player " + (ourClientID + 1), "" + ourClientID, "" + GameManager.gm.personalData.equippedWep,""+DebugManager.dbm.fps }); // Spawn my player in the lobby
         players[ourClientID].isReady = false; // Always ready to start game
         StartBroadcast(); // Announce my Network Manager is hosting
     }
@@ -613,7 +627,7 @@ public class NetworkManager : MonoBehaviour {
             {
                 Player sc = kvp.Value;
                 //msg += sc.playerName + "|" + sc.connectionID + "|" + sc.wepID+"|";
-                Send("CNN|" + sc.playerName + '|' + sc.connectionID + '|' + sc.wepID, reliableChannel, cnnId);
+                Send("CNN|" + sc.playerName + '|' + sc.connectionID + '|' + sc.wepID+"|"+sc.receiveRate, reliableChannel, cnnId);
             }
         }
     }
@@ -623,6 +637,7 @@ public class NetworkManager : MonoBehaviour {
     {
         string playerName = data[1];
         int wepID = int.Parse(data[2]);
+        float rcvRate = float.Parse(data[3]);
         // Make sure not self and client exists from OnConnection
         if (players.Count == 1 && !players.ContainsKey(cnnId))
         {
@@ -635,8 +650,9 @@ public class NetworkManager : MonoBehaviour {
         sc.playerGO.transform.SetParent(GameManager.gm.lobbyCanvas.transform.Find("PlayerList"));
         sc.playerGO.SetActive(true);
         sc.playerGO.transform.localScale = new Vector3(1, 1, 1);
+        sc.receiveRate = rcvRate;
         // Tell everybody that new player has connected
-        Send("CNN|" + sc.playerName + '|' + cnnId + '|' + data[2], reliableChannel, players);
+        Send("CNN|" + sc.playerName + '|' + cnnId + '|' + wepID +"|" + rcvRate, reliableChannel, players);
     }
 
     // Handle when someone disconnects in lobby
@@ -1757,7 +1773,7 @@ public class NetworkManager : MonoBehaviour {
         }
 
         // Send our name and other player info to server
-        Send("NAMEIS|" + "Player " + "|"+GameManager.gm.personalData.equippedWep, reliableChannel);
+        Send("NAMEIS|" + "Player " + "|"+GameManager.gm.personalData.equippedWep+"|"+DebugManager.dbm.fps, reliableChannel);
 
     }
 
@@ -1767,6 +1783,7 @@ public class NetworkManager : MonoBehaviour {
         string playerName = data[1];
         int cnnId = int.Parse(data[2]);
         int wepID = int.Parse(data[3]);
+        float rcvRate = float.Parse(data[4]);
         GameObject go = Instantiate(GameManager.gm.playerUIPrefab);
         
         //playerName += " " + (cnnId+1);
@@ -1775,6 +1792,7 @@ public class NetworkManager : MonoBehaviour {
         p.playerGO = go;
         p.playerName = playerName;
         p.connectionID = cnnId;
+        p.receiveRate = rcvRate;
         p.playerGO.transform.SetParent(GameManager.gm.lobbyCanvas.transform.Find("PlayerList"));
         p.playerGO.transform.Find("NameText").GetComponent<Text>().text = playerName;
         // Our client?
