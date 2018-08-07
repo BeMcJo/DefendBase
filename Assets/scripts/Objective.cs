@@ -106,7 +106,7 @@ public class Objective : MonoBehaviour {
         if (HP <= 0)
         {
             HP = 0;
-            gameObject.SetActive(false);
+            transform.Find("Castle Gate").gameObject.SetActive(false);
             GameManager.gm.DisplayEndGameNotifications(false);
             //GameManager.gm.DisplayDefeatNotification();
         }

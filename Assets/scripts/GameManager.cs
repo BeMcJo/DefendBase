@@ -1296,6 +1296,7 @@ public class GameManager : MonoBehaviour {
         StartCoroutine(MapManager.mapManager.LoadGameScene());
         StartCoroutine(NetworkManager.nm.LoadGameScene());
         //arrowQty.arr[3] = 9999;
+        print("starting game");
         StartGame();
         // Create available defense icon for each trap
         GameObject b = Instantiate(buttonPrefab);
@@ -1827,6 +1828,9 @@ public class GameManager : MonoBehaviour {
         playerStatusCanvas.transform.Find("Currency").gameObject.SetActive(false);
         playerStatusCanvas.transform.Find("Wave").gameObject.SetActive(false);
         playerStatusCanvas.transform.Find("ObjectiveHitIndicator").gameObject.SetActive(false);
+        interactiveUIContainer.SetActive(false);
+        effectsCanvas.SetActive(false);
+
 
         playerOrientationObjects.SetActive(false);
         isSettingPlayerOrientation = false;
@@ -2310,7 +2314,7 @@ public class GameManager : MonoBehaviour {
         playerStatusCanvas.transform.Find("Currency").Find("Text").GetComponent<Text>().text = data.inGameCurrency + "";
         quickAccessUpgradeDescription.transform.Find("Currency").Find("Text").GetComponent<Text>().text = data.inGameCurrency + "";
         shopCanvas.transform.Find("Currency").GetChild(0).GetComponent<Text>().text = "$" + data.inGameCurrency;
-        inGameWepItemUI.transform.Find("BuyBtn").GetComponent<Button>().interactable = data.inGameCurrency >= Weapon.weaponStats[data.wepID].costToUpgrade[data.wepLvl];
+        inGameWepItemUI.transform.Find("BuyBtn").GetComponent<Button>().interactable = data.wepLvl < Weapon.weaponStats[data.wepID].costToUpgrade.Length && data.inGameCurrency >= Weapon.weaponStats[data.wepID].costToUpgrade[data.wepLvl];
     }
 
     // Animates wave notification text to slowly appear
@@ -2483,6 +2487,7 @@ public class GameManager : MonoBehaviour {
         inGame = true;
         onIntermission = false;
         paused = false;
+        spawning = false;
         data.gameOver = false;
         //inGameCurrency = 0;
         startWaves = false;
@@ -2544,7 +2549,7 @@ public class GameManager : MonoBehaviour {
         {
             data = new PlayerData();
         }
-        //data.wave = 4;
+        data.wave = 18;
 
         if (w == null)
         {
@@ -2560,7 +2565,7 @@ public class GameManager : MonoBehaviour {
         }
 
         pc.wep.purchased = true;
-        UpdateInGameCurrency(0);
+        UpdateInGameCurrency(729);
         UpdateKillCount(0);
         UpdateScore(0);
         playerStatusCanvas.transform.Find("Wave").Find("Text").GetComponent<Text>().text = (data.wave == 0) ? "": "" + data.wave +"/" + EnemySpawnPattern.patternsBySpawnPointCt[0].Count;

@@ -451,23 +451,23 @@ MonoBehaviour:
     height: 433
   m_TreeViewState:
     scrollPos: {x: 0, y: 0}
-    m_SelectedIDs: 
-    m_LastClickedID: 0
-    m_ExpandedIDs: a642ffff7443ffffc244ffff8846ffff524dffff564dffffcafbffff00000000
+    m_SelectedIDs: 76cb0800
+    m_LastClickedID: 576374
+    m_ExpandedIDs: 8210e6ff281ae6ff467ce6ff2ca8e6ff18afe6ff54b3e6ff4664edff32d8efff38dbefff24e5efff5604f0ff9208f0ffd8c4f2ffecc6f2ffdce9f2ff9671f4ff8270f5ff5271f5ffa472f5ff6e74f5ff3c7bf5ff447bf5ffbc23f6ff6487f7ff8490f7ff6ed8fbfff242feff0696feff08b9feffd2e9fefff041fffff441fffffa41ffff3646ffff32cfffffcafbfffff4ffffff00000000e64b0000725f000082660000086700001678000090790000e07900006c7a0000ea7b000092a7000082cc000076d1000008810100b2890100bce00200d2880300286e05007c72050044de060098e206003a730800847808004ca2080080aa0800f6aa0800aab60800
     m_RenameOverlay:
       m_UserAcceptedRename: 0
-      m_Name: 
-      m_OriginalName: 
+      m_Name: Enemy 10
+      m_OriginalName: Enemy 10
       m_EditFieldRect:
         serializedVersion: 2
         x: 0
         y: 0
         width: 0
         height: 0
-      m_UserData: 0
+      m_UserData: -125338
       m_IsWaitingForDelay: 0
       m_IsRenaming: 0
-      m_OriginalEventType: 11
+      m_OriginalEventType: 0
       m_IsRenamingFilename: 0
       m_ClientGUIView: {fileID: 10}
     m_SearchString: 
@@ -503,14 +503,14 @@ MonoBehaviour:
     width: 535
     height: 433
   m_SceneLighting: 1
-  lastFramingTime: 1625.753293322578
+  lastFramingTime: 10925.450373029082
   m_2DMode: 0
   m_isRotationLocked: 0
   m_AudioPlay: 0
   m_Position:
-    m_Target: {x: 389.0398, y: -250.77438, z: -96.823715}
+    m_Target: {x: -65.366615, y: -287.7476, z: 130.80478}
     speed: 2
-    m_Value: {x: 389.0398, y: -250.77438, z: -96.823715}
+    m_Value: {x: -65.366615, y: -287.7476, z: 130.80478}
   m_RenderMode: 0
   m_ValidateTrueMetals: 0
   m_SceneViewState:
@@ -533,13 +533,13 @@ MonoBehaviour:
       speed: 2
       m_Value: 0
   m_Rotation:
-    m_Target: {x: 0.1978473, y: 0.70219314, z: -0.21383736, w: 0.6496575}
+    m_Target: {x: -0.4867812, y: 0.18844573, z: -0.10843357, w: -0.8460345}
     speed: 2
-    m_Value: {x: 0.19784729, y: 0.70219314, z: -0.21383736, w: 0.6496575}
+    m_Value: {x: -0.4867812, y: 0.18844573, z: -0.10843357, w: -0.8460345}
   m_Size:
-    m_Target: 509.52356
+    m_Target: 381.64514
     speed: 2
-    m_Value: 509.52356
+    m_Value: 381.64514
   m_Ortho:
     m_Target: 0
     speed: 2
@@ -596,7 +596,7 @@ MonoBehaviour:
   m_LastProjectPath: C:\Users\TwoTen512\Desktop\Unity Programs\DefendBase
   m_IsLocked: 0
   m_FolderTreeState:
-    scrollPos: {x: 0, y: 213}
+    scrollPos: {x: 0, y: 120}
     m_SelectedIDs: 7a280000
     m_LastClickedID: 10362
     m_ExpandedIDs: 0000000054250000682600009226000042270000522700001228000064280000d62c00009e2e0000262f0000e44a0000e64a0000ffffff7f
@@ -652,24 +652,24 @@ MonoBehaviour:
       m_Icon: {fileID: 0}
       m_ResourceFile: 
   m_ListAreaState:
-    m_SelectedInstanceIDs: 
-    m_LastClickedInstanceID: 0
-    m_HadKeyboardFocusLastEvent: 0
+    m_SelectedInstanceIDs: 5e270000
+    m_LastClickedInstanceID: 10078
+    m_HadKeyboardFocusLastEvent: 1
     m_ExpandedInstanceIDs: c6230000fa250000ecea0100683301004a270000802b0000f82600001427000086270000a23e0000c42600002226000092bcffff16f9fdff6e2500005ef2fbff56defbff7a4202003a2500008ccc85ffa6210100148cd9ff0e2600004e2700002a2600004a12ecff4e10d0ff622500007c2500006a98f9ff882500008064ffff342500008c250000fa0ffbff96250000502f0100903afaff46260000a495edffe02500005a5a02007c5a0200fc250000082700006260fdffd07ffcff7875010034bbfdff0e39ffff1c42feffaa260000be2e00005e280000b02500004c340000803400009434000038350000a4260000829affff4035000048260000b0260000d4260000084d020076260000ce270000680a010012260000b2280000e60501007625000074280000082600006c2800000e77fcffe02600007e850000845201001abc0100f626000060cbf5ff9227000042a00000503900000c7f0000ee65f3ffd237000046390000a028000042290000eaa405009e000600863b0200903b000002290000cc29000032270000f26afeffb02a0000c884fbfff25f0000b6280000a4ed02006e9c0000426a00009629000062260000e0270000744dfeff1e27000068290000f4260000c42b00003c280000644cffff6c2001003c27000030f1010012bb02008c290000ec810400f21a07009a2a00006227000046a504009c290000462700007a260000ae260000ec2a0000822a0000ce250000ec2b0000be0001009e290000aa360100000000005e2a0000f8270000982700007e280000282d0000fcc0f8ff0adaf8ff1c2c0000662b00000e2c0000ae2c00008e2e0000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
-      m_Name: 
-      m_OriginalName: 
+      m_Name: main
+      m_OriginalName: main
       m_EditFieldRect:
         serializedVersion: 2
         x: 0
         y: 0
         width: 0
         height: 0
-      m_UserData: 0
+      m_UserData: 10078
       m_IsWaitingForDelay: 0
       m_IsRenaming: 0
-      m_OriginalEventType: 11
+      m_OriginalEventType: 0
       m_IsRenamingFilename: 1
       m_ClientGUIView: {fileID: 11}
     m_CreateAssetUtility:

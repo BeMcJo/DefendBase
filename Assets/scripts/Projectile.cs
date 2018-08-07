@@ -127,14 +127,14 @@ public class Projectile : MonoBehaviour {
             if (target)
             {
                 transform.LookAt(target.transform);
-                transform.position += transform.forward * Time.deltaTime * moveSpd;
+                transform.position += transform.forward * Time.deltaTime * moveSpd * ((target.tag == "Objective")? 2:1);
             }
             else
             {
                 // bullet type (currently just testing to allow raycast at all times)
                 if (true || transform.GetComponent<Rigidbody>().velocity.magnitude >= 55 || (attributeID == 3 && !deflected))
                 {
-                    print("raycasting");
+                    //print("raycasting");
                     //Debug.DrawLine(transform.position, transform.);
                     //Debug.DrawRay(transform.position, transform.forward);
                     //print("shoot forward" + Time.time);
@@ -149,12 +149,12 @@ public class Projectile : MonoBehaviour {
                     */
                     if(Physics.Raycast(transform.position, transform.forward, out hit))
                     {
-                        print("HIT " + hit.distance);
-                        print(hit.point.ToString());
-                        print(hit.collider.gameObject.name + " " + hit.collider.tag);
+                        //print("HIT " + hit.distance);
+                        //print(hit.point.ToString());
+                        //print(hit.collider.gameObject.name + " " + hit.collider.tag);
                         if (hit.distance <= transform.GetComponent<Rigidbody>().velocity.magnitude)//30)
                         {
-                            print("CLOSE");
+                            //print("CLOSE");
                             //GameObject mark = Instantiate(gameObject, hit.point, Quaternion.LookRotation(hit.normal)) as GameObject;
                             //mark.transform.Rotate(Vector)
                             //mark.GetComponent<Projectile>().enabled = false;
@@ -322,16 +322,34 @@ public class Projectile : MonoBehaviour {
         //print("HIT");
 
         // If projectile is an enemy's hitting me as the player?
-        if (collision.tag == "Player" && ownerType == "Enemy")
+        if (ownerType == "Enemy")
         {
-           // print("SPLAT");
-            //GameManager.gm.Blackout();&& 
-            //if(collision.GetComponent<PlayerController>().IsMyPlayer())
-            collision.GetComponent<PlayerController>().AddBuff(1, 1);
-            if (attributeID == 3)
-                Destroy(gameObject, 3f);
-            else
+            if (collision.tag == "Player")
+            {
+                // print("SPLAT");
+                //GameManager.gm.Blackout();&& 
+                //if(collision.GetComponent<PlayerController>().IsMyPlayer())
+                collision.GetComponent<PlayerController>().AddBuff(1, 1);
+                if (attributeID == 3)
+                    Destroy(gameObject, 3f);
+                else
+                    Destroy(gameObject);
+            }
+            else if(collision.tag == "Objective")
+            {
+                // If multiplayer, synchronize the attack to prevent duplicate attacks
+                if (NetworkManager.nm.isStarted)
+                {
+                    NetworkManager.nm.QueueAttackOnObject(GameManager.gm.enemies[ownerID].gameObject, collision.gameObject);
+                }
+                // Not online, just attack target
+                else
+                {
+                    Objective o = target.transform.GetComponent<Objective>();
+                    o.TakeDamage(dmg);
+                }
                 Destroy(gameObject);
+            }
         }
         if (ownerType != "Player")
             return;

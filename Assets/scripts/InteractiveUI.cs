@@ -23,6 +23,7 @@ public class InteractiveUI : MonoBehaviour, IPointerDownHandler  {
         hp = maxHP;
         GetComponent<Image>().sprite = images[0];
     }
+    
     // Update is called once per frame
     void Update()
     {

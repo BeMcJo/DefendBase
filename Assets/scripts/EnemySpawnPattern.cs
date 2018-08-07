@@ -478,6 +478,216 @@ public class EnemySpawnPattern {
         pattern.endIterationTime = 5f;
         pattern.iterations = 2;
 
+        //////////////////////////////////////////////////
+        // Wave 16
+
+        pattern = new Pattern();
+        patterns.Add(pattern);
+        enemyLvls = new List<int>();
+        spawnCt = new List<int>();
+
+        for (int i = 0; i < 3; i++)
+        {
+            spawnCt.Add(2);
+            enemyLvls.Add(0);
+        }
+        pattern.enemyLvls.Add(enemyLvls);
+        pattern.spawnCts.Add(spawnCt);
+        pattern.spawnTimes.Add(3f);
+        pattern.spawnFreqs.Add(2f);
+
+        enemyLvls = new List<int>();
+        spawnCt = new List<int>();
+
+        for (int i = 0; i < 3; i++)
+        {
+            spawnCt.Add(0);
+            enemyLvls.Add(1);
+        }
+        pattern.enemyLvls.Add(enemyLvls);
+        pattern.spawnCts.Add(spawnCt);
+        pattern.spawnTimes.Add(6f);
+        pattern.spawnFreqs.Add(3f);
+
+        enemyLvls = new List<int>();
+        spawnCt = new List<int>();
+
+        for (int i = 0; i < 3; i++)
+        {
+            spawnCt.Add(1);
+            enemyLvls.Add(0);
+        }
+        pattern.enemyLvls.Add(enemyLvls);
+        pattern.spawnCts.Add(spawnCt);
+        pattern.spawnTimes.Add(6f);
+        pattern.spawnFreqs.Add(8f);
+
+
+        enemyLvls = new List<int>();
+        spawnCt = new List<int>();
+
+        for (int i = 0; i < 3; i++)
+        {
+            spawnCt.Add(2);
+            enemyLvls.Add(0);
+        }
+        pattern.enemyLvls.Add(enemyLvls);
+        pattern.spawnCts.Add(spawnCt);
+        pattern.spawnTimes.Add(3f);
+        pattern.spawnFreqs.Add(2f);
+        
+        enemyLvls = new List<int>();
+        spawnCt = new List<int>();
+
+        for (int i = 0; i < 2; i++)
+        {
+            spawnCt.Add(0);
+            enemyLvls.Add(1);
+            spawnCt.Add(1);
+            enemyLvls.Add(0);
+        }
+        pattern.enemyLvls.Add(enemyLvls);
+        pattern.spawnCts.Add(spawnCt);
+        pattern.spawnTimes.Add(9f);
+
+        pattern.endIterationTime = 5f;
+        pattern.iterations = 1;
+
+        //////////////////////////////////////////////////
+        // Wave 17
+
+        pattern = new Pattern();
+        patterns.Add(pattern);
+        enemyLvls = new List<int>();
+        spawnCt = new List<int>();
+
+        for (int i = 0; i < 4; i++)
+        {
+            spawnCt.Add(1);
+            enemyLvls.Add(1);
+        }
+        pattern.enemyLvls.Add(enemyLvls);
+        pattern.spawnCts.Add(spawnCt);
+        pattern.spawnTimes.Add(6f);
+        pattern.spawnFreqs.Add(4f);
+
+        enemyLvls = new List<int>();
+        spawnCt = new List<int>();
+
+        for (int i = 0; i < 3; i++)
+        {
+            spawnCt.Add(2);
+            enemyLvls.Add(0);
+        }
+        pattern.enemyLvls.Add(enemyLvls);
+        pattern.spawnCts.Add(spawnCt);
+        pattern.spawnTimes.Add(4f);
+
+        pattern.endIterationTime = 3f;
+        pattern.iterations = 2;
+
+        //////////////////////////////////////////////////
+        // Wave 18
+
+        pattern = new Pattern();
+        patterns.Add(pattern);
+        enemyLvls = new List<int>();
+        spawnCt = new List<int>();
+
+        for (int i = 0; i < 1; i++)
+        {
+            spawnCt.Add(0);
+            enemyLvls.Add(1);
+            spawnCt.Add(1);
+            enemyLvls.Add(1);
+            spawnCt.Add(0);
+            enemyLvls.Add(1);
+        }
+        pattern.enemyLvls.Add(enemyLvls);
+        pattern.spawnCts.Add(spawnCt);
+        pattern.spawnTimes.Add(3f);
+        pattern.spawnFreqs.Add(6f);
+
+        enemyLvls = new List<int>();
+        spawnCt = new List<int>();
+
+        for (int i = 0; i < 3; i++)
+        {
+            spawnCt.Add(2);
+            enemyLvls.Add(1);
+        }
+        pattern.enemyLvls.Add(enemyLvls);
+        pattern.spawnCts.Add(spawnCt);
+        pattern.spawnTimes.Add(9f);
+
+        pattern.endIterationTime = 7f;
+        pattern.iterations = 3;
+
+        //////////////////////////////////////////////////
+        // Wave 19
+
+        pattern = new Pattern();
+        patterns.Add(pattern);
+        enemyLvls = new List<int>();
+        spawnCt = new List<int>();
+
+        for (int i = 0; i < 2; i++)
+        {
+            spawnCt.Add(0);
+            enemyLvls.Add(1);
+            spawnCt.Add(0);
+            enemyLvls.Add(0);
+        }
+        pattern.enemyLvls.Add(enemyLvls);
+        pattern.spawnCts.Add(spawnCt);
+        pattern.spawnTimes.Add(4f);
+        pattern.spawnFreqs.Add(3f);
+
+        enemyLvls = new List<int>();
+        spawnCt = new List<int>();
+
+        for (int i = 0; i < 2; i++)
+        {
+            spawnCt.Add(0);
+            enemyLvls.Add(1);
+            spawnCt.Add(0);
+            enemyLvls.Add(0);
+        }
+        pattern.enemyLvls.Add(enemyLvls);
+        pattern.spawnCts.Add(spawnCt);
+        pattern.spawnTimes.Add(4f);
+        pattern.spawnFreqs.Add(5f);
+
+        enemyLvls = new List<int>();
+        spawnCt = new List<int>();
+
+        for (int i = 0; i < 2; i++)
+        {
+            spawnCt.Add(1);
+            enemyLvls.Add(1);
+            spawnCt.Add(1);
+            enemyLvls.Add(1);
+        }
+        pattern.enemyLvls.Add(enemyLvls);
+        pattern.spawnCts.Add(spawnCt);
+        pattern.spawnTimes.Add(10f);
+        pattern.spawnFreqs.Add(5f);
+
+
+        enemyLvls = new List<int>();
+        spawnCt = new List<int>();
+
+        for (int i = 0; i < 3; i++)
+        {
+            spawnCt.Add(2);
+            enemyLvls.Add(1);
+        }
+        pattern.enemyLvls.Add(enemyLvls);
+        pattern.spawnCts.Add(spawnCt);
+        pattern.spawnTimes.Add(10f);
+
+        pattern.endIterationTime = 5f;
+        pattern.iterations = 2;
 
     }
 }

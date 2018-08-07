@@ -50,10 +50,10 @@ public abstract class Weapon : MonoBehaviour
             0,
             UnlockCondition.Free,
             new int[] {1,1,1,1,1},
-            new int[] {50,100,200,500},
-            new float[] {16, 17,19,23,29},
+            new int[] {50,90,185,400},
+            new float[] {16, 17,19,23,27},
             new float[] {2f,1.75f,1.5f,1.25f,1f},
-            new float[] {.75f,.70f,.65f,.55f,.5f},
+            new float[] {.75f,.775f,.8f,.85f,.95f},
             "Your standard bow"
         ),
         // Dual-Shot Bow
@@ -480,7 +480,7 @@ public abstract class Weapon : MonoBehaviour
     // Handle charging weapon
     public virtual void Charge(float chargePower)
     {
-        chargePower = chargePower + (.03f * weaponStats[wepID].chargeAccelation[0]) / (float)DebugManager.dbm.fps * 60.0f; // increment charge power
+        chargePower = chargePower + (.03f * weaponStats[wepID].chargeAccelation[lvl]) / (float)DebugManager.dbm.fps * 60.0f; // increment charge power
         if (chargePower >= chargeLimit)
             chargePower = chargeLimit;
         //chargeBar.transform.localScale = new Vector3(1, chargePower / chargeLimit, 1); // Visual indicator of charge percentage

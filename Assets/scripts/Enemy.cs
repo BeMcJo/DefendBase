@@ -48,8 +48,8 @@ public class Enemy : MonoBehaviour
         // Stats for Flyglet ignore -> Flyies
         new EnemyStats[]
         {
-            new EnemyStats(1, 1, 70,1,1, 1),
-            new EnemyStats(2, 2, 70,1,1.2f, 1.2f),
+            new EnemyStats(1, 0, 70,1,1, 1),
+            new EnemyStats(1, 1, 70,1,1f, 1f),
             new EnemyStats(4, 3, 70,1,1.25f, 1.25f),
             new EnemyStats(4, 3, 70,1,1.5f, 1.3f),
             new EnemyStats(6, 3, 70,1,1.5f, 1.5f)
@@ -70,7 +70,7 @@ public class Enemy : MonoBehaviour
                attackType, // Current attack option
                enemyID = 0, // Distinguishes what type of enemy this is
                attackCt, // Keeps track of attack for multiplayer synchronization
-               curTarget, // Pursue current target
+               curTarget, // Pursue current target pathing
                dmgSourceID, // Damage Source ID ( most recent unit that attacked this object )
                level; // Used to determine what the stats are
     public float originalMoveSpd = 0.075f, // Default move speed
@@ -167,6 +167,7 @@ public class Enemy : MonoBehaviour
         hpBar.transform.GetComponent<StatusIndicator>().target = gameObject;
         hpBar.transform.SetParent(transform.Find("HP Placeholder"));
         hpBar.transform.localPosition = Vector3.zero;
+
 
     }
 
@@ -786,11 +787,19 @@ public class Enemy : MonoBehaviour
     public virtual void SetTarget(GameObject g)
     {
         target = g;
-        Vector3 pos = new Vector3(
-                        g.transform.position.x,
-                        transform.position.y,
-                        g.transform.position.z
-                       );
+        Vector3 pos;
+        if (g.tag == "Objective" && enemyID == 2)
+        {
+            pos = g.transform.position;
+        }
+        else
+        {
+            pos = new Vector3(
+                            g.transform.position.x,
+                            transform.position.y,
+                            g.transform.position.z
+                           );
+        }
         targetPos = pos;
         Turn();
     }

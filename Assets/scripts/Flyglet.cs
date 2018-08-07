@@ -18,9 +18,17 @@ public class Flyglet : Enemy
         enemyID = 2;
         base.Start();
         //anim.SetInteger("hp", health);
-        SetTarget(SelectPlayerTarget());
+        int r = Random.Range(0, 2);
+        print(r);
+        GameObject[] a = new GameObject[]{SelectPlayerTarget(), pathing[curTarget]};
+        print(a[0].tag);
+        print(a[1].tag);
+        if (level <= 0)
+            r = 0;
+        SetTarget(a[r]);
         if (NetworkManager.nm.isStarted && NetworkManager.nm.isHost)
             NetworkManager.nm.SendEnemyInfo(this);
+        print("flyg target " + target.tag);
         //anim.Play(ename + "_move", -1, 0);
     }
 
@@ -54,6 +62,17 @@ public class Flyglet : Enemy
             Vector2 targetPos2d = new Vector2(targetPos.x, targetPos.z);
             Vector2 pos2d = new Vector2(transform.position.x, transform.position.z);//go.transform.position.x, go.transform.position.z);
             float dist = Vector3.Distance(pos2d, targetPos2d);
+            
+            Vector2 targetPos2dObj = new Vector2(GameManager.gm.objective.transform.position.x, GameManager.gm.objective.transform.position.z);
+            //Vector2 pos2dObj = new Vector2(transform.position.x, transform.position.z);//go.transform.position.x, go.transform.position.z);
+            float distObj = Vector3.Distance(pos2d, targetPos2dObj);
+
+            if (target.tag != "Player" && distObj <= 20f)
+            {
+                SetTarget(GameManager.gm.objective);
+                AttemptAttackAction();
+                return;
+            }
 
             // Move towards target if it is a Path
             if (target.tag == "Player")
@@ -73,12 +92,44 @@ public class Flyglet : Enemy
             // Move towards objective and attack it if in range
             else if (target.tag == "Objective")
             {
-                if (dist <= 2.8f)
+                if (dist <= 15f)
                 {
                     AttemptAttackAction();
                 }
                 else
                 {
+                    Move();
+                }
+            }
+            else if(target.tag == "Path")
+            {
+                //if (enemyID == 1)
+                //print("outhere?");
+
+                if (dist <= .3f)
+                {
+                    //print("CHANGE PATH");
+                    PlatformPath p = target.transform.GetComponent<PlatformPath>();
+                    target = null;
+
+                    curTarget++;
+                    // Get new path if reached destination
+                    if (curTarget < pathing.Count) //p.destTargets.Count > 0)
+                    {
+                        SetTarget(pathing[curTarget]);
+                        //SetTarget(p.destTargets[Random.Range(0, p.destTargets.Count)]);
+                    }
+                    // No more paths, target objective
+                    else
+                    {
+                        SetTarget(GameManager.gm.objective);
+                    }
+                }
+                // Move and face towards target
+                else
+                {
+                    //if(enemyID == 1)
+                    //print("here?");
                     Move();
                 }
             }
@@ -103,8 +154,12 @@ public class Flyglet : Enemy
         Projectile p = projectile.GetComponent<Projectile>();
         projectile.transform.position = transform.position;
         projectile.GetComponent<Rigidbody>().AddForce(0, 500, 0);
-        p.Shoot(target, tag, id, 0);
-
+        if(target.tag == "Player")
+            p.Shoot(target, tag, id, 0);
+        else if(target.tag == "Objective")
+        {
+            p.Shoot(target, tag, id, enemyStats[enemyID][level].dmg);
+        }
     }
 
     // Attack target
@@ -125,7 +180,7 @@ public class Flyglet : Enemy
                 o.TakeDamage(dmg);
             }
         }*/
-        if (target.tag == "Player")
+        if (target.tag == "Player" || target.tag == "Objective")
         {
             print("FIRE");
             Shoot(target);
@@ -285,7 +340,8 @@ public class Flyglet : Enemy
     // Handles move action
     public override void Move()
     {
-        Turn();
+        //if(targ)
+        //Turn();
         transform.position = Vector3.MoveTowards(transform.position, targetPos, effectiveMoveSpd * 60f / (float)DebugManager.dbm.fps);
         StartCoroutine(MoveAnimation());
     }

@@ -47,10 +47,11 @@ public class Buff : MonoBehaviour {
     // Remove any lingering conditions when buff expires
     private void OnDestroy()
     {
-        foreach(GameObject cond in conditions)
+        for(int i =0;i < conditions.Count;i++)//(GameObject cond in conditions)
         {
-            print("DESTROYING CONDS");
-            Destroy(cond);
+            RemoveCondition(conditions[i]);
+            //print("DESTROYING CONDS");
+            //Destroy(cond);
         }
         Destroy(buffDurationUI);
     }
