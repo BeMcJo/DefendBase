@@ -81,7 +81,7 @@ public class Enemy : MonoBehaviour
                  originalAttackSpd = 1f, // Default Attack Speed
                  attackRange, // Distance before being able to attack
                  effectiveAttackSpd; // Attack speed calculated and used
-    public bool isGrounded = false, isDoneMoving, isAttacking, isPerformingAction, isDead=false, canPerformAction;
+    public bool isGrounded = false, isDoneMoving, isAttacking, isPerformingAction, isDead=false, canPerformAction, isJumping;
     protected string actionPerformed = "idle", ename = "enemy", 
                      dmgSourceType; // who or what dealt damage to me? (Player, trap, etc)
     protected Color originalColor;
@@ -120,6 +120,7 @@ public class Enemy : MonoBehaviour
     {
         id = EnemyCount;
         EnemyCount++;
+        attackType = -1;
         if (GameManager.gm.enemies != null)
         {
             GameManager.gm.enemies[id] = this;
@@ -340,7 +341,8 @@ public class Enemy : MonoBehaviour
 
     public void MoveForward()
     {
-        transform.position = Vector3.MoveTowards(transform.position, targetPos, effectiveMoveSpd * 60f / (float)DebugManager.dbm.fps);
+        transform.position += transform.forward * effectiveMoveSpd * DebugManager.dbm.FrameRate();
+        //transform.position = Vector3.MoveTowards(transform.position, targetPos, effectiveMoveSpd * 60f / (float)DebugManager.dbm.fps);
         AssignMoveTargetIfReached();
     }
 
@@ -348,14 +350,22 @@ public class Enemy : MonoBehaviour
     public bool ReachGround()
     {
         //transform.position = Vector3.MoveTowards(transform.position, targetPos, effectiveMoveSpd);
-        MoveForward();
+        //MoveForward();
         return grounds.Count > 0; //|| isGrounded && anim.GetCurrentAnimatorStateInfo(0).IsName("enemy_fall");
     }
     // Move forward while haven't reached peak of jump
     public bool ReachPeak()
     {
         Rigidbody rb = transform.GetComponent<Rigidbody>();
-        MoveForward();
+        //MoveForward();
+        //transform.position = Vector3.MoveTowards(transform.position, targetPos, effectiveMoveSpd);
+        return rb.velocity.y < 0;
+    }
+
+    public bool IsJumping()
+    {
+        Rigidbody rb = transform.GetComponent<Rigidbody>();
+        //MoveForward();
         //transform.position = Vector3.MoveTowards(transform.position, targetPos, effectiveMoveSpd);
         return rb.velocity.y > 0;
     }
@@ -383,19 +393,26 @@ public class Enemy : MonoBehaviour
     // Perform move animation
     public virtual IEnumerator MoveAnimation()
     {
+        //if (!isPerformingAction)
+        //{
         // Denote current action moving
         isPerformingAction = true;
 
-        // Animation before jumping
+        float prevSpeed = anim.speed;
+        anim.speed = enemyStats[enemyID][level].moveSpd;
+
+            // Animation before jumping
         anim.Play(ename + "_prejump", -1, 0);
         yield return new WaitUntil(IsPreJumpingAnimation);
         anim.SetBool("isJumping", true);
         yield return new WaitWhile(IsPreJumpingAnimation);
 
+        isJumping = true;
         // Jump by adding upward force
         Rigidbody rb = GetComponent<Rigidbody>();
-        GetComponent<Rigidbody>().AddForce(new Vector3(0, 600, 0));
-        yield return new WaitUntil(IsJumpingAnimation);
+        GetComponent<Rigidbody>().AddForce(new Vector3(0, 450, 0));
+        //yield return new WaitUntil(IsJumpingAnimation);
+        yield return new WaitUntil(IsJumping);
         yield return new WaitUntil(ReachPeak);
 
         // After reaching peak of jump, fall and detect landing
@@ -404,13 +421,14 @@ public class Enemy : MonoBehaviour
         anim.SetBool("isGrounded", false);
         anim.SetBool("isJumping", false);
         anim.SetBool("isFalling", true);
-        yield return new WaitUntil(IsFallingAnimation);
+        //yield return new WaitUntil(IsFallingAnimation);
         yield return new WaitUntil(ReachGround);
-
+        anim.Play(ename + "_land", -1, 0);
         // Upon touching ground, perform land animation
         rb.velocity -= new Vector3(0, rb.velocity.y, 0);
         anim.SetBool("isFalling", false);
         anim.SetBool("isGrounded", true);
+        yield return new WaitUntil(IsLandingAnimation);
 
         //if (ename == "slime")
         //    anim.Play(ename + "_land", -1, 0);
@@ -418,7 +436,11 @@ public class Enemy : MonoBehaviour
         //yield return new WaitForSeconds(1);
         // End of move action
         anim.SetBool("isMoving", false);
+        isJumping = false;
+        yield return new WaitWhile(IsLandingAnimation);
+        //yield return new WaitForSeconds(.35f/enemyStats[enemyID][level].moveSpd);
         actionPerformed = "idle";
+        anim.speed = prevSpeed;
         isPerformingAction = false;
         //}
     }
@@ -473,6 +495,14 @@ public class Enemy : MonoBehaviour
                 {
                     SetTarget(GameManager.gm.objective);
                 }
+            }
+        }else if(target.tag == "Objective")
+        {
+            if(dist <= attackRange)
+            {
+                //AttemptAttackAction();
+                isJumping = false;
+                //StopAllCoroutines();
             }
         }
     }
@@ -588,16 +618,23 @@ public class Enemy : MonoBehaviour
     // Checks if current animation is charging
     public bool IsChargingAnimation()
     {
+        if(attackType != -1)
+            return anim.GetCurrentAnimatorStateInfo(0).IsName("charge"+attackType);
+
         return anim.GetCurrentAnimatorStateInfo(0).IsName("charge");
     }
     // Checks if current animation is reloading
     public bool IsReloadingAnimation()
     {
+        if (attackType != -1)
+            return anim.GetCurrentAnimatorStateInfo(0).IsName("reload" + attackType);
         return anim.GetCurrentAnimatorStateInfo(0).IsName("reload");
     }
     // Checks if current animation is attacking
     public bool IsAttackingAnimation()
     {
+        if (attackType != -1)
+            return anim.GetCurrentAnimatorStateInfo(0).IsName("attack" + attackType);
         return anim.GetCurrentAnimatorStateInfo(0).IsName("attack");
     }
     // Checks if enemy can attack after timer reaches 0
@@ -629,8 +666,13 @@ public class Enemy : MonoBehaviour
         */
 
         yield return new WaitForSeconds(effectiveTimeToAttack);
-        
-        anim.Play("charge", -1, 0);
+        string attackVariations = "";
+        if (enemyID == 0)
+        {
+            attackType = Random.Range(0, attackTypes);
+            attackVariations += attackType;
+        }
+        anim.Play("charge" + attackVariations, -1, 0);
 
         // Perform attack animation
         //anim.SetBool("isAttacking", isAttacking);
@@ -639,11 +681,11 @@ public class Enemy : MonoBehaviour
         
         // After attack animation finishes, inflict damage
         Attack(target);
-        
+
         // Perform reload animation
         //anim.SetBool("isReloading", true);
         yield return new WaitUntil(IsReloadingAnimation);
-        
+
         // End attack action
         anim.speed = prevSpd;
         //anim.SetBool("isReloading", false);

@@ -2549,7 +2549,7 @@ public class GameManager : MonoBehaviour {
         {
             data = new PlayerData();
         }
-        data.wave = 18;
+        //data.wave = 18;
 
         if (w == null)
         {

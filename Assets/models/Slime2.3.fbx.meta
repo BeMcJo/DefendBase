@@ -1,0 +1,662 @@
+fileFormatVersion: 2
+guid: 28a60a00d48fe624cb545ead130ef26e
+timeCreated: 1533708260
+licenseType: Free
+ModelImporter:
+  serializedVersion: 19
+  fileIDToRecycleName:
+    100000: Armature
+    100002: bulb
+    100004: bulb_end
+    100006: head
+    100008: Slime
+    100010: //RootNode
+    100012: stem1
+    100014: stem2
+    100016: stem3
+    400000: Armature
+    400002: bulb
+    400004: bulb_end
+    400006: head
+    400008: Slime
+    400010: //RootNode
+    400012: stem1
+    400014: stem2
+    400016: stem3
+    4300000: Slime
+    7400000: Armature|ArmatureAction
+    7400002: idle
+    7400004: slime_prejump
+    7400006: slime_jump
+    7400008: slime_fall
+    7400010: slime_land
+    7400012: charge0
+    7400014: attack0
+    7400016: reload0
+    7400018: charge1
+    7400020: attack1
+    7400022: reload1
+    9500000: //RootNode
+    13700000: Slime
+  materials:
+    importMaterials: 1
+    materialName: 0
+    materialSearch: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    resampleCurves: 1
+    optimizeGameObjects: 0
+    motionNodeName: 
+    rigImportErrors: 
+    rigImportWarnings: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    animationCompression: 1
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    clipAnimations:
+    - serializedVersion: 16
+      name: Armature|ArmatureAction
+      takeName: Armature|ArmatureAction
+      firstFrame: 0
+      lastFrame: 120
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask:
+      - path: 
+        weight: 1
+      - path: Armature
+        weight: 1
+      - path: Armature/head
+        weight: 1
+      - path: Armature/head/stem1
+        weight: 1
+      - path: Armature/head/stem1/stem2
+        weight: 1
+      - path: Armature/head/stem1/stem2/stem3
+        weight: 1
+      - path: Armature/head/stem1/stem2/stem3/bulb
+        weight: 1
+      - path: Armature/head/stem1/stem2/stem3/bulb/bulb_end
+        weight: 1
+      - path: Slime
+        weight: 1
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: idle
+      takeName: Armature|ArmatureAction
+      firstFrame: 0
+      lastFrame: 30
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 1
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask:
+      - path: 
+        weight: 1
+      - path: Armature
+        weight: 1
+      - path: Armature/head
+        weight: 1
+      - path: Armature/head/stem1
+        weight: 1
+      - path: Armature/head/stem1/stem2
+        weight: 1
+      - path: Armature/head/stem1/stem2/stem3
+        weight: 1
+      - path: Armature/head/stem1/stem2/stem3/bulb
+        weight: 1
+      - path: Armature/head/stem1/stem2/stem3/bulb/bulb_end
+        weight: 1
+      - path: Slime
+        weight: 1
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: slime_prejump
+      takeName: Armature|ArmatureAction
+      firstFrame: 30
+      lastFrame: 36
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask:
+      - path: 
+        weight: 1
+      - path: Armature
+        weight: 1
+      - path: Armature/head
+        weight: 1
+      - path: Armature/head/stem1
+        weight: 1
+      - path: Armature/head/stem1/stem2
+        weight: 1
+      - path: Armature/head/stem1/stem2/stem3
+        weight: 1
+      - path: Armature/head/stem1/stem2/stem3/bulb
+        weight: 1
+      - path: Armature/head/stem1/stem2/stem3/bulb/bulb_end
+        weight: 1
+      - path: Slime
+        weight: 1
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: slime_jump
+      takeName: Armature|ArmatureAction
+      firstFrame: 36
+      lastFrame: 42
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask:
+      - path: 
+        weight: 1
+      - path: Armature
+        weight: 1
+      - path: Armature/head
+        weight: 1
+      - path: Armature/head/stem1
+        weight: 1
+      - path: Armature/head/stem1/stem2
+        weight: 1
+      - path: Armature/head/stem1/stem2/stem3
+        weight: 1
+      - path: Armature/head/stem1/stem2/stem3/bulb
+        weight: 1
+      - path: Armature/head/stem1/stem2/stem3/bulb/bulb_end
+        weight: 1
+      - path: Slime
+        weight: 1
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: slime_fall
+      takeName: Armature|ArmatureAction
+      firstFrame: 42
+      lastFrame: 48
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask:
+      - path: 
+        weight: 1
+      - path: Armature
+        weight: 1
+      - path: Armature/head
+        weight: 1
+      - path: Armature/head/stem1
+        weight: 1
+      - path: Armature/head/stem1/stem2
+        weight: 1
+      - path: Armature/head/stem1/stem2/stem3
+        weight: 1
+      - path: Armature/head/stem1/stem2/stem3/bulb
+        weight: 1
+      - path: Armature/head/stem1/stem2/stem3/bulb/bulb_end
+        weight: 1
+      - path: Slime
+        weight: 1
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: slime_land
+      takeName: Armature|ArmatureAction
+      firstFrame: 48
+      lastFrame: 60
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask:
+      - path: 
+        weight: 1
+      - path: Armature
+        weight: 1
+      - path: Armature/head
+        weight: 1
+      - path: Armature/head/stem1
+        weight: 1
+      - path: Armature/head/stem1/stem2
+        weight: 1
+      - path: Armature/head/stem1/stem2/stem3
+        weight: 1
+      - path: Armature/head/stem1/stem2/stem3/bulb
+        weight: 1
+      - path: Armature/head/stem1/stem2/stem3/bulb/bulb_end
+        weight: 1
+      - path: Slime
+        weight: 1
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: charge0
+      takeName: Armature|ArmatureAction
+      firstFrame: 60
+      lastFrame: 65
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask:
+      - path: 
+        weight: 1
+      - path: Armature
+        weight: 1
+      - path: Armature/head
+        weight: 1
+      - path: Armature/head/stem1
+        weight: 1
+      - path: Armature/head/stem1/stem2
+        weight: 1
+      - path: Armature/head/stem1/stem2/stem3
+        weight: 1
+      - path: Armature/head/stem1/stem2/stem3/bulb
+        weight: 1
+      - path: Armature/head/stem1/stem2/stem3/bulb/bulb_end
+        weight: 1
+      - path: Slime
+        weight: 1
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: attack0
+      takeName: Armature|ArmatureAction
+      firstFrame: 65
+      lastFrame: 72
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask:
+      - path: 
+        weight: 1
+      - path: Armature
+        weight: 1
+      - path: Armature/head
+        weight: 1
+      - path: Armature/head/stem1
+        weight: 1
+      - path: Armature/head/stem1/stem2
+        weight: 1
+      - path: Armature/head/stem1/stem2/stem3
+        weight: 1
+      - path: Armature/head/stem1/stem2/stem3/bulb
+        weight: 1
+      - path: Armature/head/stem1/stem2/stem3/bulb/bulb_end
+        weight: 1
+      - path: Slime
+        weight: 1
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: reload0
+      takeName: Armature|ArmatureAction
+      firstFrame: 72
+      lastFrame: 90
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask:
+      - path: 
+        weight: 1
+      - path: Armature
+        weight: 1
+      - path: Armature/head
+        weight: 1
+      - path: Armature/head/stem1
+        weight: 1
+      - path: Armature/head/stem1/stem2
+        weight: 1
+      - path: Armature/head/stem1/stem2/stem3
+        weight: 1
+      - path: Armature/head/stem1/stem2/stem3/bulb
+        weight: 1
+      - path: Armature/head/stem1/stem2/stem3/bulb/bulb_end
+        weight: 1
+      - path: Slime
+        weight: 1
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: charge1
+      takeName: Armature|ArmatureAction
+      firstFrame: 90
+      lastFrame: 95
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask:
+      - path: 
+        weight: 1
+      - path: Armature
+        weight: 1
+      - path: Armature/head
+        weight: 1
+      - path: Armature/head/stem1
+        weight: 1
+      - path: Armature/head/stem1/stem2
+        weight: 1
+      - path: Armature/head/stem1/stem2/stem3
+        weight: 1
+      - path: Armature/head/stem1/stem2/stem3/bulb
+        weight: 1
+      - path: Armature/head/stem1/stem2/stem3/bulb/bulb_end
+        weight: 1
+      - path: Slime
+        weight: 1
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: attack1
+      takeName: Armature|ArmatureAction
+      firstFrame: 95
+      lastFrame: 102
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask:
+      - path: 
+        weight: 1
+      - path: Armature
+        weight: 1
+      - path: Armature/head
+        weight: 1
+      - path: Armature/head/stem1
+        weight: 1
+      - path: Armature/head/stem1/stem2
+        weight: 1
+      - path: Armature/head/stem1/stem2/stem3
+        weight: 1
+      - path: Armature/head/stem1/stem2/stem3/bulb
+        weight: 1
+      - path: Armature/head/stem1/stem2/stem3/bulb/bulb_end
+        weight: 1
+      - path: Slime
+        weight: 1
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: reload1
+      takeName: Armature|ArmatureAction
+      firstFrame: 102
+      lastFrame: 120
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask:
+      - path: 
+        weight: 1
+      - path: Armature
+        weight: 1
+      - path: Armature/head
+        weight: 1
+      - path: Armature/head/stem1
+        weight: 1
+      - path: Armature/head/stem1/stem2
+        weight: 1
+      - path: Armature/head/stem1/stem2/stem3
+        weight: 1
+      - path: Armature/head/stem1/stem2/stem3/bulb
+        weight: 1
+      - path: Armature/head/stem1/stem2/stem3/bulb/bulb_end
+        weight: 1
+      - path: Slime
+        weight: 1
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    importBlendShapes: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    keepQuads: 0
+    weldVertices: 1
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+  tangentSpace:
+    normalSmoothAngle: 60
+    normalImportMode: 0
+    tangentImportMode: 3
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    serializedVersion: 2
+    human: []
+    skeleton: []
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
+    feetSpacing: 0
+    rootMotionBoneName: 
+    rootMotionBoneRotation: {x: 0, y: 0, z: 0, w: 1}
+    hasTranslationDoF: 0
+    hasExtraRoot: 0
+    skeletonHasParents: 1
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 2
+  humanoidOversampling: 1
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

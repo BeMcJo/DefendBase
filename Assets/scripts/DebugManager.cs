@@ -36,6 +36,11 @@ public class DebugManager : MonoBehaviour {
         }
     }
 
+    public float FrameRate()
+    {
+        return 60f / fps;
+    }
+
     public void SetDebugMode(bool debug)
     {
         isDebugging = debug;

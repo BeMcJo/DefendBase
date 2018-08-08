@@ -7,6 +7,7 @@ public class Slime : Enemy {
     {
         base.Awake();
         ename = "slime";
+        attackTypes = 2;
     }
     // Use this for initialization
     protected override void Start()
@@ -15,6 +16,18 @@ public class Slime : Enemy {
         base.Start();
     }
 
+    protected override void Update()
+    {
+        base.Update();
+        if (isJumping)
+            Move();
+    }
+    public override void Move()
+    {
+        base.Move();
+        MoveForward();
+    }
+    /*
     protected override void OnCollisionEnter(Collision collision)
     {
         // Ignore colliding with enemies
@@ -41,6 +54,8 @@ public class Slime : Enemy {
         if (enemyID == 0)
             anim.SetBool("isGrounded", isGrounded);
     }
+    */
+    /*
     protected override void OnCollisionStay(Collision collision)
     {
         if (collision.gameObject.tag == "Enemy")
@@ -55,7 +70,7 @@ public class Slime : Enemy {
             Physics.IgnoreCollision(c, go.GetComponent<Collider>());
             */
             //Physics.IgnoreCollision(c, GetComponentInChildren<Collider>());
-            return;
-        }
-    }
+   //         return;
+   //     }
+   // }
 }
