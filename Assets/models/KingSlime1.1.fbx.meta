@@ -1,44 +1,40 @@
 fileFormatVersion: 2
-guid: 179b36332f3086040a96f080bb1ed9ff
-timeCreated: 1533665919
+guid: 0eaede8263b575e42999526e5c6356f2
+timeCreated: 1533780867
 licenseType: Free
 ModelImporter:
   serializedVersion: 19
   fileIDToRecycleName:
-    100000: Armature.001
-    100002: Cylinder
-    100004: joint1
-    100006: joint2
-    100008: joint3
-    100010: joint4
-    100012: joint5
-    100014: joint5_end
-    100016: joint6
-    100018: //RootNode
-    100020: Slime.001
-    100022: Sphere
-    400000: Armature.001
-    400002: Cylinder
-    400004: joint1
-    400006: joint2
-    400008: joint3
-    400010: joint4
-    400012: joint5
-    400014: joint5_end
-    400016: joint6
-    400018: //RootNode
-    400020: Slime.001
-    400022: Sphere
-    2300000: Sphere
-    3300000: Sphere
-    4300000: Slime.001
-    4300002: Cylinder
-    4300004: Sphere
-    7400000: Armature.001|Armature.001|Take 001|BaseLayer
-    7400002: Armature.001|Armature|Take 001|BaseLayer
+    100000: Armature
+    100002: Brow
+    100004: bulb
+    100006: bulb_end
+    100008: head
+    100010: //RootNode
+    100012: Mustache
+    100014: Slime
+    100016: stem1
+    100018: stem2
+    100020: stem3
+    400000: Armature
+    400002: Brow
+    400004: bulb
+    400006: bulb_end
+    400008: head
+    400010: //RootNode
+    400012: Mustache
+    400014: Slime
+    400016: stem1
+    400018: stem2
+    400020: stem3
+    4300000: Brow
+    4300002: Mustache
+    4300004: Slime
+    7400000: Armature|ArmatureAction
     9500000: //RootNode
-    13700000: Cylinder
-    13700002: Slime.001
+    13700000: Brow
+    13700002: Mustache
+    13700004: Slime
   materials:
     importMaterials: 1
     materialName: 0

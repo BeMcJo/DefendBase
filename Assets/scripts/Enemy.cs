@@ -80,6 +80,7 @@ public class Enemy : MonoBehaviour
                  atkTimer, // Used to check if enemy can inflict damage
                  originalAttackSpd = 1f, // Default Attack Speed
                  attackRange, // Distance before being able to attack
+                 prevDist, // Distance from target beforehand
                  effectiveAttackSpd; // Attack speed calculated and used
     public bool isGrounded = false, isDoneMoving, isAttacking, isPerformingAction, isDead=false, canPerformAction, isJumping;
     protected string actionPerformed = "idle", ename = "enemy", 
@@ -132,6 +133,7 @@ public class Enemy : MonoBehaviour
         }
         name = "Enemy " + id;
         Physics.IgnoreLayerCollision(8, 8, true);
+        prevDist = -1;
 
     }
 
@@ -342,6 +344,15 @@ public class Enemy : MonoBehaviour
     public void MoveForward()
     {
         transform.position += transform.forward * effectiveMoveSpd * DebugManager.dbm.FrameRate();
+        Vector2 pos2D = new Vector2(transform.position.x, transform.position.z);
+        Vector2 pos2D2 = new Vector2(targetPos.x, targetPos.z);
+        float dist = Vector2.Distance(pos2D, pos2D2);
+        if(prevDist >= 0 && dist > prevDist)
+        {
+            print("LARGERasdasd");
+            SetTarget(target);
+        }
+        prevDist = dist;
         //transform.position = Vector3.MoveTowards(transform.position, targetPos, effectiveMoveSpd * 60f / (float)DebugManager.dbm.fps);
         AssignMoveTargetIfReached();
     }
@@ -843,6 +854,7 @@ public class Enemy : MonoBehaviour
                            );
         }
         targetPos = pos;
+        prevDist = -1;
         Turn();
     }
 

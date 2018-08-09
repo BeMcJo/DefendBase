@@ -2565,7 +2565,7 @@ public class GameManager : MonoBehaviour {
         }
 
         pc.wep.purchased = true;
-        UpdateInGameCurrency(729);
+        UpdateInGameCurrency(0);
         UpdateKillCount(0);
         UpdateScore(0);
         playerStatusCanvas.transform.Find("Wave").Find("Text").GetComponent<Text>().text = (data.wave == 0) ? "": "" + data.wave +"/" + EnemySpawnPattern.patternsBySpawnPointCt[0].Count;
@@ -2928,14 +2928,8 @@ public class GameManager : MonoBehaviour {
                     }
                 }
                 
-                    print(3);
-                print(quickAccessDetail);
-                print(quickAccessFingerID);
-                print(t.position.x < Screen.width / 2);
-                print(player.GetComponent<PlayerController>().gyroEnabled);
                 if (quickAccessDetail == "" && !player.GetComponent<PlayerController>().useGyro && quickAccessFingerID == -1 && t.position.x < Screen.width / 2)
                 {
-                    print(4);
                     quickAccessFingerID = t.fingerId;
                     initialPos = t.position;
                     joystick.transform.position = initialPos;
@@ -3084,7 +3078,7 @@ public class GameManager : MonoBehaviour {
                         // Are you selecting item to buy?
                         else if(tag == "Buy")
                         {
-                            Debug.Log("1");
+                            //Debug.Log("1");
                             DeselectDescription();
                             selectedItem = selected;
                             selectedDescription = descriptionDisplay.transform.Find(type + " Descriptions").gameObject;

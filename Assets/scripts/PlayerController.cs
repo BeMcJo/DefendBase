@@ -144,7 +144,7 @@ public class PlayerController : MonoBehaviour {
     {
         if (b == null)
         {
-            print("INVALID BUFF... NULL");
+            //print("INVALID BUFF... NULL");
             return;
         }
         int buffType = b.buffType, buffID = b.buffID;
@@ -152,7 +152,7 @@ public class PlayerController : MonoBehaviour {
         // Remove buff if player contains it
         if (buffs[buffType].ContainsKey(buffID))
         {
-            print("REMOVING BUFF" + buffType + "," + buffID);
+            //print("REMOVING BUFF" + buffType + "," + buffID);
             Destroy(buffs[buffType][buffID].gameObject);
             buffs[buffType].Remove(buffID);
 
@@ -173,7 +173,7 @@ public class PlayerController : MonoBehaviour {
         }
         else
         {
-            print("BUFF DNE" + buffType + "," + buffID);
+            //print("BUFF DNE" + buffType + "," + buffID);
         }
         EvaluateBuffs(buffType);
     }

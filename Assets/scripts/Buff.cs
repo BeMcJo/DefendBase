@@ -61,7 +61,7 @@ public class Buff : MonoBehaviour {
         // Remove buff when expired
         if (!isActive())
         {
-            print("BUFF EXPIRED");
+            //print("BUFF EXPIRED");
             player.RemoveBuff(this);
             //Destroy(gameObject);
         }
@@ -81,13 +81,13 @@ public class Buff : MonoBehaviour {
 
     public void RemoveCondition(GameObject cond)
     {
-        print("removeing condition");
+        //print("removeing condition");
         cond.SetActive(false);
         conditions.Remove(cond);
         //Destroy(cond);
         if (conditions.Count == 0)
         {
-            print("CONDITIONS ALL MET REMOVE BUFF " + buffID + " ," + buffType);
+            //print("CONDITIONS ALL MET REMOVE BUFF " + buffID + " ," + buffType);
             player.RemoveBuff(this);
             switch (buffName)
             {
