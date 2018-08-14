@@ -1415,17 +1415,20 @@ public class GameManager : MonoBehaviour {
             UpdateArrowQty(itemID);
             //itemWheel.GetComponent<Rotator>().ResetItemWheel(selectedAttribute);
         }
-        Transform container = inventoryCanvas.transform.Find("ItemUIPanel").Find("ArrowsUIContainer");
-        for (int i = 1; i < Projectile.projectileStats.Length; i++)
+        if (!inGame)
         {
-            container.GetChild(i).Find("ActionBtn").GetComponent<Button>().interactable = personalData.playerCurrency >= Projectile.projectileStats[i].price;
-        }
-        container = inventoryCanvas.transform.Find("ItemUIPanel").Find("WeaponsUIContainer");
-        for(int i = 1; i < Weapon.weaponStats.Length; i++)
-        {
-            container.GetChild(i).Find("ActionBtn").GetComponent<Button>().interactable = 
-                Weapon.weaponStats[i].unlockCondition != UnlockCondition.QuestThenPurchase ||
-                personalData.playerCurrency >= Weapon.weaponStats[i].price;
+            Transform container = inventoryCanvas.transform.Find("ItemUIPanel").Find("ArrowsUIContainer");
+            for (int i = 1; i < Projectile.projectileStats.Length; i++)
+            {
+                container.GetChild(i).Find("ActionBtn").GetComponent<Button>().interactable = personalData.playerCurrency >= Projectile.projectileStats[i].price;
+            }
+            container = inventoryCanvas.transform.Find("ItemUIPanel").Find("WeaponsUIContainer");
+            for (int i = 1; i < Weapon.weaponStats.Length; i++)
+            {
+                container.GetChild(i).Find("ActionBtn").GetComponent<Button>().interactable =
+                    Weapon.weaponStats[i].unlockCondition != UnlockCondition.QuestThenPurchase ||
+                    personalData.playerCurrency >= Weapon.weaponStats[i].price;
+            }
         }
     }
 
@@ -2537,7 +2540,11 @@ public class GameManager : MonoBehaviour {
         if (continuedGame)
         {
             Debug.Log("Continued Game");
-            if (data != null && data.savedGame)
+            if(data == null)
+            {
+                print("ERROR SAVED FILE NOT FOUND");
+            }
+            else
             {
                 Debug.Log("fetching saved data");
                 objective.transform.GetComponent<Objective>().HP = data.objectiveHP;
@@ -2549,7 +2556,7 @@ public class GameManager : MonoBehaviour {
         {
             data = new PlayerData();
         }
-        //data.wave = 18;
+        //data.wave = 19;
 
         if (w == null)
         {
@@ -2626,6 +2633,37 @@ public class GameManager : MonoBehaviour {
         data.difficulty = 0;
         e.level = (pattern.enemyLvls[intervalIndex][spawnIndex] + data.difficulty) % Enemy.enemyStats.Length;
 
+    }
+
+    public void SpawnEnemy(int enemyID, GameObject location)
+    {
+
+    }
+
+    // Spawn enemy onto same path as another object
+    public void SpawnEnemy(int enemyID, int curTarget, List<GameObject> pathing, Vector3 location)
+    {
+        print("SPAWNED MINION");
+        GameObject enemy = Instantiate(enemyPrefabs[enemyID]);
+        Enemy e = enemy.GetComponent<Enemy>();
+        e.curTarget = curTarget;
+        e.pathing = pathing;
+        e.SetTarget(pathing[curTarget]);
+        enemy.transform.position = location;
+        enemy.transform.SetParent(enemiesContainer.transform);
+        enemiesSpawned++;
+    }
+
+    // Spawn enemy with same target
+    public void SpawnEnemy(int enemyID, GameObject target, Vector3 location)
+    {
+        print("SPAWNED MINION");
+        GameObject enemy = Instantiate(enemyPrefabs[enemyID]);
+        Enemy e = enemy.GetComponent<Enemy>();
+        enemy.transform.position = location;
+        enemy.transform.SetParent(enemiesContainer.transform);
+        e.SetTarget(target);
+        enemiesSpawned++;
     }
 
     // Spawn enemy at the spawn point sp
@@ -2868,13 +2906,13 @@ public class GameManager : MonoBehaviour {
             if (t.phase == TouchPhase.Began)
             {
                 //print("BEING");
-                print(0);
+                //print(0);
                 if (quickAccessFingerID != -1 && mapFingerID != -1)
                     return;
                 // Is there an object we are touching?
                 if (EventSystem.current.IsPointerOverGameObject(t.fingerId))
                 {
-                    print(1);
+                    //print(1);
                     //if (EventSystem.current.currentSelectedGameObject)
                     //    Debug.Log(EventSystem.current.currentSelectedGameObject.tag);
                     // Is this a UI object?

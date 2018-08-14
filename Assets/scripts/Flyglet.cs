@@ -15,7 +15,7 @@ public class Flyglet : Enemy
     // Use this for initialization
     protected override void Start()
     {
-        enemyID = 2;
+        //enemyID = 2;
         base.Start();
         //anim.SetInteger("hp", health);
         int r = Random.Range(0, 2);

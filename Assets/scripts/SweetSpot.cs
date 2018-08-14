@@ -5,6 +5,7 @@ using UnityEngine;
 public class SweetSpot : MonoBehaviour {
     public GameObject owner;
     public GameObject onHitParticleEffectPrefab;
+    public int dmg = 2;
     //public int ssid; // sweet spot id (for determining placement of particle effect)
 	// Use this for initialization
 	void Start () {
@@ -39,13 +40,13 @@ public class SweetSpot : MonoBehaviour {
                 // If using online feature, let Network Manager handle this
                 if (NetworkManager.nm.isStarted)
                 {
-                    NetworkManager.nm.NotifyObjectDamagedBy(owner.tag.ToUpper(),owner.tag,e.id, p.ownerID,p.dmg*2,p.ownerType);
+                    NetworkManager.nm.NotifyObjectDamagedBy(owner.tag.ToUpper(),owner.tag,e.id, p.ownerID,dmg,p.ownerType);
                     return;
                 }
 
                 // If not using online feature, inflict damage to enemy
                 //e.TakeDamageFrom(dmg, ownerType, ownerID);
-                e.TakeDamageFrom(2*p.dmg,p.ownerType, p.ownerID);
+                e.TakeDamageFrom(dmg,p.ownerType, p.ownerID);
             }else if(owner.tag == "Dummy")
             {
                 if(p.ownerID == pc.id)

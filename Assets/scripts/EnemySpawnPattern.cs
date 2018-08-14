@@ -689,5 +689,23 @@ public class EnemySpawnPattern {
         pattern.endIterationTime = 5f;
         pattern.iterations = 2;
 
+        //////////////////////////////////////////////////
+        // Wave 20 ***BOSS***
+
+        pattern = new Pattern();
+        patterns.Add(pattern);
+        enemyLvls = new List<int>();
+        spawnCt = new List<int>();
+
+        for (int i = 0; i < 1; i++)
+        {
+            spawnCt.Add(3);
+            enemyLvls.Add(0);
+        }
+        pattern.enemyLvls.Add(enemyLvls);
+        pattern.spawnCts.Add(spawnCt);
+        pattern.spawnTimes.Add(1f);
+        //pattern.spawnFreqs.Add(3f);
+
     }
 }

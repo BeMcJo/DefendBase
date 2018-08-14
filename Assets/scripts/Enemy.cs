@@ -33,8 +33,6 @@ public class Enemy : MonoBehaviour
             new EnemyStats(1, 1, 50,1,1, 1),
             new EnemyStats(2, 1, 50,1,1.2f, 1.2f),
             new EnemyStats(2, 2, 50,1,1.25f, 1.25f),
-            new EnemyStats(3, 2, 50,1,1.5f, 1.3f),
-            new EnemyStats(3, 2, 50,1,1.5f, 1.5f)
         },
         // Stats for Funguys ignore -> Infuries
         new EnemyStats[]
@@ -42,8 +40,6 @@ public class Enemy : MonoBehaviour
             new EnemyStats(2, 1, 75,1,1, 1),
             new EnemyStats(2, 2, 75,1,1.2f, 1.2f),
             new EnemyStats(4, 3, 75,1,1.25f, 1.25f),
-            new EnemyStats(4, 3, 75,1,1.5f, 1.3f),
-            new EnemyStats(6, 3, 75,1,1.5f, 1.5f)
         },
         // Stats for Flyglet ignore -> Flyies
         new EnemyStats[]
@@ -51,15 +47,21 @@ public class Enemy : MonoBehaviour
             new EnemyStats(1, 0, 70,1,1, 1),
             new EnemyStats(1, 1, 70,1,1f, 1f),
             new EnemyStats(4, 3, 70,1,1.25f, 1.25f),
-            new EnemyStats(4, 3, 70,1,1.5f, 1.3f),
-            new EnemyStats(6, 3, 70,1,1.5f, 1.5f)
+        },
+        // Stats for King Slime
+        new EnemyStats[]
+        {
+            new EnemyStats(30, 5, 2500,50,.5f, .75f),
+            new EnemyStats(1, 1, 70,1,1f, 1f),
+            new EnemyStats(4, 3, 70,1,1.25f, 1.25f)
         }
     };
     public static string[] names =
     {
         "Slime",
         "Shroom",
-        "Flyglet"
+        "Flyglet",
+        "King Slime"
     };
     public Animator anim;
     public int health = 2, // Current health 
@@ -119,6 +121,7 @@ public class Enemy : MonoBehaviour
 
     protected virtual void Awake()
     {
+        Physics.IgnoreLayerCollision(8, 8, true);
         id = EnemyCount;
         EnemyCount++;
         attackType = -1;
@@ -132,9 +135,9 @@ public class Enemy : MonoBehaviour
             NetworkManager.nm.debugLog.Add("DUPLICATE HOW" +id);
         }
         name = "Enemy " + id;
-        Physics.IgnoreLayerCollision(8, 8, true);
         prevDist = -1;
 
+        curTarget = 0;
     }
 
     // Use this for initialization
@@ -149,7 +152,6 @@ public class Enemy : MonoBehaviour
         atkTimer = effectiveTimeToAttack;
         effectiveAttackSpd = originalAttackSpd * enemyStats[enemyID][level].atkSpd;
         attackCt = 0;
-        curTarget = 0;
         anim = GetComponent<Animator>();
         isDoneMoving = true;
         gameObject.AddComponent<ConstantForce>().force = new Vector3(0, -9, 0);
@@ -192,7 +194,10 @@ public class Enemy : MonoBehaviour
         {
             return;
         }
-
+        if (!isJumping)// && GetComponent<Rigidbody>().velocity.y>0)
+        {
+            //GetComponent<Rigidbody>().velocity = Vector3.zero;
+        }
         if (health <= 0)
         {
             //Die();
@@ -368,6 +373,7 @@ public class Enemy : MonoBehaviour
     public bool ReachPeak()
     {
         Rigidbody rb = transform.GetComponent<Rigidbody>();
+        //print(rb.velocity);
         //MoveForward();
         //transform.position = Vector3.MoveTowards(transform.position, targetPos, effectiveMoveSpd);
         return rb.velocity.y < 0;
@@ -376,7 +382,7 @@ public class Enemy : MonoBehaviour
     public bool IsJumping()
     {
         Rigidbody rb = transform.GetComponent<Rigidbody>();
-        //MoveForward();
+        GetComponent<Rigidbody>().AddForce(new Vector3(0, 300, 0));
         //transform.position = Vector3.MoveTowards(transform.position, targetPos, effectiveMoveSpd);
         return rb.velocity.y > 0;
     }
@@ -421,7 +427,7 @@ public class Enemy : MonoBehaviour
         isJumping = true;
         // Jump by adding upward force
         Rigidbody rb = GetComponent<Rigidbody>();
-        GetComponent<Rigidbody>().AddForce(new Vector3(0, 450, 0));
+        rb.velocity = Vector3.zero;
         //yield return new WaitUntil(IsJumpingAnimation);
         yield return new WaitUntil(IsJumping);
         yield return new WaitUntil(ReachPeak);
@@ -449,7 +455,10 @@ public class Enemy : MonoBehaviour
         anim.SetBool("isMoving", false);
         isJumping = false;
         yield return new WaitWhile(IsLandingAnimation);
-        //yield return new WaitForSeconds(.35f/enemyStats[enemyID][level].moveSpd);
+        if (enemyID == 3)
+        {
+            yield return new WaitForSeconds(2f);
+        }
         actionPerformed = "idle";
         anim.speed = prevSpeed;
         isPerformingAction = false;
@@ -586,13 +595,18 @@ public class Enemy : MonoBehaviour
         else
         {
             ///*
-            GameObject go = new GameObject();
-            go.transform.position = new Vector3(1000, 0, 1000);
-            go.tag = "Objective";
-            SetTarget(go);
+            //GameObject go = new GameObject();
+            //go.transform.position = new Vector3(1000, 0, 1000);
+            //go.tag = "Objective";
+            //SetTarget(go);
             //*/
-            //SetTarget(GameManager.gm.objective);
+            SetTarget(GameManager.gm.objective);
         }
+    }
+
+    public GameObject GetTarget()
+    {
+        return target;
     }
 
     // Provides a way to notify player that this object has been hit
@@ -678,7 +692,7 @@ public class Enemy : MonoBehaviour
 
         yield return new WaitForSeconds(effectiveTimeToAttack);
         string attackVariations = "";
-        if (enemyID == 0)
+        if (attackTypes > 1)
         {
             attackType = Random.Range(0, attackTypes);
             attackVariations += attackType;
@@ -825,14 +839,15 @@ public class Enemy : MonoBehaviour
         for (int i = 0; i < (int)spawnRewardChance; i++)
         {
             GameObject reward = Instantiate(GameManager.gm.rewardPrefabs[0]);
-            reward.transform.position = go.transform.position;
+            reward.transform.position = transform.Find("SpawnPt").position;
             rewards.Add(reward);
             reward.GetComponent<Collider>().enabled = false;
         }
 
         GameObject ps = Instantiate(GameManager.gm.VFXPrefabs[0]);//enemyDeathVFXPrefab);
-        ps.transform.position = transform.position;
+        ps.transform.position = transform.Find("SpawnPt").position;
         isDead = true;
+        ps.transform.localScale = transform.Find("SpawnPt").localScale;
         Destroy(gameObject);
     }
 
@@ -867,6 +882,11 @@ public class Enemy : MonoBehaviour
         return true;
     }
 
+    private void OnTriggerEnter(Collider other)
+    {
+        print(12);
+    }
+
     protected virtual void OnCollisionEnter(Collision collision)
     {
         // Ignore colliding with enemies
@@ -878,6 +898,7 @@ public class Enemy : MonoBehaviour
         if (collision.gameObject.tag == "Enemy")
         {
 
+            print("A?SDssssASD");
             Collider c = collision.collider;
             print(c.name);
             if (collision.gameObject.name != "EnemyObject")
@@ -903,6 +924,7 @@ public class Enemy : MonoBehaviour
     {
         if (collision.gameObject.tag == "Enemy")
         {
+            print("A?SDASD");
             Collider c = collision.collider;
             if (collision.gameObject.name != "EnemyObject")
             {
