@@ -110,7 +110,7 @@ public class Achievement {
 
         for (int i = 0; i < cumulativeScoreAchievements[0].Length; i++)
         {
-            cumulativeScoreAchievements[0][i] = new Achievement(Enemy.names[i] + " killed", "");
+            cumulativeScoreAchievements[0][i] = new Achievement(Enemy.names[i] + "s killed", "");
             cumulativeScoreAchievements[3][i] = new Achievement(Enemy.names[i] + " weak spots hit", "");
         }
         for (int i = 0; i < cumulativeScoreAchievements[1].Length; i++)
@@ -123,7 +123,7 @@ public class Achievement {
         }
         for (int i = 0; i < cumulativeScoreAchievements[4].Length; i++)
         {
-            cumulativeScoreAchievements[4][i] = new Achievement(Weapon.weaponStats[i].name + " used", "");
+            cumulativeScoreAchievements[4][i] = new Achievement(Weapon.weaponStats[i].name + "s used", "");
             cumulativeScoreAchievements[5][i] = new Achievement(Weapon.weaponStats[i].name + " kill count", "");
             cumulativeScoreAchievements[6][i] = new Achievement(Weapon.weaponStats[i].name + " weak spots hit", "");
         }
@@ -307,7 +307,7 @@ public class Achievement {
     }
 
     public static Achievement[] conditionalAchievements =
-{
+    {
         // unlock bomb arrow
         new Achievement(
                 "Kill 1000 enemies using " + Projectile.projectileStats[0].name,
@@ -335,7 +335,7 @@ public class Achievement {
                     new Condition(7500,2,"weapon")
                 }
             ),
-        /*
+        
         // unlock bullet arrow
         new Achievement(
                 "Hit 2,500 enemy weak spots using " + Weapon.weaponStats[2].name,
@@ -345,10 +345,10 @@ public class Achievement {
                     new Condition(2500,3,"attribute", 20)
                 }
             ),
-        */
+        
         // unlock ice arrow
         new Achievement(
-                "Kill 1,500 Ice " + Enemy.names[2] +"s",
+                "Kill 1,500 " + Enemy.names[2] +"s",
                 "",
                 true,
                 new Condition[] {
@@ -356,6 +356,11 @@ public class Achievement {
                 }
             ),
 
+    };
+
+    public static bool[] enableQuests =
+    {
+        true,true,true,false,true
     };
 
     // Fetches the percentage of quest completion
@@ -504,6 +509,9 @@ public class Achievement {
 
         // number of kills used by equipped weapon
         records.enemiesKilledByWeapon[gameSession.wepID] += kills;
+
+        // number of weak spots hit by weapon;
+        records.weakSpotsHitByWeapon[gameSession.wepID] += weakSpotsHit;
 
         for(int i = 0; i < Projectile.projectileStats.Length; i++)
         {

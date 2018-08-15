@@ -29,18 +29,13 @@ public class StatusIndicator : MonoBehaviour {
         // No target? Remove self
         if (target == null)
         {
-            print(1211);
             Destroy(gameObject);
             return;
         }
         // Have this face the player to player can see
         if (GameManager.gm.player)
         {
-            //transform.LookAt(GameManager.gm.player.transform.GetComponent<PlayerController>().playerCam.transform);
-            healthBarGauge.LookAt(GameManager.gm.player.transform.GetComponent<PlayerController>().playerCam.transform);
-            healthTxt.transform.LookAt(GameManager.gm.player.transform.GetComponent<PlayerController>().playerCam.transform);
-            healthBarGauge.transform.localEulerAngles += new Vector3(0, 180, 0);
-            healthTxt.transform.localEulerAngles += new Vector3(0, 180, 0);
+            transform.rotation = Quaternion.LookRotation(transform.position - GameManager.gm.player.transform.GetComponent<PlayerController>().playerCam.transform.position);
         }
 
         // Update health bar based on target's health

@@ -39,7 +39,7 @@ public class Enemy : MonoBehaviour
         {
             new EnemyStats(2, 1, 75,1,1, 1),
             new EnemyStats(2, 2, 75,1,1.2f, 1.2f),
-            new EnemyStats(4, 3, 75,1,1.25f, 1.25f),
+            new EnemyStats(2, 2, 75,1,1.25f, 1.25f),
         },
         // Stats for Flyglet ignore -> Flyies
         new EnemyStats[]
@@ -100,6 +100,7 @@ public class Enemy : MonoBehaviour
     public List<AudioClip> soundClips;
     public Dictionary<string,Coroutine> coroutines;
     public Dictionary<string, bool> statusEffects;
+    public Texture[] skinsByLevel; 
 
     // Used to create the enemy and identify it
     /*public static void AssignEnemy(Enemy e)
@@ -173,6 +174,7 @@ public class Enemy : MonoBehaviour
         hpBar.transform.SetParent(transform.Find("HP Placeholder"));
         hpBar.transform.localPosition = Vector3.zero;
 
+        go.GetComponent<Renderer>().material.mainTexture = skinsByLevel[Mathf.Min(level,skinsByLevel.Length-1)]; // SetTexture()
 
     }
 
@@ -884,7 +886,7 @@ public class Enemy : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        print(12);
+        //print(12);
     }
 
     protected virtual void OnCollisionEnter(Collision collision)

@@ -253,8 +253,8 @@ public abstract class Weapon : MonoBehaviour
         else
         {
             txts[0] += " (" + weaponStats[wepID].dmg[lvl + 1] + ")";
-            txts[1] += " (" + weaponStats[wepID].chargeAccelation[lvl + 1] + ")";
-            txts[2] += " (" + weaponStats[wepID].timeToReload[lvl + 1] + ")";
+            txts[1] += " (" + weaponStats[wepID].chargeAccelation[lvl + 1].ToString("F2") + ")";
+            txts[2] += " (" + weaponStats[wepID].timeToReload[lvl + 1].ToString("F2") + ")";
             txts[3] += " (" + weaponStats[wepID].distance[lvl + 1] + ")";
             txts[4] += " (Next)";
         }

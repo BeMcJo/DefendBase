@@ -972,6 +972,7 @@ public class GameManager : MonoBehaviour {
             itemUI = Instantiate(questAchievementUIPrefab);
             itemUI.transform.SetParent(achievementsContainer);
             itemUI.transform.localScale = new Vector3(1, 1, 1);
+            itemUI.SetActive(Achievement.enableQuests[i]);
             itemUI.transform.Find("HideProgress").gameObject.SetActive(!Achievement.CanShowProgress(AchievementType.Conditional, i));
             itemUI.transform.Find("HeaderTxt").GetComponent<Text>().text = Achievement.conditionalAchievements[i].header;
             itemUI.transform.Find("AchievementTypes").GetChild(0).gameObject.SetActive(false);
@@ -1879,7 +1880,7 @@ public class GameManager : MonoBehaviour {
         stats.Find("OverallScore").Find("Stats").GetComponent<Text>().text = "" + data.score;
 
         Achievement.CheckForAchievementProgress();
-        int earnings = data.score / 1000 + data.inGameCurrency / 20;
+        int earnings = data.score / 1000 + data.inGameCurrency / 20 + (won ? 30 : 0);
         stats.Find("Earnings").Find("Stats").GetComponent<Text>().text = "" + earnings;
         personalData.playerCurrency += earnings;
         firework.SetActive(won);
