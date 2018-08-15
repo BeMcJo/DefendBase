@@ -30,8 +30,8 @@ public class Floater : MonoBehaviour {
 	void Start () {
         rb = GetComponent<Rigidbody>();
         //audio = GetComponent<AudioSource>();
-        biasedDir = new Vector3(Random.Range(-.5f, 0.5f) / 5, Random.Range(0, 0.5f), Random.Range(-.5f, 0.5f)/5);
-        biasedTorq = new Vector3(Random.Range(-.5f, 0.5f), Random.Range(-.5f, 0.5f), Random.Range(-.5f, 0.5f));
+        biasedDir = new Vector3(0, Random.Range(0, .5f), 0);//new Vector3(Random.Range(-.5f, 0.5f) / 5, Random.Range(0, 0.5f), Random.Range(-.5f, 0.5f)/5);
+        biasedTorq = new Vector3(0, Random.Range(0, .5f), 0); //new Vector3(Random.Range(-.5f, 0.5f), Random.Range(-.5f, 0.5f), Random.Range(-.5f, 0.5f));
         rb.AddForce(biasedDir* Random.Range(20,250));
         rb.AddTorque(biasedTorq* Random.Range(100, 250));
         //GetComponent<Collider>().enabled = true;
@@ -79,10 +79,10 @@ public class Floater : MonoBehaviour {
     {
         float x = Random.Range(-.05f, 0.05f), y = Random.Range(-.05f, 0.05f), z = Random.Range(-.05f, 0.05f);
         Vector3 randDir = new Vector3(Random.Range(-.5f, 0.5f), Random.Range(-.5f, 0.5f), Random.Range(-.5f, 0.5f));
-        Vector3 randTorq = new Vector3(Random.Range(-.5f, 0.5f), Random.Range(-.5f, 0.5f), Random.Range(-.5f, 0.5f));
-        randDir.x = x;
+        Vector3 randTorq = new Vector3(0, Random.Range(0, .5f), 0);// new Vector3(Random.Range(-.5f, 0.5f), Random.Range(-.5f, 0.5f), Random.Range(-.5f, 0.5f));
+        randDir.x = 0;
         randDir.y = y;
-        randDir.z = z;
+        randDir.z = 0;
         rb.AddForce(randDir);
         //rb.AddForce(x*10,y*10,z*10);
         rb.AddTorque(randTorq);

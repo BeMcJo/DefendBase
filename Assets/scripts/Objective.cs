@@ -86,7 +86,7 @@ public class Objective : MonoBehaviour {
 
         // Visual indication of damage dealt
         GameObject damageIndicator = Instantiate(GameManager.gm.indicatorPrefabs[0]);
-        damageIndicator.transform.position = transform.Find("ObjectiveStatusIndicator").position;//healthBarGauge.position + new Vector3(0, healthBarGauge.GetComponent<RectTransform>().rect.height, 0);
+        damageIndicator.transform.position = transform.Find("HP Placeholder").position;//healthBarGauge.position + new Vector3(0, healthBarGauge.GetComponent<RectTransform>().rect.height, 0);
         damageIndicator.transform.LookAt(GameManager.gm.player.transform.GetComponent<PlayerController>().playerCam.transform);
         damageIndicator.transform.GetChild(0).GetComponent<Text>().text = "" + (-dmg);
 

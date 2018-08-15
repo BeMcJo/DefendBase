@@ -79,22 +79,23 @@ public class PersonalData
                   isArrowUnlocked; // Is arrow available to purchase?
 
     // Best Score Records
-    public int bestScore,
-               mostCurrencySavedInGame,
-               highestWaveSurvived,
-               mostWeakSpotsHitInAGame,
-               mostKillsInGame;
+    public int bestScore, // highest score obtained in a game session
+               mostCurrencySavedInGame, // most currency saved in a session
+               highestWaveSurvived, // highest wave survived in session
+               mostWeakSpotsHitInAGame, // most weak spots hit in session
+               mostKillsInGame; // most kills obtained in session
 
     // Cumulative Records
-    public int cumulativeDamageObjectiveTook,
-               totalDefeats,totalVictories;
-    public int[] killsByEnemy,
-                 killsByArrowAttribute,
-                 arrowsShotByAttribute,
-                 weakSpotsHitByEnemy,
-                 weaponsUsedByGame,
-                 enemiesKilledByWeapon,
-                 weakSpotsHitByWeapon;
+    public int cumulativeDamageObjectiveTook, // how much damage objective sustained
+               totalDefeats,totalVictories; // cumulative wins and losses
+    public int[] killsByEnemy, // how many of each enemy I killed
+                 killsByArrowAttribute, // how many of each enemy killed based on arrow type
+                 arrowsShotByAttribute, // how many of each arrow shot by type
+                 weakSpotsHitByEnemy, // how many weak spots hit by enemy
+                 weaponsUsedByGame, // how often i used a certain bow in session
+                 enemiesKilledByWeapon, // how many kills i got using a certain bow
+                 weakSpotsHitByWeapon, // how many weak spots using certain bow
+                 upgradedLevelsByWeapon; // permanent level upgraded for each bow
 
     // Achievement Unlocks
     public bool[] isAchievementUnlocked;
@@ -138,6 +139,7 @@ public class PersonalData
         killsByArrowAttribute = new int[Projectile.projectileStats.Length];
         arrowsShotByAttribute = new int[Projectile.projectileStats.Length];
         weakSpotsHitByWeapon = new int[Weapon.weaponStats.Length];
+        upgradedLevelsByWeapon = new int[Weapon.weaponStats.Length];
     }
 }
 
@@ -339,6 +341,18 @@ public class GameManager : MonoBehaviour {
     Transform notificationContainer; // holds list of notifications
 
     public List<int> availableAttributes; // list of attributes able to be used/spawned (based on Unlock Conditions)
+    
+    // Safely copy contents from source to dest
+    public void CopyArrayData<T>(T[] dest, T[] source)
+    {
+        if (dest == null || source == null)
+            return;
+        int len = Mathf.Min(dest.Length, source.Length);
+        for (int i = 0; i < len; i++)
+        {
+            dest[i] = source[i];
+        }
+    }
 
     public void CopyPlayerData(PlayerData dest, PlayerData source)
     {
@@ -352,27 +366,12 @@ public class GameManager : MonoBehaviour {
         dest.wave = source.wave;
         dest.wepID = source.wepID;
         dest.wepLvl = source.wepLvl;
-        int projectilesLen = (dest.arrowQuantities.Length < source.arrowQuantities.Length) ? dest.arrowQuantities.Length : source.arrowQuantities.Length;
-        int enemiesLen = (dest.killsByEnemy.Length < source.killsByEnemy.Length) ? dest.killsByEnemy.Length : source.killsByEnemy.Length;
-        //int weaponsLen = (dest.weakSpotsHitByWeapon.Length < source.weakSpotsHitByWeapon.Length) ? dest.weakSpotsHitByWeapon.Length : source.weakSpotsHitByWeapon.Length;
-        for (int i = 0; i < projectilesLen; i++)
-        {
-            dest.arrowQuantities[i] = source.arrowQuantities[i];
-            dest.killsByArrowAttribute[i] = source.killsByArrowAttribute[i];
-            dest.arrowsShotByAttribute[i] = source.arrowsShotByAttribute[i];
-        }
 
-        for(int i = 0; i < enemiesLen; i++)
-        {
-            dest.weakSpotsHitByEnemy[i] = source.weakSpotsHitByEnemy[i];
-        }
-        /*
-        for(int i = 0; i < weaponsLen; i++)
-        {
-            dest.weakSpotsHitByWeapon[i] = source.weakSpotsHitByWeapon[i];
-        }
-        */
+        CopyArrayData(dest.arrowQuantities, source.arrowQuantities);
+        CopyArrayData(dest.killsByArrowAttribute, source.killsByArrowAttribute);
+        CopyArrayData(dest.arrowsShotByAttribute, source.arrowsShotByAttribute);
     }
+
 
     public void CopyPersonalData(PersonalData dest, PersonalData source)
     {
@@ -386,33 +385,19 @@ public class GameManager : MonoBehaviour {
         dest.totalVictories = source.totalVictories;
         dest.mostWeakSpotsHitInAGame = source.mostWeakSpotsHitInAGame;
         dest.cumulativeDamageObjectiveTook = source.cumulativeDamageObjectiveTook;
-        int projectilesLen = (dest.arrowQuantities.Length < source.arrowQuantities.Length) ? dest.arrowQuantities.Length : source.arrowQuantities.Length;
-        int weaponsLen = (dest.isWeaponUnlocked.Length < source.isWeaponUnlocked.Length) ? dest.isWeaponUnlocked.Length : source.isWeaponUnlocked.Length;
-        int enemiesLen = (dest.killsByEnemy.Length < source.killsByEnemy.Length) ? dest.killsByEnemy.Length : source.killsByEnemy.Length;
-        int questsLen = (dest.isAchievementUnlocked.Length < source.isAchievementUnlocked.Length) ? dest.isAchievementUnlocked.Length : source.isAchievementUnlocked.Length;
-        for(int i = 0; i < projectilesLen; i++)
-        {
-            dest.arrowQuantities[i] = source.arrowQuantities[i];
-            dest.isArrowUnlocked[i] = source.isArrowUnlocked[i];
-            dest.arrowsShotByAttribute[i] = source.arrowsShotByAttribute[i];
-            dest.killsByArrowAttribute[i] = source.killsByArrowAttribute[i];
-        }
-        for (int i = 0; i < weaponsLen; i++)
-        {
-            dest.isWeaponPurchased[i] = source.isWeaponPurchased[i];
-            dest.isWeaponUnlocked[i] = source.isWeaponUnlocked[i];
-            dest.enemiesKilledByWeapon[i] = source.enemiesKilledByWeapon[i];
-            dest.weakSpotsHitByWeapon[i] = source.weakSpotsHitByWeapon[i];
-        }
-        for (int i = 0; i < enemiesLen; i++)
-        {
-            dest.killsByEnemy[i] = source.killsByEnemy[i];
-            dest.weakSpotsHitByEnemy[i] = source.weakSpotsHitByEnemy[i];
-        }
-        for(int i = 0; i < questsLen; i++)
-        {
-            dest.isAchievementUnlocked[i] = source.isAchievementUnlocked[i];
-        }
+
+        CopyArrayData(dest.arrowQuantities, source.arrowQuantities);
+        CopyArrayData(dest.isArrowUnlocked, source.isArrowUnlocked);
+        CopyArrayData(dest.arrowsShotByAttribute, source.arrowsShotByAttribute);
+        CopyArrayData(dest.killsByArrowAttribute, source.killsByArrowAttribute);
+        CopyArrayData(dest.isWeaponPurchased, source.isWeaponPurchased);
+        CopyArrayData(dest.isWeaponUnlocked, source.isWeaponUnlocked);
+        CopyArrayData(dest.enemiesKilledByWeapon, source.enemiesKilledByWeapon);
+        CopyArrayData(dest.weakSpotsHitByEnemy, source.weakSpotsHitByEnemy);
+        CopyArrayData(dest.upgradedLevelsByWeapon, source.upgradedLevelsByWeapon);
+        CopyArrayData(dest.killsByEnemy, source.killsByEnemy);
+        CopyArrayData(dest.weakSpotsHitByWeapon, source.weakSpotsHitByWeapon);
+        CopyArrayData(dest.isAchievementUnlocked, source.isAchievementUnlocked);
     }
 
     // Saves data based on the type
@@ -498,7 +483,7 @@ public class GameManager : MonoBehaviour {
     // Load data based on the type
     public void Load(string type)
     {
-        //print(Application.persistentDataPath);
+        print(Application.persistentDataPath);
         string path = Application.persistentDataPath + "/" + type + ".dat";
         if (File.Exists(path))
         {
@@ -758,7 +743,8 @@ public class GameManager : MonoBehaviour {
         inventoryCanvas.transform.Find("BackBtn").GetComponent<Button>().onClick.AddListener(ToggleInventoryCanvas);
         inventoryCanvas.transform.Find("BackBtn").GetComponent<Button>().onClick.AddListener(ToggleMainMenuCanvas);
         inventoryCanvas.transform.Find("BackBtn").GetComponent<Button>().onClick.AddListener(NotifyButtonPressed);
-        inventoryCanvas.transform.Find("PlayerCurrency").GetChild(0).GetComponent<Text>().text = "" + personalData.playerCurrency;
+        // update currency for a purpose????
+        //UpdatePlayerCurrency(0);
         inventoryItemPanel = inventoryCanvas.transform.Find("ItemUIPanel").gameObject;
 
         // Set up weapon section
@@ -771,7 +757,7 @@ public class GameManager : MonoBehaviour {
             itemUI.transform.SetParent(UIContainer);
             //csf.AddItem(itemUI);
             itemUI.transform.Find("ItemImageBG").GetComponent<RawImage>().color = new Color(249f / 255, 88f/255, 0);// / 255;
-            itemUI.transform.Find("ItemName").GetComponent<Text>().text = Weapon.weaponStats[i].name;
+            itemUI.transform.Find("ItemName").GetComponent<Text>().text = Weapon.weaponStats[i].name + " Lvl " + (personalData.upgradedLevelsByWeapon[i] + 1);
             itemUI.transform.Find("ItemImageBG").GetChild(0).GetComponent<RawImage>().texture = weaponItemIcons[i % weaponItemIcons.Length].texture;
             itemUI.transform.Find("ItemStats").Find("Damage").Find("Text").GetComponent<Text>().text = "" + Weapon.weaponStats[i].dmg[0];
             itemUI.transform.Find("ItemStats").Find("Reload").Find("Text").GetComponent<Text>().text = "" + Weapon.weaponStats[i].timeToReload[0];
@@ -789,48 +775,72 @@ public class GameManager : MonoBehaviour {
             itemUI.transform.Find("LockedItemImage").gameObject.SetActive(
                 (Weapon.weaponStats[i].unlockCondition == UnlockCondition.Quest || Weapon.weaponStats[i].unlockCondition == UnlockCondition.QuestThenPurchase) 
                 && !personalData.isWeaponUnlocked[i]);
-            Transform actionBtn = itemUI.transform.Find("ActionBtn");
-            actionBtn.GetComponent<Button>().interactable = personalData.equippedWep != i && personalData.playerCurrency >= Weapon.weaponStats[i].price;
+            Transform actionBtn;
+            GameObject wepActionBtns = itemUI.transform.Find("WepActionButtons").gameObject;
+            //actionBtn = itemUI.transform.Find("ActionBtn");
+            //actionBtn.gameObject.SetActive(false);
+            //actionBtn = itemUI.transform.Find("WepActionButtons").Find("ActionBtn");
+            int cost;
+
+            // Handles button to buy weapon
+            actionBtn = itemUI.transform.Find("ActionBtn");
+            //actionBtn.gameObject.SetActive(false);
+            actionBtn.Find("Text").GetComponent<Text>().text = "Unlock\n";
+            actionBtn.Find("Currency").Find("Text").GetComponent<Text>().text = "" + Weapon.weaponStats[i].price;
+            actionBtn.GetComponent<Button>().interactable = personalData.playerCurrency >= Weapon.weaponStats[i].price;
+            //wepActionBtns.SetActive(true);
+
+            // Handles button to equip weapon
+            actionBtn = wepActionBtns.transform.Find("ActionBtn");
+            actionBtn.GetComponent<Button>().interactable = personalData.equippedWep != i;
+            actionBtn.Find("Text").GetComponent<Text>().text = (personalData.equippedWep == i) ? "Equipped" : "Equip";
+            actionBtn.Find("Currency").gameObject.SetActive(false);
+
+            // Handles button to upgrade weapon
+            actionBtn = wepActionBtns.transform.Find("UpgradeBtn");
+            //actionBtn.name = "upgrade " + i;
+           if (HasWeaponReachedMaxLevel(i))
+            {
+                actionBtn.Find("Text").GetComponent<Text>().text = "Upgrade\nMAXED";
+                actionBtn.Find("Currency").gameObject.SetActive(false);
+                actionBtn.GetComponent<Button>().interactable = false;
+            }
+            else
+            {
+                cost = Weapon.weaponStats[i].costToUpgrade[personalData.upgradedLevelsByWeapon[i]] * 10;
+                actionBtn.GetComponent<Button>().interactable = personalData.upgradedLevelsByWeapon[i] < Weapon.weaponStats[i].costToUpgrade.Length && personalData.playerCurrency >= cost;
+
+                actionBtn.Find("Text").GetComponent<Text>().text = "Upgrade\n";
+                actionBtn.Find("Currency").gameObject.SetActive(true);
+                actionBtn.Find("Currency").Find("Text").GetComponent<Text>().text = "" + cost;
+            }
             switch (Weapon.weaponStats[i].unlockCondition)
             {
                 case UnlockCondition.Free:
-                    actionBtn.Find("Text").GetComponent<Text>().text = (personalData.equippedWep == i) ? "Equipped" : "Equip";
-                    actionBtn.Find("Currency").gameObject.SetActive(false);
+                    actionBtn = itemUI.transform.Find("ActionBtn");
+                    actionBtn.gameObject.SetActive(false);
+                    wepActionBtns.SetActive(true);
                     break;
                 case UnlockCondition.Purchase:
-                    if (personalData.isWeaponPurchased[i])
-                    {
-                        actionBtn.Find("Text").GetComponent<Text>().text = (personalData.equippedWep == i) ? "Equipped" : "Equip";
-                        actionBtn.Find("Currency").gameObject.SetActive(false);
-                    }
-                    else
-                    {
-                        actionBtn.Find("Text").GetComponent<Text>().text = "Unlock\n";
-                        actionBtn.Find("Currency").gameObject.SetActive(true);
-                        actionBtn.Find("Currency").Find("Text").GetComponent<Text>().text = "" + Weapon.weaponStats[i].price;
-                    }
+                    actionBtn = itemUI.transform.Find("ActionBtn");
+                    actionBtn.gameObject.SetActive(!personalData.isWeaponPurchased[i]);
+                    wepActionBtns.SetActive(personalData.isWeaponPurchased[i]);
                     break;
                 case UnlockCondition.Quest:
-                    actionBtn.Find("Text").GetComponent<Text>().text = (personalData.equippedWep == i) ? "Equipped" : "Equip";
-                    actionBtn.Find("Currency").gameObject.SetActive(false);
+                    actionBtn = itemUI.transform.Find("ActionBtn");
+                    actionBtn.gameObject.SetActive(false);
+                    wepActionBtns.SetActive(true);
                     break;
                 case UnlockCondition.QuestThenPurchase:
-                    if (personalData.isWeaponPurchased[i])
-                    {
-                        actionBtn.Find("Text").GetComponent<Text>().text = (personalData.equippedWep == i) ? "Equipped" : "Equip";
-                        actionBtn.Find("Currency").gameObject.SetActive(false);
-                    }
-                    else
-                    {
-                        actionBtn.Find("Text").GetComponent<Text>().text = "Unlock\n";
-                        actionBtn.Find("Currency").gameObject.SetActive(true);
-                        actionBtn.Find("Currency").Find("Text").GetComponent<Text>().text = "" + Weapon.weaponStats[i].price;
-                    }
+                    actionBtn = itemUI.transform.Find("ActionBtn");
+                    actionBtn.gameObject.SetActive(!personalData.isWeaponPurchased[i]);
+                    wepActionBtns.SetActive(personalData.isWeaponPurchased[i]);
+
                     break;
             }
-
             itemUI.SetActive(Weapon.enableWeps[i]);
         }
+        
         if (availableAttributes != null)
             availableAttributes.Clear();
         else
@@ -854,7 +864,7 @@ public class GameManager : MonoBehaviour {
             itemUI.transform.Find("ItemDescription").GetComponent<Text>().text = Projectile.projectileStats[i].description;
             itemUI.transform.Find("QtyTxt").gameObject.SetActive(true);
             itemUI.transform.Find("InfinityIcon").gameObject.SetActive(i==0);
-
+            itemUI.transform.Find("WepActionButtons").gameObject.SetActive(false);
             itemUI.transform.Find("QtyTxt").GetComponent<Text>().text = "Quantity: " + ((i == 0)? "": "" + arrowQty.arr[i]);
             itemUI.name = "arrowUI " + i;
             //wepUI.tag = "wepUI";
@@ -988,6 +998,7 @@ public class GameManager : MonoBehaviour {
         achievementsContainer.gameObject.SetActive(false);
         achievementsCanvas.SetActive(false);
 
+        UpdatePlayerCurrency(0);
 
         print("done main");
     }
@@ -996,7 +1007,7 @@ public class GameManager : MonoBehaviour {
     public void LoadGameScene()
     {
 
-        //personalData.equippedWep = 2;
+        personalData.equippedWep = 2;
 
         for (int i = 0; i < outOfGameAudio.Count; i++)
         {
@@ -1311,6 +1322,48 @@ public class GameManager : MonoBehaviour {
         b.SetActive(true);
     }
 
+    public void UpgradeWeapon(int wepID)
+    {
+        int cost = GetWeaponPermanentUpgradeCost(wepID);
+        if(personalData.playerCurrency >= cost)
+        {
+            print("can upgrade");
+            personalData.upgradedLevelsByWeapon[wepID]++;
+            Transform upgradeBtn = inventoryCanvas.transform.Find("ItemUIPanel").Find("WeaponsUIContainer").GetChild(wepID).Find("WepActionButtons").Find("UpgradeBtn");
+            if (HasWeaponReachedMaxLevel(wepID))
+            {
+                upgradeBtn.Find("Text").GetComponent<Text>().text = "Upgrade\nMAXED";
+                upgradeBtn.Find("Currency").gameObject.SetActive(false);
+            }
+            else
+            {
+                upgradeBtn.Find("Currency").Find("Text").GetComponent<Text>().text = "" + GetWeaponPermanentUpgradeCost(wepID);
+            }
+            upgradeBtn.parent.parent.Find("ItemName").GetComponent<Text>().text = Weapon.weaponStats[wepID].name + " Lvl " + (1+personalData.upgradedLevelsByWeapon[wepID]);
+            UpdatePlayerCurrency(-cost);
+            StartCoroutine(PlaySFX(purchaseSFX));
+        }
+        else
+        {
+            print("CANT UPGRADE WEP");
+        }
+    }
+    
+    // Returns a multiple amount needed to upgrade in game session
+    public int GetWeaponPermanentUpgradeCost(int wepID)
+    {
+        if (HasWeaponReachedMaxLevel(wepID))
+            return -1;
+        return Weapon.weaponStats[wepID].costToUpgrade[personalData.upgradedLevelsByWeapon[wepID]] * 10;
+    }
+
+    // Returns whether weapon has been max upgraded
+    public bool HasWeaponReachedMaxLevel(int wepID)
+    {
+        print(wepID + " " + personalData.upgradedLevelsByWeapon[wepID] + " " + Weapon.weaponStats[wepID].costToUpgrade.Length);
+        return personalData.upgradedLevelsByWeapon[wepID] >= Weapon.weaponStats[wepID].costToUpgrade.Length;
+    }
+
     public void NotifyButtonPressed()
     {
         //StartCoroutine(PlaySFX(btnClickSFX));
@@ -1401,6 +1454,38 @@ public class GameManager : MonoBehaviour {
             Save("setupMain");
     }
 
+    public void UpdatePlayerCurrency(int amt)
+    {
+        personalData.playerCurrency += amt;
+        Save("setupMain");
+        inventoryCanvas.transform.Find("PlayerCurrency").GetChild(0).GetComponent<Text>().text = "" + personalData.playerCurrency;
+        UpdateItemPurchasability();
+    }
+
+    public void UpdateItemPurchasability()
+    {
+        if (!inGame)
+        {
+            Transform container = inventoryCanvas.transform.Find("ItemUIPanel").Find("ArrowsUIContainer");
+            for (int i = 1; i < Projectile.projectileStats.Length; i++)
+            {
+                container.GetChild(i).Find("ActionBtn").GetComponent<Button>().interactable = personalData.playerCurrency >= Projectile.projectileStats[i].price;
+            }
+            container = inventoryCanvas.transform.Find("ItemUIPanel").Find("WeaponsUIContainer");
+            for (int i = 1; i < Weapon.weaponStats.Length; i++)
+            {
+                container.GetChild(i).Find("ActionBtn").GetComponent<Button>().interactable =
+                    Weapon.weaponStats[i].unlockCondition != UnlockCondition.QuestThenPurchase ||
+                    personalData.playerCurrency >= Weapon.weaponStats[i].price;
+                Transform wepActionBtns = container.GetChild(i).Find("WepActionButtons");
+                print(i + " " + HasWeaponReachedMaxLevel(i));
+                wepActionBtns.Find("UpgradeBtn").GetComponent<Button>().interactable =
+                    !HasWeaponReachedMaxLevel(i) &&
+                    personalData.playerCurrency >= Weapon.weaponStats[i].costToUpgrade[personalData.upgradedLevelsByWeapon[i]]*10;
+            }
+        }
+    }
+
     public void UpdateItem(string itemType, int itemID, int qty)
     {
         if(itemType == "Attribute")
@@ -1416,21 +1501,7 @@ public class GameManager : MonoBehaviour {
             UpdateArrowQty(itemID);
             //itemWheel.GetComponent<Rotator>().ResetItemWheel(selectedAttribute);
         }
-        if (!inGame)
-        {
-            Transform container = inventoryCanvas.transform.Find("ItemUIPanel").Find("ArrowsUIContainer");
-            for (int i = 1; i < Projectile.projectileStats.Length; i++)
-            {
-                container.GetChild(i).Find("ActionBtn").GetComponent<Button>().interactable = personalData.playerCurrency >= Projectile.projectileStats[i].price;
-            }
-            container = inventoryCanvas.transform.Find("ItemUIPanel").Find("WeaponsUIContainer");
-            for (int i = 1; i < Weapon.weaponStats.Length; i++)
-            {
-                container.GetChild(i).Find("ActionBtn").GetComponent<Button>().interactable =
-                    Weapon.weaponStats[i].unlockCondition != UnlockCondition.QuestThenPurchase ||
-                    personalData.playerCurrency >= Weapon.weaponStats[i].price;
-            }
-        }
+        UpdateItemPurchasability();
     }
 
     public void UseItem(string itemType, int itemID)
@@ -1589,6 +1660,12 @@ public class GameManager : MonoBehaviour {
                     BuyWeapon(wepID);
                 }
                 break;
+            case UnlockCondition.Quest:
+                if (wepID != personalData.equippedWep)
+                {
+                    EquipWeapon(wepID);
+                }
+                break;
             case UnlockCondition.QuestThenPurchase:
                 if (personalData.isWeaponPurchased[wepID])
                 {
@@ -1620,11 +1697,11 @@ public class GameManager : MonoBehaviour {
         print(wepID);
         print(personalData.equippedWep);
         Transform wepUIContainer = inventoryItemPanel.transform.Find("WeaponsUIContainer");
-        wepUIContainer.GetChild(personalData.equippedWep).Find("ActionBtn").Find("Text").GetComponent<Text>().text = "Equip";
-        wepUIContainer.GetChild(personalData.equippedWep).Find("ActionBtn").GetComponent<Button>().interactable = true;
-        wepUIContainer.GetChild(wepID).Find("ActionBtn").Find("Text").GetComponent<Text>().text = "Equipped";
+        wepUIContainer.GetChild(personalData.equippedWep).Find("WepActionButtons").Find("ActionBtn").Find("Text").GetComponent<Text>().text = "Equip";
+        wepUIContainer.GetChild(personalData.equippedWep).Find("WepActionButtons").Find("ActionBtn").GetComponent<Button>().interactable = true;
+        wepUIContainer.GetChild(wepID).Find("WepActionButtons").Find("ActionBtn").Find("Text").GetComponent<Text>().text = "Equipped";
         personalData.equippedWep = wepID;
-        wepUIContainer.GetChild(personalData.equippedWep).Find("ActionBtn").GetComponent<Button>().interactable = false;
+        wepUIContainer.GetChild(personalData.equippedWep).Find("WepActionButtons").Find("ActionBtn").GetComponent<Button>().interactable = false;
 
         StartCoroutine(PlaySFX(equipSFX));
         //audioSrc.clip = equipSFX;
@@ -1642,8 +1719,10 @@ public class GameManager : MonoBehaviour {
             //audioSrc.Play();
             return;
         }
-        personalData.playerCurrency -= Weapon.weaponStats[wepID].price;
-        inventoryItemPanel.transform.Find("WeaponsUIContainer").GetChild(wepID).Find("ActionBtn").Find("Currency").gameObject.SetActive(false);
+        UpdatePlayerCurrency(Weapon.weaponStats[wepID].price);
+        //personalData.playerCurrency -= Weapon.weaponStats[wepID].price;
+        inventoryItemPanel.transform.Find("WeaponsUIContainer").GetChild(wepID).Find("ActionBtn").gameObject.SetActive(false);
+        inventoryItemPanel.transform.Find("WeaponsUIContainer").GetChild(wepID).Find("WepActionButtons").gameObject.SetActive(true);// Find("Currency").gameObject.SetActive(false);
         personalData.isWeaponPurchased[wepID] = true;
         UpdateItem("", 0,0);
         print("BOUGHT");
@@ -1739,7 +1818,8 @@ public class GameManager : MonoBehaviour {
             return;
         }
         print("BOUGHT");
-        personalData.playerCurrency -= Projectile.projectileStats[aID].price;
+        UpdatePlayerCurrency(-Projectile.projectileStats[aID].price);
+        //personalData.playerCurrency -= Projectile.projectileStats[aID].price;
         UpdateItem("Attribute", aID, Projectile.projectileStats[aID].purchaseQty);
         
         //audioSrc.clip = purchaseSFX;
@@ -2558,7 +2638,7 @@ public class GameManager : MonoBehaviour {
             data = new PlayerData();
         }
         //data.wave = 19;
-
+        data.wepID = 2;
         if (w == null)
         {
             for (int i = 0; i < 1; i++)
@@ -2572,6 +2652,7 @@ public class GameManager : MonoBehaviour {
             pc.EquipWeapon(w);
         }
 
+        data.wepID = personalData.equippedWep;
         pc.wep.purchased = true;
         UpdateInGameCurrency(0);
         UpdateKillCount(0);

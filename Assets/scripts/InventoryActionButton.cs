@@ -30,6 +30,20 @@ public class InventoryActionButton : MonoBehaviour {
                 break;
         }
     }
+
+    public void UpgradeItem()
+    {
+        string[] details = name.Split(' ');
+        print(details[0]);
+        print(details[1]);
+        // Handle action based on item type
+        switch (details[0])
+        {
+            case "wepUI":
+                GameManager.gm.UpgradeWeapon(int.Parse(details[1]));
+                break;
+        }
+    }
     
 
 

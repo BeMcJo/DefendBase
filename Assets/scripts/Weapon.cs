@@ -76,9 +76,9 @@ public abstract class Weapon : MonoBehaviour
             0,
             UnlockCondition.Quest,
             new int[] {1,1,1,1,1},
-            new int[] {50,100,200,500},
+            new int[] {65,115,220,475},
             new float[] {24, 30,36,43,50},
-            new float[] {2.5f,2.3f,2.0f,1.7f,1.3f},
+            new float[] {2.2f,2.0f,1.8f,1.5f,1.1f},
             new float[] {.75f,.70f,.65f,.55f,.5f},
             "Steady focused aim wins the game"
         ),
