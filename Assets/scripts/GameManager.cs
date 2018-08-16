@@ -757,7 +757,7 @@ public class GameManager : MonoBehaviour {
             itemUI.transform.SetParent(UIContainer);
             //csf.AddItem(itemUI);
             itemUI.transform.Find("ItemImageBG").GetComponent<RawImage>().color = new Color(249f / 255, 88f/255, 0);// / 255;
-            itemUI.transform.Find("ItemName").GetComponent<Text>().text = Weapon.weaponStats[i].name + " Lvl " + (personalData.upgradedLevelsByWeapon[i] + 1);
+            itemUI.transform.Find("ItemName").GetComponent<Text>().text = Weapon.weaponStats[i].name;// + " Lvl " + (personalData.upgradedLevelsByWeapon[i] + 1);
             itemUI.transform.Find("ItemImageBG").GetChild(0).GetComponent<RawImage>().texture = weaponItemIcons[i % weaponItemIcons.Length].texture;
             itemUI.transform.Find("ItemStats").Find("Damage").Find("Text").GetComponent<Text>().text = "" + Weapon.weaponStats[i].dmg[0];
             itemUI.transform.Find("ItemStats").Find("Reload").Find("Text").GetComponent<Text>().text = "" + Weapon.weaponStats[i].timeToReload[0];
@@ -765,6 +765,9 @@ public class GameManager : MonoBehaviour {
             itemUI.transform.Find("ItemStats").Find("BowStr").Find("Text").GetComponent<Text>().text = "" + Weapon.weaponStats[i].distance[0];
             itemUI.transform.Find("ItemDescription").GetComponent<Text>().text = Weapon.weaponStats[i].description;
             itemUI.transform.Find("QtyTxt").gameObject.SetActive(false);
+            itemUI.transform.Find("Txt BG").gameObject.SetActive(true);
+            itemUI.transform.Find("LvlTxt").gameObject.SetActive(true);
+            itemUI.transform.Find("LvlTxt").GetComponent<Text>().text = "" + (personalData.upgradedLevelsByWeapon[i]+1);
             itemUI.name = "wepUI " + i;
             //wepUI.tag = "wepUI";
             //wepUI.transform.GetComponent<Button>().onClick.AddListener(PerformInventoryAction);
@@ -1007,7 +1010,7 @@ public class GameManager : MonoBehaviour {
     public void LoadGameScene()
     {
 
-        personalData.equippedWep = 2;
+        //personalData.equippedWep = 2;
 
         for (int i = 0; i < outOfGameAudio.Count; i++)
         {
@@ -1324,8 +1327,13 @@ public class GameManager : MonoBehaviour {
 
     public void UpgradeWeapon(int wepID)
     {
+        if (HasWeaponReachedMaxLevel(wepID))
+        {
+            print("MAXED NO UPGRADES");
+            return;
+        }
         int cost = GetWeaponPermanentUpgradeCost(wepID);
-        if(personalData.playerCurrency >= cost)
+        if( personalData.playerCurrency >= cost)
         {
             print("can upgrade");
             personalData.upgradedLevelsByWeapon[wepID]++;
@@ -1339,7 +1347,7 @@ public class GameManager : MonoBehaviour {
             {
                 upgradeBtn.Find("Currency").Find("Text").GetComponent<Text>().text = "" + GetWeaponPermanentUpgradeCost(wepID);
             }
-            upgradeBtn.parent.parent.Find("ItemName").GetComponent<Text>().text = Weapon.weaponStats[wepID].name + " Lvl " + (1+personalData.upgradedLevelsByWeapon[wepID]);
+            upgradeBtn.parent.parent.Find("LvlTxt").GetComponent<Text>().text = "" + (1+personalData.upgradedLevelsByWeapon[wepID]);
             UpdatePlayerCurrency(-cost);
             StartCoroutine(PlaySFX(purchaseSFX));
         }
@@ -1353,7 +1361,7 @@ public class GameManager : MonoBehaviour {
     public int GetWeaponPermanentUpgradeCost(int wepID)
     {
         if (HasWeaponReachedMaxLevel(wepID))
-            return -1;
+            return 0;
         return Weapon.weaponStats[wepID].costToUpgrade[personalData.upgradedLevelsByWeapon[wepID]] * 10;
     }
 
@@ -1472,7 +1480,7 @@ public class GameManager : MonoBehaviour {
                 container.GetChild(i).Find("ActionBtn").GetComponent<Button>().interactable = personalData.playerCurrency >= Projectile.projectileStats[i].price;
             }
             container = inventoryCanvas.transform.Find("ItemUIPanel").Find("WeaponsUIContainer");
-            for (int i = 1; i < Weapon.weaponStats.Length; i++)
+            for (int i = 0; i < Weapon.weaponStats.Length; i++)
             {
                 container.GetChild(i).Find("ActionBtn").GetComponent<Button>().interactable =
                     Weapon.weaponStats[i].unlockCondition != UnlockCondition.QuestThenPurchase ||
@@ -2638,13 +2646,15 @@ public class GameManager : MonoBehaviour {
             data = new PlayerData();
         }
         //data.wave = 19;
-        data.wepID = 2;
+        //data.wepID = 2;
         if (w == null)
         {
+            print(1);
             for (int i = 0; i < 1; i++)
             {
                 GameObject wep = Instantiate(weaponPrefabs[personalData.equippedWep]);
                 pc.EquipWeapon(wep.transform.GetComponent<Weapon>());
+                wep.GetComponent<Weapon>().lvl = personalData.upgradedLevelsByWeapon[personalData.equippedWep];
             }
         }
         else

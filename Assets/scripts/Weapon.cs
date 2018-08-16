@@ -258,7 +258,7 @@ public abstract class Weapon : MonoBehaviour
             txts[3] += " (" + weaponStats[wepID].distance[lvl + 1] + ")";
             txts[4] += " (Next)";
         }
-
+        GameManager.gm.quickAccessCanvas.transform.Find("UpgradeWepBtn").Find("LvlTxt").GetComponent<Text>().text = "" + (lvl + 1);
         itemStats.Find("Damage").Find("Text").GetComponent<Text>().text = txts[0];//weaponStats[wepID].dmg[lvl] + "";
         itemStats.Find("ChargeAcceleration").Find("Text").GetComponent<Text>().text = txts[1];//weaponStats[wepID].chargeAccelation[lvl] + "";
         itemStats.Find("Reload").Find("Text").GetComponent<Text>().text = txts[2];// weaponStats[wepID].timeToReload[lvl] + "";
