@@ -18,17 +18,17 @@ public class Flyglet : Enemy
         //enemyID = 2;
         base.Start();
         //anim.SetInteger("hp", health);
-        int r = Random.Range(0, 2);
-        print(r);
+        /*
+        int target = Random.Range(0, 2);
+        //print(r);
         GameObject[] a = new GameObject[]{SelectPlayerTarget(), pathing[curTarget]};
-        print(a[0].tag);
-        print(a[1].tag);
         if (level <= 0)
-            r = 0;
-        SetTarget(a[r]);
+            target = 0;
+        SetTarget(a[target]);
         if (NetworkManager.nm.isStarted && NetworkManager.nm.isHost)
             NetworkManager.nm.SendEnemyInfo(this);
-        print("flyg target " + target.tag);
+        print("flyg target " + base.target.tag);
+        */
         //anim.Play(ename + "_move", -1, 0);
     }
 
@@ -43,7 +43,7 @@ public class Flyglet : Enemy
     }
 
     // Chooses player target at random if multiplayer
-    protected override GameObject SelectPlayerTarget()
+    public override GameObject SelectPlayerTarget()
     {
         if(!NetworkManager.nm.isStarted)
             return base.SelectPlayerTarget();
@@ -182,7 +182,7 @@ public class Flyglet : Enemy
         }*/
         if (target.tag == "Player" || target.tag == "Objective")
         {
-            print("FIRE");
+            //print("FIRE");
             Shoot(target);
         }
         atkTimer = effectiveTimeToAttack;

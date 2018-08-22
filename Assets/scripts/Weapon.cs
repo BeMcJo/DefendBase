@@ -418,7 +418,7 @@ public abstract class Weapon : MonoBehaviour
     // Handles the beginning of weapon usage for online feature
     public virtual bool StartUse()
     {
-        print(1123);
+        //print(1123);
         inUse = true;
         charging = true;
         chargePower = 0;

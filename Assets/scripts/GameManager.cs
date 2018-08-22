@@ -181,6 +181,7 @@ public class GameManager : MonoBehaviour {
                 paused; // Game paused?
 
     public int //wave, // Determines current wave to spawn
+               prevIndex = -1,
                playerID, // Unique identifier for player
                kills, // Total enemies killed in one wave
                //personalKills, // Total enemies you killed in one wave (multiplayer purpose)
@@ -1009,8 +1010,6 @@ public class GameManager : MonoBehaviour {
     // Load game scene. If there was any saved game progress, remove it
     public void LoadGameScene()
     {
-
-        //personalData.equippedWep = 2;
 
         for (int i = 0; i < outOfGameAudio.Count; i++)
         {
@@ -2597,15 +2596,20 @@ public class GameManager : MonoBehaviour {
         trap.transform.SetParent(playerRotation.transform);
         trap.transform.localPosition = new Vector3(5, 2, -72);
        */
+
         //DisplayIntermission();
         if (NetworkManager.nm.isStarted)
         {
             data = new PlayerData();
+            //data.wave = 15;
             UpdateInGameCurrency(0);
             UpdateKillCount(0);
             UpdateScore(0);
+            playerStatusCanvas.transform.Find("Wave").Find("Text").GetComponent<Text>().text = (data.wave == 0) ? "" : "" + data.wave + "/" + EnemySpawnPattern.patternsBySpawnPointCt[0].Count;
+
             for (int i = 0; i < arrowQty.arr.Length; i++)
                 UpdateArrowQty(i);
+            DisplayIntermission();
             return;
         }
         
@@ -2640,7 +2644,7 @@ public class GameManager : MonoBehaviour {
         {
             data = new PlayerData();
         }
-        //data.wave = 16;
+        //data.wave = 18;
         
         //data.wepID = 2;
         if (w == null)
@@ -2663,7 +2667,8 @@ public class GameManager : MonoBehaviour {
         UpdateInGameCurrency(0);
         UpdateKillCount(0);
         UpdateScore(0);
-        playerStatusCanvas.transform.Find("Wave").Find("Text").GetComponent<Text>().text = (data.wave == 0) ? "": "" + data.wave +"/" + EnemySpawnPattern.patternsBySpawnPointCt[0].Count;
+        playerStatusCanvas.transform.Find("Wave").Find("Text").GetComponent<Text>().text = (data.wave == 0) ? "" : "" + data.wave + "/" + EnemySpawnPattern.patternsBySpawnPointCt[0].Count;
+
         //playerStatusCanvas.transform.Find("Wave").Find("Text").GetComponent<Text>().text = (wave) + "";
         for (int i = 0; i < arrowQty.arr.Length; i++)
             UpdateArrowQty(i);
@@ -2693,9 +2698,11 @@ public class GameManager : MonoBehaviour {
     }
 
     // Spawns enemy and selects pre-determined path (spPath) from map manager at a spawn point (sp)
-    public void SpawnEnemy(int sp,int spPath = -1)
+    public void SpawnEnemy(int sp,int spPath = -1, string targetType = "", int targetID = -1)
     {
-        GameObject enemy = Instantiate(enemyPrefabs[pattern.spawnCts[intervalIndex][spawnIndex]]);
+        int enemyID = pattern.spawnCts[intervalIndex][spawnIndex];
+        int enemyLvl = (pattern.enemyLvls[intervalIndex][spawnIndex] + data.difficulty) % Enemy.enemyStats.Length;
+        GameObject enemy = Instantiate(enemyPrefabs[enemyID]);
         List<GameObject> pathing;
         //Enemy.AssignEnemy(enemy.transform.GetComponent<Enemy>());
         // Get random spawn point
@@ -2707,9 +2714,28 @@ public class GameManager : MonoBehaviour {
                                     enemy.transform.position.y + 1,
                                     spawnPoint.transform.position.z);
         Enemy e = enemy.transform.GetComponent<Enemy>();
-        e.SetTarget(spawnPoint);
+        e.level = enemyLvl;
+        //e.SetTarget(spawnPoint);
         if (spPath == -1)
             spPath = UnityEngine.Random.Range(0, MapManager.mapManager.pathsBySpawnPoint[sp].Count);
+        if(targetType == "")
+        {
+            targetType = "Path";
+            targetID = 0;
+
+            if (enemyID == 2)
+            {
+                int target = UnityEngine.Random.Range(0, 2);
+                //print(r);
+                String[] targets = new String[] { "Player", "Path" };//new GameObject[] { GameManager.gm.player, spawnPoint };
+                if (e.level <= 0)
+                    target = 0;
+                targetType = targets[target];
+                if (targetType == "Player")
+                    targetID = e.SelectPlayerTarget().GetComponent<PlayerController>().id;
+                //e.SetTarget(targets[target]);
+            }
+        }
             //pathing = MapManager.mapManager.pathsBySpawnPoint[sp][];//Enemy.GeneratePathing(spawnPoint);
             //e.SetPathing(sp, );
         //else
@@ -2717,26 +2743,26 @@ public class GameManager : MonoBehaviour {
         //pathing = MapManager.mapManager.pathsBySpawnPoint[sp][spPath];
         //print("path gen");
         e.SetPathing(sp,spPath);
+        e.AssignTarget(targetType, targetID);
         //e.pathing = pathing;
         //GameObject enemyUI = Instantiate(statusIndicatorPrefab);
         //enemyUI.transform.GetComponent<StatusIndicator>().target = enemy;
         enemy.transform.SetParent(enemiesContainer.transform);
         data.difficulty = 0;
-        e.level = (pattern.enemyLvls[intervalIndex][spawnIndex] + data.difficulty) % Enemy.enemyStats.Length;
-
-    }
-
-    public void SpawnEnemy(int enemyID, GameObject location)
-    {
-
+        //print(e.enemyID + "," + e.level)
+        if(NetworkManager.nm.isStarted && NetworkManager.nm.isHost)
+        {
+            NetworkManager.nm.NotifySpawnEnemyAt(sp, spPath, targetType, targetID);
+        }
     }
 
     // Spawn enemy[enemyID] onto same pathing as another object starting at curTarget at location
-    public void SpawnEnemy(int enemyID, int curTarget, List<GameObject> pathing, Vector3 location)
+    public void SpawnEnemy(int enemyID,int lvl, int curTarget, List<GameObject> pathing, Vector3 location)
     {
         print("SPAWNED MINION");
         GameObject enemy = Instantiate(enemyPrefabs[enemyID]);
         Enemy e = enemy.GetComponent<Enemy>();
+        e.level = lvl;
         e.curTarget = curTarget;
         e.pathing = pathing;
         e.SetTarget(pathing[curTarget]);
@@ -2757,8 +2783,54 @@ public class GameManager : MonoBehaviour {
         enemiesSpawned++;
     }
 
+    public void SpawnEnemyFromPattern(int sp, int spPath = -1, string targetType = "", int targetID = -1)
+    {
+        spawning = true; // Indicate currently spawning an enemy
+        enemiesSpawned++;
+
+        SpawnEnemy(sp, spPath, targetType, targetID);
+        prevIndex = spawnIndex;
+        spawnIndex++;
+
+        // If reached end of spawning enemies in current group
+        if (spawnIndex >= pattern.spawnCts[intervalIndex].Count)
+        {
+            spawnIndex = 0;
+            // If reached end of spawning from current wave
+            if (intervalIndex >= pattern.spawnFreqs.Count)
+            {
+                intervalIndex = 0;
+                patternIterations--;
+                // If no more iterations of this pattern to spawn
+                if (patternIterations <= 0)
+                {
+                    doneSpawningWave = true;
+                }
+                // Repeat this spawn pattern
+                else
+                {
+                    spawnTimer = 0;
+                    timeToSpawn = pattern.spawnTimes[intervalIndex] / pattern.spawnCts[intervalIndex].Count;
+                }
+            }
+            // Move to next group of enemies to spawn
+            else
+            {
+                intervalIndex++;
+                spawnTimer = 0;
+                timeToSpawn = pattern.spawnTimes[intervalIndex] / pattern.spawnCts[intervalIndex].Count;
+            }
+        }
+        // Still got enemies to spawn in this group
+        else
+        {
+            spawnTimer = timeToSpawn;
+        }
+        spawning = false; // Indicate the end of spawning current enemy
+    }
+
     // Spawn enemy at the spawn point sp
-    public IEnumerator SpawnEnemyCoroutine(int sp, int spPath = -1)
+    public IEnumerator SpawnEnemyCoroutine(int sp, int spPath = -1, string targetType ="", int targetID = -1)
     { 
         if (inGame)
         {
@@ -2787,7 +2859,13 @@ public class GameManager : MonoBehaviour {
             difficulty = 0;
             e.level = (pattern.enemyLvls[intervalIndex][spawnIndex] + difficulty) % Enemy.difficulties.Length;
             */
-            SpawnEnemy(sp, spPath);
+            if(prevIndex != -1 && prevIndex == spawnIndex)
+            {
+                print("SPAWNING SAME ENEMY...");
+                Debug.LogError("SPAWNING SAME ENEMY");
+            }
+            SpawnEnemy(sp, spPath,targetType, targetID);
+            prevIndex = spawnIndex;
             spawnIndex++;
             
             // If reached end of spawning enemies in current group

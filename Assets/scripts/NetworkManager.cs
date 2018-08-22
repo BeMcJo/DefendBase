@@ -506,14 +506,14 @@ public class NetworkManager : MonoBehaviour {
         int wepID = int.Parse(data[2]);
         int lvl = int.Parse(data[3]);
         players[cnnID].playerGO.GetComponent<PlayerController>().wep.SetLevel(lvl);
-        print("PLAYER " + cnnID + " lvled wep to " + lvl);
+        //print("PLAYER " + cnnID + " lvled wep to " + lvl);
         
     }
 
     // Tell other players I have changed my arrow attribute
     public void NotifyPlayerChangedArrowAttribute(int attributeID)
     {
-        print("changing attribute");
+        //print("changing attribute");
         string msg = "ARROWCHANGE|" + ourClientID + "|" + attributeID + "|";
         if (isHost)
         {
@@ -898,6 +898,7 @@ public class NetworkManager : MonoBehaviour {
                     case "ENEMYINFO":
                         int eid = int.Parse(splitData[1]);
                         debugLog.Add(msg);
+                        print(msg);
                         // Make sure enemy is alive to adjust their details
                         if (GameManager.gm.enemies.ContainsKey(eid))
                         {
@@ -1287,17 +1288,18 @@ public class NetworkManager : MonoBehaviour {
     public void SpawnEnemy(string[] splitData)
     {
         int sp = int.Parse(splitData[2]), spPath = int.Parse(splitData[3]);
-
+        string targetType = splitData[4];
+        int targetID = int.Parse(splitData[5]);
         // if spawn specific enemy at specific location
-        if (splitData.Length != 4)
+        if (splitData.Length != 6)
         {
-            print(splitData[4]);
             int pathIndex = int.Parse(splitData[4]);
             int enemyID = int.Parse(splitData[5]);
-            string[] pos = splitData[6].Split(',');
+            int lvl = int.Parse(splitData[6]);
+            string[] pos = splitData[7].Split(',');
             print(pathIndex);
             Vector3 location = new Vector3(float.Parse(pos[0]), float.Parse(pos[1]), float.Parse(pos[2]));
-            SpawnEnemy(enemyID, sp, spPath, pathIndex, location);
+            SpawnEnemy(enemyID,lvl, sp, spPath, pathIndex, location);
             return;
         }
       
@@ -1315,12 +1317,13 @@ public class NetworkManager : MonoBehaviour {
             spPath = Random.Range(0, MapManager.mapManager.pathsBySpawnPoint[sp].Count);
 
 
-        StartCoroutine(GameManager.gm.SpawnEnemyCoroutine(sp,spPath));
-        NotifySpawnEnemyAt(sp, spPath);
+        //StartCoroutine(GameManager.gm.SpawnEnemyCoroutine(sp, spPath, targetType, targetID));
+        GameManager.gm.SpawnEnemyFromPattern(sp, spPath, targetType, targetID);
+        NotifySpawnEnemyAt(sp, spPath,targetType,targetID);
     }
 
     // As host, tell game manager to spawn enemy and tell clients to do so as well
-    public void SpawnEnemy(int sp, int spPath = -1)
+    public void SpawnEnemy(int sp, int spPath = -1)//, string target = "", int targetID = -1)
     {
         if (sp == -1)
             sp = Random.Range(0, MapManager.mapManager.spawnPoints.Count);
@@ -1331,29 +1334,30 @@ public class NetworkManager : MonoBehaviour {
         //List<GameObject> pathing = Enemy.GeneratePathing(spawnPoint);
         //StartCoroutine(GameManager.gm.SpawnEnemy(sp, pathing));
         StartCoroutine(GameManager.gm.SpawnEnemyCoroutine(sp, spPath));
-        NotifySpawnEnemyAt(sp, spPath);
+        //NotifySpawnEnemyAt(sp, spPath);
     }
 
     // Spawn enemy[enemyID] at location, traversing pathingIndex with target being at pathIndex
-    public void SpawnEnemy(int enemyID, int spawnPoint, int pathingIndex, int pathIndex, Vector3 location)
+    public void SpawnEnemy(int enemyID, int lvl, int spawnPoint, int pathingIndex, int pathIndex, Vector3 location)
     {
-        GameManager.gm.SpawnEnemy(enemyID, pathIndex, MapManager.mapManager.GetPathing(spawnPoint, pathingIndex), location);
-        NotifySpawnEnemyAt(enemyID, spawnPoint, pathingIndex, pathIndex, location);
+        GameManager.gm.SpawnEnemy(enemyID, lvl, pathIndex, MapManager.mapManager.GetPathing(spawnPoint, pathingIndex), location);
+        NotifySpawnEnemyAt(enemyID, lvl, spawnPoint, pathingIndex, pathIndex, location);
     }
 
-    public void NotifySpawnEnemyAt(int enemyID, int spawnPoint, int pathingIndex, int pathIndex, Vector3 location)
+    public void NotifySpawnEnemyAt(int enemyID, int lvl, int spawnPoint, int pathingIndex, int pathIndex, Vector3 location)
     {
-        string msg = "ENEMYSPAWN|" + activityLog.Count + "|" + spawnPoint + "|" + pathingIndex + "|" + pathIndex + "|" + enemyID + "|" + location.x + "," + location.y + "," + location.z;
+        string msg = "ENEMYSPAWN|" + activityLog.Count + "|" + spawnPoint + "|" + pathingIndex + "|" + pathIndex + "|" + enemyID + "|" + lvl + "|" + location.x + "," + location.y + "," + location.z;
 
         activityLog.Add(msg);
+        print(msg);
         if (isHost)
             Send(msg, reliableChannel, players);
     }
 
     // Notify players to spawn enemies
-    public void NotifySpawnEnemyAt(int spawnPoint, int spPath)
+    public void NotifySpawnEnemyAt(int spawnPoint, int spPath, string targetType,int targetID)
     {
-        string msg = "ENEMYSPAWN|" + activityLog.Count + "|" + spawnPoint + "|" + spPath;
+        string msg = "ENEMYSPAWN|" + activityLog.Count + "|" + spawnPoint + "|" + spPath + "|" + targetType + "|" + targetID;
         
         activityLog.Add(msg);
         if (isHost)
@@ -1691,6 +1695,11 @@ public class NetworkManager : MonoBehaviour {
         {
             kvp.Value.isReady = false;
         }
+        if (GameManager.gm.inGame)
+        {
+            GameObject readyMarker = GameManager.gm.intermissionCanvas.transform.Find("ReadyMarker").gameObject;
+            readyMarker.SetActive(players[ourClientID].isReady);
+        }
     }
 
     // Announce to start game
@@ -1716,7 +1725,7 @@ public class NetworkManager : MonoBehaviour {
         // As client, tell host that I am in game and ready to start wave
         if (!isHost)
         {
-            RequestReady();
+            //RequestReady();
         }
     }
 
@@ -1856,8 +1865,6 @@ public class NetworkManager : MonoBehaviour {
             {
                 GameManager.gm.intermissionCanvas.transform.Find("ResumeBtn").GetComponent<Button>().interactable = false;
                 GameManager.gm.intermissionCanvas.transform.Find("SaveAndQuitBtn").GetComponent<Button>().interactable = false;
-                GameObject readyMarker = GameManager.gm.intermissionCanvas.transform.Find("ReadyMarker").gameObject;
-                readyMarker.SetActive(!readyMarker.activeSelf);
             }
         }
     }
@@ -1916,6 +1923,11 @@ public class NetworkManager : MonoBehaviour {
             if (GameManager.gm.onIntermission)
             {
                 GameManager.gm.intermissionCanvas.transform.Find("ResumeBtn").GetComponent<Button>().interactable = !nm.isHost || readyToStart;
+                if (cnnID == ourClientID)
+                {
+                    GameObject readyMarker = GameManager.gm.intermissionCanvas.transform.Find("ReadyMarker").gameObject;
+                    readyMarker.SetActive(players[ourClientID].isReady);
+                }
             }
         }
 

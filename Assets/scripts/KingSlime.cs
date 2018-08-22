@@ -17,12 +17,12 @@ public class KingSlime : Slime {
             {
                 if (curTarget < pathing.Count)
                 {
-                    NetworkManager.nm.SpawnEnemy(0, spawnPoint, pathingIndex, curTarget, transform.Find("SpawnPt").position);
+                    NetworkManager.nm.SpawnEnemy(0, 1, spawnPoint, pathingIndex, curTarget, transform.Find("SpawnPt").position);
                 }
                 // targetting objective
                 else
                 {
-                    NetworkManager.nm.SpawnEnemy(0, spawnPoint, pathingIndex, curTarget - 1, transform.Find("SpawnPt").position);
+                    NetworkManager.nm.SpawnEnemy(0, 1, spawnPoint, pathingIndex, curTarget - 1, transform.Find("SpawnPt").position);
                 }
             }
             return;
@@ -31,12 +31,12 @@ public class KingSlime : Slime {
         // if still have pathing to traverse
         if (curTarget < pathing.Count)
         {
-            GameManager.gm.SpawnEnemy(0, curTarget, pathing, transform.Find("SpawnPt").position);
+            GameManager.gm.SpawnEnemy(0, 1, curTarget, pathing, transform.Find("SpawnPt").position);
         }
         else
         {
             //GameManager.gm.SpawnEnemy(0, target, transform.Find("SpawnPt").position);
-            GameManager.gm.SpawnEnemy(0, curTarget-1, pathing, transform.Find("SpawnPt").position);
+            GameManager.gm.SpawnEnemy(0, 1, curTarget-1, pathing, transform.Find("SpawnPt").position);
         }
         
     }

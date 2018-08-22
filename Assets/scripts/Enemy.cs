@@ -213,7 +213,7 @@ public class Enemy : MonoBehaviour
     }
 
     // Based on enemy type, will determine how player targets will be selected
-    protected virtual GameObject SelectPlayerTarget()
+    public virtual GameObject SelectPlayerTarget()
     {
         return GameManager.gm.player;
     }
@@ -224,6 +224,29 @@ public class Enemy : MonoBehaviour
         this.spawnPoint = spawnPoint;
         this.pathingIndex = pathIndex;
         pathing = MapManager.mapManager.pathsBySpawnPoint[spawnPoint][pathIndex];
+
+    }
+
+    public void AssignTarget(string targetType = "", int targetID = -1)
+    {
+        //if (NetworkManager.nm.isStarted && NetworkManager.nm.isHost)
+        //    NetworkManager.nm.SendEnemyInfo(this);
+        GameObject target = null;
+        switch (targetType)
+        {
+            case "Player":
+
+                if (!NetworkManager.nm.isStarted)
+                    target = GameManager.gm.player;
+                else
+                    target = NetworkManager.nm.players[targetID].playerGO;
+                break;
+            case "Path":
+                target = pathing[targetID];
+                break;
+        }
+
+        SetTarget(target);
     }
 
     // Generates random pathing towards objective
@@ -296,6 +319,11 @@ public class Enemy : MonoBehaviour
                 //target =;
                 break;
             case "Player":
+                if(enemyID != 2)
+                {
+                    print("not valid");
+                    Debug.LogError("INVALID TARGET");
+                }
                 SetTarget(NetworkManager.nm.players[tid].playerGO);
                 break;
         }

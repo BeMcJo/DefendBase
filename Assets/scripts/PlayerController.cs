@@ -233,7 +233,7 @@ public class PlayerController : MonoBehaviour {
 
     public Vector3 SetOrientation(Vector3 orientation)
     {
-        print("set orientatiation to" + orientation);
+        //print("set orientatiation to" + orientation);
         transform.eulerAngles = new Vector3(0, transform.eulerAngles.y - orientation.y, 0);
         return -transform.eulerAngles;
         //if (playerCam)
