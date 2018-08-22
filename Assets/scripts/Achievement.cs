@@ -41,12 +41,7 @@ public class Achievement {
                 false
             ),
         new Achievement(
-                "Most Kills In A Game",
-                "",
-                false
-            ),
-        new Achievement(
-                "What shall this score be?",
+                "Most Eliminations In A Game",
                 "",
                 false
             ),
@@ -56,7 +51,7 @@ public class Achievement {
                 false
             ),
         new Achievement(
-                "Total Enemies Killed",
+                "Total Enemies Eliminated",
                 "",
                 false
             ),
@@ -110,12 +105,12 @@ public class Achievement {
 
         for (int i = 0; i < cumulativeScoreAchievements[0].Length; i++)
         {
-            cumulativeScoreAchievements[0][i] = new Achievement(Enemy.names[i] + "s killed", "");
+            cumulativeScoreAchievements[0][i] = new Achievement(Enemy.names[i] + "s eliminated", "");
             cumulativeScoreAchievements[3][i] = new Achievement(Enemy.names[i] + " weak spots hit", "");
         }
         for (int i = 0; i < cumulativeScoreAchievements[1].Length; i++)
         {
-            cumulativeScoreAchievements[1][i] = new Achievement(Projectile.projectileStats[i].name + " kills", "");
+            cumulativeScoreAchievements[1][i] = new Achievement(Projectile.projectileStats[i].name + " eliminations", "");
         }
         for (int i = 0; i < cumulativeScoreAchievements[2].Length; i++)
         {
@@ -124,7 +119,7 @@ public class Achievement {
         for (int i = 0; i < cumulativeScoreAchievements[4].Length; i++)
         {
             cumulativeScoreAchievements[4][i] = new Achievement(Weapon.weaponStats[i].name + "s used", "");
-            cumulativeScoreAchievements[5][i] = new Achievement(Weapon.weaponStats[i].name + " kill count", "");
+            cumulativeScoreAchievements[5][i] = new Achievement(Weapon.weaponStats[i].name + " elimination count", "");
             cumulativeScoreAchievements[6][i] = new Achievement(Weapon.weaponStats[i].name + " weak spots hit", "");
         }
 
@@ -242,23 +237,19 @@ public class Achievement {
             case 1:
                 details = GameManager.gm.personalData.mostKillsInGame + "";
                 break;
-            // Most Money Saved In A Game
-            case 2:
-                details = GameManager.gm.personalData.mostCurrencySavedInGame + "";
-                break;
             // Highest Wave Survived In A Game
-            case 3:
+            case 2:
                 details = GameManager.gm.personalData.highestWaveSurvived + "";
                 break;
             // total enemies killed
-            case 4:
+            case 3:
                 int sum = 0;
                 for (int i = 0; i < GameManager.gm.personalData.killsByEnemy.Length; i++)
                     sum += GameManager.gm.personalData.killsByEnemy[i];
                 details = sum + "";
                 break;
             // Most Weak Spots Hit In A Game
-            case 5:
+            case 4:
                 details = GameManager.gm.personalData.mostWeakSpotsHitInAGame + "";
                 break;
         }
@@ -310,7 +301,7 @@ public class Achievement {
     {
         // unlock bomb arrow
         new Achievement(
-                "Kill 1000 enemies using " + Projectile.projectileStats[0].name,
+                "Eliminate 1000 enemies using " + Projectile.projectileStats[0].name,
                 "",
                 true,
                 new Condition[] {
@@ -319,7 +310,7 @@ public class Achievement {
             ),
         // unlock fire arrow
         new Achievement(
-                "Kill 2,500 enemies using " + Projectile.projectileStats[1].name,
+                "Eliminate 2,500 enemies using " + Projectile.projectileStats[1].name,
                 "",
                 true,
                 new Condition[] {
@@ -348,7 +339,7 @@ public class Achievement {
         
         // unlock ice arrow
         new Achievement(
-                "Kill 1,500 " + Enemy.names[2] +"s",
+                "Eliminate 1,500 " + Enemy.names[2] +"s",
                 "",
                 true,
                 new Condition[] {

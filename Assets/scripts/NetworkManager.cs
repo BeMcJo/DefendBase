@@ -1287,10 +1287,21 @@ public class NetworkManager : MonoBehaviour {
     public void SpawnEnemy(string[] splitData)
     {
         int sp = int.Parse(splitData[2]), spPath = int.Parse(splitData[3]);
-        //string pathstr = null;
-        //if (splitData.Length > 2) {
-        //    pathstr = splitData[3];
-        //}
+
+        // if spawn specific enemy at specific location
+        if (splitData.Length != 4)
+        {
+            print(splitData[4]);
+            int pathIndex = int.Parse(splitData[4]);
+            int enemyID = int.Parse(splitData[5]);
+            string[] pos = splitData[6].Split(',');
+            print(pathIndex);
+            Vector3 location = new Vector3(float.Parse(pos[0]), float.Parse(pos[1]), float.Parse(pos[2]));
+            SpawnEnemy(enemyID, sp, spPath, pathIndex, location);
+            return;
+        }
+      
+
         // Shouldn't need to worry about spawn point and path as client
         if(sp < 0 || spPath < 0)
         {
@@ -1303,23 +1314,7 @@ public class NetworkManager : MonoBehaviour {
         if (spPath == -1)
             spPath = Random.Range(0, MapManager.mapManager.pathsBySpawnPoint[sp].Count);
 
-        //GameObject spawnPoint = MapManager.mapManager.spawnPoints[sp];
-        //List<GameObject> pathing = new List<GameObject>();//Enemy.GeneratePathing(spawnPoint);
 
-        /*
-        if (pathstr != null)
-        {
-            string[] paths = pathstr.Split(',');
-            for(int i =0; i < paths.Length; i++)
-            {
-                string[] tagAndID = paths[i].Split(' ');
-                if(tagAndID[0] == "Path")
-                {
-                    pathing.Add(MapManager.mapManager.platforms[int.Parse(tagAndID[1])]);
-                }
-            }
-        }
-        */
         StartCoroutine(GameManager.gm.SpawnEnemyCoroutine(sp,spPath));
         NotifySpawnEnemyAt(sp, spPath);
     }
@@ -1339,26 +1334,26 @@ public class NetworkManager : MonoBehaviour {
         NotifySpawnEnemyAt(sp, spPath);
     }
 
+    // Spawn enemy[enemyID] at location, traversing pathingIndex with target being at pathIndex
+    public void SpawnEnemy(int enemyID, int spawnPoint, int pathingIndex, int pathIndex, Vector3 location)
+    {
+        GameManager.gm.SpawnEnemy(enemyID, pathIndex, MapManager.mapManager.GetPathing(spawnPoint, pathingIndex), location);
+        NotifySpawnEnemyAt(enemyID, spawnPoint, pathingIndex, pathIndex, location);
+    }
+
+    public void NotifySpawnEnemyAt(int enemyID, int spawnPoint, int pathingIndex, int pathIndex, Vector3 location)
+    {
+        string msg = "ENEMYSPAWN|" + activityLog.Count + "|" + spawnPoint + "|" + pathingIndex + "|" + pathIndex + "|" + enemyID + "|" + location.x + "," + location.y + "," + location.z;
+
+        activityLog.Add(msg);
+        if (isHost)
+            Send(msg, reliableChannel, players);
+    }
+
     // Notify players to spawn enemies
     public void NotifySpawnEnemyAt(int spawnPoint, int spPath)
     {
-        string msg = "ENEMYSPAWN|" + activityLog.Count + "|" + spawnPoint + "|" + spPath + "|";
-        /*
-        if (pathing != null)
-        {
-            for(int i = 0; i < pathing.Count; i++)
-            {
-                msg += pathing[i].tag;
-                if(pathing[i].tag == "Path")
-                {
-                    msg += " " + pathing[i].GetComponent<PlatformPath>().id;
-                }
-                msg += ',';
-            }
-            msg.Trim(',');
-            msg += '|';
-        }
-        */
+        string msg = "ENEMYSPAWN|" + activityLog.Count + "|" + spawnPoint + "|" + spPath;
         
         activityLog.Add(msg);
         if (isHost)

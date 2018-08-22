@@ -9,19 +9,35 @@ public class KingSlime : Slime {
     {
         int prevHP = health;
         base.TakeDamageFrom(dmg, dmgSourceType, sid);
-        if(health != 0)
+        if (health <= 0 || dmg == 0)
+            return;
+        if (NetworkManager.nm.isStarted)
         {
-            if (curTarget < pathing.Count)
+            if (NetworkManager.nm.isHost)
             {
-                print("followme");
-                GameManager.gm.SpawnEnemy(0, curTarget, pathing, transform.Find("SpawnPt").position);
+                if (curTarget < pathing.Count)
+                {
+                    NetworkManager.nm.SpawnEnemy(0, spawnPoint, pathingIndex, curTarget, transform.Find("SpawnPt").position);
+                }
+                // targetting objective
+                else
+                {
+                    NetworkManager.nm.SpawnEnemy(0, spawnPoint, pathingIndex, curTarget - 1, transform.Find("SpawnPt").position);
+                }
             }
-            else
-            {
-                print("CHARGE");
-                GameManager.gm.SpawnEnemy(0, target, transform.Find("SpawnPt").position);
-            }
-            print("OW");
+            return;
         }
+
+        // if still have pathing to traverse
+        if (curTarget < pathing.Count)
+        {
+            GameManager.gm.SpawnEnemy(0, curTarget, pathing, transform.Find("SpawnPt").position);
+        }
+        else
+        {
+            //GameManager.gm.SpawnEnemy(0, target, transform.Find("SpawnPt").position);
+            GameManager.gm.SpawnEnemy(0, curTarget-1, pathing, transform.Find("SpawnPt").position);
+        }
+        
     }
 }

@@ -100,6 +100,12 @@ public class MapManager : MonoBehaviour {
         }
     }
 
+    // returns one of the many pathings based on spawnPoint
+    public List<GameObject> GetPathing(int spawnPoint, int index)
+    {
+        return pathsBySpawnPoint[spawnPoint][index];
+    }
+
     // Instantiates the platforms from the Map Library based on the map
     public void LoadMap(int map)
     {

@@ -74,7 +74,9 @@ public class Enemy : MonoBehaviour
                attackCt, // Keeps track of attack for multiplayer synchronization
                curTarget, // Pursue current target pathing
                dmgSourceID, // Damage Source ID ( most recent unit that attacked this object )
-               level; // Used to determine what the stats are
+               level, // Used to determine what the stats are
+               spawnPoint, // Which spawn point did this enemy originate from
+               pathingIndex; // Which pathing from spawn point does this enemy traverse
     public float originalMoveSpd = 0.075f, // Default move speed
                  effectiveMoveSpd, // Move speed calculated and used 
                  originalTimeToAttack = 2.5f, // Default amount of time before inflicting damage
@@ -216,6 +218,14 @@ public class Enemy : MonoBehaviour
         return GameManager.gm.player;
     }
 
+    // Assigns the spawn point and pathing
+    public void SetPathing(int spawnPoint, int pathIndex)
+    {
+        this.spawnPoint = spawnPoint;
+        this.pathingIndex = pathIndex;
+        pathing = MapManager.mapManager.pathsBySpawnPoint[spawnPoint][pathIndex];
+    }
+
     // Generates random pathing towards objective
     public static List<GameObject> GeneratePathing(GameObject sp)
     {
@@ -319,7 +329,6 @@ public class Enemy : MonoBehaviour
     // slowly unfreeze enemy
     public bool HasThawed()
     {
-        print(statusEffectObjects[0].transform.localScale.magnitude);
         statusEffectObjects[0].transform.localScale /= 1.0015f;
         return statusEffectObjects[0].transform.localScale.magnitude < .5f;
     }
@@ -475,7 +484,7 @@ public class Enemy : MonoBehaviour
             return;
         actionPerformed = "move";
         anim.SetBool("isMoving", true);
-        anim.SetBool("isAttacking", false);
+        //anim.SetBool("isAttacking", false);
         StartCoroutine(MoveAnimation());
         //actionPerformed = "idle";
         //transform.position = Vector3.MoveTowards(transform.position, targetPos, effectiveMoveSpd);

@@ -122,6 +122,10 @@ public class Projectile : MonoBehaviour {
 	protected virtual void Update () {
         if (isShot)
         {
+            if (hitGround || deflected)
+            {
+                return;
+            }
             //print("VALOCITY>>:" + GetComponent<Rigidbody>().velocity + "............" + GetComponent<Rigidbody>().velocity.magnitude);
             activeDuration -= Time.deltaTime;
             if (target)
@@ -270,9 +274,6 @@ public class Projectile : MonoBehaviour {
                 // If piercing attribute, don't stop arrow
                 else if (attributeID != 2)
                 {
-                    deflected = true;
-
-                    Destroy(gameObject);
                     /*
                     transform.GetComponent<Rigidbody>().velocity = Vector3.zero;
                     transform.GetComponent<Rigidbody>().useGravity = false;
@@ -280,10 +281,13 @@ public class Projectile : MonoBehaviour {
                     transform.SetParent(collision.transform);
                     */
                 }
+                deflected = true;
+
+                Destroy(gameObject);
 
             }
         }
-        else if (collision.transform.tag == "Ground" || collision.transform.tag == "Impenetrable" || collision.transform.tag == "Path")
+        else if (collision.transform.tag == "Ground" || collision.transform.tag == "Impenetrable" || collision.transform.tag == "Path" || collision.transform.tag == "Dummy")
         {
             //print(collision.transform.name);
             if (!isShot)
@@ -510,6 +514,36 @@ public class Projectile : MonoBehaviour {
                 //}
             }
         }
+        else if (collision.tag == "Dummy")
+        {
+            print("BAKA");
+            GameManager.gm.OnHitEnemy();
+
+            if (attributeID == 1)
+            {
+                CreateExplosion(ExplosionType.damage);
+            }
+            // ice arrow
+            else if (attributeID == 4)
+            {
+                CreateExplosion(ExplosionType.freeze);
+                //e.ApplyEffect(Effect.freeze);
+            }
+            // fire arrow
+            else if (attributeID == 5)
+            {
+                CreateAreaEffect(0);
+            }
+            hitGround = true;
+            deflected = true;
+            if (attributeID == 3)
+            {
+                deflected = true;
+                Destroy(gameObject, 1f);
+            }
+            else
+                Destroy(gameObject);
+        }
         else if (collision.transform.tag == "Ground" || collision.transform.tag == "Impenetrable" || collision.transform.tag == "Path")
         {
             //print(collision.transform.name);
@@ -550,16 +584,6 @@ public class Projectile : MonoBehaviour {
                 return;
             }
             collision.GetComponent<Trap>().TakeDamage(dmg);
-        }else if(collision.tag == "Dummy")
-        {
-            print("BAKA");
-            GameManager.gm.OnHitEnemy();
-            if (attributeID == 3)
-            {
-                deflected = true;
-                Destroy(gameObject, 1f);
-            }else
-                Destroy(gameObject);
         }
     }
 

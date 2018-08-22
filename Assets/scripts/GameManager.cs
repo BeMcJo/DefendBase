@@ -894,12 +894,12 @@ public class GameManager : MonoBehaviour {
                     actionBtn.Find("Currency").gameObject.SetActive(false);
                     break;
                 case UnlockCondition.Purchase:
-                    actionBtn.Find("Text").GetComponent<Text>().text = "Buy\n";
+                    actionBtn.Find("Text").GetComponent<Text>().text = "Buy x" + Projectile.projectileStats[i].purchaseQty +  "\n";
                     actionBtn.Find("Currency").gameObject.SetActive(true);
                     actionBtn.Find("Currency").Find("Text").GetComponent<Text>().text = "" + Projectile.projectileStats[i].price;
                     break;
                 case UnlockCondition.QuestThenPurchase:
-                    actionBtn.Find("Text").GetComponent<Text>().text = "Buy\n";
+                    actionBtn.Find("Text").GetComponent<Text>().text = "Buy x" + Projectile.projectileStats[i].purchaseQty + "\n";
                     actionBtn.Find("Currency").gameObject.SetActive(true);
                     actionBtn.Find("Currency").Find("Text").GetComponent<Text>().text = "" + Projectile.projectileStats[i].price;
                     break;
@@ -1368,7 +1368,6 @@ public class GameManager : MonoBehaviour {
     // Returns whether weapon has been max upgraded
     public bool HasWeaponReachedMaxLevel(int wepID)
     {
-        print(wepID + " " + personalData.upgradedLevelsByWeapon[wepID] + " " + Weapon.weaponStats[wepID].costToUpgrade.Length);
         return personalData.upgradedLevelsByWeapon[wepID] >= Weapon.weaponStats[wepID].costToUpgrade.Length;
     }
 
@@ -1486,7 +1485,6 @@ public class GameManager : MonoBehaviour {
                     Weapon.weaponStats[i].unlockCondition != UnlockCondition.QuestThenPurchase ||
                     personalData.playerCurrency >= Weapon.weaponStats[i].price;
                 Transform wepActionBtns = container.GetChild(i).Find("WepActionButtons");
-                print(i + " " + HasWeaponReachedMaxLevel(i));
                 wepActionBtns.Find("UpgradeBtn").GetComponent<Button>().interactable =
                     !HasWeaponReachedMaxLevel(i) &&
                     personalData.playerCurrency >= Weapon.weaponStats[i].costToUpgrade[personalData.upgradedLevelsByWeapon[i]]*10;
@@ -1820,12 +1818,10 @@ public class GameManager : MonoBehaviour {
     {
         if(Projectile.projectileStats[aID].price > personalData.playerCurrency)
         {
-            print("CANT BUY");
             audioSrc.clip = invalidSFX;
             audioSrc.Play();
             return;
         }
-        print("BOUGHT");
         UpdatePlayerCurrency(-Projectile.projectileStats[aID].price);
         //personalData.playerCurrency -= Projectile.projectileStats[aID].price;
         UpdateItem("Attribute", aID, Projectile.projectileStats[aID].purchaseQty);
@@ -1838,7 +1834,6 @@ public class GameManager : MonoBehaviour {
 
     public void Purchase()
     {
-        Debug.Log("BUY" + selectedItem.name);
         if (selectedItem == null)
             return;
         string[] details = selectedItem.name.Split(' ');
@@ -1968,7 +1963,7 @@ public class GameManager : MonoBehaviour {
         stats.Find("OverallScore").Find("Stats").GetComponent<Text>().text = "" + data.score;
 
         Achievement.CheckForAchievementProgress();
-        int earnings = data.score / 1000 + data.inGameCurrency / 20 + (won ? 30 : 0);
+        int earnings = data.score / 1000 + data.inGameCurrency / 20 + (won ? 50 : 0);
         stats.Find("Earnings").Find("Stats").GetComponent<Text>().text = "" + earnings;
         personalData.playerCurrency += earnings;
         firework.SetActive(won);
@@ -2645,7 +2640,8 @@ public class GameManager : MonoBehaviour {
         {
             data = new PlayerData();
         }
-        //data.wave = 19;
+        //data.wave = 16;
+        
         //data.wepID = 2;
         if (w == null)
         {
@@ -2712,13 +2708,16 @@ public class GameManager : MonoBehaviour {
                                     spawnPoint.transform.position.z);
         Enemy e = enemy.transform.GetComponent<Enemy>();
         e.SetTarget(spawnPoint);
-      
         if (spPath == -1)
-            pathing = MapManager.mapManager.pathsBySpawnPoint[sp][UnityEngine.Random.Range(0, MapManager.mapManager.pathsBySpawnPoint[sp].Count)];//Enemy.GeneratePathing(spawnPoint);
-        else
-            pathing = MapManager.mapManager.pathsBySpawnPoint[sp][spPath];
+            spPath = UnityEngine.Random.Range(0, MapManager.mapManager.pathsBySpawnPoint[sp].Count);
+            //pathing = MapManager.mapManager.pathsBySpawnPoint[sp][];//Enemy.GeneratePathing(spawnPoint);
+            //e.SetPathing(sp, );
+        //else
+            //e.SetPathing(sp, UnityEngine.Random.Range(0, MapManager.mapManager.pathsBySpawnPoint[sp].Count));
+        //pathing = MapManager.mapManager.pathsBySpawnPoint[sp][spPath];
         //print("path gen");
-        e.pathing = pathing;
+        e.SetPathing(sp,spPath);
+        //e.pathing = pathing;
         //GameObject enemyUI = Instantiate(statusIndicatorPrefab);
         //enemyUI.transform.GetComponent<StatusIndicator>().target = enemy;
         enemy.transform.SetParent(enemiesContainer.transform);
@@ -2732,7 +2731,7 @@ public class GameManager : MonoBehaviour {
 
     }
 
-    // Spawn enemy onto same path as another object
+    // Spawn enemy[enemyID] onto same pathing as another object starting at curTarget at location
     public void SpawnEnemy(int enemyID, int curTarget, List<GameObject> pathing, Vector3 location)
     {
         print("SPAWNED MINION");
@@ -2746,7 +2745,7 @@ public class GameManager : MonoBehaviour {
         enemiesSpawned++;
     }
 
-    // Spawn enemy with same target
+    // Spawn enemy[enemyID] with same target spawned at location
     public void SpawnEnemy(int enemyID, GameObject target, Vector3 location)
     {
         print("SPAWNED MINION");

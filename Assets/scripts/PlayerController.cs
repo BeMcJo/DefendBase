@@ -115,6 +115,8 @@ public class PlayerController : MonoBehaviour {
         }
         PlayerMobileInput();
         PlayerPCInput();
+        
+        /* TAP REWARD BUBBLE TO OBTAIN
         if(Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Began)
         {
             Ray raycast = playerCam.ScreenPointToRay(Input.GetTouch(0).position);
@@ -125,6 +127,7 @@ public class PlayerController : MonoBehaviour {
                     raycastHit.collider.GetComponent<Floater>().OnHit();
             }
         }
+        */
     }
 
     // Calculates the status of player based on the buffType that changed
