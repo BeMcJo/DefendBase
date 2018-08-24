@@ -310,20 +310,20 @@ public class Achievement {
             ),
         // unlock fire arrow
         new Achievement(
-                "Eliminate 2,500 enemies using " + Projectile.projectileStats[1].name,
+                "Eliminate 1500 enemies using " + Projectile.projectileStats[1].name,
                 "",
                 true,
                 new Condition[] {
-                    new Condition(2500,5,"attribute",10)
+                    new Condition(1500,5,"attribute",10)
                 }
             ),
         // unlock sniper bow
         new Achievement(
-                "Hit 7,500 enemy weak spots",
+                "Hit 3500 enemy weak spots",
                 "",
                 true,
                 new Condition[] {
-                    new Condition(7500,2,"weapon")
+                    new Condition(3500,2,"weapon")
                 }
             ),
         
@@ -339,11 +339,11 @@ public class Achievement {
         
         // unlock ice arrow
         new Achievement(
-                "Eliminate 1,500 " + Enemy.names[2] +"s",
+                "Eliminate 800 " + Enemy.names[2] +"s",
                 "",
                 true,
                 new Condition[] {
-                    new Condition(1500,4,"attribute", 20)
+                    new Condition(800,4,"attribute", 20)
                 }
             ),
 
